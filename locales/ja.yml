@@ -260,6 +260,9 @@ sidebar.unknown_project: 不明なプロジェクト
 sidebar.close: サイドバーを閉じる
 sidebar.hide: サイドバーを隠す
 sidebar.open: サイドバーを開く
+sidebar.toggle: サイドバーの表示を切り替える
+sidebar.back: 戻る
+sidebar.forward: 進む
 sidebar.tasks: タスク
 sidebar.add_project: リモートプロジェクトを追加
 sidebar.resize: サイドバーの幅を変更

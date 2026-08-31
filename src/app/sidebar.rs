@@ -479,6 +479,11 @@ impl Orbis {
 
     fn render_sidebar_toggle(&self, cx: &mut Context<Self>) -> Stateful<Div> {
         let theme = Theme::current(cx);
+        let label = if self.sidebar_visible {
+            tr!("sidebar.close")
+        } else {
+            tr!("sidebar.open")
+        };
         div()
             .id("toggle-sidebar")
             .w(px(26.0))
@@ -492,7 +497,7 @@ impl Orbis {
             .hover(|element| element.bg(theme.overlay))
             .active(|element| element.bg(theme.overlay_strong))
             .tooltip(Tooltip::with_shortcut(
-                tr!("sidebar.toggle"),
+                label,
                 crate::platform::primary_shortcut("⌘B", "Ctrl+B"),
             ))
             .child(icon("icons/panel-left.svg", 14.0, theme.text_tertiary))
@@ -514,6 +519,16 @@ impl Orbis {
         cx: &mut Context<Self>,
     ) -> Stateful<Div> {
         let theme = Theme::current(cx);
+        let shortcut = if navigate_back {
+            crate::platform::primary_shortcut("⌘[", "Ctrl+[")
+        } else {
+            crate::platform::primary_shortcut("⌘]", "Ctrl+]")
+        };
+        let label = if navigate_back {
+            tr!("sidebar.back")
+        } else {
+            tr!("sidebar.forward")
+        };
         div()
             .id(id)
             .w(px(26.0))
@@ -523,24 +538,14 @@ impl Orbis {
             .flex()
             .items_center()
             .justify_center()
+            .tooltip(Tooltip::with_shortcut(label, shortcut))
             .when(enabled, |el| el.cursor_pointer())
             .when(!enabled, |el| el.cursor_default())
             .when(!enabled, |element| element.opacity(0.35))
             .when(enabled, |element| {
-                let shortcut = if navigate_back {
-                    crate::platform::primary_shortcut("⌘[", "Ctrl+[")
-                } else {
-                    crate::platform::primary_shortcut("⌘]", "Ctrl+]")
-                };
-                let label = if navigate_back {
-                    tr!("sidebar.back")
-                } else {
-                    tr!("sidebar.forward")
-                };
                 element
                     .hover(|element| element.bg(theme.overlay))
                     .active(|element| element.bg(theme.overlay_strong))
-                    .tooltip(Tooltip::with_shortcut(label, shortcut))
                     .on_mouse_down(MouseButton::Left, |_, _, cx| {
                         cx.stop_propagation();
                     })
