@@ -1126,7 +1126,7 @@ fn render_menu_item(
             let hover_handle = handle.clone();
             let click_handle = handle.clone();
             row(index, highlighted, theme, handle, None)
-                .cursor_default()
+                .cursor_pointer()
                 .hover(move |element| element.bg(hover))
                 .text_color(theme.text_secondary)
                 .on_hover(move |hovered, window, _| {
@@ -1231,7 +1231,7 @@ fn row(
         .when(highlighted, |element| element.bg(highlight))
         .when_some(on_click, |element, on_click| {
             element
-                .cursor_default()
+                .cursor_pointer()
                 .hover(move |element| element.bg(hover))
                 .on_mouse_down(MouseButton::Left, move |_, window, cx| {
                     handle.close(window, cx);

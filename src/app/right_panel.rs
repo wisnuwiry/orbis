@@ -2128,7 +2128,7 @@ impl Orbis {
             .flex()
             .items_center()
             .justify_center()
-            .cursor_default()
+            .cursor_pointer()
             .hover(|element| element.bg(theme.overlay))
             .active(|element| element.bg(theme.overlay_strong))
             .child(icon("icons/panel-right.svg", 14.0, theme.text_tertiary))
@@ -2405,7 +2405,7 @@ impl Orbis {
                     .flex()
                     .items_center()
                     .gap(px(6.0))
-                    .cursor_default()
+                    .cursor_pointer()
                     .on_mouse_down(MouseButton::Left, |_, _, cx| {
                         cx.stop_propagation();
                     })
@@ -2666,7 +2666,7 @@ impl Orbis {
             .flex()
             .flex_col()
             .items_start()
-            .cursor_default()
+            .cursor_pointer()
             .hover(|element| element.bg(theme.raised).border_color(theme.text_ghost))
             .active(|element| element.bg(theme.overlay_strong))
             .child(icon(icon_path, 18.0, theme.text_secondary))
@@ -2743,7 +2743,7 @@ impl Orbis {
                 .flex()
                 .items_center()
                 .gap(px(6.0))
-                .cursor_default()
+                .cursor_pointer()
                 .when(selected, |element| element.bg(theme.overlay_strong))
                 .hover(|element| element.bg(theme.overlay))
                 .child(if is_dir {
@@ -2880,7 +2880,7 @@ impl Orbis {
                 .flex()
                 .items_center()
                 .justify_center()
-                .cursor_default()
+                .cursor_pointer()
                 .focus_visible(|style| style.border_1().border_color(theme.accent))
                 .hover(|style| style.bg(theme.overlay))
                 .child(icon(icon_path, 12.0, theme.text_tertiary))
@@ -3620,7 +3620,7 @@ impl Orbis {
             .flex()
             .items_center()
             .justify_center()
-            .cursor_default()
+            .cursor_pointer()
             .focus_visible(|style| style.border_1().border_color(theme.accent))
             .hover(|style| style.bg(theme.overlay))
             .child(refresh_icon)
@@ -3815,7 +3815,7 @@ impl Orbis {
                     .when(expandable, |label| {
                         label
                             .tab_index(0)
-                            .cursor_default()
+                            .cursor_pointer()
                             .focus_visible(|style| style.border_1().border_color(theme.accent))
                             .hover(|style| {
                                 style
@@ -3970,7 +3970,7 @@ impl Orbis {
             .flex()
             .items_center()
             .justify_center()
-            .cursor_default()
+            .cursor_pointer()
             .when(compact_half, |button| button.h(px(16.0)).flex_none())
             .when(border_bottom, |button| {
                 button.border_b_1().border_color(theme.border)
@@ -4137,7 +4137,7 @@ impl Orbis {
                         .flex()
                         .items_center()
                         .gap(px(6.0))
-                        .cursor_default()
+                        .cursor_pointer()
                         .when(cursor, |row| row.bg(theme.overlay_strong))
                         .when(!cursor, |row| row.hover(|row| row.bg(theme.overlay)))
                         .child(icon(
@@ -4202,7 +4202,7 @@ impl Orbis {
                             .flex()
                             .items_center()
                             .gap(px(6.0))
-                            .cursor_default()
+                            .cursor_pointer()
                             .when(selected && cursor, |row| row.bg(theme.overlay_strong))
                             .when(selected ^ cursor, |row| row.bg(theme.overlay))
                             .when(!selected && !cursor, |row| {

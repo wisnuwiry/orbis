@@ -1794,7 +1794,7 @@ impl Orbis {
                                 .flex()
                                 .items_center()
                                 .gap(px(7.0))
-                                .cursor_default()
+                                .cursor_pointer()
                                 .hover(|button| button.bg(theme.overlay))
                                 .active(|button| button.opacity(0.82))
                                 .child(icon(
@@ -1881,7 +1881,7 @@ impl Orbis {
                         .flex()
                         .items_center()
                         .gap(px(10.0))
-                        .cursor_default()
+                        .cursor_pointer()
                         .when(highlighted, |row| row.bg(theme.overlay_strong))
                         .hover(|row| row.bg(theme.overlay))
                         .active(|row| row.opacity(0.82))

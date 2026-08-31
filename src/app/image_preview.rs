@@ -179,7 +179,7 @@ impl Orbis {
             .flex()
             .items_center()
             .justify_center()
-            .cursor_default()
+            .cursor_pointer()
             .bg(gpui::hsla(0.0, 0.0, 0.0, 0.48))
             .focus_visible(|style| style.border_1().border_color(theme.accent))
             .hover(|style| style.bg(gpui::hsla(0.0, 0.0, 0.0, 0.66)))

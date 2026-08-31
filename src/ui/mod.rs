@@ -43,7 +43,7 @@ pub fn icon_button(id: impl Into<ElementId>, path: &'static str, theme: Theme) -
         .flex()
         .items_center()
         .justify_center()
-        .cursor_default()
+        .cursor_pointer()
         .hover(|element| element.bg(theme.overlay))
         .active(|element| element.bg(theme.overlay_strong))
         .child(icon(path, 13.0, theme.text_tertiary))
@@ -133,7 +133,7 @@ where
         .p(px(2.0))
         .flex_none()
         .rounded_full()
-        .cursor_default()
+        .cursor_pointer()
         .when(disabled, |element| element.opacity(0.55))
         .bg(if on { theme.inverse } else { theme.inset })
         .border_1()
@@ -344,7 +344,7 @@ impl RenderOnce for MenuChip {
             .gap(px(6.0))
             .text_size(sp(13.0))
             .line_height(sp(16.0))
-            .cursor_default()
+            .cursor_pointer()
             .focus_visible(|style| style.border_1().border_color(theme.accent))
             .when(self.outlined, |element| {
                 element
@@ -428,7 +428,7 @@ impl RenderOnce for ProjectNameSelector {
         self.base
             .relative()
             .flex_none()
-            .cursor_default()
+            .cursor_pointer()
             .focus_visible(|style| style.border_1().border_color(theme.accent))
             .child(self.label)
             .child(

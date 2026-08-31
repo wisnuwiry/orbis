@@ -499,7 +499,7 @@ impl Orbis {
             .flex()
             .items_center()
             .gap(px(8.0))
-            .cursor_default()
+            .cursor_pointer()
             .when(highlighted, |element| element.bg(theme.overlay_strong))
             .hover(|element| element.bg(theme.overlay))
             .on_mouse_down(

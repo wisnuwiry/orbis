@@ -274,7 +274,7 @@ impl Orbis {
                         .flex()
                         .items_center()
                         .justify_center()
-                        .cursor_default()
+                        .cursor_pointer()
                         .focus_visible(|style| style.border_color(theme.accent))
                         .hover(|style| style.bg(theme.raised))
                         .active(|style| style.bg(theme.overlay_strong))
@@ -709,7 +709,7 @@ impl ConversationNavigationRail {
             .flex_none()
             .flex()
             .items_center()
-            .cursor_default()
+            .cursor_pointer()
             .on_hover(cx.listener(move |this, hovering: &bool, _, cx| {
                 if *hovering {
                     this.hovered_turn = Some(message_id);
@@ -915,7 +915,7 @@ impl Orbis {
             .flex()
             .items_center()
             .justify_center()
-            .cursor_default()
+            .cursor_pointer()
             .focus_visible(|button| button.bg(theme.overlay_strong))
             .hover(|button| button.bg(theme.overlay_strong))
             .child(icon(
@@ -1527,7 +1527,7 @@ impl Orbis {
             .flex()
             .items_center()
             .gap(px(5.0))
-            .cursor_default()
+            .cursor_pointer()
             .text_size(sp(12.5))
             .font_weight(FontWeight::MEDIUM)
             .text_color(theme.text_secondary)
@@ -1691,7 +1691,7 @@ impl Orbis {
                     .flex()
                     .items_center()
                     .gap(px(6.0))
-                    .cursor_default()
+                    .cursor_pointer()
                     .text_size(sp(12.5))
                     .font_weight(FontWeight::MEDIUM)
                     .text_color(theme.text_secondary)
@@ -1767,7 +1767,7 @@ impl Orbis {
                     .flex()
                     .items_center()
                     .gap(px(5.0))
-                    .cursor_default()
+                    .cursor_pointer()
                     .text_size(sp(13.5))
                     .line_height(sp(18.0))
                     .font_weight(FontWeight::MEDIUM)
@@ -1915,7 +1915,7 @@ impl Orbis {
                     .gap(px(6.0))
                     .text_size(sp(12.5))
                     .line_height(sp(16.0))
-                    .cursor_default()
+                    .cursor_pointer()
                     .focus_visible(|style| style.text_color(theme.text))
                     .hover(|style| style.text_color(theme.text))
                     .child(
@@ -1989,7 +1989,7 @@ impl Orbis {
                     .flex_none()
                     .flex()
                     .items_center()
-                    .cursor_default()
+                    .cursor_pointer()
                     .text_size(sp(12.5))
                     .text_color(color)
                     .focus_visible(|style| style.border_color(theme.accent))
@@ -2082,7 +2082,7 @@ impl Orbis {
                             element
                                 .track_focus(&item_focus)
                                 .tab_index(0)
-                                .cursor_default()
+                                .cursor_pointer()
                                 .focus_visible(|element| element.bg(activity_hover_surface))
                                 .hover(|element| element.bg(activity_hover_surface))
                                 .active(|element| element.bg(activity_active_surface))
@@ -2333,7 +2333,7 @@ impl Orbis {
                                             .flex()
                                             .items_center()
                                             .justify_center()
-                                            .cursor_default()
+                                            .cursor_pointer()
                                             .hover(|button| button.bg(theme.overlay_strong))
                                             .child(icon(
                                                 if copied {

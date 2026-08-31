@@ -52,7 +52,7 @@ impl Orbis {
                     .rounded(px(7.0))
                     .flex()
                     .items_center()
-                    .cursor_default()
+                    .cursor_pointer()
                     .text_size(sp(12.5))
                     .font_weight(FontWeight::SEMIBOLD)
                     .when(allow, |element| {
@@ -175,7 +175,7 @@ impl Orbis {
                     .flex()
                     .items_center()
                     .gap(px(8.0))
-                    .cursor_default()
+                    .cursor_pointer()
                     .focus_visible(|style| style.border_color(theme.accent))
                     .when(!is_selected, |row| {
                         row.hover(|style| style.border_color(theme.border).bg(theme.overlay_strong))
@@ -238,7 +238,7 @@ impl Orbis {
                 .rounded(px(6.0))
                 .flex()
                 .items_center()
-                .cursor_default()
+                .cursor_pointer()
                 .text_size(sp(12.5))
                 .font_weight(FontWeight::MEDIUM)
                 .text_color(theme.text_tertiary)
@@ -266,7 +266,8 @@ impl Orbis {
             .rounded(px(6.0))
             .flex()
             .items_center()
-            .cursor_default()
+            .when(can_continue, |el| el.cursor_pointer())
+            .when(!can_continue, |el| el.cursor_default())
             .text_size(sp(12.5))
             .font_weight(FontWeight::SEMIBOLD)
             .bg(if can_continue {
@@ -433,7 +434,7 @@ impl Orbis {
                     .rounded(px(7.0))
                     .flex()
                     .items_center()
-                    .cursor_default()
+                    .cursor_pointer()
                     .text_size(sp(12.5))
                     .font_weight(FontWeight::SEMIBOLD)
                     .when(primary, |element| {
@@ -661,7 +662,7 @@ impl Orbis {
                                             .border_color(theme.border_strong)
                                             .flex()
                                             .items_center()
-                                            .cursor_default()
+                                            .cursor_pointer()
                                             .text_size(sp(12.5))
                                             .font_weight(FontWeight::MEDIUM)
                                             .text_color(if active {
@@ -987,7 +988,7 @@ impl Orbis {
                             .flex()
                             .items_center()
                             .justify_center()
-                            .cursor_default()
+                            .cursor_pointer()
                             .when(favorites_selected, |element| {
                                 element.bg(theme.overlay_strong)
                             })
@@ -1040,7 +1041,8 @@ impl Orbis {
                             .flex()
                             .items_center()
                             .justify_center()
-                            .cursor_default()
+                            .when(usable, |el| el.cursor_pointer())
+                            .when(!usable, |el| el.cursor_default())
                             .when(selected, |element| element.bg(theme.overlay_strong))
                             .when(!usable, |element| element.opacity(0.35))
                             .when(usable, |element| {
@@ -1058,11 +1060,13 @@ impl Orbis {
                             .child(icon(
                                 provider_icon(kind),
                                 18.0,
-                                provider_color(&theme, kind).opacity(if selected {
-                                    1.0
+                                if selected {
+                                    theme.text
+                                } else if usable {
+                                    theme.text_secondary
                                 } else {
-                                    0.82
-                                }),
+                                    theme.text_tertiary
+                                },
                             )),
                     );
                 }
@@ -1148,7 +1152,7 @@ impl Orbis {
                             .flex()
                             .items_center()
                             .gap(px(10.0))
-                            .cursor_default()
+                            .cursor_pointer()
                             // Reserved on every row so highlighting one cannot
                             // resize it and shift the list by a pixel.
                             .border_1()
@@ -1833,7 +1837,8 @@ impl Orbis {
             .flex()
             .items_center()
             .gap(px(6.0))
-            .cursor_default()
+            .when(interactive, |el| el.cursor_pointer())
+            .when(!interactive, |el| el.cursor_default())
             .text_size(sp(12.5))
             .line_height(sp(14.0))
             .text_color(if mode == InteractionMode::Plan {
@@ -1901,7 +1906,7 @@ impl Orbis {
                 .flex()
                 .items_center()
                 .gap(px(6.0))
-                .cursor_default()
+                .cursor_pointer()
                 .text_size(sp(12.5))
                 .line_height(sp(14.0))
                 .text_color(color)
@@ -2377,7 +2382,7 @@ impl Orbis {
                                 "composer-attachment-{index}-preview"
                             )))
                             .size_full()
-                            .cursor_default()
+                            .cursor_pointer()
                             .on_click(cx.listener(move |this, _, window, cx| {
                                 this.open_image_preview(
                                     preview_image.clone(),
@@ -2458,7 +2463,7 @@ impl Orbis {
                     .flex()
                     .items_center()
                     .justify_center()
-                    .cursor_default()
+                    .cursor_pointer()
                     .bg(theme.canvas.opacity(0.8))
                     .focus_visible(|style| style.border_1().border_color(theme.accent))
                     .hover(|element| element.bg(theme.canvas.opacity(0.95)))
@@ -2530,7 +2535,7 @@ impl Orbis {
                     .flex()
                     .items_center()
                     .gap(px(5.0))
-                    .cursor_default()
+                    .cursor_pointer()
                     .tab_index(0)
                     .focus_visible(|style| style.border_1().border_color(theme.accent))
                     .hover(|element| element.bg(theme.overlay_strong))
@@ -2569,7 +2574,7 @@ impl Orbis {
                     .flex()
                     .items_center()
                     .justify_center()
-                    .cursor_default()
+                    .cursor_pointer()
                     .focus_visible(|style| style.border_1().border_color(theme.accent))
                     .when(menu_open, |element| element.bg(theme.overlay_strong))
                     .hover(|element| element.bg(theme.overlay_strong))
@@ -2606,7 +2611,7 @@ impl Orbis {
                     .flex()
                     .items_center()
                     .gap(px(9.0))
-                    .cursor_default()
+                    .cursor_pointer()
                     .tab_index(0)
                     .focus_visible(|style| style.border_1().border_color(theme.accent))
                     .hover(|element| element.bg(theme.overlay))
@@ -2638,7 +2643,7 @@ impl Orbis {
                                     .flex()
                                     .items_center()
                                     .justify_center()
-                                    .cursor_default()
+                                    .cursor_pointer()
                                     .tab_index(0)
                                     .focus_visible(|style| {
                                         style.border_1().border_color(theme.accent)
@@ -2836,7 +2841,7 @@ impl Orbis {
                                         .flex()
                                         .items_center()
                                         .justify_center()
-                                        .cursor_default()
+                                        .cursor_pointer()
                                         .bg(theme.overlay_strong)
                                         .hover(|element| element.bg(theme.danger_soft))
                                         .active(|element| element.opacity(0.8))
@@ -2866,7 +2871,7 @@ impl Orbis {
                                             .flex()
                                             .items_center()
                                             .justify_center()
-                                            .cursor_default()
+                                            .cursor_pointer()
                                             .bg(theme.inverse)
                                             .hover(|element| element.opacity(0.9))
                                             .active(|element| element.opacity(0.8))
@@ -2904,7 +2909,7 @@ impl Orbis {
                                 })
                                 .when(can_send, |element| {
                                     element
-                                        .cursor_default()
+                                        .cursor_pointer()
                                         .hover(|element| element.opacity(0.9))
                                         .active(|element| element.opacity(0.8))
                                 })
@@ -3161,7 +3166,8 @@ impl Orbis {
                                         .flex()
                                         .items_center()
                                         .gap(px(8.0))
-                                        .cursor_default()
+                                        .when(!disabled, |el| el.cursor_pointer())
+                                        .when(disabled, |el| el.cursor_default())
                                         .when(highlighted, |element| {
                                             element.bg(theme.overlay_strong)
                                         })
@@ -3227,7 +3233,7 @@ impl Orbis {
                             .flex()
                             .items_center()
                             .gap(px(8.0))
-                            .cursor_default()
+                            .cursor_pointer()
                             .when(
                                 highlight.and_then(|index| actions.get(index))
                                     == Some(&BranchPickerAction::Create),
@@ -3853,7 +3859,7 @@ fn model_picker_empty_state(
                 .flex()
                 .items_center()
                 .gap(px(6.0))
-                .cursor_default()
+                .cursor_pointer()
                 .text_size(sp(12.5))
                 .text_color(theme.text_secondary)
                 .hover(|element| element.bg(theme.overlay))

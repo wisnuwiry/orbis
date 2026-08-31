@@ -1556,7 +1556,7 @@ fn render_code_block(language: Option<&str>, code: &str, ctx: &Ctx) -> AnyElemen
         .flex()
         .items_center()
         .justify_center()
-        .cursor_default()
+        .cursor_pointer()
         .focus_visible(|style| style.border_1().border_color(ctx.palette.accent))
         .hover(|style| style.bg(ctx.palette.overlay))
         .child(crate::ui::icon(

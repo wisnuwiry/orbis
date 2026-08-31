@@ -232,7 +232,7 @@ pub(super) fn render_message_footer(
         .flex()
         .items_center()
         .justify_center()
-        .cursor_default()
+        .cursor_pointer()
         .hover(|element| element.bg(theme.overlay_strong))
         .child(icon(
             if copied {
@@ -287,7 +287,8 @@ pub(super) fn render_message_footer(
                 .flex()
                 .items_center()
                 .justify_center()
-                .cursor_default()
+                .when(action.enabled, |el| el.cursor_pointer())
+                .when(!action.enabled, |el| el.cursor_default())
                 .when(!action.enabled && !action.preparing, |element| {
                     element.opacity(0.45)
                 })
@@ -329,7 +330,7 @@ pub(super) fn render_message_footer(
                 .flex()
                 .items_center()
                 .justify_center()
-                .cursor_default()
+                .cursor_pointer()
                 .hover(|element| element.bg(theme.overlay_strong))
                 .child(icon("icons/rewind.svg", 14.0, footer_color))
                 .tooltip(Tooltip::text(tr_cow!("session.revert_to_here")))
@@ -428,7 +429,7 @@ fn render_sent_message_attachments(
                             "message-{message_id}-attachment-{index}-preview"
                         )))
                         .size_full()
-                        .cursor_default()
+                        .cursor_pointer()
                         .on_click(move |_, window, cx| {
                             let _ = preview_orbis.update(cx, |this, cx| {
                                 this.open_image_preview(
@@ -627,7 +628,7 @@ pub(super) fn render_message(params: MessageRender, cx: &mut App) -> AnyElement 
                                         .items_center()
                                         .text_size(sp(12.5))
                                         .text_color(theme.text_secondary)
-                                        .cursor_default()
+                                        .cursor_pointer()
                                         .hover(|element| element.bg(theme.overlay_strong))
                                         .child(tr_cow!("common.cancel"))
                                         .on_click(move |_, window, cx| {
@@ -660,9 +661,10 @@ pub(super) fn render_message(params: MessageRender, cx: &mut App) -> AnyElement 
                                         })
                                         .when(can_submit, |element| {
                                             element
-                                                .cursor_default()
+                                                .cursor_pointer()
                                                 .hover(|element| element.opacity(0.9))
                                         })
+                                        .when(!can_submit, |element| element.cursor_default())
                                         .child(tr_cow!("common.send"))
                                         .on_click(move |_, _, cx| {
                                             if can_submit {

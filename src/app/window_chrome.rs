@@ -243,7 +243,8 @@ fn client_window_button(
         .flex()
         .items_center()
         .justify_center()
-        .cursor_default()
+        .when(enabled, |el| el.cursor_pointer())
+        .when(!enabled, |el| el.cursor_default())
         .opacity(if enabled { 1.0 } else { 0.45 })
         .focus_visible(|style| style.border_1().border_color(theme.accent))
         .when(enabled, |control| {
