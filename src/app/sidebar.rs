@@ -206,8 +206,11 @@ fn updater_button_available_content(
 /// virtualized sidebar list. Keep the gap inside the list row so measured and
 /// estimated heights stay identical for off-screen sessions.
 const SIDEBAR_SESSION_CARD_HEIGHT: f32 = 51.0;
+const SIDEBAR_PROJECT_SESSION_CARD_HEIGHT: f32 = 34.0;
 const SIDEBAR_SESSION_ROW_GAP: f32 = 1.0;
 const SIDEBAR_SESSION_ROW_HEIGHT: f32 = SIDEBAR_SESSION_CARD_HEIGHT + SIDEBAR_SESSION_ROW_GAP;
+const SIDEBAR_PROJECT_SESSION_ROW_HEIGHT: f32 =
+    SIDEBAR_PROJECT_SESSION_CARD_HEIGHT + SIDEBAR_SESSION_ROW_GAP;
 const SIDEBAR_ACTION_ROW_HEIGHT: f32 = 32.0;
 const SIDEBAR_SEARCH_BOTTOM_GAP: f32 = 10.0;
 const SIDEBAR_GROUP_HEADER_HEIGHT: f32 = 28.0;
@@ -308,6 +311,7 @@ fn sidebar_project_is_projectless(project: &Project, projectless_root: Option<&P
     projectless_root.is_some_and(|root| project.path.starts_with(root))
 }
 
+#[allow(dead_code)]
 fn persisted_sidebar_branch_label(workspace: &SessionWorkspace) -> Option<&str> {
     match workspace {
         SessionWorkspace::Local => None,
@@ -349,13 +353,19 @@ fn sidebar_session_row_index(rows: &[SidebarRow], session_id: Uuid) -> Option<us
         .position(|row| *row == SidebarRow::Session(session_id))
 }
 
-fn sidebar_row_height(row: SidebarRow) -> Pixels {
+fn sidebar_row_height(row: SidebarRow, grouping: SidebarGrouping) -> Pixels {
     px(match row {
         SidebarRow::Search => SIDEBAR_ACTION_ROW_HEIGHT + SIDEBAR_SEARCH_BOTTOM_GAP,
         SidebarRow::Header(_) => {
             SIDEBAR_GROUP_HEADER_HEIGHT + SIDEBAR_GROUP_HEADER_BOTTOM_GAP
         }
-        SidebarRow::Session(_) => SIDEBAR_SESSION_ROW_HEIGHT,
+        SidebarRow::Session(_) => {
+            if grouping == SidebarGrouping::Project {
+                SIDEBAR_PROJECT_SESSION_ROW_HEIGHT
+            } else {
+                SIDEBAR_SESSION_ROW_HEIGHT
+            }
+        }
         SidebarRow::ShowMore(_) => SIDEBAR_SHOW_MORE_ROW_HEIGHT,
         SidebarRow::GroupSpacer => SIDEBAR_GROUP_SPACER_HEIGHT,
     })
@@ -365,12 +375,13 @@ fn sidebar_bottom_aligned_offset(
     rows: &[SidebarRow],
     target: usize,
     viewport_height: Pixels,
+    grouping: SidebarGrouping,
 ) -> ListOffset {
     let mut item_ix = target;
-    let mut height = sidebar_row_height(rows[target]);
+    let mut height = sidebar_row_height(rows[target], grouping);
     while item_ix > 0 && height < viewport_height {
         item_ix -= 1;
-        height += sidebar_row_height(rows[item_ix]);
+        height += sidebar_row_height(rows[item_ix], grouping);
     }
     ListOffset {
         item_ix,
@@ -378,7 +389,12 @@ fn sidebar_bottom_aligned_offset(
     }
 }
 
-fn reveal_sidebar_list_row(list: &ListState, rows: &[SidebarRow], index: usize) {
+fn reveal_sidebar_list_row(
+    list: &ListState,
+    rows: &[SidebarRow],
+    index: usize,
+    grouping: SidebarGrouping,
+) {
     let viewport = list.viewport_bounds();
     if viewport.size.height <= Pixels::ZERO {
         return;
@@ -401,6 +417,7 @@ fn reveal_sidebar_list_row(list: &ListState, rows: &[SidebarRow], index: usize) 
             rows,
             index,
             viewport.size.height,
+            grouping,
         ));
     }
 }
@@ -1264,7 +1281,12 @@ impl Orbis {
         let rows = self.sidebar_rows_cached(Local::now().date_naive(), unix_time());
         self.sync_sidebar_rows(&rows);
         if let Some(index) = sidebar_session_row_index(&rows, session_id) {
-            reveal_sidebar_list_row(&self.sidebar_list_state, &rows, index);
+            reveal_sidebar_list_row(
+                &self.sidebar_list_state,
+                &rows,
+                index,
+                self.state.sidebar_grouping,
+            );
         }
     }
 
@@ -1550,65 +1572,6 @@ impl Orbis {
                 .invisible()
                 .group_hover(group_name.clone(), |icon| icon.visible())
         });
-        let compose = show_folder_icon.then(|| {
-            let compose_focus = self
-                .sidebar_group_compose_focuses
-                .borrow_mut()
-                .entry(group)
-                .or_insert_with(|| cx.focus_handle())
-                .clone();
-            div()
-                .w(px(20.0))
-                .h(px(22.0))
-                .flex_none()
-                .flex()
-                .items_center()
-                .justify_end()
-                .child(
-                    div()
-                        .id(SharedString::from(format!(
-                            "sidebar-group-compose-{group_key}"
-                        )))
-                        .track_focus(&compose_focus)
-                        .tab_index(0)
-                        .tab_stop(true)
-                        .w_0()
-                        .h(px(22.0))
-                        .overflow_hidden()
-                        .rounded(px(4.0))
-                        .flex()
-                        .items_center()
-                        .justify_center()
-                        .cursor_pointer()
-                        .opacity(0.0)
-                        .group_hover(group_name.clone(), |style| style.w(px(20.0)).opacity(1.0))
-                        .focus_visible(|style| {
-                            style
-                                .w(px(20.0))
-                                .opacity(1.0)
-                                .border_1()
-                                .border_color(theme.accent)
-                        })
-                        .hover(|style| style.bg(theme.overlay))
-                        .active(|style| style.bg(theme.overlay_strong))
-                        .tooltip(Tooltip::with_shortcut(
-                            tr!("menu.new_task"),
-                            crate::platform::primary_shortcut("⌘N", "Ctrl+N"),
-                        ))
-                        .child(icon("icons/compose.svg", 14.0, theme.text_secondary))
-                        .on_mouse_down(MouseButton::Left, |_, _, cx| cx.stop_propagation())
-                        .on_click(cx.listener(move |this, _, window, cx| {
-                            cx.stop_propagation();
-                            this.open_new_task_for_sidebar_group(group, window, cx);
-                        }))
-                        .on_key_down(cx.listener(move |this, event: &KeyDownEvent, window, cx| {
-                            if matches!(event.keystroke.key.as_str(), "enter" | "space") {
-                                this.open_new_task_for_sidebar_group(group, window, cx);
-                                cx.stop_propagation();
-                            }
-                        })),
-                )
-        });
 
         let header = session_group_header(&theme)
             .id(SharedString::from(format!(
@@ -1648,7 +1611,6 @@ impl Orbis {
                     )
                     .child(div().flex_1()),
             )
-            .when_some(compose, |element, compose| element.child(compose))
             .when(first, |element| {
                 element.child(self.render_sidebar_header_actions(cx))
             })
@@ -1691,22 +1653,6 @@ impl Orbis {
             .w_full()
             .pb(px(SIDEBAR_GROUP_HEADER_BOTTOM_GAP))
             .child(header)
-    }
-
-    fn open_new_task_for_sidebar_group(
-        &mut self,
-        group: SidebarGroup,
-        window: &mut Window,
-        cx: &mut Context<Self>,
-    ) {
-        self.settings_page = None;
-        match group {
-            SidebarGroup::Project(project_id) => self.select_project(project_id, cx),
-            SidebarGroup::Projectless => self.create_projectless_session(cx),
-            SidebarGroup::Updated(_) => return,
-        }
-        let focus = self.composer_focus(cx);
-        window.focus(&focus, cx);
     }
 
     fn render_sidebar_show_more(
@@ -1947,33 +1893,13 @@ impl Orbis {
         } else {
             8.0
         };
-        let detail_label = if grouped_by_project {
-            persisted_sidebar_branch_label(&session.workspace)
-                .map(|branch| SharedString::from(branch.to_owned()))
-                .or_else(|| {
-                    if !matches!(&session.workspace, SessionWorkspace::Local) {
-                        return None;
-                    }
-                    project.and_then(|project| {
-                        self.sidebar_branch_labels
-                            .borrow()
-                            .get(&project.path)
-                            .cloned()
-                    })
-                })
+        let row_height = if grouped_by_project {
+            SIDEBAR_PROJECT_SESSION_CARD_HEIGHT
         } else {
-            Some(SharedString::from(
-                project
-                    .map(Project::display_name)
-                    .unwrap_or_else(|| tr!("sidebar.unknown_project")),
-            ))
+            SIDEBAR_SESSION_CARD_HEIGHT
         };
-        let has_detail_label = detail_label.is_some();
-        let detail_icon = if grouped_by_project {
-            "icons/git-branch.svg"
-        } else {
-            "icons/folder.svg"
-        };
+        let row_py = if grouped_by_project { 4.0 } else { 7.0 };
+
         let rename_input =
             (self.session_rename == Some(session_id)).then(|| self.session_rename_input.clone());
         let renaming = rename_input.is_some();
@@ -2007,85 +1933,130 @@ impl Orbis {
                 .whitespace_normal()
                 .line_clamp(1)
                 .text_overflow(gpui::TextOverflow::Truncate("...".into()))
-                .text_size(sp(13.5))
-                .text_color(theme.text)
+                .text_size(sp(if grouped_by_project { 13.0 } else { 13.5 }))
+                .text_color(if grouped_by_project && !selected {
+                    theme.text_secondary
+                } else {
+                    theme.text
+                })
                 .child(SharedString::from(localized_session_title(session)))
                 .into_any_element()
         };
-        let orbis = cx.entity().downgrade();
-        let menu = self.menu_handle(format!("session-{session_id}"), cx);
-        let row_focus = menu.trigger_focus_handle().clone();
-        let keyboard_menu = menu.clone();
-        let row = div()
-            .id(SharedString::from(format!("session-{}", session.id)))
-            .w_full()
-            .min_w_0()
-            .flex()
-            .flex_col()
-            .gap(px(4.0))
-            .pl(px(left_padding))
-            .pr(px(8.0))
-            .py(px(7.0))
-            .rounded(px(7.0))
-            .cursor_pointer()
-            .when(selected, |element| {
-                element.bg(theme.sidebar_item_background)
-            })
-            .hover(|element| element.bg(theme.sidebar_item_background))
-            .active(|element| element.bg(theme.sidebar_item_background))
-            .child(
-                div()
-                    .flex()
-                    .items_center()
-                    .gap(px(6.0))
-                    .overflow_hidden()
-                    .line_height(sp(18.0))
-                    .child(title)
-                    .when(working, |element| {
-                        element.child(motion::spin_slow(icon(
-                            "icons/loader-circle.svg",
-                            12.0,
-                            status_color(&theme, session.status),
-                        )))
-                    })
-                    .when(session.status == SessionStatus::Waiting, |element| {
-                        element.child(icon(
-                            "icons/alert.svg",
-                            12.0,
-                            status_color(&theme, session.status),
-                        ))
-                    })
-                    .when(session.status == SessionStatus::Failed, |element| {
-                        element.child(icon(
-                            "icons/x.svg",
-                            12.0,
-                            status_color(&theme, session.status),
-                        ))
-                    }),
-            )
-            .child(
-                div()
-                    .flex()
-                    .items_center()
-                    .gap(px(5.0))
-                    .text_size(sp(if grouped_by_project { 12.5 } else { 13.0 }))
-                    .line_height(sp(15.0))
-                    .when_some(detail_label, |element, label| {
-                        element
-                            .child(icon(detail_icon, 12.5, theme.text_tertiary))
-                            .child(
-                                div()
-                                    .flex_1()
-                                    .min_w_0()
-                                    .truncate()
-                                    .text_color(theme.text_tertiary)
-                                    .child(label),
-                            )
-                    })
-                    .when(!has_detail_label, |element| element.child(div().flex_1()))
-                    .when_some(
-                        session_time_label(session, unix_time()),
-                        |element, label| {
+
+        let time_label = session_time_label(session, unix_time()).map(SharedString::from);
+        let row_content = if grouped_by_project {
+            div()
+                .flex_1()
+                .min_w_0()
+                .flex()
+                .items_center()
+                .justify_between()
+                .gap(px(6.0))
+                .child(
+                    div()
+                        .flex_1()
+                        .min_w_0()
+                        .flex()
+                        .items_center()
+                        .gap(px(6.0))
+                        .child(title)
+                        .when(working, |element| {
+                            element.child(motion::spin_slow(icon(
+                                "icons/loader-circle.svg",
+                                12.0,
+                                status_color(&theme, session.status),
+                            )))
+                        })
+                        .when(session.status == SessionStatus::Waiting, |element| {
+                            element.child(icon(
+                                "icons/alert.svg",
+                                12.0,
+                                status_color(&theme, session.status),
+                            ))
+                        })
+                        .when(session.status == SessionStatus::Failed, |element| {
+                            element.child(icon(
+                                "icons/x.svg",
+                                12.0,
+                                status_color(&theme, session.status),
+                            ))
+                        }),
+                )
+                .when_some(time_label, |element, label| {
+                    element.child(
+                        div()
+                            .flex_none()
+                            .text_size(sp(11.5))
+                            .text_color(if session.is_busy() {
+                                theme.text_tertiary
+                            } else {
+                                theme.text_ghost
+                            })
+                            .child(label),
+                    )
+                })
+        } else {
+            let detail_label = Some(SharedString::from(
+                project
+                    .map(Project::display_name)
+                    .unwrap_or_else(|| tr!("sidebar.unknown_project")),
+            ));
+            div()
+                .flex_1()
+                .min_w_0()
+                .flex()
+                .flex_col()
+                .gap(px(4.0))
+                .child(
+                    div()
+                        .flex()
+                        .items_center()
+                        .gap(px(6.0))
+                        .overflow_hidden()
+                        .line_height(sp(18.0))
+                        .child(title)
+                        .when(working, |element| {
+                            element.child(motion::spin_slow(icon(
+                                "icons/loader-circle.svg",
+                                12.0,
+                                status_color(&theme, session.status),
+                            )))
+                        })
+                        .when(session.status == SessionStatus::Waiting, |element| {
+                            element.child(icon(
+                                "icons/alert.svg",
+                                12.0,
+                                status_color(&theme, session.status),
+                            ))
+                        })
+                        .when(session.status == SessionStatus::Failed, |element| {
+                            element.child(icon(
+                                "icons/x.svg",
+                                12.0,
+                                status_color(&theme, session.status),
+                            ))
+                        }),
+                )
+                .child(
+                    div()
+                        .flex()
+                        .items_center()
+                        .gap(px(5.0))
+                        .text_size(sp(13.0))
+                        .line_height(sp(15.0))
+                        .when_some(detail_label, |element, label| {
+                            element
+                                .child(icon("icons/folder.svg", 12.5, theme.text_tertiary))
+                                .child(
+                                    div()
+                                        .flex_1()
+                                        .min_w_0()
+                                        .truncate()
+                                        .text_color(theme.text_tertiary)
+                                        .child(label),
+                                )
+                        })
+                        .when_some(time_label, |element, label| {
                             element.child(
                                 div()
                                     .flex_none()
@@ -2095,11 +2066,34 @@ impl Orbis {
                                     } else {
                                         theme.text_ghost
                                     })
-                                    .child(SharedString::from(label)),
+                                    .child(label),
                             )
-                        },
-                    ),
-            )
+                        }),
+                )
+        };
+
+        let orbis = cx.entity().downgrade();
+        let menu = self.menu_handle(format!("session-{session_id}"), cx);
+        let row_focus = menu.trigger_focus_handle().clone();
+        let keyboard_menu = menu.clone();
+        let row = div()
+            .id(SharedString::from(format!("session-{}", session.id)))
+            .w_full()
+            .min_w_0()
+            .h(px(row_height))
+            .flex()
+            .items_center()
+            .pl(px(left_padding))
+            .pr(px(8.0))
+            .py(px(row_py))
+            .rounded(px(7.0))
+            .cursor_pointer()
+            .when(selected, |element| {
+                element.bg(theme.sidebar_item_background)
+            })
+            .hover(|element| element.bg(theme.sidebar_item_background))
+            .active(|element| element.bg(theme.sidebar_item_background))
+            .child(row_content)
             .when(!renaming, |element| {
                 element
                     .track_focus(&row_focus)
@@ -2804,7 +2798,7 @@ mod tests {
         rows.push(SidebarRow::GroupSpacer);
 
         let index = sidebar_session_row_index(&rows, target).unwrap();
-        let offset = sidebar_bottom_aligned_offset(&rows, index, px(400.0));
+        let offset = sidebar_bottom_aligned_offset(&rows, index, px(400.0), SidebarGrouping::Updated);
 
         assert_eq!(index, 32);
         assert_eq!(offset.item_ix, 25);
@@ -2812,7 +2806,7 @@ mod tests {
         let visible_height = rows[offset.item_ix..=index]
             .iter()
             .copied()
-            .map(sidebar_row_height)
+            .map(|r| sidebar_row_height(r, SidebarGrouping::Updated))
             .fold(Pixels::ZERO, |height, row| height + row)
             - offset.offset_in_item;
         assert_eq!(visible_height, px(400.0));

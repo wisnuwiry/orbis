@@ -9,6 +9,7 @@ import {
   sessionHasStarted,
   sessionTimeLabel,
   sidebarRows,
+  sortSidebarSessions,
 } from './sidebar-presentation'
 
 describe('desktop sidebar presentation', () => {
@@ -25,8 +26,14 @@ describe('desktop sidebar presentation', () => {
       { kind: 'search', key: 'search' },
       {
         kind: 'group',
-        key: 'group:today',
-        group: { id: 'today', label: 'Today', sessions: [] },
+        key: 'group:updated:today',
+        group: {
+          id: 'updated:today',
+          kind: 'updated',
+          dateGroup: 'today',
+          label: 'Today',
+          sessions: [],
+        },
         collapsed: false,
         first: true,
       },
@@ -76,6 +83,60 @@ describe('desktop sidebar presentation', () => {
       'プロジェクトなし',
     )
     expect(groups[0]?.sessions[0]?.projectName).toBe('プロジェクトなし')
+  })
+
+  test('sorts sessions by newest or oldest timestamp', () => {
+    const s1 = session({ id: 's1', created_at: 100, last_reply_at: 100, messages: [{ id: 'm1' } as never] })
+    const s2 = session({ id: 's2', created_at: 200, last_reply_at: 200, messages: [{ id: 'm2' } as never] })
+    const s3 = session({ id: 's3', created_at: 300, last_reply_at: 300, messages: [{ id: 'm3' } as never] })
+
+    const newest = sortSidebarSessions([s2, s1, s3], 'newest')
+    expect(newest.map((s) => s.id)).toEqual(['s3', 's2', 's1'])
+
+    const oldest = sortSidebarSessions([s2, s1, s3], 'oldest')
+    expect(oldest.map((s) => s.id)).toEqual(['s1', 's2', 's3'])
+  })
+
+  test('groups sessions by project and applies 7-day recent cutoff with pagination', () => {
+    const now = new Date(2026, 7, 15, 12)
+    const nowSeconds = Math.floor(now.getTime() / 1000)
+    const eightDaysAgo = nowSeconds - 8 * 86_400
+    const oneDayAgo = nowSeconds - 1 * 86_400
+
+    const p1: Project = { id: 'p1', name: 'Project Alpha', path: '/home/alpha', created_at: 1 }
+    const p2: Project = { id: 'p2', name: 'Project Beta', path: '/home/beta', created_at: 1 }
+
+    const sRecentAlpha = session({ id: 's1', project_id: 'p1', created_at: oneDayAgo, last_reply_at: oneDayAgo, messages: [{ id: 'm1' } as never] })
+    const sOlderAlpha = session({ id: 's2', project_id: 'p1', created_at: eightDaysAgo, last_reply_at: eightDaysAgo, messages: [{ id: 'm2' } as never] })
+    const sRecentBeta = session({ id: 's3', project_id: 'p2', created_at: oneDayAgo, last_reply_at: oneDayAgo, messages: [{ id: 'm3' } as never] })
+
+    // Without revealing older sessions: Alpha has 1 visible and hasMore: true
+    const groups = groupSessions([p1, p2], [sRecentAlpha, sOlderAlpha, sRecentBeta], now, 'Unknown', 'No project', 'project', 'newest', {})
+    expect(groups.length).toBe(2)
+
+    const alphaGroup = groups.find((g) => g.projectId === 'p1')!
+    expect(alphaGroup.sessions.length).toBe(1)
+    expect(alphaGroup.sessions[0]?.session.id).toBe('s1')
+    expect(alphaGroup.hasMore).toBe(true)
+
+    // With reveal count >= 1 for Alpha: both sessions visible and hasMore: false
+    const groupsRevealed = groupSessions([p1, p2], [sRecentAlpha, sOlderAlpha, sRecentBeta], now, 'Unknown', 'No project', 'project', 'newest', { 'project:p1': 5 })
+    const alphaRevealed = groupsRevealed.find((g) => g.projectId === 'p1')!
+    expect(alphaRevealed.sessions.length).toBe(2)
+    expect(alphaRevealed.hasMore).toBe(false)
+  })
+
+  test('reverses date group order in updated grouping when oldest ordering is selected', () => {
+    const now = new Date(2026, 7, 15, 12)
+    const nowSeconds = Math.floor(now.getTime() / 1000)
+    const today = session({ id: 'today', created_at: nowSeconds, last_reply_at: nowSeconds, messages: [{ id: 'm' } as never] })
+    const month = session({ id: 'month', created_at: nowSeconds - 10 * 86_400, last_reply_at: nowSeconds - 10 * 86_400, messages: [{ id: 'm' } as never] })
+
+    const groupsNewest = groupSessions([], [today, month], now, 'Unknown', 'No project', 'updated', 'newest')
+    expect(groupsNewest.map((g) => g.dateGroup)).toEqual(['today', 'month'])
+
+    const groupsOldest = groupSessions([], [today, month], now, 'Unknown', 'No project', 'updated', 'oldest')
+    expect(groupsOldest.map((g) => g.dateGroup)).toEqual(['month', 'today'])
   })
 })
 
