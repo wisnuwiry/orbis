@@ -20,6 +20,7 @@ import { toast } from 'sonner'
 import { ControlMenu } from '@/components/control-menu'
 import { PanelResizeHandle } from '@/components/panel-resize-handle'
 import { Button } from '@/components/ui/button'
+import { Tooltip } from '@/components/ui/tooltip'
 import { FileTypeIcon, OrbisIcon, type OrbisIconName } from '@/components/orbis-icon'
 import type { CodeDiffSurfaceHandle, DiffSurfaceFile } from '@/components/code-surfaces'
 import {
@@ -377,9 +378,11 @@ export function RightPanel({
             <OrbisIcon className="size-3.5" name="plus" />
           </ControlMenu>
         )}
-        <Button aria-label={t('right_panel.hide')} size="icon-sm" variant="ghost" onClick={() => onOpenChange(false)}>
-          <OrbisIcon name="panelRight" />
-        </Button>
+        <Tooltip content={t('right_panel.toggle')} shortcut={usePrimaryShortcut('⇧⌘B', 'Ctrl+Shift+B')}>
+          <Button aria-label={t('right_panel.hide')} size="icon-sm" variant="ghost" onClick={() => onOpenChange(false)}>
+            <OrbisIcon name="panelRight" />
+          </Button>
+        </Tooltip>
       </header>
 
       {!activeTab && <PanelChooser onSelect={openSurface} />}
