@@ -1063,6 +1063,7 @@ pub struct Orbis {
     task_switcher: task_switcher::TaskSwitcherUi,
     model_search: Entity<TextInput>,
     settings_search: Entity<TextInput>,
+    keybindings_search: Entity<TextInput>,
     daemon_port_input: Entity<TextInput>,
     daemon_origins_input: Entity<TextInput>,
     daemon_reconfigure_pending: bool,
@@ -1997,6 +1998,11 @@ impl Orbis {
                 .clear_on_escape()
                 .placeholder(tr!("settings.search"))
         });
+        let keybindings_search = cx.new(|cx| {
+            TextInput::new(window, cx)
+                .clear_on_escape()
+                .placeholder(tr!("keybindings.search"))
+        });
         let daemon_port = state.daemon_exposure.port.to_string();
         let daemon_origins = state.daemon_exposure.allowed_origins_text();
         let daemon_port_input = cx.new(|cx| {
@@ -2556,6 +2562,15 @@ impl Orbis {
                 },
             )
             .detach();
+            cx.subscribe(
+                &keybindings_search,
+                |_: &mut Self, _, event: &InputEvent, cx| {
+                    if matches!(event, InputEvent::Edited) {
+                        cx.notify();
+                    }
+                },
+            )
+            .detach();
             for input in [&daemon_port_input, &daemon_origins_input] {
                 cx.subscribe(
                     input,
@@ -2738,6 +2753,7 @@ impl Orbis {
                 branch_search,
                 branch_create_input,
                 settings_search,
+                keybindings_search,
                 daemon_port_input,
                 daemon_origins_input,
                 daemon_reconfigure_pending: false,

@@ -151,6 +151,8 @@ keybindings.browser_forward: 履歴を進む
 keybindings.browser_forward_desc: ブラウザ履歴を進む
 keybindings.browser_devtools: 開発者ツール
 keybindings.browser_devtools_desc: Web 開発者ツールを開く/閉じる
+keybindings.search: ショートカットを検索...
+keybindings.no_results: ショートカットが見つかりません
 settings.back: 戻る
 settings.search: 設定を検索
 daemon.expose_title: 管理対象デーモンを公開
