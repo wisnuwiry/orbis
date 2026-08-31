@@ -1992,12 +1992,14 @@ impl BrowserView {
             .flex_none()
             .flex()
             .items_center()
-            .justify_center()
-            .cursor_default();
+            .justify_center();
         if !enabled {
-            return base.child(icon(icon_path, 14.0, theme.text_ghost));
+            return base
+                .cursor_default()
+                .child(icon(icon_path, 14.0, theme.text_ghost));
         }
-        base.hover(|element| element.bg(theme.overlay))
+        base.cursor_pointer()
+            .hover(|element| element.bg(theme.overlay))
             .active(|element| element.bg(theme.overlay_strong))
             .child(icon(icon_path, 14.0, theme.text_secondary))
             .tooltip(move |window, cx| Tooltip::new(tooltip.clone()).build(window, cx))

@@ -607,7 +607,7 @@ impl Orbis {
             .flex()
             .flex_col()
             .gap(px(PREVIEW_TITLE_GAP))
-            .cursor_default()
+            .cursor_pointer()
             .when(highlighted, |card| card.bg(theme.overlay_strong))
             .hover(|card| card.bg(theme.overlay))
             .on_mouse_move(cx.listener(move |this, _, _, cx| {

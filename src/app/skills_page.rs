@@ -764,7 +764,7 @@ impl Orbis {
                     .px(px(9.0))
                     .py(px(7.0))
                     .rounded(px(8.0))
-                    .cursor_default()
+                    .cursor_pointer()
                     .when(selected, |element| {
                         element.bg(theme.sidebar_item_background)
                     })
@@ -876,7 +876,7 @@ impl Orbis {
             .p(px(2.0))
             .flex_none()
             .rounded_full()
-            .cursor_default()
+            .cursor_pointer()
             .bg(if enabled { theme.inverse } else { theme.inset })
             .border_1()
             .border_color(if enabled {
@@ -973,7 +973,7 @@ impl Orbis {
                 .flex_none()
                 .items_center()
                 .gap(px(5.0))
-                .cursor_default()
+                .cursor_pointer()
                 .text_size(sp(12.5))
                 .text_color(theme.text_secondary)
                 .hover(|element| element.bg(theme.overlay))
@@ -1060,7 +1060,7 @@ impl Orbis {
             .flex_none()
             .items_center()
             .gap(px(5.0))
-            .cursor_default()
+            .cursor_pointer()
             .text_size(sp(12.5))
             .text_color(if armed {
                 theme.danger

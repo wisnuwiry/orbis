@@ -768,7 +768,7 @@ impl Orbis {
             .flex()
             .items_center()
             .justify_center()
-            .cursor_default()
+            .cursor_pointer()
             .focus_visible(|style| {
                 style
                     .bg(theme.overlay)
@@ -805,7 +805,7 @@ impl Orbis {
                 .flex()
                 .items_center()
                 .gap(px(6.0))
-                .cursor_default()
+                .cursor_pointer()
                 .text_size(sp(12.5))
                 .font_weight(FontWeight::MEDIUM)
                 .focus_visible(|style| {
@@ -965,7 +965,7 @@ impl Orbis {
             .flex()
             .items_center()
             .justify_center()
-            .cursor_default()
+            .cursor_pointer()
             .focus_visible(|style| {
                 style
                     .bg(theme.overlay)
@@ -1000,7 +1000,7 @@ impl Orbis {
             .flex()
             .items_center()
             .justify_center()
-            .cursor_default()
+            .cursor_pointer()
             .focus_visible(|style| {
                 style
                     .bg(theme.overlay)
@@ -1127,7 +1127,7 @@ impl Orbis {
                     .flex()
                     .items_center()
                     .gap(px(5.0))
-                    .cursor_default()
+                    .cursor_pointer()
                     .text_size(sp(12.5))
                     .font_weight(FontWeight::MEDIUM)
                     .text_color(theme.text_secondary)
@@ -1542,7 +1542,7 @@ fn render_task_identifier_row(
         .flex()
         .items_center()
         .justify_center()
-        .cursor_default()
+        .cursor_pointer()
         .focus_visible(|style| {
             style
                 .bg(theme.overlay)
@@ -1720,7 +1720,8 @@ fn render_environment_action_row(
         .flex()
         .items_center()
         .gap(px(10.0))
-        .cursor_default()
+        .when(enabled, |el| el.cursor_pointer())
+        .when(!enabled, |el| el.cursor_default())
         .focus_visible(|style| style.border_1().border_color(theme.accent))
         .when(enabled, |row| {
             row.hover(|style| style.bg(theme.overlay_strong))
@@ -1826,7 +1827,7 @@ fn render_background_summary_row(
             .flex()
             .items_center()
             .justify_center()
-            .cursor_default()
+            .cursor_pointer()
             .opacity(0.0)
             .group_hover(group_name.clone(), |style| style.opacity(1.0))
             .hover(|style| style.bg(theme.overlay_strong))
@@ -1885,7 +1886,7 @@ fn render_background_summary_row(
         .flex()
         .items_center()
         .gap(px(9.0))
-        .cursor_default()
+        .cursor_pointer()
         .focus_visible(|style| style.border_1().border_color(theme.accent))
         .hover(|style| style.bg(theme.overlay_strong))
         .child(icon(

@@ -493,7 +493,7 @@ impl Orbis {
             .flex()
             .items_center()
             .justify_center()
-            .cursor_default()
+            .cursor_pointer()
             .focus_visible(|style| style.border_1().border_color(theme.accent))
             .hover(|element| element.bg(theme.overlay))
             .active(|element| element.bg(theme.overlay_strong))

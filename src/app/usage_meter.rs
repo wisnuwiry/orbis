@@ -261,7 +261,7 @@ impl Orbis {
             .flex()
             .items_center()
             .flex_none()
-            .cursor_default()
+            .cursor_pointer()
             .hover(|element| element.bg(theme.overlay))
             .when(handle.is_open(), |element| element.bg(theme.overlay_strong))
             .tooltip(Tooltip::text(tooltip))
@@ -457,7 +457,7 @@ fn usage_panel(
         panel = panel.child(match usage_url {
             Some(url) => header_row
                 .id("plan-usage-link")
-                .cursor_default()
+                .cursor_pointer()
                 .hover(|element| element.opacity(0.8))
                 .tooltip(Tooltip::text(tr!("usage.open_account_settings")))
                 .on_click(move |_, _, cx| cx.open_url(url))

@@ -546,7 +546,7 @@ impl Orbis {
                 .flex()
                 .items_center()
                 .gap(px(10.0))
-                .cursor_default()
+                .cursor_pointer()
                 .focus_visible(|style| style.border_1().border_color(theme.accent))
                 .when(include_enabled, |row| {
                     row.hover(|style| style.bg(theme.overlay))
@@ -813,7 +813,7 @@ fn render_commit_action_row(
         .flex()
         .items_center()
         .gap(px(10.0))
-        .cursor_default()
+        .cursor_pointer()
         .text_size(sp(14.0))
         .text_color(foreground)
         .focus_visible(|style| style.border_1().border_color(theme.accent))

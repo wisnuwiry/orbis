@@ -291,7 +291,7 @@ impl Orbis {
                     .px(px(11.0))
                     .flex()
                     .items_center()
-                    .cursor_default()
+                    .cursor_pointer()
                     .text_size(sp(12.5))
                     .text_color(if selected {
                         theme.text
@@ -365,7 +365,7 @@ impl Orbis {
             .border_color(theme.border_strong)
             .flex()
             .items_center()
-            .cursor_default()
+            .cursor_pointer()
             .hover(|element| element.bg(theme.overlay))
             .tooltip(Tooltip::text(if pending {
                 tr!("usage.scanning")
@@ -585,7 +585,7 @@ impl Orbis {
                     .px(px(9.0))
                     .flex()
                     .items_center()
-                    .cursor_default()
+                    .cursor_pointer()
                     .text_size(sp(12.5))
                     .text_color(if selected {
                         theme.text
@@ -985,7 +985,7 @@ impl Orbis {
                     .px(px(9.0))
                     .flex()
                     .items_center()
-                    .cursor_default()
+                    .cursor_pointer()
                     .text_size(sp(12.5))
                     .text_color(if selected {
                         theme.text
@@ -1391,7 +1391,7 @@ impl Orbis {
             .flex()
             .items_center()
             .gap(px(5.0))
-            .cursor_default()
+            .cursor_pointer()
             .text_size(sp(12.5))
             .text_color(theme.text_tertiary)
             .focus_visible(|style| style.border_1().border_color(theme.accent))

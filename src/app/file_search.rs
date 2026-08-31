@@ -997,7 +997,7 @@ impl Orbis {
                         .flex()
                         .items_center()
                         .justify_center()
-                        .cursor_default()
+                        .cursor_pointer()
                         .when(writable, |element| {
                             element
                                 .hover(|element| element.bg(theme.overlay))
@@ -1106,7 +1106,7 @@ fn find_toggle(
         .flex()
         .items_center()
         .justify_center()
-        .cursor_default()
+        .cursor_pointer()
         // The border is always present so toggling never shifts the glyph.
         .border_1()
         .border_color(if active {
@@ -1151,7 +1151,8 @@ fn find_bar_button(
         .flex()
         .items_center()
         .justify_center()
-        .cursor_default()
+        .when(enabled, |el| el.cursor_pointer())
+        .when(!enabled, |el| el.cursor_default())
         .child(icon(
             icon_path,
             12.0,
