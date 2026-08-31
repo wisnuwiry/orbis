@@ -7,6 +7,7 @@ import type {
 import { useEffect, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import { ControlMenu } from '@/components/control-menu'
+import { KeybindingsSettings } from '@/components/keybindings-settings'
 import { SkillsSettings } from '@/components/skills-settings'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -37,6 +38,7 @@ import { cn } from '@/lib/utils'
 export type SettingsPageId =
   | 'general'
   | 'appearance'
+  | 'keybindings'
   | 'providers'
   | 'skills'
   | 'usage'
@@ -52,6 +54,7 @@ export const SETTINGS_PAGES: Array<{
 }> = [
   { id: 'general', label: 'General', labelKey: 'settings.general', icon: 'settings', keywords: 'general local projects conversations privacy analytics telemetry anonymous sharing', keywordsKey: 'settings.general_keywords' },
   { id: 'appearance', label: 'Appearance', labelKey: 'settings.appearance', icon: 'appearance', keywords: 'appearance theme system light dark language', keywordsKey: 'settings.appearance_keywords' },
+  { id: 'keybindings', label: 'Keybindings', labelKey: 'settings.keybindings', icon: 'command', keywords: 'keybindings keyboard shortcuts hotkeys bindings shortcuts keys commands', keywordsKey: 'settings.keybindings_keywords' },
   { id: 'providers', label: 'Providers', labelKey: 'settings.providers', icon: 'bot', keywords: 'providers agents models cli version install detect claude codex cursor opencode amp grok pi omp oh my pi kimi', keywordsKey: 'settings.providers_keywords' },
   { id: 'skills', label: 'Skills', labelKey: 'settings.skills', icon: 'package', keywords: 'skills library agent disable enable delete shared', keywordsKey: 'settings.skills_keywords' },
   { id: 'usage', label: 'Usage', labelKey: 'settings.usage', icon: 'chartColumn', keywords: 'usage tokens cost spend cache daily monthly project model history', keywordsKey: 'settings.usage_keywords' },
@@ -154,6 +157,7 @@ export function SettingsView({
             <h1 className="text-[18px] font-medium">{activePage?.localizedLabel}</h1>
             {page === 'general' && <GeneralSettings />}
             {page === 'appearance' && <AppearanceSettings />}
+            {page === 'keybindings' && <KeybindingsSettings />}
             {page === 'providers' && <ProvidersSettings />}
             {page === 'usage' && <UsageSettings projects={projects} />}
             {page === 'daemon' && <DaemonSettings />}

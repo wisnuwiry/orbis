@@ -147,6 +147,8 @@ keybindings.browser_forward: 网页前进
 keybindings.browser_forward_desc: 前进到下一个网页
 keybindings.browser_devtools: 开发者工具
 keybindings.browser_devtools_desc: 打开或关闭网页开发者工具
+keybindings.search: 搜索快捷键...
+keybindings.no_results: 未找到快捷键
 settings.back: 返回
 settings.search: 搜索设置
 daemon.expose_title: 暴露由 Orbis 管理的守护进程

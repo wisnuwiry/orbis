@@ -1730,9 +1730,51 @@ impl Orbis {
             ),
         ];
 
-        let mut content = div().flex().flex_col().gap(px(20.0)).mt(px(15.0));
+        let query = self
+            .keybindings_search
+            .read(cx)
+            .content()
+            .trim()
+            .to_lowercase();
+
+        let search_input = div().w_full().child(
+            TextField::new("keybindings-search-field", self.keybindings_search.clone())
+                .icon("icons/search.svg", 13.0)
+                .w_full(),
+        );
+
+        let mut content = div()
+            .flex()
+            .flex_col()
+            .gap(px(20.0))
+            .mt(px(15.0))
+            .child(search_input);
+
+        let mut matched_any = false;
 
         for (section_title_key, shortcuts) in sections {
+            let section_title = crate::i18n::translate(section_title_key);
+            let section_title_lower = section_title.to_lowercase();
+            let section_matches = !query.is_empty() && section_title_lower.contains(&query);
+
+            let matching_shortcuts: Vec<_> = shortcuts
+                .iter()
+                .filter(|(title_key, desc_key, shortcut)| {
+                    if query.is_empty() || section_matches {
+                        return true;
+                    }
+                    let title = crate::i18n::translate(title_key).to_lowercase();
+                    let desc = crate::i18n::translate(desc_key).to_lowercase();
+                    let shortcut_lower = shortcut.to_lowercase();
+                    title.contains(&query) || desc.contains(&query) || shortcut_lower.contains(&query)
+                })
+                .collect();
+
+            if matching_shortcuts.is_empty() {
+                continue;
+            }
+            matched_any = true;
+
             let mut section_card = div()
                 .w_full()
                 .flex()
@@ -1741,7 +1783,7 @@ impl Orbis {
                 .overflow_hidden()
                 .bg(theme.raised);
 
-            for (index, (title_key, desc_key, shortcut)) in shortcuts.iter().enumerate() {
+            for (index, (title_key, desc_key, shortcut)) in matching_shortcuts.iter().enumerate() {
                 if index > 0 {
                     section_card = section_card.child(div().mx(px(20.0)).h(px(1.0)).bg(theme.border));
                 }
@@ -1807,11 +1849,25 @@ impl Orbis {
                         .text_size(sp(13.0))
                         .font_weight(FontWeight::SEMIBOLD)
                         .text_color(theme.text_secondary)
-                        .child(crate::i18n::translate(section_title_key)),
+                        .child(section_title),
                 )
                 .child(section_card);
 
             content = content.child(section_block);
+        }
+
+        if !matched_any {
+            content = content.child(
+                div()
+                    .w_full()
+                    .py(px(32.0))
+                    .flex()
+                    .items_center()
+                    .justify_center()
+                    .text_size(sp(13.0))
+                    .text_color(theme.text_tertiary)
+                    .child(tr!("keybindings.no_results")),
+            );
         }
 
         content.into_any_element()
@@ -2708,6 +2764,9 @@ impl Orbis {
         });
         self.settings_search.update(cx, |input, cx| {
             input.set_placeholder(tr!("settings.search"), cx)
+        });
+        self.keybindings_search.update(cx, |input, cx| {
+            input.set_placeholder(tr!("keybindings.search"), cx)
         });
         self.skills_search.update(cx, |input, cx| {
             input.set_placeholder(tr!("skills.search"), cx)

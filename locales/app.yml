@@ -298,6 +298,10 @@ keybindings.browser_devtools:
   en: Developer Tools
 keybindings.browser_devtools_desc:
   en: Toggle web developer tools
+keybindings.search:
+  en: Search keybindings...
+keybindings.no_results:
+  en: No keybindings found
 settings.back:
   en: Back
 settings.search:
