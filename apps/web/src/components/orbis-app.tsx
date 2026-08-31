@@ -91,6 +91,9 @@ interface RetainedPanelSession {
   project?: Project
 }
 
+const DEFAULT_SIDEBAR_WIDTH = 252
+const DEFAULT_RIGHT_PANEL_WIDTH = 460
+
 type Translator = (key: string, params?: Record<string, string | number>) => string
 
 export function OrbisApp() {
@@ -1222,11 +1225,11 @@ export function OrbisApp() {
 }
 
 function readSidebarWidth(): number {
-  if (typeof window === 'undefined') return 252
+  if (typeof window === 'undefined') return DEFAULT_SIDEBAR_WIDTH
   const raw = window.localStorage.getItem('orbis.sidebarWidth')
-  if (raw === null) return 252
+  if (raw === null) return DEFAULT_SIDEBAR_WIDTH
   const stored = Number(raw)
-  return Number.isFinite(stored) ? Math.min(420, Math.max(180, stored)) : 252
+  return Number.isFinite(stored) ? Math.min(420, Math.max(180, stored)) : DEFAULT_SIDEBAR_WIDTH
 }
 
 function readSidebarVisible(): boolean {
@@ -1235,11 +1238,11 @@ function readSidebarVisible(): boolean {
 }
 
 function readRightPanelWidth(): number {
-  if (typeof window === 'undefined') return 460
+  if (typeof window === 'undefined') return DEFAULT_RIGHT_PANEL_WIDTH
   const raw = window.localStorage.getItem('orbis.rightPanelWidth')
-  if (raw === null) return 460
+  if (raw === null) return DEFAULT_RIGHT_PANEL_WIDTH
   const stored = Number(raw)
-  return Number.isFinite(stored) ? Math.min(1_000, Math.max(280, stored)) : 460
+  return Number.isFinite(stored) ? Math.min(1_000, Math.max(280, stored)) : DEFAULT_RIGHT_PANEL_WIDTH
 }
 
 function panelSessionIds(
