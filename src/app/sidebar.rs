@@ -491,6 +491,10 @@ impl Orbis {
             .cursor_pointer()
             .hover(|element| element.bg(theme.overlay))
             .active(|element| element.bg(theme.overlay_strong))
+            .tooltip(Tooltip::with_shortcut(
+                tr!("sidebar.toggle"),
+                crate::platform::primary_shortcut("⌘B", "Ctrl+B"),
+            ))
             .child(icon("icons/panel-left.svg", 14.0, theme.text_tertiary))
             .on_mouse_down(MouseButton::Left, |_, _, cx| {
                 cx.stop_propagation();
@@ -523,9 +527,20 @@ impl Orbis {
             .when(!enabled, |el| el.cursor_default())
             .when(!enabled, |element| element.opacity(0.35))
             .when(enabled, |element| {
+                let shortcut = if navigate_back {
+                    crate::platform::primary_shortcut("⌘[", "Ctrl+[")
+                } else {
+                    crate::platform::primary_shortcut("⌘]", "Ctrl+]")
+                };
+                let label = if navigate_back {
+                    tr!("sidebar.back")
+                } else {
+                    tr!("sidebar.forward")
+                };
                 element
                     .hover(|element| element.bg(theme.overlay))
                     .active(|element| element.bg(theme.overlay_strong))
+                    .tooltip(Tooltip::with_shortcut(label, shortcut))
                     .on_mouse_down(MouseButton::Left, |_, _, cx| {
                         cx.stop_propagation();
                     })
@@ -681,7 +696,10 @@ impl Orbis {
             .focus_visible(|style| style.border_1().border_color(theme.accent))
             .hover(|element| element.bg(theme.overlay))
             .active(|element| element.bg(theme.overlay_strong))
-            .tooltip(Tooltip::text(tr!("project.new_project")))
+            .tooltip(Tooltip::with_shortcut(
+                tr!("project.new_project"),
+                crate::platform::primary_shortcut("⌘O", "Ctrl+O"),
+            ))
             .child(icon("icons/folder-new.svg", 14.0, theme.text_secondary))
             .on_mouse_down(MouseButton::Left, |_, _, cx| cx.stop_propagation())
             .on_click(cx.listener(|this, _, _, cx| {
@@ -708,6 +726,7 @@ impl Orbis {
         id: &'static str,
         icon_path: &'static str,
         label: String,
+        shortcut: Option<&'static str>,
         cx: &mut Context<Self>,
     ) -> Stateful<Div> {
         let theme = Theme::current(cx);
@@ -717,7 +736,7 @@ impl Orbis {
             .w_full()
             .h(px(SIDEBAR_ACTION_ROW_HEIGHT))
             .flex_none()
-            .px(px(4.0))
+            .px(px(6.0))
             .rounded(px(7.0))
             .flex()
             .items_center()
@@ -738,11 +757,30 @@ impl Orbis {
             .child(
                 div()
                     .min_w_0()
+                    .flex_1()
                     .truncate()
                     .text_size(sp(13.0))
                     .text_color(theme.text_secondary)
                     .child(label),
             )
+            .when_some(shortcut, |row, shortcut| {
+                row.child(
+                    div()
+                        .h(px(20.0))
+                        .min_w(px(24.0))
+                        .px(px(6.0))
+                        .rounded(px(5.0))
+                        .flex_none()
+                        .flex()
+                        .items_center()
+                        .justify_center()
+                        .bg(theme.overlay_strong)
+                        .text_size(sp(11.5))
+                        .font_weight(FontWeight::MEDIUM)
+                        .text_color(theme.text_tertiary)
+                        .child(shortcut),
+                )
+            })
     }
 
     fn render_sidebar_new_session(&self, cx: &mut Context<Self>) -> Stateful<Div> {
@@ -750,6 +788,7 @@ impl Orbis {
             "sidebar-new-session",
             "icons/compose.svg",
             tr!("menu.new_task"),
+            Some(crate::platform::primary_shortcut("⌘N", "Ctrl+N")),
             cx,
         )
         .on_click(cx.listener(|this, _, window, cx| {
@@ -769,6 +808,7 @@ impl Orbis {
                 "sidebar-search",
                 "icons/search.svg",
                 tr!("sidebar.search"),
+                Some(crate::platform::primary_shortcut("⌘K", "Ctrl+K")),
                 cx,
             )
             .on_click(cx.listener(|this, _, window, cx| {
@@ -932,7 +972,10 @@ impl Orbis {
                     .cursor_pointer()
                     .hover(|element| element.bg(theme.overlay))
                     .active(|element| element.bg(theme.overlay_strong))
-                    .tooltip(Tooltip::text(tr_cow!("common.settings")))
+                    .tooltip(Tooltip::with_shortcut(
+                        tr_cow!("common.settings"),
+                        crate::platform::primary_shortcut("⌘,", "Ctrl+,"),
+                    ))
                     .child(icon("icons/settings.svg", 14.0, theme.text_tertiary))
                     .on_click(cx.listener(|this, _, window, cx| {
                         this.open_settings_action(&OpenSettings, window, cx);
@@ -1471,7 +1514,10 @@ impl Orbis {
                         })
                         .hover(|style| style.bg(theme.overlay))
                         .active(|style| style.bg(theme.overlay_strong))
-                        .tooltip(Tooltip::text(tr!("menu.new_task")))
+                        .tooltip(Tooltip::with_shortcut(
+                            tr!("menu.new_task"),
+                            crate::platform::primary_shortcut("⌘N", "Ctrl+N"),
+                        ))
                         .child(icon("icons/compose.svg", 14.0, theme.text_secondary))
                         .on_mouse_down(MouseButton::Left, |_, _, cx| cx.stop_propagation())
                         .on_click(cx.listener(move |this, _, window, cx| {
