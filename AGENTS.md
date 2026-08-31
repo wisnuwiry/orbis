@@ -64,6 +64,23 @@
   interactive targets enough hit area — extend the hit region rather than
   shrinking to the glyph.
 
+## Client synchronization and feature parity
+
+- Keep the native desktop app (`src/`) and the browser client (`apps/web/`) in
+  lockstep. Whenever adding a feature, modifying workflows, or making UI/UX
+  changes, update both `src/` and `apps/web/` together in the same change set.
+- Never implement or update user-facing features, components, or UI behaviors in
+  only one client while leaving the other behind, unless a capability is
+  explicitly platform-exclusive by design (e.g. native macOS window chrome or
+  local OS integrations).
+- When a feature or UI change touches the wire protocol
+  (`crates/orbis-protocol`), immediately run `bun run protocol:generate` and
+  `bun run protocol:check` to ensure `packages/orbis-client` and `apps/web/`
+  remain strictly type-safe and synchronized with the daemon backend.
+- Ensure visual hierarchy, state representation, controls, and interaction
+  models remain consistent across both surfaces, while respecting native GPUI
+  idioms in `src/` and modern web patterns in `apps/web/`.
+
 ## Product reference
 
 - Use [T3 Code](https://github.com/pingdotgg/t3code) source code on github as a reference when a task
