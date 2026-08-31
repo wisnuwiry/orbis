@@ -21,7 +21,7 @@ The script installs into `~/.local` without root. See
 uninstalling.
 
 On Windows, run `Orbis-<version>-<arch>-Setup.exe` from the
-[latest release](https://github.com/egoist/orbis/releases/latest). It installs
+[latest release](https://github.com/wisnuwiry/orbis/releases/latest). It installs
 per-user and updates itself. A portable `.zip` is published alongside it. See
 [docs/windows.md](docs/windows.md) for requirements and what is not available
 there yet.
@@ -115,7 +115,7 @@ Release maintainers should also read [RELEASING.md](RELEASING.md).
 
 ## Sponsorship
 
-You can support the project development via [GitHub Sponsors](https://github.com/sponsors/egoist).
+You can support the project development via [GitHub Sponsors](https://github.com/sponsors/wisnuwiry).
 
 ## License
 

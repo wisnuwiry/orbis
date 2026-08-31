@@ -1723,7 +1723,7 @@ mod tests {
     fn locates_claudes_native_task_output_across_workspace_slugs() {
         let root = std::env::temp_dir().join(format!("orbis-claude-output-test-{}", Uuid::new_v4()));
         let output = root
-            .join("-Users-egoist-dev-orbis")
+            .join("-Users-wisnu-dev-orbis")
             .join("session-live")
             .join("tasks")
             .join("task-live.output");

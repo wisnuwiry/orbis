@@ -4,7 +4,7 @@
 
 Download `Orbis-<version>-x86_64-Setup.exe` (or the `aarch64` installer on an
 Arm device) from [releases.orbis.sh](https://releases.orbis.sh) or the
-[GitHub release](https://github.com/egoist/orbis/releases) and run it. It
+[GitHub release](https://github.com/wisnuwiry/orbis/releases) and run it. It
 installs per-user into `%LOCALAPPDATA%\Programs\Orbis`, so it never asks for
 administrator rights — which is also what lets Orbis update itself later
 without a UAC prompt.

@@ -10,7 +10,7 @@ through the in-app updater and https://orbis.sh.
 Please use GitHub private vulnerability reporting:
 https://github.com/wisnuwiry/orbis/security/advisories/new
 
-If that doesn't work for you, email hi@egoist.dev.
+If that doesn't work for you, email `wisnuwiry[at]gmail[dot]com.`
 
 Please don't open a public issue for anything you believe is
 exploitable before it has been fixed. Include reproduction steps and

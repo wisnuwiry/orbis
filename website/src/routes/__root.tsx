@@ -50,16 +50,6 @@ export const Route = createRootRouteWithContext<{
         // Mirror the system color scheme onto <html> before first paint.
         children: `try{var m=matchMedia('(prefers-color-scheme: dark)'),d=document.documentElement,s=function(){d.classList.toggle('dark',m.matches)};s();m.addEventListener('change',s)}catch(e){}`,
       },
-      // Analytics, production builds only.
-      ...(import.meta.env.PROD
-        ? [
-            {
-              defer: true,
-              src: 'https://u.egoist.dev/script.js',
-              'data-website-id': '5dc2da71-cd6e-4862-8d60-e1cfb782f54f',
-            },
-          ]
-        : []),
     ],
   }),
   component: RootComponent,

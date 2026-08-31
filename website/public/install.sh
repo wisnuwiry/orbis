@@ -61,7 +61,7 @@ main() {
         aarch64 | arm64) target="aarch64-unknown-linux-gnu" ;;
         *)
             echo "Unsupported architecture: $machine" >&2
-            echo "Build from source: https://github.com/egoist/orbis" >&2
+            echo "Build from source: https://github.com/wisnuwiry/orbis" >&2
             exit 1
             ;;
     esac
