@@ -31,7 +31,7 @@ Set `ORBIS_VERSION` to install a specific version rather than the latest.
 The script is a convenience, not a requirement. Download
 `orbis-<version>-<target>.tar.gz` from
 [releases.orbis.sh](https://releases.orbis.sh) or the
-[GitHub release](https://github.com/egoist/orbis/releases), then unpack it
+[GitHub release](https://github.com/wisnuwiry/orbis/releases), then unpack it
 wherever you like:
 
 ```sh

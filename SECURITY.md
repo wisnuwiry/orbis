@@ -8,7 +8,7 @@ through the in-app updater and https://orbis.sh.
 ## Reporting a Vulnerability
 
 Please use GitHub private vulnerability reporting:
-https://github.com/egoist/orbis/security/advisories/new
+https://github.com/wisnuwiry/orbis/security/advisories/new
 
 If that doesn't work for you, email hi@egoist.dev.
 
