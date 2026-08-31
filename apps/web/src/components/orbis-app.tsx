@@ -1488,7 +1488,7 @@ function EnvironmentWorkSection({
           const stoppable = isStoppableBackgroundStatus(item.status) && item.canStop && item.controlId
           return (
             <div
-              className="group flex h-8 w-full cursor-default items-center gap-[9px] rounded-[8px] px-2 outline-none hover:bg-accent focus-visible:ring-1 focus-visible:ring-ring"
+              className="group flex h-8 w-full cursor-pointer items-center gap-[9px] rounded-[8px] px-2 outline-none hover:bg-accent focus-visible:ring-1 focus-visible:ring-ring"
               key={`${item.key.kind}:${item.key.providerId}`}
               role="menuitem"
               tabIndex={0}

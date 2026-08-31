@@ -155,6 +155,32 @@
     font: inherit;
   }
 
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]):not([data-disabled]),
+  [role="tab"]:not([aria-disabled="true"]):not([data-disabled]),
+  [role="option"]:not([aria-disabled="true"]):not([data-disabled]),
+  [role="menuitem"]:not([aria-disabled="true"]):not([data-disabled]),
+  [role="switch"]:not([aria-disabled="true"]):not([data-disabled]),
+  [role="checkbox"]:not([aria-disabled="true"]):not([data-disabled]),
+  [role="radio"]:not([aria-disabled="true"]):not([data-disabled]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  summary {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role="button"][aria-disabled="true"],
+  [role="button"][data-disabled],
+  [type="button"]:disabled,
+  [type="submit"]:disabled,
+  [type="reset"]:disabled {
+    cursor: not-allowed;
+  }
+
   ::selection {
     background: color-mix(in oklch, var(--foreground) 18%, transparent);
   }
@@ -242,7 +268,7 @@
     font-size: 11.5px;
     line-height: 15px;
     text-align: left;
-    cursor: default;
+    cursor: pointer;
     user-select: none;
     outline: none;
   }
@@ -257,6 +283,7 @@
 
   .orbis-menu-item[data-disabled] {
     color: var(--text-ghost);
+    cursor: not-allowed;
   }
 
   .orbis-menu-separator {
