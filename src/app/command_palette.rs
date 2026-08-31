@@ -832,6 +832,12 @@ impl Orbis {
                 "settings preferences appearance theme language light dark",
             ),
             (
+                SettingsPage::Keybindings,
+                "settings.keybindings",
+                "icons/command.svg",
+                "settings preferences keybindings keyboard shortcuts hotkeys bindings keys",
+            ),
+            (
                 SettingsPage::Providers,
                 "settings.providers",
                 "icons/bot.svg",

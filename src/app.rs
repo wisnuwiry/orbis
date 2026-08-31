@@ -214,12 +214,13 @@ enum BranchPickerAction {
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum SettingsPage {
     General,
+    Appearance,
+    Keybindings,
     Providers,
     Skills,
     Usage,
     Daemon,
     ComputerUse,
-    Appearance,
 }
 
 impl SettingsPage {

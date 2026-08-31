@@ -1879,6 +1879,7 @@ fn settings_search_filters_pages_for_arrow_cycling() {
     let mut all_pages = vec![
         SettingsPage::General,
         SettingsPage::Appearance,
+        SettingsPage::Keybindings,
         SettingsPage::Providers,
         SettingsPage::Skills,
         SettingsPage::Usage,
@@ -1890,6 +1891,7 @@ fn settings_search_filters_pages_for_arrow_cycling() {
     assert_eq!(pages(""), all_pages);
 
     assert_eq!(pages("theme"), vec![SettingsPage::Appearance]);
+    assert_eq!(pages("shortcut"), vec![SettingsPage::Keybindings]);
     assert_eq!(pages("skill"), vec![SettingsPage::Skills]);
 
     // A keyword shared across pages keeps them all reachable.

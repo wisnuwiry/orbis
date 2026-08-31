@@ -72,18 +72,81 @@ language.system: 跟随系统
 language.description: 选择 Orbis 的界面语言
 settings.general: 通用
 settings.appearance: 外观
+settings.keybindings: 快捷键
 settings.providers: 服务商
 settings.usage: 用量
 settings.daemon: 守护进程
 settings.computer_use: 电脑操作
 settings.general_keywords: 通用 本地 项目 对话 隐私 匿名 使用数据 分析 分享 更新 自动 版本
 settings.appearance_keywords: 外观 主题 系统 浅色 深色 语言 英语 中文 简体 字号 字体 大小 编辑器
+settings.keybindings_keywords: 快捷键 键盘 按键 绑定 热键 命令 操作 导航 窗口 浏览器
 settings.providers_keywords: 服务商 智能体 模型 命令行 版本 安装 检测 claude codex cursor opencode amp grok pi
 settings.skills: 技能
 settings.skills_keywords: 技能 技能库 智能体 禁用 启用 删除 claude codex cursor opencode pi amp 共享
 settings.usage_keywords: 用量 令牌 费用 支出 缓存 每日 图表 模型 明细 历史 claude codex
 settings.daemon_keywords: 守护进程 服务 远程 网页 网络 暴露 来源 令牌 端口 websocket
 settings.computer_use_keywords: 电脑操作 屏幕录制 辅助功能 应用 控制 codex
+keybindings.section_general: 通用与窗口
+keybindings.section_navigation: 导航与面板
+keybindings.section_chat: 对话与输入
+keybindings.section_editor: 编辑器与查找
+keybindings.section_browser: 内置浏览器
+keybindings.new_task: 新建任务
+keybindings.new_task_desc: 创建新对话或任务
+keybindings.open_project: 打开项目
+keybindings.open_project_desc: 打开项目文件夹或工作区
+keybindings.command_palette: 命令面板
+keybindings.command_palette_desc: 快速搜索任务、运行命令或打开设置
+keybindings.open_settings: 设置
+keybindings.open_settings_desc: 打开应用偏好设置
+keybindings.close_window: 关闭窗口
+keybindings.close_window_desc: 关闭当前窗口
+keybindings.quit: 退出
+keybindings.quit_desc: 退出 Orbis 应用程序
+keybindings.toggle_sidebar: 切换侧边栏
+keybindings.toggle_sidebar_desc: 显示或隐藏左侧项目与任务列表
+keybindings.toggle_right_panel: 切换右侧面板
+keybindings.toggle_right_panel_desc: 显示或隐藏工具、差分与文件面板
+keybindings.toggle_usage_panel: 切换用量面板
+keybindings.toggle_usage_panel_desc: 显示或隐藏用量与费用统计
+keybindings.toggle_fps: 切换帧率显示
+keybindings.toggle_fps_desc: 显示或隐藏界面渲染帧率
+keybindings.navigate_back: 后退
+keybindings.navigate_back_desc: 返回上一个会话页面
+keybindings.navigate_forward: 前进
+keybindings.navigate_forward_desc: 前进到下一个会话页面
+keybindings.next_task: 下一个任务
+keybindings.next_task_desc: 在任务切换器中向后切换
+keybindings.prev_task: 上一个任务
+keybindings.prev_task_desc: 在任务切换器中向前切换
+keybindings.focus_composer: 聚焦输入框
+keybindings.focus_composer_desc: 将焦点移至提示词输入框
+keybindings.select_model: 选择模型
+keybindings.select_model_desc: 打开模型选择下拉菜单
+keybindings.cancel_turn: 停止生成
+keybindings.cancel_turn_desc: 取消当前正在生成的回答
+keybindings.save_file: 保存文件
+keybindings.save_file_desc: 保存编辑器中当前文件的修改
+keybindings.find: 文件内查找
+keybindings.find_desc: 在文件编辑器中打开搜索栏
+keybindings.replace: 文件内替换
+keybindings.replace_desc: 在文件编辑器中打开查找与替换栏
+keybindings.find_next: 查找下一个
+keybindings.find_next_desc: 跳转到下一个匹配项
+keybindings.find_prev: 查找上一个
+keybindings.find_prev_desc: 跳转到上一个匹配项
+keybindings.browser_focus: 聚焦地址栏
+keybindings.browser_focus_desc: 聚焦浏览器标签页中的地址输入框
+keybindings.browser_reload: 重新加载
+keybindings.browser_reload_desc: 刷新当前网页
+keybindings.browser_hard_reload: 强制刷新
+keybindings.browser_hard_reload_desc: 忽略缓存并重新加载网页
+keybindings.browser_back: 网页后退
+keybindings.browser_back_desc: 返回上一个网页
+keybindings.browser_forward: 网页前进
+keybindings.browser_forward_desc: 前进到下一个网页
+keybindings.browser_devtools: 开发者工具
+keybindings.browser_devtools_desc: 打开或关闭网页开发者工具
 settings.back: 返回
 settings.search: 搜索设置
 daemon.expose_title: 暴露由 Orbis 管理的守护进程

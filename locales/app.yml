@@ -148,6 +148,8 @@ settings.general:
   en: General
 settings.appearance:
   en: Appearance
+settings.keybindings:
+  en: Keybindings
 settings.providers:
   en: Providers
 settings.usage:
@@ -160,6 +162,8 @@ settings.general_keywords:
   en: general local projects conversations privacy analytics telemetry anonymous sharing updates automatic sparkle version
 settings.appearance_keywords:
   en: appearance theme system light dark language english chinese simplified font size text editor
+settings.keybindings_keywords:
+  en: keybindings keyboard shortcuts hotkeys bindings shortcuts keys commands
 settings.providers_keywords:
   en: providers agents models cli version install detect claude codex cursor opencode amp grok pi
 settings.skills:
@@ -172,6 +176,128 @@ settings.daemon_keywords:
   en: daemon server remote web network expose origin token port websocket
 settings.computer_use_keywords:
   en: computer use screen recording accessibility apps control codex
+keybindings.section_general:
+  en: General & Window
+keybindings.section_navigation:
+  en: Navigation & Panels
+keybindings.section_chat:
+  en: Chat & Composer
+keybindings.section_editor:
+  en: Editor & Search
+keybindings.section_browser:
+  en: In-App Browser
+keybindings.new_task:
+  en: New Task
+keybindings.new_task_desc:
+  en: Create a new conversation or task
+keybindings.open_project:
+  en: Open Project
+keybindings.open_project_desc:
+  en: Open a project folder or workspace
+keybindings.command_palette:
+  en: Command Palette
+keybindings.command_palette_desc:
+  en: Search tasks, execute commands, or open settings
+keybindings.open_settings:
+  en: Settings
+keybindings.open_settings_desc:
+  en: Open application preferences
+keybindings.close_window:
+  en: Close Window
+keybindings.close_window_desc:
+  en: Close the current Orbis window
+keybindings.quit:
+  en: Quit
+keybindings.quit_desc:
+  en: Quit Orbis application
+keybindings.toggle_sidebar:
+  en: Toggle Sidebar
+keybindings.toggle_sidebar_desc:
+  en: Show or hide the project and task sidebar
+keybindings.toggle_right_panel:
+  en: Toggle Right Panel
+keybindings.toggle_right_panel_desc:
+  en: Show or hide the tools, diff, and files panel
+keybindings.toggle_usage_panel:
+  en: Toggle Usage Panel
+keybindings.toggle_usage_panel_desc:
+  en: Show or hide token and cost usage
+keybindings.toggle_fps:
+  en: Toggle FPS Counter
+keybindings.toggle_fps_desc:
+  en: Show or hide rendering performance counter
+keybindings.navigate_back:
+  en: Navigate Back
+keybindings.navigate_back_desc:
+  en: Go back in session navigation history
+keybindings.navigate_forward:
+  en: Navigate Forward
+keybindings.navigate_forward_desc:
+  en: Go forward in session navigation history
+keybindings.next_task:
+  en: Next Task
+keybindings.next_task_desc:
+  en: Cycle forward in task switcher
+keybindings.prev_task:
+  en: Previous Task
+keybindings.prev_task_desc:
+  en: Cycle backward in task switcher
+keybindings.focus_composer:
+  en: Focus Composer
+keybindings.focus_composer_desc:
+  en: Move focus to the prompt input field
+keybindings.select_model:
+  en: Select Model
+keybindings.select_model_desc:
+  en: Open model picker menu
+keybindings.cancel_turn:
+  en: Stop Generation
+keybindings.cancel_turn_desc:
+  en: Cancel active turn or stop model response
+keybindings.save_file:
+  en: Save File
+keybindings.save_file_desc:
+  en: Save active file in editor
+keybindings.find:
+  en: Find in File
+keybindings.find_desc:
+  en: Open search bar in file editor
+keybindings.replace:
+  en: Replace in File
+keybindings.replace_desc:
+  en: Open find and replace bar in file editor
+keybindings.find_next:
+  en: Find Next
+keybindings.find_next_desc:
+  en: Jump to next match
+keybindings.find_prev:
+  en: Find Previous
+keybindings.find_prev_desc:
+  en: Jump to previous match
+keybindings.browser_focus:
+  en: Focus Address Bar
+keybindings.browser_focus_desc:
+  en: Focus address bar in browser tab
+keybindings.browser_reload:
+  en: Reload Page
+keybindings.browser_reload_desc:
+  en: Reload current web page
+keybindings.browser_hard_reload:
+  en: Hard Reload
+keybindings.browser_hard_reload_desc:
+  en: Reload page ignoring cached content
+keybindings.browser_back:
+  en: Browser Back
+keybindings.browser_back_desc:
+  en: Go back in browser history
+keybindings.browser_forward:
+  en: Browser Forward
+keybindings.browser_forward_desc:
+  en: Go forward in browser history
+keybindings.browser_devtools:
+  en: Developer Tools
+keybindings.browser_devtools_desc:
+  en: Toggle web developer tools
 settings.back:
   en: Back
 settings.search:

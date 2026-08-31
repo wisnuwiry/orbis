@@ -76,18 +76,81 @@ language.description: Orbis 全体で使用する言語を選択します
 
 settings.general: 一般
 settings.appearance: 外観
+settings.keybindings: キーバインド
 settings.providers: プロバイダー
 settings.usage: 使用状況
 settings.daemon: デーモン
 settings.computer_use: コンピュータ操作
 settings.general_keywords: 一般 ローカル プロジェクト 会話 プライバシー 分析 テレメトリ 匿名 共有 アップデート 自動 バージョン
 settings.appearance_keywords: 外観 テーマ システム ライト ダーク 言語 英語 中国語 簡体字 日本語 フォント サイズ 文字 エディタ
+settings.keybindings_keywords: キーバインド ショートカット キーボード ホットキー 操作 コマンド
 settings.providers_keywords: プロバイダー エージェント モデル CLI バージョン インストール 検出 claude codex cursor opencode amp grok pi
 settings.skills: スキル
 settings.skills_keywords: スキル ライブラリ エージェント 無効 有効 削除 claude codex cursor opencode pi amp 共有
 settings.usage_keywords: 使用状況 トークン コスト 支出 キャッシュ 日別 グラフ モデル 内訳 履歴 claude codex
 settings.daemon_keywords: デーモン サーバー リモート ウェブ ネットワーク 公開 オリジン トークン ポート websocket
 settings.computer_use_keywords: コンピュータ 操作 画面収録 アクセシビリティ アプリ 制御 codex
+keybindings.section_general: 一般とウィンドウ
+keybindings.section_navigation: ナビゲーションとパネル
+keybindings.section_chat: チャットと入力
+keybindings.section_editor: エディタと検索
+keybindings.section_browser: 内蔵ブラウザ
+keybindings.new_task: 新規タスク
+keybindings.new_task_desc: 新しい会話またはタスクを作成
+keybindings.open_project: プロジェクトを開く
+keybindings.open_project_desc: プロジェクトフォルダまたはワークスペースを開く
+keybindings.command_palette: コマンドパレット
+keybindings.command_palette_desc: タスクの検索、コマンドの実行、設定を開く
+keybindings.open_settings: 設定
+keybindings.open_settings_desc: アプリケーション設定を開く
+keybindings.close_window: ウィンドウを閉じる
+keybindings.close_window_desc: 現在のウィンドウを閉じる
+keybindings.quit: 終了
+keybindings.quit_desc: Orbis を終了
+keybindings.toggle_sidebar: サイドバーの切り替え
+keybindings.toggle_sidebar_desc: 左側のサイドバーを表示/非表示
+keybindings.toggle_right_panel: 右パネルの切り替え
+keybindings.toggle_right_panel_desc: ツール、差分、ファイルパネルを表示/非表示
+keybindings.toggle_usage_panel: 使用状況パネルの切り替え
+keybindings.toggle_usage_panel_desc: トークンと費用の使用状況を表示/非表示
+keybindings.toggle_fps: FPS 表示の切り替え
+keybindings.toggle_fps_desc: レンダリングフレームレートを表示/非表示
+keybindings.navigate_back: 戻る
+keybindings.navigate_back_desc: セッション履歴を戻る
+keybindings.navigate_forward: 進む
+keybindings.navigate_forward_desc: セッション履歴を進む
+keybindings.next_task: 次のタスク
+keybindings.next_task_desc: タスクスイッチャーで次のタスクへ切り替え
+keybindings.prev_task: 前のタスク
+keybindings.prev_task_desc: タスクスイッチャーで前のタスクへ切り替え
+keybindings.focus_composer: 入力欄にフォーカス
+keybindings.focus_composer_desc: プロンプト入力欄にフォーカスを移動
+keybindings.select_model: モデルを選択
+keybindings.select_model_desc: モデル選択メニューを開く
+keybindings.cancel_turn: 生成を中止
+keybindings.cancel_turn_desc: 実行中のターンまたは回答生成を停止
+keybindings.save_file: ファイルを保存
+keybindings.save_file_desc: エディタ内のファイルを保存
+keybindings.find: ファイル内検索
+keybindings.find_desc: エディタ内で検索バーを開く
+keybindings.replace: ファイル内置換
+keybindings.replace_desc: エディタ内で検索と置換バーを開く
+keybindings.find_next: 次を検索
+keybindings.find_next_desc: 次の一致項目へ移動
+keybindings.find_prev: 前を検索
+keybindings.find_prev_desc: 前の一致項目へ移動
+keybindings.browser_focus: アドレスバーにフォーカス
+keybindings.browser_focus_desc: ブラウザのアドレスバーにフォーカス
+keybindings.browser_reload: 再読み込み
+keybindings.browser_reload_desc: 現在のページを再読み込み
+keybindings.browser_hard_reload: 強制再読み込み
+keybindings.browser_hard_reload_desc: キャッシュを無視して再読み込み
+keybindings.browser_back: 履歴を戻る
+keybindings.browser_back_desc: ブラウザ履歴を戻る
+keybindings.browser_forward: 履歴を進む
+keybindings.browser_forward_desc: ブラウザ履歴を進む
+keybindings.browser_devtools: 開発者ツール
+keybindings.browser_devtools_desc: Web 開発者ツールを開く/閉じる
 settings.back: 戻る
 settings.search: 設定を検索
 daemon.expose_title: 管理対象デーモンを公開
