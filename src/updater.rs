@@ -1394,8 +1394,8 @@ mod windows {
         /// below came from that script with a throwaway key.
         #[test]
         fn a_signature_from_the_release_script_verifies_here() {
-            const PUBLIC: &str = "7gZ3dbx+MPQD4vc2dk7olL9QU66JIjpJ1iqNNafU2lQ=";
-            const SIGNATURE: &str = "eBIPKGvQSxFIVNwOzNjzHYs/AGiYFIe3pGulv0TeocoMN0+0l28OJZrlJ2ZuQnNBfif10VW3virGo+7GP3TwCw==";
+            const PUBLIC: &str = "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w=";
+            const SIGNATURE: &str = "4HceuSbPYEAI7oo+DKAbAOzsYuJRpaxfugkOmZCs8NzcbYIBncDaeTYJMGqAPCeet0IR/cmHv872v19owpmwAg==";
             const PAYLOAD: &[u8] = b"Orbis-0.0.0-x86_64-Setup.exe contents";
 
             let decode = |value: &str| {
