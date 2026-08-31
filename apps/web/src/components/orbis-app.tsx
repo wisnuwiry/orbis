@@ -993,7 +993,7 @@ export function OrbisApp() {
           mobileOpen={mobileSidebar}
           onAddProject={openProjectPicker}
           onMobileOpenChange={setMobileSidebar}
-          onNewTask={() => startNewTask()}
+          onNewTask={(project) => startNewTask(project)}
           onRemoveSession={removeSessionById}
           onRenameSession={renameSession}
           onSearch={() => openCommandPalette('commands')}

@@ -1,8 +1,9 @@
-import type { AgentSession } from '@orbis/client'
+import type { AgentSession, Project } from '@orbis/client'
 import { ContextMenu } from '@base-ui/react/context-menu'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Virtuoso } from 'react-virtuoso'
 import { Button } from '@/components/ui/button'
+import { ControlMenu } from '@/components/control-menu'
 import { Input } from '@/components/ui/input'
 import { Tooltip } from '@/components/ui/tooltip'
 import { PanelResizeHandle } from '@/components/panel-resize-handle'
@@ -17,7 +18,10 @@ import {
   sessionTimeLabel,
   sidebarRows,
   type DateGroup,
+  type SessionGroup,
   type SessionItem,
+  type SidebarGrouping,
+  type SidebarOrdering,
 } from '@/lib/sidebar-presentation'
 import { cn } from '@/lib/utils'
 import orbisAppIconUrl from '../../../../website/public/app-icon.png'
@@ -30,7 +34,7 @@ interface SidebarProps {
   onMobileOpenChange: (open: boolean) => void
   onToggleSidebar: () => void
   onWidthChange: (width: number) => void
-  onNewTask: () => void
+  onNewTask: (project?: Project) => void
   onAddProject: () => void
   onSelectSession: (sessionId: string) => void
   onRenameSession: (sessionId: string, title: string) => Promise<void>
@@ -69,21 +73,67 @@ export function Sidebar({
   onUsage,
 }: SidebarProps) {
   const { t } = useI18n()
-  const [collapsed, setCollapsed] = useState<Set<DateGroup>>(new Set())
+  const [grouping, setGrouping] = useState<SidebarGrouping>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = window.localStorage.getItem('orbis:sidebar_grouping')
+      if (saved === 'project' || saved === 'updated') return saved
+    }
+    return 'updated'
+  })
+  const [ordering, setOrdering] = useState<SidebarOrdering>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = window.localStorage.getItem('orbis:sidebar_ordering')
+      if (saved === 'newest' || saved === 'oldest') return saved
+    }
+    return 'newest'
+  })
+  const [collapsed, setCollapsed] = useState<Set<string>>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = window.localStorage.getItem('orbis:sidebar_collapsed_groups')
+        if (saved) return new Set(JSON.parse(saved))
+      } catch {}
+    }
+    return new Set()
+  })
+  const [revealedOlderCounts, setRevealedOlderCounts] = useState<Record<string, number>>({})
   const [liveWidth, setLiveWidth] = useState(width)
   const [nowSeconds, setNowSeconds] = useState(() => Math.floor(Date.now() / 1_000))
+
   const sidebarShortcut = usePrimaryShortcut('⌘B', 'Ctrl+B')
   const settingsShortcut = usePrimaryShortcut('⌘,', 'Ctrl+,')
   const usageShortcut = usePrimaryShortcut('⌘U', 'Ctrl+U')
   const projectShortcut = usePrimaryShortcut('⌘O', 'Ctrl+O')
   const newTaskShortcut = usePrimaryShortcut('⌘N', 'Ctrl+N')
   const searchShortcut = usePrimaryShortcut('⌘K', 'Ctrl+K')
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('orbis:sidebar_grouping', grouping)
+    } catch {}
+  }, [grouping])
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('orbis:sidebar_ordering', ordering)
+    } catch {}
+  }, [ordering])
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('orbis:sidebar_collapsed_groups', JSON.stringify(Array.from(collapsed)))
+    } catch {}
+  }, [collapsed])
+
   const groups = groupSessions(
     taskState.projects,
     taskState.sessions,
     new Date(nowSeconds * 1_000),
     t('sidebar.unknown_project'),
     t('project.no_project_name'),
+    grouping,
+    ordering,
+    revealedOlderCounts,
   )
   const rows = sidebarRows(groups, collapsed)
 
@@ -169,13 +219,42 @@ export function Sidebar({
                 )
               }
               if (row.kind === 'spacer') return <div className="h-2.5" />
-              if (row.kind === 'group') {
+              if (row.kind === 'showMore') {
                 return (
-                  <div className="px-2.5">
-                    <div className="flex h-7 items-center justify-between px-2">
+                  <div className="relative px-2.5 pb-1">
+                    <div className="pointer-events-none absolute left-[18px] top-0 h-[14px] w-[9px] rounded-bl-[4px] border-b border-l border-border/40" />
+                    <div className="pl-6 pr-2">
+                      <button
+                        className="flex h-7 items-center justify-start rounded-[5px] px-2 text-[12px] font-medium text-[var(--text-tertiary)] hover:bg-sidebar-accent hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
+                        type="button"
+                        onClick={() => {
+                          setRevealedOlderCounts((current) => ({
+                            ...current,
+                            [row.groupId]: (current[row.groupId] ?? 0) + 10,
+                          }))
+                        }}
+                      >
+                        {t('sidebar.show_more')}
+                      </button>
+                    </div>
+                  </div>
+                )
+              }
+              if (row.kind === 'group') {
+                const isProjectGroup = row.group.kind === 'project' || row.group.kind === 'projectless'
+                const hasExpandedChildren = !row.collapsed && row.group.sessions.length > 0
+                const label = row.group.kind === 'updated' && row.group.dateGroup
+                  ? t(GROUP_TRANSLATION_KEYS[row.group.dateGroup])
+                  : row.group.label
+                return (
+                  <div className="relative px-2.5">
+                    {isProjectGroup && hasExpandedChildren && (
+                      <div className="pointer-events-none absolute bottom-0 left-[18px] top-[22px] w-px bg-border/40" />
+                    )}
+                    <div className="group/header flex h-7 items-center justify-between px-2">
                       <button
                         aria-expanded={!row.collapsed}
-                        className="group flex h-[22px] items-center gap-[5px] rounded px-1 text-[12.5px] font-medium text-[var(--text-tertiary)] outline-none hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring"
+                        className="group flex h-[22px] min-w-0 flex-1 items-center gap-[5px] rounded px-1 text-[12.5px] font-medium text-[var(--text-tertiary)] outline-none hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring"
                         type="button"
                         onClick={() => {
                           setCollapsed((current) => {
@@ -199,32 +278,93 @@ export function Sidebar({
                           }
                         }}
                       >
-                        {t(GROUP_TRANSLATION_KEYS[row.group.id])}
-                        <OrbisIcon
-                          className="size-3 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"
-                          name={row.collapsed ? 'chevronRight' : 'chevronDown'}
-                        />
+                        {isProjectGroup && (
+                          <OrbisIcon
+                            className="size-3.5 shrink-0 text-[var(--text-secondary)]"
+                            name={row.collapsed ? 'folder' : 'folderOpen'}
+                          />
+                        )}
+                        <span className="truncate">{label}</span>
+                        {!isProjectGroup && (
+                          <OrbisIcon
+                            className="size-3 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"
+                            name={row.collapsed ? 'chevronRight' : 'chevronDown'}
+                          />
+                        )}
                       </button>
-                      {row.first && (
-                        <Tooltip content={t('project.new_project')} shortcut={projectShortcut}>
-                          <Button
-                            aria-label={t('sidebar.add_project')}
-                            className="text-[var(--text-tertiary)]"
-                            size="icon-sm"
-                            variant="ghost"
-                            onClick={onAddProject}
-                          >
-                            <OrbisIcon name="folderNew" />
-                          </Button>
-                        </Tooltip>
-                      )}
+                      <div className="flex items-center gap-0.5">
+                        {row.first && (
+                          <>
+                            <ControlMenu
+                              align="right"
+                              caret={false}
+                              items={[
+                                {
+                                  id: 'grouping-project',
+                                  section: t('sidebar.grouping'),
+                                  label: t('sidebar.grouping_project'),
+                                  selected: grouping === 'project',
+                                  onSelect: () => setGrouping('project'),
+                                },
+                                {
+                                  id: 'grouping-updated',
+                                  section: t('sidebar.grouping'),
+                                  label: t('sidebar.grouping_updated'),
+                                  selected: grouping === 'updated',
+                                  onSelect: () => setGrouping('updated'),
+                                },
+                                {
+                                  id: 'ordering-newest',
+                                  section: t('sidebar.ordering'),
+                                  separatorBefore: true,
+                                  label: t('sidebar.ordering_newest'),
+                                  selected: ordering === 'newest',
+                                  onSelect: () => setOrdering('newest'),
+                                },
+                                {
+                                  id: 'ordering-oldest',
+                                  section: t('sidebar.ordering'),
+                                  label: t('sidebar.ordering_oldest'),
+                                  selected: ordering === 'oldest',
+                                  onSelect: () => setOrdering('oldest'),
+                                },
+                              ]}
+                              label={t('sidebar.options')}
+                              placement="below"
+                              selectionMode="choice"
+                              triggerClassName="size-8 max-w-none p-0 justify-center text-[var(--text-tertiary)] hover:bg-sidebar-accent hover:text-foreground cursor-pointer"
+                            >
+                              <Tooltip content={t('sidebar.options')}>
+                                <span className="grid size-8 place-items-center">
+                                  <OrbisIcon className="size-3.5 text-[var(--text-tertiary)]" name="listFilter" />
+                                </span>
+                              </Tooltip>
+                            </ControlMenu>
+                            <Tooltip content={t('project.new_project')} shortcut={projectShortcut}>
+                              <Button
+                                aria-label={t('sidebar.add_project')}
+                                className="text-[var(--text-tertiary)]"
+                                size="icon-sm"
+                                variant="ghost"
+                                onClick={onAddProject}
+                              >
+                                <OrbisIcon name="folderNew" />
+                              </Button>
+                            </Tooltip>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )
               }
               return (
-                <div className="px-2.5 pb-px">
+                <div className="relative px-2.5 pb-px">
+                  {grouping === 'project' && (
+                    <div className="pointer-events-none absolute bottom-0 left-[18px] top-0 w-px bg-border/40" />
+                  )}
                   <SessionRow
+                    groupedByProject={grouping === 'project'}
                     item={row.item}
                     nowSeconds={nowSeconds}
                     selected={selectedSessionId === row.item.session.id}
@@ -299,7 +439,7 @@ function SidebarAction({
 }) {
   return (
     <button
-      className="flex h-8 w-full items-center gap-2.5 rounded-[7px] px-1 text-left text-[13px] text-[var(--text-secondary)] outline-none hover:bg-sidebar-accent focus-visible:ring-1 focus-visible:ring-ring active:bg-sidebar-accent"
+      className="flex h-8 w-full items-center gap-2.5 rounded-[7px] px-1 text-left text-[13px] text-[var(--text-secondary)] outline-none hover:bg-sidebar-accent focus-visible:ring-1 focus-visible:ring-ring active:bg-sidebar-accent cursor-pointer"
       type="button"
       onClick={onClick}
     >
@@ -318,6 +458,7 @@ function SessionRow({
   item,
   nowSeconds,
   selected,
+  groupedByProject,
   onSelect,
   onRename,
   onRemove,
@@ -326,6 +467,7 @@ function SessionRow({
   item: SessionItem
   nowSeconds: number
   selected: boolean
+  groupedByProject?: boolean
   onSelect: (sessionId: string) => void
   onRename: (sessionId: string, title: string) => Promise<void>
   onRemove: (sessionId: string) => Promise<void>
@@ -338,6 +480,7 @@ function SessionRow({
   const rowButton = useRef<HTMLButtonElement>(null)
   const restoreMenuFocus = useRef(false)
   const currentTitle = displayTitle(item.session)
+  const timeLabel = sessionTimeLabel(item.session, nowSeconds, t)
 
   async function commitRename() {
     if (skipRenameCommit.current) {
@@ -379,11 +522,16 @@ function SessionRow({
         )}
       >
         {renaming ? (
-          <div className="flex h-[51px] w-full min-w-0 flex-col gap-1 rounded-[7px] px-2 py-[7px]">
+          <div
+            className={cn(
+              'flex w-full min-w-0 flex-col rounded-[7px]',
+              groupedByProject ? 'h-[36px] justify-center pl-6 pr-2 py-1' : 'h-[51px] gap-1 px-2 py-[7px]',
+            )}
+          >
             <span className="flex min-w-0 w-full items-center gap-1.5 leading-[18px]">
               <Input
                 autoFocus
-                className="h-[22px] min-w-0 flex-1 rounded border-ring bg-[var(--inset)] px-1 text-[13.5px]"
+                className="h-[22px] min-w-0 flex-1 rounded border-ring bg-[var(--inset)] px-1 text-[13px]"
                 value={title}
                 onBlur={() => void commitRename()}
                 onChange={(event) => setTitle(event.target.value)}
@@ -403,13 +551,51 @@ function SessionRow({
               />
               <SessionStatus status={item.session.status} t={t} />
             </span>
-            <SessionMetadata item={item} nowSeconds={nowSeconds} t={t} />
           </div>
+        ) : groupedByProject ? (
+          <button
+            aria-current={selected ? 'page' : undefined}
+            aria-haspopup="menu"
+            className="flex h-[34px] w-full min-w-0 items-center justify-between gap-2 rounded-[6px] pl-6 pr-2 text-left outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
+            ref={rowButton}
+            type="button"
+            onClick={() => onSelect(item.session.id)}
+            onKeyDown={(event) => {
+              if ((event.shiftKey && event.key === 'F10') || event.key === 'ContextMenu') {
+                event.preventDefault()
+                restoreMenuFocus.current = true
+                setMenuOpen(true)
+              }
+            }}
+          >
+            <span className="flex min-w-0 flex-1 items-center gap-1.5">
+              <span
+                className={cn(
+                  'min-w-0 flex-1 truncate text-[13px] leading-tight text-[var(--text-secondary)] group-hover:text-foreground',
+                  selected && 'font-medium text-foreground',
+                )}
+              >
+                {currentTitle}
+              </span>
+              <SessionStatus status={item.session.status} t={t} />
+            </span>
+            {timeLabel && (
+              <span
+                className={cn(
+                  'shrink-0 text-[11px] text-[var(--text-ghost)] group-hover:text-[var(--text-tertiary)]',
+                  item.session.status !== 'idle' && 'text-[var(--text-tertiary)]',
+                  selected && 'text-[var(--text-tertiary)]',
+                )}
+              >
+                {timeLabel}
+              </span>
+            )}
+          </button>
         ) : (
           <button
             aria-current={selected ? 'page' : undefined}
             aria-haspopup="menu"
-            className="flex h-[51px] w-full min-w-0 flex-col gap-1 rounded-[7px] px-2 py-[7px] text-left outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className="flex h-[51px] w-full min-w-0 flex-col gap-1 rounded-[7px] px-2 py-[7px] text-left outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
             ref={rowButton}
             type="button"
             onClick={() => onSelect(item.session.id)}
@@ -467,17 +653,27 @@ function SessionRow({
   )
 }
 
-function SessionMetadata({ item, nowSeconds, t }: { item: SessionItem; nowSeconds: number; t: Translator }) {
+function SessionMetadata({
+  item,
+  nowSeconds,
+  t,
+}: {
+  item: SessionItem
+  nowSeconds: number
+  t: Translator
+}) {
   const timeLabel = sessionTimeLabel(item.session, nowSeconds, t)
   return (
     <span className="flex w-full min-w-0 items-center gap-1.5 text-[11.5px] leading-[15px] text-[var(--text-tertiary)]">
       <OrbisIcon className="size-[11px] shrink-0" name="folder" />
       <span className="min-w-0 flex-1 truncate">{item.projectName}</span>
       {timeLabel && (
-        <span className={cn(
-          'shrink-0 text-[var(--text-ghost)]',
-          item.session.status !== 'idle' && 'text-[var(--text-tertiary)]',
-        )}>
+        <span
+          className={cn(
+            'shrink-0 text-[var(--text-ghost)]',
+            item.session.status !== 'idle' && 'text-[var(--text-tertiary)]',
+          )}
+        >
           {timeLabel}
         </span>
       )}
