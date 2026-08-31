@@ -243,6 +243,7 @@ impl Render for Orbis {
         }
         let image_preview = self.render_image_preview(cx);
         let task_switcher = self.render_task_switcher(window, cx);
+        let onboarding_modal = self.render_onboarding_modal(window, cx);
         if self.settings_page.is_some() {
             let command_palette = self.render_command_palette(window, cx);
             let commit_dialog = self.render_commit_dialog(cx);
@@ -267,6 +268,7 @@ impl Render for Orbis {
                 .children(goal_dialog)
                 .children(image_preview)
                 .children(task_switcher)
+                .children(onboarding_modal)
                 .into_any_element();
             return self.render_window_frame(content, window, cx);
         }
@@ -415,6 +417,7 @@ impl Render for Orbis {
             .children(goal_dialog)
             .children(image_preview)
             .children(task_switcher)
+            .children(onboarding_modal)
             .into_any_element();
 
         self.render_window_frame(content, window, cx)

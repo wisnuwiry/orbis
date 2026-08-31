@@ -160,6 +160,7 @@ enum PaletteAction {
     ToggleSidebar,
     ToggleRightPanel,
     OpenSettings(SettingsPage),
+    OpenOnboarding,
     SelectTask(Uuid),
 }
 
@@ -744,6 +745,15 @@ impl Orbis {
             Some(crate::platform::primary_shortcut("⌘L", "Ctrl+L")),
             PaletteAction::FocusComposer,
             "focus composer prompt input message",
+            next(),
+        ));
+        commands.push(CommandPaletteItem::command(
+            PaletteSection::Commands,
+            tr!("onboarding.command_title"),
+            "icons/sparkle.svg",
+            None,
+            PaletteAction::OpenOnboarding,
+            "onboarding tour welcome help guide intro tutorial features",
             next(),
         ));
         for identifier in PaletteIdentifier::ALL {
@@ -1589,6 +1599,10 @@ impl Orbis {
             PaletteAction::OpenSettings(page) => {
                 self.open_settings_action(&OpenSettings, window, cx);
                 self.open_settings_page(page, cx);
+            }
+            PaletteAction::OpenOnboarding => {
+                self.settings_page = None;
+                self.open_onboarding(window, cx);
             }
             PaletteAction::SelectTask(session_id) => {
                 self.settings_page = None;

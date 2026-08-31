@@ -1104,3 +1104,54 @@ usage_error.curl_did_not_finish: curl がリクエストを完了しませんで
 usage_error.curl_failed: "curl に失敗しました：%{error}"
 usage_error.unknown_error: 不明なエラー
 usage_error.curl_no_status: curl から HTTP ステータス行が返されませんでした
+
+onboarding.welcome_title: Orbis へようこそ
+onboarding.welcome_subtitle: ローカルコーディングエージェントのための高速ネイティブコントロールプレーン
+onboarding.step_indicator: "%{current} / %{total}"
+onboarding.skip: スキップ
+onboarding.back: 戻る
+onboarding.next: 次へ
+onboarding.get_started: はじめる
+onboarding.command_title: ようこそツアーとオンボーディング
+onboarding.replay_button: オンボーディングツアーを再生
+
+onboarding.slide1_badge: マルチエージェントハブ
+onboarding.slide1_title: ネイティブ・マルチエージェント・コントロールプレーン
+onboarding.slide1_desc: Orbis は、構造化プロトコルストリーミングによってローカルエージェント CLI に直接接続し、クラウドを介さず動作します。
+onboarding.slide1_item1_title: 幅広い CLI サポート
+onboarding.slide1_item1_desc: Claude Code、Codex CLI、Cursor CLI、Amp、OpenCode、Grok、Kimi、Pi、Fx をシームレスに利用可能。
+onboarding.slide1_item2_title: 自動検出
+onboarding.slide1_item2_desc: インストール済みのエージェント CLI を自動検出し、認証とセッション状態を管理します。
+onboarding.slide1_item3_title: 高性能ネイティブ GUI
+onboarding.slide1_item3_desc: Rust と GPUI で構築され、滑らかな 120Hz 描画と最小限のリソース消費を実現。
+
+onboarding.slide2_badge: ワークスペースと制御
+onboarding.slide2_title: マルチセッションワークスペースとライブステアリング
+onboarding.slide2_desc: プロジェクトを快適に整理しながら、エージェントの実行をリアルタイムでコントロールできます。
+onboarding.slide2_item1_title: ライブステアリングとメッセージキュー
+onboarding.slide2_item1_desc: 実行中のターンを中断することなく、後続の指示をキューに入れたり途中で方向修正したりできます。
+onboarding.slide2_item2_title: スレッド目標とスラッシュコマンド
+onboarding.slide2_item2_desc: /goal で高レベルの目標を設定し、組み込みのスラッシュワークフローを実行。
+onboarding.slide2_item3_title: 柔軟なモデル選択
+onboarding.slide2_item3_desc: 推論の強度を調整し、プロバイダーのモデルやサービスクラスを自在に切り替えられます。
+
+onboarding.slide3_badge: 差分とチェックポイント
+onboarding.slide3_title: 変更の確認と即時 Git 巻き戻し
+onboarding.slide3_desc: ビジュアルな差分表示と会話チェックポイントにより、安心してコード修正を任せられます。
+onboarding.slide3_item1_title: 折りたたみ可能な右パネル (Cmd/Ctrl + B)
+onboarding.slide3_item1_desc: エージェントがファイルを編集する際、横並びまたはインラインでリアルタイムに差分を確認。
+onboarding.slide3_item2_title: 会話対応チェックポイント
+onboarding.slide3_item2_desc: 過去のメッセージ時点へ作業ディレクトリを巻き戻したり、新しいセッションブランチを作成可能。
+onboarding.slide3_item3_title: 組み込みターミナルとプレビュー
+onboarding.slide3_item3_desc: Orbis を離れることなく、Markdown プレビューや統合ターミナルセッションを利用できます。
+
+onboarding.slide4_badge: 生産性とプライバシー
+onboarding.slide4_title: キーボードで素早く操作、100% ローカル完結
+onboarding.slide4_desc: Orbis はキーボード中心の設計であり、大切なコードのプライバシーを完全に守ります。
+onboarding.slide4_item1_title: コマンドパレット (Cmd/Ctrl + K)
+onboarding.slide4_item1_desc: セッション、コマンド実行、設定検索をあいまい検索で素早く実行。
+onboarding.slide4_item2_title: タスクスイッチャー (Cmd/Ctrl + T / Ctrl + Tab)
+onboarding.slide4_item2_desc: アクティブなエージェント会話やバックグラウンドタスクを瞬時に切り替え。
+onboarding.slide4_item3_title: 100% ローカルファースト
+onboarding.slide4_item3_desc: すべてのプロジェクト、ログ、設定は ~/.orbis にローカル保存され、外部アカウントは不要です。
+

@@ -541,6 +541,60 @@ impl Orbis {
                         .child(toggle),
                 )
             })
+            .child(
+                div()
+                    .mt(px(15.0))
+                    .w_full()
+                    .min_h(px(60.0))
+                    .px(px(20.0))
+                    .py(px(12.0))
+                    .rounded(px(13.0))
+                    .bg(theme.raised)
+                    .flex()
+                    .items_center()
+                    .gap(px(24.0))
+                    .child(
+                        div()
+                            .flex_1()
+                            .min_w_0()
+                            .child(
+                                div()
+                                    .text_size(sp(13.5))
+                                    .font_weight(FontWeight::MEDIUM)
+                                    .text_color(theme.text)
+                                    .child(tr!("onboarding.command_title")),
+                            )
+                            .child(
+                                div()
+                                    .mt(px(5.0))
+                                    .text_size(sp(12.5))
+                                    .line_height(sp(18.0))
+                                    .text_color(theme.text_secondary)
+                                    .child(tr!("onboarding.welcome_subtitle")),
+                            ),
+                    )
+                    .child(
+                        div()
+                            .id("replay-onboarding-btn")
+                            .h(px(32.0))
+                            .px(px(14.0))
+                            .rounded(px(8.0))
+                            .bg(theme.overlay_strong)
+                            .text_size(sp(12.5))
+                            .font_weight(FontWeight::MEDIUM)
+                            .text_color(theme.text)
+                            .flex()
+                            .items_center()
+                            .justify_center()
+                            .cursor_default()
+                            .hover(|el| el.bg(theme.overlay))
+                            .child(tr!("onboarding.replay_button"))
+                            .on_click(cx.listener(|this, _, window, cx| {
+                                this.settings_page = None;
+                                this.open_onboarding(window, cx);
+                            })),
+                    ),
+            )
             .into_any_element()
     }
 

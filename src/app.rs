@@ -1213,6 +1213,7 @@ pub struct Orbis {
     commit_dialog: Option<commit_dialog::CommitDialogState>,
     goal_dialog: Option<goal_dialog::GoalDialogState>,
     goal_dialog_request: Option<goal_dialog::GoalDialogRequest>,
+    onboarding: onboarding::OnboardingState,
     /// Goal operations accepted before the session's runtime exists. Goals
     /// attach to the provider thread, not to any turn, so `/goal` on a fresh
     /// task starts the provider and these drain once it installs.
@@ -1607,6 +1608,7 @@ mod composer;
 mod drafts;
 mod file_search;
 mod image_preview;
+mod onboarding;
 mod render;
 mod right_panel;
 mod runtime;
@@ -1632,6 +1634,7 @@ pub use commit_dialog::init as init_commit_dialog_keys;
 pub use goal_dialog::init as init_goal_dialog_keys;
 use components::*;
 pub use image_preview::init as init_image_preview_keys;
+pub use onboarding::init as init_onboarding_keys;
 pub use settings::init as init_settings_keys;
 pub use sidebar::init as init_sidebar_keys;
 use sidebar::{SidebarGroup, SidebarRow};
@@ -2073,6 +2076,10 @@ impl Orbis {
         }
         crate::theme::apply_theme_preference(state.theme, window, cx);
         crate::platform::set_sidebar_material_width(window, sidebar_width);
+        let mut onboarding = onboarding::OnboardingState::new(cx);
+        if !state.has_completed_onboarding {
+            onboarding.open = true;
+        }
         let project_paths = state
             .projects
             .iter()
@@ -2812,6 +2819,7 @@ impl Orbis {
                 commit_dialog: None,
                 goal_dialog: None,
                 goal_dialog_request: None,
+                onboarding,
                 pending_goal_operations: HashMap::new(),
                 goal_runtime_starts: HashSet::new(),
                 goal_observed_at: HashMap::new(),
@@ -3036,6 +3044,9 @@ impl Orbis {
             // And the header's "open project in app" targets, so its menu
             // lists installed apps and icons without ever probing on a frame.
             this.detect_open_in_apps(cx);
+            if this.onboarding.open {
+                window.focus(&this.onboarding.focus, cx);
+            }
         });
         entity
     }

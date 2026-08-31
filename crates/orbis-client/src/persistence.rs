@@ -335,6 +335,8 @@ struct AppState {
     markdown_preview: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     window_state: Option<PersistedWindowState>,
+    #[serde(default)]
+    has_completed_onboarding: bool,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -393,6 +395,8 @@ pub struct PersistedState {
     pub markdown_preview: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub window_state: Option<PersistedWindowState>,
+    #[serde(default)]
+    pub has_completed_onboarding: bool,
     #[serde(default = "default_computer_use_enabled")]
     pub computer_use_enabled: bool,
     #[serde(default)]
@@ -454,6 +458,7 @@ impl PersistedState {
             right_panel_width: DEFAULT_RIGHT_PANEL_WIDTH,
             markdown_preview: false,
             window_state: None,
+            has_completed_onboarding: false,
             computer_use_enabled: false,
             computer_use_allowed_apps: Vec::new(),
             disabled_providers: Vec::new(),
@@ -593,6 +598,7 @@ impl PersistedState {
             right_panel_width: self.right_panel_width,
             markdown_preview: self.markdown_preview,
             window_state: self.window_state,
+            has_completed_onboarding: self.has_completed_onboarding,
         }
     }
 
@@ -626,6 +632,7 @@ impl PersistedState {
         self.right_panel_width = app_state.right_panel_width;
         self.markdown_preview = app_state.markdown_preview;
         self.window_state = app_state.window_state;
+        self.has_completed_onboarding = app_state.has_completed_onboarding;
     }
 
     fn persistable_selected_session(&self) -> Option<Uuid> {
@@ -1156,6 +1163,7 @@ mod tests {
         assert_eq!(state.sidebar_grouping, SidebarGrouping::Updated);
         assert_eq!(state.sidebar_ordering, SidebarOrdering::Newest);
         assert_eq!(state.last_runtime_mode, RuntimeMode::FullAccess);
+        assert!(!state.has_completed_onboarding);
     }
 
     #[test]

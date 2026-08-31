@@ -2161,3 +2161,99 @@ usage_error.unknown_error:
   en: unknown error
 usage_error.curl_no_status:
   en: curl returned no HTTP status line
+
+onboarding.welcome_title:
+  en: Welcome to Orbis
+onboarding.welcome_subtitle:
+  en: A fast, native control plane for local coding agents
+onboarding.step_indicator:
+  en: "%{current} of %{total}"
+onboarding.skip:
+  en: Skip
+onboarding.back:
+  en: Back
+onboarding.next:
+  en: Next
+onboarding.get_started:
+  en: Get Started
+onboarding.command_title:
+  en: Welcome Tour & Onboarding
+onboarding.replay_button:
+  en: Replay Onboarding Tour
+
+onboarding.slide1_badge:
+  en: Multi-Agent Hub
+onboarding.slide1_title:
+  en: Native Multi-Agent Control Plane
+onboarding.slide1_desc:
+  en: Orbis connects directly to your favorite local agent CLIs with structured protocol streaming and zero cloud middleman.
+onboarding.slide1_item1_title:
+  en: Broad CLI Support
+onboarding.slide1_item1_desc:
+  en: Seamlessly run Claude Code, Codex CLI, Cursor CLI, Amp, OpenCode, Grok, Kimi, Pi, and Fx.
+onboarding.slide1_item2_title:
+  en: Automatic Detection
+onboarding.slide1_item2_desc:
+  en: Discovers installed agent CLIs automatically and manages authentication and session state.
+onboarding.slide1_item3_title:
+  en: High-Performance Native GUI
+onboarding.slide1_item3_desc:
+  en: Built in Rust with GPUI for fluid, low-latency 120Hz rendering and minimal resource consumption.
+
+onboarding.slide2_badge:
+  en: Workspace & Control
+onboarding.slide2_title:
+  en: Multi-Session Workspace & Live Steering
+onboarding.slide2_desc:
+  en: Manage projects effortlessly while keeping continuous control over your agent's execution.
+onboarding.slide2_item1_title:
+  en: Live Steering & Follow-up Queue
+onboarding.slide2_item1_desc:
+  en: Queue follow-up instructions or adjust agent direction midway without breaking conversation context.
+onboarding.slide2_item2_title:
+  en: Thread Goals & Slash Commands
+onboarding.slide2_item2_desc:
+  en: Define high-level objectives using /goal and trigger built-in agent workflow commands.
+onboarding.slide2_item3_title:
+  en: Flexible Model Selection
+onboarding.slide2_item3_desc:
+  en: Tune reasoning effort, switch provider models, and select service tiers on the fly.
+
+onboarding.slide3_badge:
+  en: Diffs & Checkpoints
+onboarding.slide3_title:
+  en: Inspect Changes & Instant Git Rewind
+onboarding.slide3_desc:
+  en: Review code modifications with confidence through visual diffs and conversation checkpoints.
+onboarding.slide3_item1_title:
+  en: Collapsible Right Panel (Cmd/Ctrl + B)
+onboarding.slide3_item1_desc:
+  en: Review side-by-side or inline code diffs in real time as the agent modifies files.
+onboarding.slide3_item2_title:
+  en: Conversation-Aware Checkpoints
+onboarding.slide3_item2_desc:
+  en: Rewind working directory changes back to any earlier message or create new session branches.
+onboarding.slide3_item3_title:
+  en: Built-in Terminal & Preview
+onboarding.slide3_item3_desc:
+  en: Render markdown previews and access integrated terminal sessions without leaving Orbis.
+
+onboarding.slide4_badge:
+  en: Productivity & Privacy
+onboarding.slide4_title:
+  en: Speed at Your Fingertips, 100% Local
+onboarding.slide4_desc:
+  en: Orbis is built keyboard-first with absolute privacy for your proprietary codebase.
+onboarding.slide4_item1_title:
+  en: Command Palette (Cmd/Ctrl + K)
+onboarding.slide4_item1_desc:
+  en: Jump across sessions, execute commands, and search settings with fuzzy matching.
+onboarding.slide4_item2_title:
+  en: Quick Task Switcher (Cmd/Ctrl + T / Ctrl + Tab)
+onboarding.slide4_item2_desc:
+  en: Rapidly toggle between active agent conversations and background tasks.
+onboarding.slide4_item3_title:
+  en: 100% Local-First Storage
+onboarding.slide4_item3_desc:
+  en: All projects, transcripts, and settings reside locally in ~/.orbis with no external accounts needed.
+
