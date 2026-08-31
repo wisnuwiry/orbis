@@ -1,5 +1,8 @@
 import type { AgentSession, Project } from '@orbis/client'
-import { projectDisplayName } from './project-presentation'
+import { isProjectlessProject, projectDisplayName } from './project-presentation'
+
+export type SidebarGrouping = 'project' | 'updated'
+export type SidebarOrdering = 'newest' | 'oldest'
 
 export type DateGroup = 'today' | 'yesterday' | 'week' | 'month' | 'year' | 'more'
 
@@ -10,18 +13,24 @@ export interface SessionItem {
 }
 
 export interface SessionGroup {
-  id: DateGroup
+  id: string
+  kind: 'updated' | 'project' | 'projectless'
+  dateGroup?: DateGroup
+  projectId?: string
+  project?: Project
   label: string
   sessions: SessionItem[]
+  hasMore?: boolean
 }
 
 export type SidebarListRow =
   | { kind: 'search'; key: 'search' }
   | { kind: 'group'; key: string; group: SessionGroup; collapsed: boolean; first: boolean }
   | { kind: 'session'; key: string; item: SessionItem }
+  | { kind: 'showMore'; key: string; groupId: string }
   | { kind: 'spacer'; key: string }
 
-const GROUP_LABELS: Record<DateGroup, string> = {
+export const GROUP_LABELS: Record<DateGroup, string> = {
   today: 'Today',
   yesterday: 'Yesterday',
   week: 'This Week',
@@ -30,18 +39,27 @@ const GROUP_LABELS: Record<DateGroup, string> = {
   more: 'More',
 }
 
-const GROUP_ORDER: DateGroup[] = ['today', 'yesterday', 'week', 'month', 'year', 'more']
+export const GROUP_ORDER_NEWEST: DateGroup[] = ['today', 'yesterday', 'week', 'month', 'year', 'more']
+export const GROUP_ORDER_OLDEST: DateGroup[] = ['more', 'year', 'month', 'week', 'yesterday', 'today']
+
+export const SIDEBAR_PROJECT_RECENT_WINDOW_SECONDS = 7 * 24 * 60 * 60 // 604_800 seconds (7 days)
 
 export function sidebarRows(
   groups: SessionGroup[],
-  collapsed: ReadonlySet<DateGroup>,
+  collapsed: ReadonlySet<string>,
 ): SidebarListRow[] {
   const rows: SidebarListRow[] = [{ kind: 'search', key: 'search' }]
   const visibleGroups = groups.length
     ? groups
     // Desktop keeps the first header so Add Project never disappears merely
     // because there is no task history yet.
-    : [{ id: 'today' as const, label: GROUP_LABELS.today, sessions: [] }]
+    : [{
+        id: 'updated:today',
+        kind: 'updated' as const,
+        dateGroup: 'today' as const,
+        label: GROUP_LABELS.today,
+        sessions: [],
+      }]
   visibleGroups.forEach((group, index) => {
     const isCollapsed = collapsed.has(group.id)
     rows.push({
@@ -57,10 +75,28 @@ export function sidebarRows(
         key: `session:${item.session.id}`,
         item,
       })))
+      if (group.hasMore) {
+        rows.push({
+          kind: 'showMore',
+          key: `showMore:${group.id}`,
+          groupId: group.id,
+        })
+      }
     }
     if (groups.length) rows.push({ kind: 'spacer', key: `spacer:${group.id}` })
   })
   return rows
+}
+
+export function sortSidebarSessions(
+  sessions: AgentSession[],
+  ordering: SidebarOrdering = 'newest',
+): AgentSession[] {
+  return [...sessions].sort((left, right) => {
+    const leftTime = sessionTimestamp(left)
+    const rightTime = sessionTimestamp(right)
+    return ordering === 'oldest' ? leftTime - rightTime : rightTime - leftTime
+  })
 }
 
 export function groupSessions(
@@ -69,28 +105,114 @@ export function groupSessions(
   now = new Date(),
   unknownProject = 'Unknown project',
   projectlessName = 'No project',
+  grouping: SidebarGrouping = 'updated',
+  ordering: SidebarOrdering = 'newest',
+  revealedOlderCounts: Record<string, number> = {},
 ): SessionGroup[] {
+  const projectMap = new Map(projects.map((p) => [p.id, p]))
   const projectNames = new Map(projects.map((project) => [
     project.id,
     projectDisplayName(project, projectlessName),
   ]))
-  const grouped = new Map<DateGroup, SessionItem[]>()
-  const started = sessions
-    .filter(sessionHasStarted)
-    .sort((left, right) => sessionTimestamp(right) - sessionTimestamp(left))
+  const started = sortSidebarSessions(sessions.filter(sessionHasStarted), ordering)
+
+  if (grouping === 'updated') {
+    const grouped = new Map<DateGroup, SessionItem[]>()
+    for (const session of started) {
+      const id = dateGroup(sessionTimestamp(session), now)
+      const items = grouped.get(id) ?? []
+      items.push({
+        session,
+        projectName: projectNames.get(session.project_id) ?? unknownProject,
+        timestamp: sessionTimestamp(session),
+      })
+      grouped.set(id, items)
+    }
+    const order = ordering === 'oldest' ? GROUP_ORDER_OLDEST : GROUP_ORDER_NEWEST
+    return order
+      .filter((id) => grouped.has(id))
+      .map((id) => ({
+        id: `updated:${id}`,
+        kind: 'updated',
+        dateGroup: id,
+        label: GROUP_LABELS[id],
+        sessions: grouped.get(id)!,
+      }))
+  }
+
+  // grouping === 'project'
+  const nowSeconds = Math.floor(now.getTime() / 1000)
+  const recentCutoff = nowSeconds - SIDEBAR_PROJECT_RECENT_WINDOW_SECONDS
+
+  const projectGroups: SessionGroup[] = []
+  const projectIndexMap = new Map<string, number>()
+  const projectlessSessions: SessionItem[] = []
+
   for (const session of started) {
-    const id = dateGroup(sessionTimestamp(session), now)
-    const items = grouped.get(id) ?? []
-    items.push({
+    const project = projectMap.get(session.project_id)
+    const isProjectless = !project || isProjectlessProject(project)
+    const item: SessionItem = {
       session,
       projectName: projectNames.get(session.project_id) ?? unknownProject,
       timestamp: sessionTimestamp(session),
-    })
-    grouped.set(id, items)
+    }
+
+    if (isProjectless) {
+      projectlessSessions.push(item)
+      continue
+    }
+
+    let groupIndex = projectIndexMap.get(session.project_id)
+    if (groupIndex === undefined) {
+      groupIndex = projectGroups.length
+      projectIndexMap.set(session.project_id, groupIndex)
+      projectGroups.push({
+        id: `project:${session.project_id}`,
+        kind: 'project',
+        projectId: session.project_id,
+        project,
+        label: projectNames.get(session.project_id) ?? unknownProject,
+        sessions: [],
+      })
+    }
+    projectGroups[groupIndex]!.sessions.push(item)
   }
-  return GROUP_ORDER
-    .filter((id) => grouped.has(id))
-    .map((id) => ({ id, label: GROUP_LABELS[id], sessions: grouped.get(id)! }))
+
+  if (projectlessSessions.length > 0) {
+    projectGroups.push({
+      id: 'projectless',
+      kind: 'projectless',
+      label: projectlessName,
+      sessions: projectlessSessions,
+    })
+  }
+
+  // Apply recent cutoff and pagination for each project group
+  return projectGroups.map((group) => {
+    const allSessions = group.sessions
+    const revealedOlder = revealedOlderCounts[group.id] ?? 0
+
+    const visible: SessionItem[] = []
+    let olderSeen = 0
+
+    for (const item of allSessions) {
+      const recent = item.timestamp >= recentCutoff
+      if (recent || olderSeen < revealedOlder) {
+        visible.push(item)
+      }
+      if (!recent) {
+        olderSeen++
+      }
+    }
+
+    const hasMore = olderSeen > revealedOlder
+
+    return {
+      ...group,
+      sessions: visible,
+      hasMore,
+    }
+  })
 }
 
 export function sessionHasStarted(session: AgentSession): boolean {
