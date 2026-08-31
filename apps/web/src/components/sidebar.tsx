@@ -4,11 +4,13 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Virtuoso } from 'react-virtuoso'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Tooltip } from '@/components/ui/tooltip'
 import { PanelResizeHandle } from '@/components/panel-resize-handle'
 import { OrbisIcon } from '@/components/orbis-icon'
 import { displayTitle, type TaskState } from '@/lib/daemon-api'
 import { useDaemon } from '@/lib/daemon-context'
 import { useI18n } from '@/lib/i18n'
+import { usePrimaryShortcut } from '@/lib/platform'
 import {
   groupSessions,
   nextSidebarUpdateDelay,
@@ -35,6 +37,7 @@ interface SidebarProps {
   onRemoveSession: (sessionId: string) => Promise<void>
   onSearch: () => void
   onSettings: () => void
+  onUsage?: () => void
 }
 
 const GROUP_TRANSLATION_KEYS: Record<DateGroup, string> = {
@@ -63,11 +66,18 @@ export function Sidebar({
   onRemoveSession,
   onSearch,
   onSettings,
+  onUsage,
 }: SidebarProps) {
   const { t } = useI18n()
   const [collapsed, setCollapsed] = useState<Set<DateGroup>>(new Set())
   const [liveWidth, setLiveWidth] = useState(width)
   const [nowSeconds, setNowSeconds] = useState(() => Math.floor(Date.now() / 1_000))
+  const sidebarShortcut = usePrimaryShortcut('⌘B', 'Ctrl+B')
+  const settingsShortcut = usePrimaryShortcut('⌘,', 'Ctrl+,')
+  const usageShortcut = usePrimaryShortcut('⌘U', 'Ctrl+U')
+  const projectShortcut = usePrimaryShortcut('⌘O', 'Ctrl+O')
+  const newTaskShortcut = usePrimaryShortcut('⌘N', 'Ctrl+N')
+  const searchShortcut = usePrimaryShortcut('⌘K', 'Ctrl+K')
   const groups = groupSessions(
     taskState.projects,
     taskState.sessions,
@@ -115,19 +125,22 @@ export function Sidebar({
             src={orbisAppIconUrl}
           />
           <div className="flex-1" />
-          <Button
-            aria-label={t('sidebar.hide')}
-            size="icon-sm"
-            variant="ghost"
-            onClick={onToggleSidebar}
-          >
-            <OrbisIcon name="panelLeft" />
-          </Button>
+          <Tooltip content={t('sidebar.toggle')} shortcut={sidebarShortcut}>
+            <Button
+              aria-label={t('sidebar.hide')}
+              size="icon-sm"
+              variant="ghost"
+              onClick={onToggleSidebar}
+            >
+              <OrbisIcon name="panelLeft" />
+            </Button>
+          </Tooltip>
         </header>
         <div className="px-2.5">
           <SidebarAction
             icon={<OrbisIcon name="pencil" />}
             label={t('menu.new_task')}
+            shortcut={newTaskShortcut}
             onClick={() => {
               onNewTask()
               onMobileOpenChange(false)
@@ -149,6 +162,7 @@ export function Sidebar({
                     <SidebarAction
                       icon={<OrbisIcon name="search" />}
                       label={t('sidebar.search')}
+                      shortcut={searchShortcut}
                       onClick={onSearch}
                     />
                   </div>
@@ -192,15 +206,17 @@ export function Sidebar({
                         />
                       </button>
                       {row.first && (
-                        <Button
-                          aria-label={t('sidebar.add_project')}
-                          className="text-[var(--text-tertiary)]"
-                          size="icon-sm"
-                          variant="ghost"
-                          onClick={onAddProject}
-                        >
-                          <OrbisIcon name="folderNew" />
-                        </Button>
+                        <Tooltip content={t('project.new_project')} shortcut={projectShortcut}>
+                          <Button
+                            aria-label={t('sidebar.add_project')}
+                            className="text-[var(--text-tertiary)]"
+                            size="icon-sm"
+                            variant="ghost"
+                            onClick={onAddProject}
+                          >
+                            <OrbisIcon name="folderNew" />
+                          </Button>
+                        </Tooltip>
                       )}
                     </div>
                   </div>
@@ -226,17 +242,32 @@ export function Sidebar({
           />
         </nav>
 
-        <div className="flex h-10 shrink-0 items-center px-2.5">
-          <Button
-            aria-label={t('common.settings')}
-            className="text-[var(--text-tertiary)]"
-            size="icon-sm"
-            variant="ghost"
-            onClick={onSettings}
-          >
-            <OrbisIcon name="settings" />
-          </Button>
+        <div className="flex h-10 shrink-0 items-center gap-1 px-2.5">
+          <Tooltip content={t('common.settings')} shortcut={settingsShortcut}>
+            <Button
+              aria-label={t('common.settings')}
+              className="text-[var(--text-tertiary)]"
+              size="icon-sm"
+              variant="ghost"
+              onClick={onSettings}
+            >
+              <OrbisIcon name="settings" />
+            </Button>
+          </Tooltip>
           <div className="flex-1" />
+          {onUsage && (
+            <Tooltip content={t('settings.usage')} shortcut={usageShortcut}>
+              <Button
+                aria-label={t('settings.usage')}
+                className="text-[var(--text-tertiary)]"
+                size="icon-sm"
+                variant="ghost"
+                onClick={onUsage}
+              >
+                <OrbisIcon name="chartColumn" />
+              </Button>
+            </Tooltip>
+          )}
           <ConnectionDot />
         </div>
         <PanelResizeHandle
@@ -258,10 +289,12 @@ export function Sidebar({
 function SidebarAction({
   icon,
   label,
+  shortcut,
   onClick,
 }: {
   icon: ReactNode
   label: string
+  shortcut?: string
   onClick: () => void
 }) {
   return (
@@ -271,7 +304,12 @@ function SidebarAction({
       onClick={onClick}
     >
       <span className="grid size-5 place-items-center [&>svg]:size-4">{icon}</span>
-      <span className="truncate">{label}</span>
+      <span className="min-w-0 flex-1 truncate">{label}</span>
+      {shortcut && (
+        <span className="flex h-5 min-w-6 flex-none items-center justify-center rounded-[5px] bg-[var(--inset)] px-1.5 text-[11px] font-medium text-[var(--text-tertiary)]">
+          {shortcut}
+        </span>
+      )}
     </button>
   )
 }

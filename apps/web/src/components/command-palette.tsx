@@ -348,7 +348,8 @@ export function CommandPalette({
       }}
     >
       <div className="flex max-h-[min(480px,calc(100dvh-108px))] w-full max-w-[680px] flex-col overflow-hidden rounded-[15px] bg-[var(--raised)] shadow-[0_24px_80px_rgba(0,0,0,0.26)]">
-        <div className="flex h-[60px] shrink-0 items-center border-b px-[19px]">
+        <div className="flex h-[60px] shrink-0 items-center gap-3 border-b px-[19px]">
+          <OrbisIcon className="size-4 shrink-0 text-[var(--text-tertiary)]" name="search" />
           <input
             aria-activedescendant={items[selected] ? `palette-${items[selected]!.id}` : undefined}
             aria-controls="command-palette-results"

@@ -15,6 +15,7 @@ import type {
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { Tooltip } from '@/components/ui/tooltip'
 import {
   CommandPalette,
   type CommandPaletteActions,
@@ -77,6 +78,7 @@ import {
 } from '@/lib/navigation-memory'
 import { transcriptLinkRoute } from '@/lib/transcript-links'
 import { shouldShowInitialDestination } from '@/lib/workspace-presentation'
+import { usePrimaryShortcut } from '@/lib/platform'
 import { agentPresetIdLabel } from '@/lib/agent-preset-presentation'
 import { isProjectlessProject, projectDisplayName } from '@/lib/project-presentation'
 import {
@@ -997,6 +999,7 @@ export function OrbisApp() {
           onSearch={() => openCommandPalette('commands')}
           onSelectSession={selectSession}
           onSettings={() => openSettings('general')}
+          onUsage={() => openSettings('usage')}
           onToggleSidebar={hideSidebar}
           onWidthChange={setSidebarWidth}
           selectedSessionId={search.session}
@@ -1277,6 +1280,8 @@ function TaskHeader({
   sidebarVisible: boolean
 }) {
   const { t } = useI18n()
+  const sidebarShortcut = usePrimaryShortcut('⌘B', 'Ctrl+B')
+  const rightPanelShortcut = usePrimaryShortcut('⇧⌘B', 'Ctrl+Shift+B')
   const cwd = session && project ? sessionCwd(session, project) : undefined
   const branches = useWorkspaceBranches(cwd)
   const preset = session?.provider === 'deepSeek' && session.messages.length
@@ -1284,15 +1289,17 @@ function TaskHeader({
     : null
   return (
     <header className="flex h-12 shrink-0 items-center gap-2 px-3 lg:px-3.5">
-      <Button
-        aria-label={t('sidebar.open')}
-        className={sidebarVisible ? 'lg:hidden' : undefined}
-        size="icon-sm"
-        variant="ghost"
-        onClick={onMenu}
-      >
-        <OrbisIcon name="panelLeft" />
-      </Button>
+      <Tooltip content={t('sidebar.toggle')} shortcut={sidebarShortcut}>
+        <Button
+          aria-label={t('sidebar.open')}
+          className={sidebarVisible ? 'lg:hidden' : undefined}
+          size="icon-sm"
+          variant="ghost"
+          onClick={onMenu}
+        >
+          <OrbisIcon name="panelLeft" />
+        </Button>
+      </Tooltip>
       <h1 className="min-w-0 truncate text-[13px] font-medium">{title}</h1>
       {preset && (
         <span className="max-w-44 truncate rounded-md bg-accent px-1.5 py-1 text-[11px] font-medium text-[var(--text-secondary)]">
@@ -1302,7 +1309,7 @@ function TaskHeader({
       <div className="flex-1" />
       {branches.data && (branches.data.additions > 0 || branches.data.deletions > 0) && (
         <button
-          className="flex items-center gap-1 rounded px-1.5 py-1 text-[11px] hover:bg-accent"
+          className="flex items-center gap-1 rounded px-1.5 py-1 text-[11px] hover:bg-accent cursor-pointer"
           type="button"
           onClick={onOpenChanges}
         >
@@ -1318,9 +1325,11 @@ function TaskHeader({
           onOpenBackgroundWork={onOpenBackgroundWork}
         />
       )}
-      <Button aria-label={t('right_panel.toggle')} size="icon-sm" variant="ghost" onClick={onTogglePanel}>
-        <OrbisIcon name="panelRight" />
-      </Button>
+      <Tooltip content={t('right_panel.toggle')} shortcut={rightPanelShortcut}>
+        <Button aria-label={t('right_panel.toggle')} size="icon-sm" variant="ghost" onClick={onTogglePanel}>
+          <OrbisIcon name="panelRight" />
+        </Button>
+      </Tooltip>
     </header>
   )
 }
