@@ -248,6 +248,9 @@ sidebar.unknown_project: 未知项目
 sidebar.close: 关闭侧边栏
 sidebar.hide: 隐藏侧边栏
 sidebar.open: 打开侧边栏
+sidebar.toggle: 显示或隐藏侧边栏
+sidebar.back: 后退
+sidebar.forward: 前进
 sidebar.tasks: 任务
 sidebar.add_project: 添加远程项目
 sidebar.resize: 调整侧边栏宽度

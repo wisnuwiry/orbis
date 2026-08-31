@@ -1009,9 +1009,10 @@ impl Orbis {
                                         cx.notify();
                                     }
                                 }))
-                                .tooltip(|window, cx| {
-                                    Tooltip::new(tr!("find.toggle_replace")).build(window, cx)
-                                })
+                                .tooltip(Tooltip::with_shortcut(
+                                    tr!("find.toggle_replace"),
+                                    crate::platform::primary_shortcut("⌥⌘F", "Ctrl+Alt+F"),
+                                ))
                         })
                         .child(icon(
                             if replace_shown {

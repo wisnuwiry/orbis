@@ -508,6 +508,12 @@ sidebar.hide:
   en: Hide sidebar
 sidebar.open:
   en: Open sidebar
+sidebar.toggle:
+  en: Toggle Sidebar
+sidebar.back:
+  en: Back
+sidebar.forward:
+  en: Forward
 sidebar.tasks:
   en: Tasks
 sidebar.add_project:

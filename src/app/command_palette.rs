@@ -2034,10 +2034,12 @@ impl Orbis {
                         .flex_none()
                         .flex()
                         .items_center()
+                        .gap(px(12.0))
                         .border_b_1()
                         .border_color(theme.border)
                         .text_size(sp(15.5))
                         .text_color(theme.text)
+                        .child(icon("icons/search.svg", 16.0, theme.text_tertiary))
                         .child(
                             div()
                                 .min_w_0()
