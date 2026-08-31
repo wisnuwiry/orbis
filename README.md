@@ -1,5 +1,7 @@
 # Orbis
 
+> **Notice**: Orbis is a fork of [Waku](https://github.com/egoist/waku), originally created by [egoist](https://github.com/egoist), licensed under GPL-3.0. See [NOTICE.md](NOTICE.md) for full attribution and details.
+
 Orbis is a fast, native desktop app for working with local coding agents. It is
 built in Rust with [GPUI](https://github.com/zed-industries/zed/tree/main/crates/gpui)
 and keeps projects, sessions, transcripts on your machine.
@@ -118,3 +120,4 @@ You can support the project development via [GitHub Sponsors](https://github.com
 ## License
 
 Orbis is licensed under the [GNU General Public License v3.0 only](LICENSE).
+See [NOTICE.md](NOTICE.md) for full license attribution and details.
