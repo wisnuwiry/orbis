@@ -29,13 +29,12 @@ function Terms() {
       <section>
         <h2>Padu&apos;s open-source software</h2>
         <p>
-          Padu is open-source software licensed under the Apache License 2.0. You can install,
-          modify, and self-host it under that license without purchasing Padu Hub or using the
-          official relay.
+          Padu is open-source software licensed under the GNU General Public License v3.0 (GPL-3.0).
+          You can install, modify, and self-host it freely under the terms of that license.
         </p>
         <p>
           These Terms do not replace or restrict the open-source license. They apply only to
-          services operated by Padu. A self-hosted Hub or relay is operated by whoever hosts it.
+          services operated on official Padu websites.
         </p>
       </section>
 

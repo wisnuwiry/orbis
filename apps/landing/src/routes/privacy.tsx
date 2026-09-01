@@ -26,9 +26,9 @@ function Privacy() {
         <h2>Who is responsible</h2>
         <PaduLegalIdentity />
         <p>
-          Mohamed Boudra Ziani is the data controller for personal data processed through the
-          official Padu website, relay, and hosted Hub. Independently self-hosted daemons, Hubs,
-          and relays are controlled by their operators and are not covered by this policy.
+          The Padu Project maintainers are the data controllers for personal data processed through
+          the official website. Independently self-hosted daemons and clients are controlled by
+          their operators and are not covered by this policy.
         </p>
       </section>
 
