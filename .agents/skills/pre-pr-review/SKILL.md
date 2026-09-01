@@ -30,13 +30,13 @@ Classify the changed files into domains:
 
 | Domain | Paths | Activates |
 | :--- | :--- | :--- |
-| **Rust native** | `src/`, `crates/`, `Cargo.*`, `build.rs` | Rust format, check, test, performance audit |
+| **Rust native** | `apps/desktop/`, `crates/`, `Cargo.*`, `build.rs` | Rust format, check, test, performance audit |
 | **Wire protocol** | `crates/padu-protocol/` | Protocol sync, client package checks |
 | **Client package** | `packages/padu-client/` | Client typecheck & tests |
 | **Web client** | `apps/web/` | Web typecheck & tests |
 | **Mobile client** | `apps/mobile/` | Mobile typecheck |
 
-When a change touches `src/` UI files (`app/`, `ui/`, `input/`, `browser/`,
+When a change touches `apps/desktop/src/` UI files (`app/`, `ui/`, `input/`, `browser/`,
 `terminal/`) but not `apps/web/`, flag a **parity warning**. The converse is
 also a warning.
 
@@ -137,7 +137,7 @@ through the hold pins the pane at pulse rate.
 
 For every user-facing change in the diff:
 
-1. **Desktop (`src/`) ↔ Web (`apps/web/`)**: Both must receive the same
+1. **Desktop (`apps/desktop/`) ↔ Web (`apps/web/`)**: Both must receive the same
    feature, UI behavior, state representation, and controls — unless the
    capability is explicitly platform-exclusive (native window chrome, local OS
    integrations).
@@ -146,7 +146,7 @@ For every user-facing change in the diff:
 3. **Mobile (`apps/mobile/`)**: If the change is user-facing and not
    desktop-exclusive, check mobile parity.
 4. **Visual hierarchy and interaction models**: Must be consistent across
-   surfaces, while respecting GPUI idioms in `src/` and modern web patterns
+   surfaces, while respecting GPUI idioms in `apps/desktop/` and modern web patterns
    in `apps/web/`.
 
 ---

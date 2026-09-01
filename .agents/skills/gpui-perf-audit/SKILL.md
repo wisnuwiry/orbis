@@ -16,7 +16,7 @@ This skill provides the exact methodology, measurement tools, and invariant chec
 
 - Investigating CPU spikes or frame stutter during streaming.
 - Adding or modifying animation loops, loaders, or scrollbars.
-- Refactoring `src/app/runtime.rs`, `src/ui/motion.rs`, or `src/md/render.rs`.
+- Refactoring `apps/desktop/src/app/runtime.rs`, `apps/desktop/src/ui/motion.rs`, or `apps/desktop/src/md/render.rs`.
 - Changing how panes observe root state or embedding new cached views.
 - Benchmarking performance before release.
 
@@ -29,8 +29,8 @@ Run through these checks in order:
 ### 1. UI Thread Blocking I/O
 Ensure no synchronous I/O exists in `render()` or row builders:
 ```bash
-git grep -n 'std::fs::' src/
-git grep -n 'Command::new' src/
+git grep -n 'std::fs::' apps/desktop/src/
+git grep -n 'Command::new' apps/desktop/src/
 ```
 All heavy operations must use `cx.background_executor().spawn`.
 
@@ -39,7 +39,7 @@ All heavy operations must use `cx.background_executor().spawn`.
 ### 2. Cadence Audit
 Read [Cadence Invariants](./references/cadence-invariants.md):
 - **Stream commits ≤ ~8.3 Hz** (120 ms `STREAM_FRAME_INTERVAL`).
-- **Pulse ticks ≤ ~30 Hz** via shared clock (`src/ui/motion.rs`).
+- **Pulse ticks ≤ ~30 Hz** via shared clock (`apps/desktop/src/ui/motion.rs`).
 - No `with_animation(...).repeat()` (pins at 120 Hz).
 - Loaders on expensive surfaces must carry a stride (`spin_slow`, `Pulse::every(2)`).
 

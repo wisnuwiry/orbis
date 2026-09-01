@@ -90,7 +90,7 @@ fi
 echo -e "${BLUE}▶ 5. Inspecting changed files for cross-client parity...${NC}"
 CHANGED_FILES=$(git diff --name-only "${BASE_REF}"...HEAD 2>/dev/null || git diff --name-only HEAD)
 
-RUST_UI=$(echo "$CHANGED_FILES" | grep -E '^src/(app|ui|input|browser|terminal)' || true)
+RUST_UI=$(echo "$CHANGED_FILES" | grep -E '^apps/desktop/src/(app|ui|input|browser|terminal)' || true)
 WEB_UI=$(echo "$CHANGED_FILES" | grep -E '^apps/web/src/(components|routes|lib)' || true)
 MOBILE_UI=$(echo "$CHANGED_FILES" | grep -E '^apps/mobile/src/' || true)
 
