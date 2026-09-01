@@ -25,7 +25,7 @@ fn main() {
 /// rather than repeating the key in Rust means the platforms cannot drift
 /// into a feed the app rejects.
 fn export_sparkle_public_key() {
-    const PLIST: &str = "resources/Info.plist";
+    const PLIST: &str = "../../resources/Info.plist";
     const KEY: &str = "<key>SUPublicEDKey</key>";
 
     println!("cargo:rerun-if-changed={PLIST}");
@@ -44,7 +44,7 @@ fn export_sparkle_public_key() {
 
 #[cfg(target_os = "windows")]
 fn embed_windows_resources() {
-    const ICON: &str = "resources/windows/AppIcon.ico";
+    const ICON: &str = "../../resources/windows/AppIcon.ico";
 
     println!("cargo:rerun-if-changed={ICON}");
 

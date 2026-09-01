@@ -10,7 +10,7 @@ macro_rules! icons {
     ($($name:literal),+ $(,)?) => {
         &[$((
             concat!("icons/", $name, ".svg"),
-            include_bytes!(concat!("../assets/icons/", $name, ".svg")).as_slice(),
+            include_bytes!(concat!("../../../assets/icons/", $name, ".svg")).as_slice(),
         )),+]
     };
 }
@@ -208,15 +208,15 @@ const ICONS: &[(&str, &[u8])] = icons![
 ];
 
 const TEXT_FONTS: &[&[u8]] = &[
-    include_bytes!("../assets/fonts/JetBrainsMono-Regular.ttf"),
-    include_bytes!("../assets/fonts/JetBrainsMono-Bold.ttf"),
-    include_bytes!("../assets/fonts/JetBrainsMono-Italic.ttf"),
-    include_bytes!("../assets/fonts/JetBrainsMono-BoldItalic.ttf"),
+    include_bytes!("../../../assets/fonts/JetBrainsMono-Regular.ttf"),
+    include_bytes!("../../../assets/fonts/JetBrainsMono-Bold.ttf"),
+    include_bytes!("../../../assets/fonts/JetBrainsMono-Italic.ttf"),
+    include_bytes!("../../../assets/fonts/JetBrainsMono-BoldItalic.ttf"),
 ];
 
 /// Symbols-only icon face resolved via CoreText cascade (`FontFallbacks`),
 /// never as a primary GPUI family; see `register_fonts_with_coretext`.
-const SYMBOLS_FONT: &[u8] = include_bytes!("../assets/fonts/SymbolsNerdFontMono-Regular.ttf");
+const SYMBOLS_FONT: &[u8] = include_bytes!("../../../assets/fonts/SymbolsNerdFontMono-Regular.ttf");
 
 /// Family name of [`SYMBOLS_FONT`] for `FontFallbacks` lists.
 pub const SYMBOLS_FONT_FAMILY: &str = "Symbols Nerd Font Mono";
