@@ -16,8 +16,14 @@ const daemonPath = join(
   targetDir,
   `debug/padu-debug-daemon${executableSuffix}`,
 );
-const watchedDirectories = ["src", "crates", "assets", "resources", "locales"];
-const watchedFiles = ["Cargo.toml", "Cargo.lock", "build.rs"];
+const watchedDirectories = [
+  "apps/desktop",
+  "crates",
+  "assets",
+  "resources",
+  "locales",
+];
+const watchedFiles = ["Cargo.toml", "Cargo.lock"];
 const rebuildDebounceMs = 1_000;
 type BuildTarget = "app" | "daemon";
 type HyprlandWorkspace = {

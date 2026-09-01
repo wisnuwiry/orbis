@@ -506,9 +506,9 @@ function main() {
       name: "Landing CSS Themes (apps/landing/src/themes.css)",
     },
     {
-      path: join(root, "src/theme_palette.rs"),
+      path: join(root, "apps/desktop/src/theme_palette.rs"),
       content: generateRustPalette(config),
-      name: "Rust Desktop Palette (src/theme_palette.rs)",
+      name: "Rust Desktop Palette (apps/desktop/src/theme_palette.rs)",
     },
   ];
 
