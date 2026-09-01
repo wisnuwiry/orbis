@@ -1,0 +1,22 @@
+name: Docs
+description: Missing or wrong documentation
+title: "[docs] "
+labels: [documentation]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Edit source docs (`docs/`, crate READMEs).
+  - type: input
+    id: path
+    attributes:
+      label: Path
+      placeholder: docs/architecture.md
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: What's wrong
+    validations:
+      required: true
