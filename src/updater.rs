@@ -1394,8 +1394,8 @@ mod windows {
         /// below came from that script with a throwaway key.
         #[test]
         fn a_signature_from_the_release_script_verifies_here() {
-            const PUBLIC: &str = "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w=";
-            const SIGNATURE: &str = "4HceuSbPYEAI7oo+DKAbAOzsYuJRpaxfugkOmZCs8NzcbYIBncDaeTYJMGqAPCeet0IR/cmHv872v19owpmwAg==";
+            const PUBLIC: &str = "7I+ZtzwXkN+39+K8zpr1UpF1vIlElWmYH2yJhA/Y/Ow=";
+            const SIGNATURE: &str = "h/dz7HIneBadfIeJptTg441AtEkP4eAWnYUQYGQ1d3TSaSy6B8cs842f+ktBVxQzgqXlbeK0ydmopj37AUGvBw==";
             const PAYLOAD: &[u8] = b"Padu-0.0.0-x86_64-Setup.exe contents";
 
             let decode = |value: &str| {
