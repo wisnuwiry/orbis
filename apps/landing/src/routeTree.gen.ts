@@ -31,13 +31,6 @@ import { Route as OpencodeRouteImport } from "./routes/opencode";
 import { Route as PiRouteImport } from "./routes/pi";
 import { Route as PrivacyRouteImport } from "./routes/privacy";
 import { Route as TermsRouteImport } from "./routes/terms";
-import { Route as AlternativesClaudeDesktopRouteImport } from "./routes/alternatives/claude-desktop";
-import { Route as AlternativesCodexAppRouteImport } from "./routes/alternatives/codex-app";
-import { Route as AlternativesConductorRouteImport } from "./routes/alternatives/conductor";
-import { Route as AlternativesHappyCoderRouteImport } from "./routes/alternatives/happy-coder";
-import { Route as AlternativesOpenchamberRouteImport } from "./routes/alternatives/openchamber";
-import { Route as AlternativesOpencodeDesktopRouteImport } from "./routes/alternatives/opencode-desktop";
-import { Route as AlternativesSupersetRouteImport } from "./routes/alternatives/superset";
 import { Route as DocsIndexRouteImport } from "./routes/docs/index";
 import { Route as DocsSplatRouteImport } from "./routes/docs/$";
 
@@ -151,43 +144,6 @@ const TermsRoute = TermsRouteImport.update({
   path: "/terms",
   getParentRoute: () => rootRouteImport,
 } as any);
-const AlternativesClaudeDesktopRoute =
-  AlternativesClaudeDesktopRouteImport.update({
-    id: "/alternatives/claude-desktop",
-    path: "/alternatives/claude-desktop",
-    getParentRoute: () => rootRouteImport,
-  } as any);
-const AlternativesCodexAppRoute = AlternativesCodexAppRouteImport.update({
-  id: "/alternatives/codex-app",
-  path: "/alternatives/codex-app",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const AlternativesConductorRoute = AlternativesConductorRouteImport.update({
-  id: "/alternatives/conductor",
-  path: "/alternatives/conductor",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const AlternativesHappyCoderRoute = AlternativesHappyCoderRouteImport.update({
-  id: "/alternatives/happy-coder",
-  path: "/alternatives/happy-coder",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const AlternativesOpenchamberRoute = AlternativesOpenchamberRouteImport.update({
-  id: "/alternatives/openchamber",
-  path: "/alternatives/openchamber",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const AlternativesOpencodeDesktopRoute =
-  AlternativesOpencodeDesktopRouteImport.update({
-    id: "/alternatives/opencode-desktop",
-    path: "/alternatives/opencode-desktop",
-    getParentRoute: () => rootRouteImport,
-  } as any);
-const AlternativesSupersetRoute = AlternativesSupersetRouteImport.update({
-  id: "/alternatives/superset",
-  path: "/alternatives/superset",
-  getParentRoute: () => rootRouteImport,
-} as any);
 const DocsIndexRoute = DocsIndexRouteImport.update({
   id: "/",
   path: "/",
@@ -222,13 +178,6 @@ export interface FileRoutesByFullPath {
   "/pi": typeof PiRoute;
   "/privacy": typeof PrivacyRoute;
   "/terms": typeof TermsRoute;
-  "/alternatives/claude-desktop": typeof AlternativesClaudeDesktopRoute;
-  "/alternatives/codex-app": typeof AlternativesCodexAppRoute;
-  "/alternatives/conductor": typeof AlternativesConductorRoute;
-  "/alternatives/happy-coder": typeof AlternativesHappyCoderRoute;
-  "/alternatives/openchamber": typeof AlternativesOpenchamberRoute;
-  "/alternatives/opencode-desktop": typeof AlternativesOpencodeDesktopRoute;
-  "/alternatives/superset": typeof AlternativesSupersetRoute;
   "/docs/$": typeof DocsSplatRoute;
   "/docs/": typeof DocsIndexRoute;
 }
@@ -254,13 +203,6 @@ export interface FileRoutesByTo {
   "/pi": typeof PiRoute;
   "/privacy": typeof PrivacyRoute;
   "/terms": typeof TermsRoute;
-  "/alternatives/claude-desktop": typeof AlternativesClaudeDesktopRoute;
-  "/alternatives/codex-app": typeof AlternativesCodexAppRoute;
-  "/alternatives/conductor": typeof AlternativesConductorRoute;
-  "/alternatives/happy-coder": typeof AlternativesHappyCoderRoute;
-  "/alternatives/openchamber": typeof AlternativesOpenchamberRoute;
-  "/alternatives/opencode-desktop": typeof AlternativesOpencodeDesktopRoute;
-  "/alternatives/superset": typeof AlternativesSupersetRoute;
   "/docs/$": typeof DocsSplatRoute;
   "/docs": typeof DocsIndexRoute;
 }
@@ -288,13 +230,6 @@ export interface FileRoutesById {
   "/pi": typeof PiRoute;
   "/privacy": typeof PrivacyRoute;
   "/terms": typeof TermsRoute;
-  "/alternatives/claude-desktop": typeof AlternativesClaudeDesktopRoute;
-  "/alternatives/codex-app": typeof AlternativesCodexAppRoute;
-  "/alternatives/conductor": typeof AlternativesConductorRoute;
-  "/alternatives/happy-coder": typeof AlternativesHappyCoderRoute;
-  "/alternatives/openchamber": typeof AlternativesOpenchamberRoute;
-  "/alternatives/opencode-desktop": typeof AlternativesOpencodeDesktopRoute;
-  "/alternatives/superset": typeof AlternativesSupersetRoute;
   "/docs/$": typeof DocsSplatRoute;
   "/docs/": typeof DocsIndexRoute;
 }
@@ -323,13 +258,6 @@ export interface FileRouteTypes {
     | "/pi"
     | "/privacy"
     | "/terms"
-    | "/alternatives/claude-desktop"
-    | "/alternatives/codex-app"
-    | "/alternatives/conductor"
-    | "/alternatives/happy-coder"
-    | "/alternatives/openchamber"
-    | "/alternatives/opencode-desktop"
-    | "/alternatives/superset"
     | "/docs/$"
     | "/docs/";
   fileRoutesByTo: FileRoutesByTo;
@@ -355,13 +283,6 @@ export interface FileRouteTypes {
     | "/pi"
     | "/privacy"
     | "/terms"
-    | "/alternatives/claude-desktop"
-    | "/alternatives/codex-app"
-    | "/alternatives/conductor"
-    | "/alternatives/happy-coder"
-    | "/alternatives/openchamber"
-    | "/alternatives/opencode-desktop"
-    | "/alternatives/superset"
     | "/docs/$"
     | "/docs";
   id:
@@ -388,13 +309,6 @@ export interface FileRouteTypes {
     | "/pi"
     | "/privacy"
     | "/terms"
-    | "/alternatives/claude-desktop"
-    | "/alternatives/codex-app"
-    | "/alternatives/conductor"
-    | "/alternatives/happy-coder"
-    | "/alternatives/openchamber"
-    | "/alternatives/opencode-desktop"
-    | "/alternatives/superset"
     | "/docs/$"
     | "/docs/";
   fileRoutesById: FileRoutesById;
@@ -422,13 +336,6 @@ export interface RootRouteChildren {
   PiRoute: typeof PiRoute;
   PrivacyRoute: typeof PrivacyRoute;
   TermsRoute: typeof TermsRoute;
-  AlternativesClaudeDesktopRoute: typeof AlternativesClaudeDesktopRoute;
-  AlternativesCodexAppRoute: typeof AlternativesCodexAppRoute;
-  AlternativesConductorRoute: typeof AlternativesConductorRoute;
-  AlternativesHappyCoderRoute: typeof AlternativesHappyCoderRoute;
-  AlternativesOpenchamberRoute: typeof AlternativesOpenchamberRoute;
-  AlternativesOpencodeDesktopRoute: typeof AlternativesOpencodeDesktopRoute;
-  AlternativesSupersetRoute: typeof AlternativesSupersetRoute;
 }
 
 declare module "@tanstack/react-router" {
@@ -587,55 +494,6 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof TermsRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/alternatives/claude-desktop": {
-      id: "/alternatives/claude-desktop";
-      path: "/alternatives/claude-desktop";
-      fullPath: "/alternatives/claude-desktop";
-      preLoaderRoute: typeof AlternativesClaudeDesktopRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/alternatives/codex-app": {
-      id: "/alternatives/codex-app";
-      path: "/alternatives/codex-app";
-      fullPath: "/alternatives/codex-app";
-      preLoaderRoute: typeof AlternativesCodexAppRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/alternatives/conductor": {
-      id: "/alternatives/conductor";
-      path: "/alternatives/conductor";
-      fullPath: "/alternatives/conductor";
-      preLoaderRoute: typeof AlternativesConductorRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/alternatives/happy-coder": {
-      id: "/alternatives/happy-coder";
-      path: "/alternatives/happy-coder";
-      fullPath: "/alternatives/happy-coder";
-      preLoaderRoute: typeof AlternativesHappyCoderRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/alternatives/openchamber": {
-      id: "/alternatives/openchamber";
-      path: "/alternatives/openchamber";
-      fullPath: "/alternatives/openchamber";
-      preLoaderRoute: typeof AlternativesOpenchamberRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/alternatives/opencode-desktop": {
-      id: "/alternatives/opencode-desktop";
-      path: "/alternatives/opencode-desktop";
-      fullPath: "/alternatives/opencode-desktop";
-      preLoaderRoute: typeof AlternativesOpencodeDesktopRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/alternatives/superset": {
-      id: "/alternatives/superset";
-      path: "/alternatives/superset";
-      fullPath: "/alternatives/superset";
-      preLoaderRoute: typeof AlternativesSupersetRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
     "/docs/": {
       id: "/docs/";
       path: "/";
@@ -688,13 +546,6 @@ const rootRouteChildren: RootRouteChildren = {
   PiRoute: PiRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
-  AlternativesClaudeDesktopRoute: AlternativesClaudeDesktopRoute,
-  AlternativesCodexAppRoute: AlternativesCodexAppRoute,
-  AlternativesConductorRoute: AlternativesConductorRoute,
-  AlternativesHappyCoderRoute: AlternativesHappyCoderRoute,
-  AlternativesOpenchamberRoute: AlternativesOpenchamberRoute,
-  AlternativesOpencodeDesktopRoute: AlternativesOpencodeDesktopRoute,
-  AlternativesSupersetRoute: AlternativesSupersetRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

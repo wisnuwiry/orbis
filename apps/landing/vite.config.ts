@@ -56,17 +56,6 @@ function discoverAgentRoutes(): string[] {
     .map((slug) => `/${slug}`);
 }
 
-function discoverAlternativeRoutes(): string[] {
-  const alternativesDir = path.join(__dirname, "src/routes/alternatives");
-  if (!fs.existsSync(alternativesDir)) return [];
-  const slugs = fs
-    .readdirSync(alternativesDir, { withFileTypes: true })
-    .filter((entry) => entry.isFile() && entry.name.endsWith(".tsx"))
-    .map((entry) => entry.name.replace(/\.tsx$/, ""))
-    .sort();
-  return ["/alternatives", ...slugs.map((slug) => `/alternatives/${slug}`)];
-}
-
 const sitemapPages = [
   "/",
   "/agents",
@@ -75,7 +64,6 @@ const sitemapPages = [
   "/privacy",
   "/terms",
   ...discoverAgentRoutes(),
-  ...discoverAlternativeRoutes(),
   ...discoverDocsRoutes(),
 ].map((routePath) => ({
   path: routePath,

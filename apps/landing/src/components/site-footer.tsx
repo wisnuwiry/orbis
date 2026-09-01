@@ -1,15 +1,9 @@
-import { getAlternativePages } from "~/data/alternative-pages";
 import { webAppUrl } from "~/downloads";
 
-interface SiteFooterProps {
-  width?: "default" | "prose";
-}
-
 export function SiteFooter() {
-  const alternatives = getAlternativePages();
   return (
     <footer className="w-full max-w-7xl px-6 md:px-32 pb-16 mx-auto">
-      <div className="border-t border-white/10 pt-10 pb-4 grid grid-cols-2 sm:grid-cols-5 gap-8 text-sm">
+      <div className="border-t border-white/10 pt-10 pb-4 grid grid-cols-2 sm:grid-cols-4 gap-8 text-sm">
         <div className="space-y-3">
           <p className="text-white/70 font-medium text-xs uppercase tracking-wider">Docs</p>
           <div className="space-y-2">
@@ -83,25 +77,10 @@ export function SiteFooter() {
         </div>
 
         <div className="space-y-3">
-          <p className="text-white/70 font-medium text-xs uppercase tracking-wider">Alternatives</p>
-          <div className="space-y-2">
-            {alternatives.map((page) => (
-              <a
-                key={page.slug}
-                href={page.href}
-                className="block text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {page.name}
-              </a>
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-3">
           <p className="text-white/70 font-medium text-xs uppercase tracking-wider">Community</p>
           <div className="space-y-2">
             <a
-              href="https://github.com/wisnuwiry/padu"
+              href="https://github.com/wisnusaputra/padu"
               target="_blank"
               rel="noopener noreferrer"
               className="block text-muted-foreground hover:text-foreground transition-colors"
@@ -109,7 +88,7 @@ export function SiteFooter() {
               GitHub
             </a>
             <a
-              href="https://github.com/wisnuwiry/padu/releases"
+              href="https://github.com/wisnusaputra/padu/releases"
               target="_blank"
               rel="noopener noreferrer"
               className="block text-muted-foreground hover:text-foreground transition-colors"
@@ -117,7 +96,7 @@ export function SiteFooter() {
               Releases
             </a>
             <a
-              href="https://github.com/wisnuwiry/padu/discussions"
+              href="https://github.com/wisnusaputra/padu/discussions"
               target="_blank"
               rel="noopener noreferrer"
               className="block text-muted-foreground hover:text-foreground transition-colors"
@@ -125,7 +104,7 @@ export function SiteFooter() {
               Discussions
             </a>
             <a
-              href="https://github.com/wisnuwiry/padu/issues"
+              href="https://github.com/wisnusaputra/padu/issues"
               target="_blank"
               rel="noopener noreferrer"
               className="block text-muted-foreground hover:text-foreground transition-colors"
@@ -152,9 +131,6 @@ export function SiteFooter() {
             >
               Web App
             </a>
-            {/* App Store and Google Play links temporarily commented out until released */}
-            {/* <a href={appStoreUrl} target="_blank" rel="noopener noreferrer" className="block text-muted-foreground hover:text-foreground transition-colors">App Store</a> */}
-            {/* <a href={playStoreUrl} target="_blank" rel="noopener noreferrer" className="block text-muted-foreground hover:text-foreground transition-colors">Google Play</a> */}
             <a
               href="/changelog"
               className="block text-muted-foreground hover:text-foreground transition-colors"
@@ -187,4 +163,3 @@ export function SiteFooter() {
     </footer>
   );
 }
-
