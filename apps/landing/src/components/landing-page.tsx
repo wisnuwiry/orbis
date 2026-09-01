@@ -104,7 +104,7 @@ export function LandingPage({ title, subtitle }: LandingPageProps) {
       <div className="landing-content bg-background border-t border-white/[0.06]">
         <main className="p-6 md:p-20 md:pt-32 max-w-5xl mx-auto">
           <div className="space-y-32">
-            <BentoFeatureSection />
+            <ArchitectureSection />
             <MultiProviderSection />
             <FAQ />
           </div>
@@ -195,17 +195,17 @@ function SectionHeader({
   description: string;
 }) {
   return (
-    <div className="mb-12 space-y-3">
-      <span className="text-xs font-semibold tracking-wider uppercase text-purple-400">
+    <div className="mb-10 space-y-2.5">
+      <span className="font-mono text-xs font-medium tracking-wider uppercase text-zinc-400">
         {eyebrow}
       </span>
-      <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-white">{title}</h2>
-      <p className="text-base text-zinc-400 max-w-xl leading-relaxed">{description}</p>
+      <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">{title}</h2>
+      <p className="text-sm sm:text-base text-zinc-400 max-w-xl leading-relaxed">{description}</p>
     </div>
   );
 }
 
-function BentoFeatureSection() {
+function ArchitectureSection() {
   return (
     <motion.section
       initial={FADE_IN_UP}
@@ -215,97 +215,109 @@ function BentoFeatureSection() {
     >
       <SectionHeader
         eyebrow="Architecture"
-        title="Engineered like no other client."
-        description="Built in Rust with GPU acceleration. Instant cold startup, sub-millisecond turn updates, and fluid 120fps streaming."
+        title="A native runtime built for developer control."
+        description="Padu runs directly on your hardware. The desktop client renders natively with GPUI, communicating with a lightweight background daemon that supervises your local agent CLIs."
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Hero Bento Card - 120 FPS GPUI */}
-        <div className="md:col-span-3 rounded-2xl border border-white/10 bg-white/[0.02] p-8 md:p-10 relative overflow-hidden group hover:border-white/20 transition-all">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-            <div className="space-y-2 max-w-xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/20 bg-purple-500/10 px-3 py-1 text-xs font-medium text-purple-300">
-                <Cpu className="h-3.5 w-3.5" />
-                GPUI Native Engine
-              </div>
-              <h3 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
-                120 FPS GPU-Accelerated UI
-              </h3>
-              <p className="text-sm sm:text-base text-zinc-400 leading-relaxed">
-                Powered by GPUI, the rendering technology behind Zed. Zero Electron overhead, sub-millisecond
-                turn response, and smooth 120fps scrolling even with tens of thousands of streaming tokens.
-              </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Card 1: GPUI Rendering */}
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-[11px] text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-full">
+                gpui / rust
+              </span>
+              <Cpu className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
             </div>
-            <div className="flex items-center gap-3 shrink-0">
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-center">
-                <span className="block text-2xl font-semibold text-white">120</span>
-                <span className="text-[11px] uppercase tracking-wider text-zinc-500 font-medium">
-                  FPS Render
-                </span>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-center">
-                <span className="block text-2xl font-semibold text-white">&lt;10ms</span>
-                <span className="text-[11px] uppercase tracking-wider text-zinc-500 font-medium">
-                  Latency
-                </span>
-              </div>
+            <h3 className="text-lg font-semibold text-white tracking-tight">
+              GPU-accelerated native rendering
+            </h3>
+            <p className="text-sm text-zinc-400 leading-relaxed">
+              Built on GPUI—the high-performance GPU UI framework developed for Zed. No Electron,
+              no DOM overhead, and direct rendering to Metal, Vulkan, and DirectX at your display&apos;s
+              native refresh rate.
+            </p>
+          </div>
+          <div className="pt-5 mt-4 border-t border-white/[0.06]">
+            <div className="font-mono text-xs text-zinc-400 bg-black/40 border border-white/[0.06] rounded-lg px-3 py-2 flex items-center justify-between">
+              <span className="text-zinc-500">pipeline</span>
+              <span className="text-zinc-300">GPUI UI → Memory Ring → Daemon RPC</span>
             </div>
           </div>
         </div>
 
-        {/* Bento Card 2 - Local First */}
-        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-7 flex flex-col justify-between hover:border-white/20 transition-all">
+        {/* Card 2: Git Worktrees */}
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all">
           <div className="space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-white/80">
-              <ShieldCheck className="h-5 w-5 text-emerald-400" strokeWidth={1.75} />
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-[11px] text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-full">
+                git worktree
+              </span>
+              <GitFork className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
             </div>
             <h3 className="text-lg font-semibold text-white tracking-tight">
-              100% Local-First & Private
+              Parallel worktree isolation
             </h3>
             <p className="text-sm text-zinc-400 leading-relaxed">
-              Your source code, prompts, credentials, and transcripts stay on your computer. Zero telemetry,
-              zero tracking, and no cloud lock-in.
+              Spawn concurrent agent sessions in dedicated worktree directories. Agents write code and
+              run tests on independent branches without mutating your active staging or unstaged files.
             </p>
+          </div>
+          <div className="pt-5 mt-4 border-t border-white/[0.06]">
+            <div className="font-mono text-xs text-zinc-400 bg-black/40 border border-white/[0.06] rounded-lg px-3 py-2 flex items-center justify-between">
+              <span className="text-zinc-500">isolation</span>
+              <span className="text-zinc-300">.padu/worktrees/task-49a2 (feat/auth)</span>
+            </div>
           </div>
         </div>
 
-        {/* Bento Card 3 - Worktree Isolation */}
-        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-7 flex flex-col justify-between hover:border-white/20 transition-all">
+        {/* Card 3: Checkpoints */}
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all">
           <div className="space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-white/80">
-              <GitFork className="h-5 w-5 text-sky-400" strokeWidth={1.75} />
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-[11px] text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-full">
+                checkpoints / time-travel
+              </span>
+              <RotateCcw className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
             </div>
             <h3 className="text-lg font-semibold text-white tracking-tight">
-              Git Worktree Isolation
+              Turn-by-turn checkpoint rewind
             </h3>
             <p className="text-sm text-zinc-400 leading-relaxed">
-              Launch multiple agents in parallel on isolated branches. Agents never touch your active
-              working tree or dirty edits.
+              Padu captures automated Git snapshots before and after every turn. Review structured file
+              diffs in real time, or rewind code and conversation state back to any historical point.
             </p>
           </div>
-          <div className="pt-4">
-            <a
-              href="/docs/worktrees"
-              className="inline-flex items-center gap-1 text-xs font-medium text-purple-300 hover:text-purple-200 transition-colors"
-            >
-              Read docs <ArrowRight className="h-3 w-3" />
-            </a>
+          <div className="pt-5 mt-4 border-t border-white/[0.06]">
+            <div className="font-mono text-xs text-zinc-400 bg-black/40 border border-white/[0.06] rounded-lg px-3 py-2 flex items-center justify-between">
+              <span className="text-zinc-500">state</span>
+              <span className="text-zinc-300">turn #3 → diff: +18 -4 → rewind ready</span>
+            </div>
           </div>
         </div>
 
-        {/* Bento Card 4 - Checkpoint Rewinds */}
-        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-7 flex flex-col justify-between hover:border-white/20 transition-all">
+        {/* Card 4: Local First & Daemon */}
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all">
           <div className="space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-white/80">
-              <RotateCcw className="h-5 w-5 text-purple-400" strokeWidth={1.75} />
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-[11px] text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-full">
+                local-first / stdio
+              </span>
+              <ShieldCheck className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
             </div>
             <h3 className="text-lg font-semibold text-white tracking-tight">
-              Turn-by-Turn Checkpoints
+              Supervised local processes
             </h3>
             <p className="text-sm text-zinc-400 leading-relaxed">
-              Inspect structured diffs after every turn. Instantly rewind code, conversation, and runtime
-              state with 1-click.
+              The daemon manages agent CLIs via stdio/PTY and structured RPC. Credentials stay in your
+              local OS keychain, and source code never leaves your computer.
             </p>
+          </div>
+          <div className="pt-5 mt-4 border-t border-white/[0.06]">
+            <div className="font-mono text-xs text-zinc-400 bg-black/40 border border-white/[0.06] rounded-lg px-3 py-2 flex items-center justify-between">
+              <span className="text-zinc-500">daemon</span>
+              <span className="text-zinc-300">127.0.0.1:4789 · 0 cloud telemetry</span>
+            </div>
           </div>
         </div>
       </div>
@@ -330,9 +342,9 @@ function MultiProviderSection() {
       transition={EASE_OUT_05}
     >
       <SectionHeader
-        eyebrow="Compatibility"
-        title="All your favorite agents, unified."
-        description="Switch seamlessly between leading AI coding agents while keeping your local workspace context and credentials intact."
+        eyebrow="Integrations"
+        title="Direct drivers for your local agents."
+        description="Padu communicates with your locally installed CLIs via native structured protocols. Switch between agents while preserving workspace state."
       />
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
