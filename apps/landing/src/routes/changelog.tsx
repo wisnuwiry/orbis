@@ -81,8 +81,13 @@ function Release({ group }: { group: ChangelogReleaseGroup }) {
 function Changelog() {
   return (
     <SiteShell width="default">
-      <div className="max-w-2xl">
-        <h1 className="mb-12 text-3xl font-medium tracking-tight">Changelog</h1>
+      <div className="max-w-3xl">
+        <header className="mb-12 space-y-2">
+          <h1 className="text-3xl md:text-4xl font-medium tracking-tight text-white">Changelog</h1>
+          <p className="text-base text-white/60">
+            Product updates, improvements, and release notes across the Padu desktop app, daemon, and client ecosystem.
+          </p>
+        </header>
         {changelogReleaseGroups.map((group) => (
           <Release key={group.version} group={group} />
         ))}
