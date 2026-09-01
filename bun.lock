@@ -12,6 +12,10 @@
         "typescript": "^7.0.2",
       },
     },
+    "apps/desktop": {
+      "name": "@padu/desktop",
+      "version": "0.1.0",
+    },
     "apps/landing": {
       "name": "@padu/landing",
       "version": "0.1.0",
@@ -597,6 +601,8 @@
     "@oxc-project/types": ["@oxc-project/types@0.147.0", "", {}, "sha512-IJ3s6ltHLp45S0bh7phkX+gJO7A1Wuz2EaqpAhb8WjqDwbzMiWKHhyyT42tskaWjEYXtHtVCPpnBJVT9+dcRLg=="],
 
     "@padu/client": ["@padu/client@workspace:packages/padu-client"],
+
+    "@padu/desktop": ["@padu/desktop@workspace:apps/desktop"],
 
     "@padu/landing": ["@padu/landing@workspace:apps/landing"],
 
