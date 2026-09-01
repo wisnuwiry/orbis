@@ -1,6 +1,9 @@
 import * as React from "react";
 import {
   ArrowRight,
+  Check,
+  ChevronLeft,
+  ChevronRight,
   Cpu,
   GitFork,
   Globe,
@@ -28,6 +31,7 @@ const EASE_OUT_08_DELAY_05: Transition = { duration: 0.8, delay: 0.5, ease: "eas
 const EASE_OUT_05: Transition = { duration: 0.5, ease: "easeOut" };
 const EASE_OUT_015: Transition = { duration: 0.15, ease: "easeOut" };
 const DURATION_05: Transition = { duration: 0.5 };
+const SLIDE_TRANSITION: Transition = { duration: 0.35, ease: [0.22, 0.61, 0.36, 1] };
 
 const VIEWPORT_60 = { once: true, margin: "-60px" };
 
@@ -85,7 +89,7 @@ export function LandingPage({ title, subtitle }: LandingPageProps) {
       <div className="landing-content bg-background border-t border-white/[0.06]">
         <main className="p-6 md:p-20 md:pt-32 max-w-5xl mx-auto">
           <div className="space-y-32">
-            <ArchitectureSection />
+            <ArchitectureCarousel />
             <EcosystemBentoSection />
             <MultiProviderSection />
             <FAQ />
@@ -186,7 +190,283 @@ function SectionHeader({
   );
 }
 
-function ArchitectureSection() {
+/* -------------------------------------------------------------------------- */
+/* Architecture Tab Carousel (Apple Style)                                    */
+/* -------------------------------------------------------------------------- */
+
+const ARCHITECTURE_TABS = [
+  {
+    id: "gpui",
+    name: "GPUI Engine",
+    tag: "gpui / rust",
+    icon: Cpu,
+    title: "GPU-accelerated native rendering",
+    description:
+      "Built on GPUI—the high-performance GPU UI framework developed for Zed. No Electron, no DOM overhead, and direct rendering to Metal, Vulkan, and DirectX at native refresh rates.",
+    points: [
+      "Sub-millisecond turn updates under massive streaming token volume",
+      "Direct Metal/Vulkan draw calls without browser engine reflow",
+      "Virtualized list rendering handling 100k+ line session transcripts",
+    ],
+    docHref: "/docs",
+    docLabel: "Read architecture docs",
+    preview: <GpuiPreview />,
+  },
+  {
+    id: "worktrees",
+    name: "Git Worktrees",
+    tag: "git worktree",
+    icon: GitFork,
+    title: "Parallel worktree branch isolation",
+    description:
+      "Spawn concurrent agent sessions in dedicated worktree directories. Agents write code, execute commands, and run tests on independent branches without mutating your active staging or unstaged files.",
+    points: [
+      "Launch multiple agent tasks in parallel on separate branches",
+      "Active working tree stays clean and untouched",
+      "Automated lifecycle cleanup when tasks settle",
+    ],
+    docHref: "/docs/worktrees",
+    docLabel: "Read worktrees docs",
+    preview: <WorktreePreview />,
+  },
+  {
+    id: "checkpoints",
+    name: "Checkpoints",
+    tag: "checkpoints / time-travel",
+    icon: RotateCcw,
+    title: "Turn-by-turn checkpoint rewind",
+    description:
+      "Padu captures automated Git snapshots before and after every turn. Review structured file diffs in real time, or rewind code, prompts, and conversation state back to any historical point.",
+    points: [
+      "Automated Git commit snapshot on every agent turn",
+      "Unified diff review with side-by-side hunk inspection",
+      "1-click rollback of code and conversation context",
+    ],
+    preview: <CheckpointPreview />,
+  },
+  {
+    id: "daemon",
+    name: "Local Daemon",
+    tag: "local-first / stdio",
+    icon: ShieldCheck,
+    title: "Supervised local processes & zero cloud intermediary",
+    description:
+      "The lightweight background daemon manages agent CLIs via stdio/PTY and structured RPC. Credentials stay in your local OS keychain, and source code never leaves your computer.",
+    points: [
+      "Loopback RPC communication over local Unix sockets/TCP",
+      "100% local data storage with zero analytics or telemetry",
+      "Run headless on remote devboxes and connect over private network",
+    ],
+    docHref: "/docs/cli",
+    docLabel: "Read CLI docs",
+    preview: <DaemonPreview />,
+  },
+];
+
+function GpuiPreview() {
+  return (
+    <div className="rounded-xl border border-white/10 bg-black/60 p-4 font-mono text-[11px] text-zinc-400 space-y-3 select-none">
+      <div className="flex items-center justify-between border-b border-white/[0.06] pb-2 text-[10px]">
+        <div className="flex items-center gap-1.5 text-zinc-300">
+          <span className="w-2 h-2 rounded-full bg-emerald-400" />
+          <span>GPUI Native Render Pipeline</span>
+        </div>
+        <span className="text-zinc-500">120 Hz Target</span>
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-[10px] text-zinc-500">
+          <span>Frame Time</span>
+          <span className="text-emerald-400 font-semibold">2.1ms / 8.3ms budget</span>
+        </div>
+        {/* Frame bar */}
+        <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden flex">
+          <div className="h-full bg-emerald-400 w-[25%]" />
+          <div className="h-full bg-purple-400 w-[10%]" />
+          <div className="h-full bg-white/20 w-[65%]" />
+        </div>
+        <div className="flex items-center justify-between text-[9px] text-zinc-500">
+          <span>Render: 1.4ms</span>
+          <span>Layout: 0.7ms</span>
+          <span>Idle: 6.2ms</span>
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-2.5 space-y-1.5 text-[10px]">
+        <div className="flex items-center justify-between text-zinc-300">
+          <span>Backend Target</span>
+          <span className="text-white">macOS Metal / Linux Vulkan / Win DirectX</span>
+        </div>
+        <div className="flex items-center justify-between text-zinc-300">
+          <span>DOM / Webview Layer</span>
+          <span className="text-emerald-400 font-semibold">None (0ms Reflow)</span>
+        </div>
+        <div className="flex items-center justify-between text-zinc-300">
+          <span>Transcript Buffer</span>
+          <span className="text-white">Virtualized GPUI List (100k+ tokens)</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WorktreePreview() {
+  return (
+    <div className="rounded-xl border border-white/10 bg-black/60 p-4 font-mono text-[11px] text-zinc-400 space-y-3 select-none">
+      <div className="flex items-center justify-between border-b border-white/[0.06] pb-2 text-[10px]">
+        <div className="flex items-center gap-1.5 text-zinc-300">
+          <GitFork className="h-3.5 w-3.5 text-sky-400" />
+          <span>Git Worktree Manager</span>
+        </div>
+        <span className="text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded text-[9px]">
+          2 Active Worktrees
+        </span>
+      </div>
+
+      <div className="space-y-2 text-[10px]">
+        {/* Main working directory */}
+        <div className="rounded border border-white/[0.06] bg-white/[0.01] p-2 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-zinc-300">
+            <span className="text-zinc-500">ROOT</span>
+            <span className="text-white">~/project (main)</span>
+          </div>
+          <span className="text-zinc-500 text-[9px]">Active Working Tree · Pristine</span>
+        </div>
+
+        {/* Worktree 1 */}
+        <div className="rounded border border-sky-500/20 bg-sky-500/[0.03] p-2 space-y-1">
+          <div className="flex items-center justify-between text-sky-300">
+            <div className="flex items-center gap-2">
+              <span className="text-sky-400 font-semibold">TASK #1</span>
+              <span>.padu/worktrees/task-81f (feat/auth-refresh)</span>
+            </div>
+            <span className="text-emerald-400 text-[9px]">Claude Code</span>
+          </div>
+          <div className="text-zinc-400 text-[9px] pl-2 border-l border-sky-500/30">
+            Running tests in isolated branch · 4 files modified
+          </div>
+        </div>
+
+        {/* Worktree 2 */}
+        <div className="rounded border border-purple-500/20 bg-purple-500/[0.03] p-2 space-y-1">
+          <div className="flex items-center justify-between text-purple-300">
+            <div className="flex items-center gap-2">
+              <span className="text-purple-400 font-semibold">TASK #2</span>
+              <span>.padu/worktrees/task-49a (fix/rate-limits)</span>
+            </div>
+            <span className="text-purple-400 text-[9px]">Codex CLI</span>
+          </div>
+          <div className="text-zinc-400 text-[9px] pl-2 border-l border-purple-500/30">
+            Refactoring Redis token bucket · 2 files modified
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CheckpointPreview() {
+  return (
+    <div className="rounded-xl border border-white/10 bg-black/60 p-4 font-mono text-[11px] text-zinc-400 space-y-3 select-none">
+      <div className="flex items-center justify-between border-b border-white/[0.06] pb-2 text-[10px]">
+        <div className="flex items-center gap-1.5 text-zinc-300">
+          <RotateCcw className="h-3.5 w-3.5 text-purple-400" />
+          <span>Turn-by-Turn Checkpoint Timeline</span>
+        </div>
+        <span className="text-purple-300 bg-purple-500/10 px-1.5 py-0.5 rounded text-[9px]">
+          Time Travel Ready
+        </span>
+      </div>
+
+      <div className="space-y-2 text-[10px]">
+        {/* Turn 1 */}
+        <div className="rounded border border-white/[0.06] bg-white/[0.01] p-2 flex items-center justify-between opacity-60">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-zinc-500" />
+            <span className="text-zinc-400">Turn 1: Initialized database schema</span>
+          </div>
+          <span className="text-zinc-500 text-[9px]">+84 -0</span>
+        </div>
+
+        {/* Turn 2 */}
+        <div className="rounded border border-white/[0.06] bg-white/[0.01] p-2 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
+            <span className="text-zinc-300">Turn 2: Added token refresh handler</span>
+          </div>
+          <span className="text-emerald-400 text-[9px]">+28 -6</span>
+        </div>
+
+        {/* Turn 3 (Active) */}
+        <div className="rounded border border-purple-500/30 bg-purple-500/[0.04] p-2.5 space-y-1.5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-white font-medium">
+              <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
+              <span>Turn 3: Unit test validation</span>
+            </div>
+            <span className="text-purple-300 text-[9px] font-semibold">Latest Snapshot</span>
+          </div>
+          <div className="flex items-center gap-2 pt-1">
+            <span className="px-2 py-0.5 rounded bg-white/10 text-[9px] text-white">Review Diff</span>
+            <span className="px-2 py-0.5 rounded bg-purple-500/20 text-[9px] text-purple-300 border border-purple-500/30">
+              1-Click Rewind
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DaemonPreview() {
+  return (
+    <div className="rounded-xl border border-white/10 bg-black/60 p-4 font-mono text-[11px] text-zinc-400 space-y-3 select-none">
+      <div className="flex items-center justify-between border-b border-white/[0.06] pb-2 text-[10px]">
+        <div className="flex items-center gap-1.5 text-zinc-300">
+          <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+          <span>Supervised Daemon RPC</span>
+        </div>
+        <span className="text-zinc-500">127.0.0.1:4789</span>
+      </div>
+
+      <div className="space-y-2 text-[10px]">
+        <div className="grid grid-cols-2 gap-2">
+          <div className="rounded border border-white/[0.06] bg-white/[0.02] p-2 space-y-1">
+            <span className="text-zinc-500 text-[9px] uppercase">Process Supervision</span>
+            <div className="text-white font-medium">PTY / Unix Sockets</div>
+            <div className="text-zinc-400 text-[9px]">Zero cloud proxying</div>
+          </div>
+          <div className="rounded border border-white/[0.06] bg-white/[0.02] p-2 space-y-1">
+            <span className="text-zinc-500 text-[9px] uppercase">Key Storage</span>
+            <div className="text-white font-medium">OS Native Keychain</div>
+            <div className="text-zinc-400 text-[9px]">AES-256 encrypted</div>
+          </div>
+        </div>
+
+        <div className="rounded border border-emerald-500/20 bg-emerald-500/[0.03] p-2.5 flex items-center justify-between">
+          <div className="space-y-0.5">
+            <div className="text-emerald-400 font-medium text-[10px]">Zero Cloud Telemetry</div>
+            <div className="text-zinc-400 text-[9px]">Code, prompts, and credentials stay on your hardware.</div>
+          </div>
+          <span className="text-emerald-400 font-bold text-sm">100% Local</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ArchitectureCarousel() {
+  const [activeTab, setActiveTab] = React.useState(0);
+  const current = ARCHITECTURE_TABS[activeTab];
+
+  const handlePrev = React.useCallback(() => {
+    setActiveTab((i) => (i === 0 ? ARCHITECTURE_TABS.length - 1 : i - 1));
+  }, []);
+
+  const handleNext = React.useCallback(() => {
+    setActiveTab((i) => (i === ARCHITECTURE_TABS.length - 1 ? 0 : i + 1));
+  }, []);
+
   return (
     <motion.section
       initial={FADE_IN_UP}
@@ -194,113 +474,129 @@ function ArchitectureSection() {
       viewport={VIEWPORT_60}
       transition={EASE_OUT_05}
     >
-      <SectionHeader
-        eyebrow="Architecture"
-        title="A native runtime built for developer control."
-        description="Padu runs directly on your hardware. The desktop client renders natively with GPUI, communicating with a lightweight background daemon that supervises your local agent CLIs."
-      />
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+        <SectionHeader
+          eyebrow="Architecture"
+          title="A native runtime built for developer control."
+          description="Padu runs directly on your hardware. The desktop client renders natively with GPUI, communicating with a lightweight background daemon that supervises your local agent CLIs."
+        />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Card 1: GPUI Rendering */}
-        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-[11px] text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-full">
-                gpui / rust
-              </span>
-              <Cpu className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
-            </div>
-            <h3 className="text-lg font-semibold text-white tracking-tight">
-              GPU-accelerated native rendering
-            </h3>
-            <p className="text-sm text-zinc-400 leading-relaxed">
-              Built on GPUI—the high-performance GPU UI framework developed for Zed. No Electron,
-              no DOM overhead, and direct rendering to Metal, Vulkan, and DirectX at your display&apos;s
-              native refresh rate.
-            </p>
+        {/* Carousel controls */}
+        <div className="flex items-center gap-2 mb-10 shrink-0">
+          <button
+            type="button"
+            onClick={handlePrev}
+            aria-label="Previous architecture feature"
+            className="w-8 h-8 rounded-full border border-white/10 bg-white/[0.03] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/20 transition-all cursor-pointer"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <div className="flex items-center gap-1.5 px-2">
+            {ARCHITECTURE_TABS.map((tab, idx) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(idx)}
+                aria-label={`Go to ${tab.name}`}
+                className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                  activeTab === idx ? "w-6 bg-white" : "w-1.5 bg-white/20 hover:bg-white/40"
+                }`}
+              />
+            ))}
           </div>
-          <div className="pt-5 mt-4 border-t border-white/[0.06]">
-            <div className="font-mono text-xs text-zinc-400 bg-black/40 border border-white/[0.06] rounded-lg px-3 py-2 flex items-center justify-between">
-              <span className="text-zinc-500">pipeline</span>
-              <span className="text-zinc-300">GPUI UI → Memory Ring → Daemon RPC</span>
-            </div>
-          </div>
+          <button
+            type="button"
+            onClick={handleNext}
+            aria-label="Next architecture feature"
+            className="w-8 h-8 rounded-full border border-white/10 bg-white/[0.03] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/20 transition-all cursor-pointer"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
         </div>
+      </div>
 
-        {/* Card 2: Git Worktrees */}
-        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-[11px] text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-full">
-                git worktree
-              </span>
-              <GitFork className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
-            </div>
-            <h3 className="text-lg font-semibold text-white tracking-tight">
-              Parallel worktree isolation
-            </h3>
-            <p className="text-sm text-zinc-400 leading-relaxed">
-              Spawn concurrent agent sessions in dedicated worktree directories. Agents write code and
-              run tests on independent branches without mutating your active staging or unstaged files.
-            </p>
-          </div>
-          <div className="pt-5 mt-4 border-t border-white/[0.06]">
-            <div className="font-mono text-xs text-zinc-400 bg-black/40 border border-white/[0.06] rounded-lg px-3 py-2 flex items-center justify-between">
-              <span className="text-zinc-500">isolation</span>
-              <span className="text-zinc-300">.padu/worktrees/task-49a2 (feat/auth)</span>
-            </div>
-          </div>
-        </div>
+      {/* Apple-style Tab Bar */}
+      <div className="mb-6 flex flex-wrap items-center gap-1 sm:gap-2 bg-white/[0.03] p-1.5 rounded-2xl border border-white/[0.08] backdrop-blur-xl w-full">
+        {ARCHITECTURE_TABS.map((tab, idx) => {
+          const selected = activeTab === idx;
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(idx)}
+              aria-selected={selected}
+              role="tab"
+              className={`relative flex-1 min-w-[120px] cursor-pointer rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+                selected ? "text-white" : "text-zinc-400 hover:text-white hover:bg-white/[0.02]"
+              }`}
+            >
+              {selected && (
+                <motion.span
+                  layoutId="arch-tab-pill"
+                  transition={SLIDE_TRANSITION}
+                  className="absolute inset-0 rounded-xl bg-white/10 border border-white/15 shadow-sm"
+                />
+              )}
+              <Icon className="h-4 w-4 shrink-0 relative z-10" />
+              <span className="relative z-10 truncate">{tab.name}</span>
+            </button>
+          );
+        })}
+      </div>
 
-        {/* Card 3: Checkpoints */}
-        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-[11px] text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-full">
-                checkpoints / time-travel
-              </span>
-              <RotateCcw className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
-            </div>
-            <h3 className="text-lg font-semibold text-white tracking-tight">
-              Turn-by-turn checkpoint rewind
-            </h3>
-            <p className="text-sm text-zinc-400 leading-relaxed">
-              Padu captures automated Git snapshots before and after every turn. Review structured file
-              diffs in real time, or rewind code and conversation state back to any historical point.
-            </p>
-          </div>
-          <div className="pt-5 mt-4 border-t border-white/[0.06]">
-            <div className="font-mono text-xs text-zinc-400 bg-black/40 border border-white/[0.06] rounded-lg px-3 py-2 flex items-center justify-between">
-              <span className="text-zinc-500">state</span>
-              <span className="text-zinc-300">turn #3 → diff: +18 -4 → rewind ready</span>
-            </div>
-          </div>
-        </div>
+      {/* Active Tab Slide Content Container */}
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-8 md:p-10 relative overflow-hidden min-h-[380px]">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={current.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={SLIDE_TRANSITION}
+            className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center"
+          >
+            {/* Left explanation side */}
+            <div className="md:col-span-6 space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[11px] text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-full">
+                  {current.tag}
+                </span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-semibold tracking-tight text-white">
+                {current.title}
+              </h3>
+              <p className="text-sm text-zinc-400 leading-relaxed">
+                {current.description}
+              </p>
 
-        {/* Card 4: Local First & Daemon */}
-        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-[11px] text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-full">
-                local-first / stdio
-              </span>
-              <ShieldCheck className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
+              <ul className="space-y-2 pt-2 text-xs sm:text-sm text-zinc-300">
+                {current.points.map((point) => (
+                  <li key={point} className="flex items-start gap-2">
+                    <Check className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {current.docHref && (
+                <div className="pt-3">
+                  <a
+                    href={current.docHref}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-purple-300 hover:text-purple-200 transition-colors"
+                  >
+                    {current.docLabel ?? "Read documentation"} <ArrowRight className="h-3.5 w-3.5" />
+                  </a>
+                </div>
+              )}
             </div>
-            <h3 className="text-lg font-semibold text-white tracking-tight">
-              Supervised local processes
-            </h3>
-            <p className="text-sm text-zinc-400 leading-relaxed">
-              The daemon manages agent CLIs via stdio/PTY and structured RPC. Credentials stay in your
-              local OS keychain, and source code never leaves your computer.
-            </p>
-          </div>
-          <div className="pt-5 mt-4 border-t border-white/[0.06]">
-            <div className="font-mono text-xs text-zinc-400 bg-black/40 border border-white/[0.06] rounded-lg px-3 py-2 flex items-center justify-between">
-              <span className="text-zinc-500">daemon</span>
-              <span className="text-zinc-300">127.0.0.1:4789 · 0 cloud telemetry</span>
+
+            {/* Right schematic preview */}
+            <div className="md:col-span-6 w-full">
+              {current.preview}
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </motion.section>
   );
