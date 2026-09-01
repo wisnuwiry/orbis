@@ -356,9 +356,7 @@ fn sidebar_session_row_index(rows: &[SidebarRow], session_id: Uuid) -> Option<us
 fn sidebar_row_height(row: SidebarRow, grouping: SidebarGrouping) -> Pixels {
     px(match row {
         SidebarRow::Search => SIDEBAR_ACTION_ROW_HEIGHT + SIDEBAR_SEARCH_BOTTOM_GAP,
-        SidebarRow::Header(_) => {
-            SIDEBAR_GROUP_HEADER_HEIGHT + SIDEBAR_GROUP_HEADER_BOTTOM_GAP
-        }
+        SidebarRow::Header(_) => SIDEBAR_GROUP_HEADER_HEIGHT + SIDEBAR_GROUP_HEADER_BOTTOM_GAP,
         SidebarRow::Session(_) => {
             if grouping == SidebarGrouping::Project {
                 SIDEBAR_PROJECT_SESSION_ROW_HEIGHT
@@ -1614,20 +1612,17 @@ impl Padu {
             .when(first, |element| {
                 element.child(self.render_sidebar_header_actions(cx))
             })
-            .when(
-                show_folder_icon && has_expanded_children,
-                |element| {
-                    element.child(
-                        div()
-                            .absolute()
-                            .left(px(SIDEBAR_GROUP_GUIDE_X))
-                            .top(px(19.0))
-                            .bottom(px(-2.0))
-                            .w(px(1.0))
-                            .bg(theme.border),
-                    )
-                },
-            )
+            .when(show_folder_icon && has_expanded_children, |element| {
+                element.child(
+                    div()
+                        .absolute()
+                        .left(px(SIDEBAR_GROUP_GUIDE_X))
+                        .top(px(19.0))
+                        .bottom(px(-2.0))
+                        .w(px(1.0))
+                        .bg(theme.border),
+                )
+            })
             .on_click(cx.listener(move |this, _, _, cx| {
                 this.toggle_sidebar_group(group, cx);
             }))
@@ -1655,11 +1650,7 @@ impl Padu {
             .child(header)
     }
 
-    fn render_sidebar_show_more(
-        &self,
-        group: SidebarGroup,
-        cx: &mut Context<Self>,
-    ) -> Div {
+    fn render_sidebar_show_more(&self, group: SidebarGroup, cx: &mut Context<Self>) -> Div {
         let theme = Theme::current(cx);
         let group_key = group.element_key();
         let focus = self
@@ -1703,9 +1694,9 @@ impl Padu {
                     .absolute()
                     .left(px(SIDEBAR_GROUP_GUIDE_X))
                     .top_0()
-                    .w(px(
-                        SIDEBAR_GROUP_CHILD_PADDING - SIDEBAR_GROUP_GUIDE_X - 4.0,
-                    ))
+                    .w(px(SIDEBAR_GROUP_CHILD_PADDING
+                        - SIDEBAR_GROUP_GUIDE_X
+                        - 4.0))
                     .h(px(15.0))
                     .border_l_1()
                     .border_b_1()
@@ -1757,11 +1748,7 @@ impl Padu {
         } else {
             self.sidebar_collapsed_groups.remove(&group)
         };
-        let reveal_reset = collapsed
-            && self
-                .sidebar_project_reveal_counts
-                .remove(&group)
-                .is_some();
+        let reveal_reset = collapsed && self.sidebar_project_reveal_counts.remove(&group).is_some();
         if collapse_changed || reveal_reset {
             self.sidebar_rows_fingerprint.set(None);
             cx.notify();
@@ -2798,7 +2785,8 @@ mod tests {
         rows.push(SidebarRow::GroupSpacer);
 
         let index = sidebar_session_row_index(&rows, target).unwrap();
-        let offset = sidebar_bottom_aligned_offset(&rows, index, px(400.0), SidebarGrouping::Updated);
+        let offset =
+            sidebar_bottom_aligned_offset(&rows, index, px(400.0), SidebarGrouping::Updated);
 
         assert_eq!(index, 32);
         assert_eq!(offset.item_ix, 25);

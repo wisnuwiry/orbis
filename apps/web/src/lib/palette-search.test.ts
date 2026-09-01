@@ -4,9 +4,9 @@ import { fuzzyScore, shouldKeepPreviousPaletteItems } from './palette-search'
 describe('command palette search parity', () => {
   test('ranks contiguous and boundary matches above loose subsequences', () => {
     expect(fuzzyScore('padu', 'Padu daemon')!).toBeGreaterThan(
-      fuzzyScore('padu', 'open repository branch inspection server')!,
+      fuzzyScore('padu', 'post audit details updates')!,
     )
-    expect(fuzzyScore('od', 'Padu daemon')).not.toBeNull()
+    expect(fuzzyScore('pd', 'Padu daemon')).not.toBeNull()
     expect(fuzzyScore('missing', 'Padu daemon')).toBeNull()
   })
 

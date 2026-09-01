@@ -2191,11 +2191,7 @@ impl Padu {
             || self.execute_goal_composer_command(prompt, cx)
     }
 
-    fn execute_resume_composer_command(
-        &mut self,
-        prompt: &str,
-        cx: &mut Context<Self>,
-    ) -> bool {
+    fn execute_resume_composer_command(&mut self, prompt: &str, cx: &mut Context<Self>) -> bool {
         if !crate::composer_complete::is_resume_submission(prompt) {
             return false;
         }
@@ -2213,14 +2209,16 @@ impl Padu {
     fn execute_goal_composer_command(&mut self, prompt: &str, cx: &mut Context<Self>) -> bool {
         use crate::composer_complete::GoalCommand;
         use crate::model::{GoalOperation, ThreadGoalStatus};
-        let Some((session_id, command, current_goal)) = self.selected_session().and_then(|session| {
-            let command = crate::composer_complete::parse_goal_submission(
-                session.provider,
-                prompt,
-                &self.slash_command_index,
-            )?;
-            Some((session.id, command, session.thread_goal.clone()))
-        }) else {
+        let Some((session_id, command, current_goal)) =
+            self.selected_session().and_then(|session| {
+                let command = crate::composer_complete::parse_goal_submission(
+                    session.provider,
+                    prompt,
+                    &self.slash_command_index,
+                )?;
+                Some((session.id, command, session.thread_goal.clone()))
+            })
+        else {
             return false;
         };
         match command {

@@ -52,7 +52,8 @@ interface LastSequence {
   sequence: number;
 }
 
-type ConnectionState = "disconnected" | "connecting" | "connected";
+export type PaduConnectionState = "disconnected" | "connecting" | "connected";
+export type ConnectionStateListener = (state: PaduConnectionState) => void;
 
 /** Browser-safe client for Padu's versioned JSON-over-WebSocket protocol. */
 export class PaduClient {
@@ -64,11 +65,12 @@ export class PaduClient {
   private readonly socketFactory: (url: string) => WebSocketLike;
   private readonly randomUUID: () => string;
   private socket?: WebSocketLike;
-  private state: ConnectionState = "disconnected";
+  private state: PaduConnectionState = "disconnected";
   private pending = new Map<string, PendingRequest>();
   private subscriptions = new Map<string, Set<EventListener>>();
   private pendingEvents = new Map<string, SequencedEvent[]>();
   private taskStateListeners = new Set<(revision: number) => void>();
+  private connectionStateListeners = new Set<ConnectionStateListener>();
   private sequences = new Map<string, LastSequence>();
   private connectionGeneration = 0;
   private rejectConnect?: (error: Error) => void;
@@ -100,6 +102,10 @@ export class PaduClient {
     return this.state === "connected";
   }
 
+  get connectionState(): PaduConnectionState {
+    return this.state;
+  }
+
   /** Connects, or reconnects while replaying events after the last seen sequence. */
   connect(): Promise<void> {
     if (this.state === "connected") return Promise.resolve();
@@ -107,24 +113,25 @@ export class PaduClient {
       return Promise.reject(new Error("Padu client is already connecting"));
     }
 
-    this.state = "connecting";
+    this.setConnectionState("connecting");
     const generation = ++this.connectionGeneration;
     let socket: WebSocketLike;
     try {
       socket = this.socketFactory(daemonUrl(this.address));
     } catch (error) {
-      this.state = "disconnected";
+      this.setConnectionState("disconnected");
       return Promise.reject(asError(error));
     }
     this.socket = socket;
 
     return new Promise((resolve, reject) => {
       let handshakeSettled = false;
+      let socketErrored = false;
       const failHandshake = (error: Error) => {
         if (handshakeSettled) return;
         handshakeSettled = true;
         if (this.rejectConnect === failHandshake) this.rejectConnect = undefined;
-        this.state = "disconnected";
+        this.setConnectionState("disconnected");
         reject(error);
       };
       this.rejectConnect = failHandshake;
@@ -163,7 +170,7 @@ export class PaduClient {
             }
             handshakeSettled = true;
             if (this.rejectConnect === failHandshake) this.rejectConnect = undefined;
-            this.state = "connected";
+            this.setConnectionState("connected");
             resolve();
             return;
           }
@@ -179,11 +186,21 @@ export class PaduClient {
         this.handleMessage(message);
       });
       socket.addEventListener("error", () => {
-        failHandshake(new Error("Padu daemon connection failed"));
+        // React Native puts the useful native network error on the close
+        // event's reason, immediately after this otherwise-empty error event.
+        socketErrored = true;
       });
-      socket.addEventListener("close", () => {
+      socket.addEventListener("close", (event) => {
         if (generation !== this.connectionGeneration) return;
-        failHandshake(new Error("Padu daemon disconnected during handshake"));
+        const reason = event.reason?.trim();
+        failHandshake(
+          new Error(
+            reason ||
+              (socketErrored
+                ? "Padu daemon connection failed"
+                : "Padu daemon disconnected during handshake"),
+          ),
+        );
         this.markDisconnected(new Error("Padu daemon disconnected"));
       });
     });
@@ -267,6 +284,13 @@ export class PaduClient {
     return () => this.taskStateListeners.delete(listener);
   }
 
+  /** Observes connection changes, including remote socket closure. */
+  subscribeConnectionState(listener: ConnectionStateListener): () => void {
+    this.connectionStateListeners.add(listener);
+    listener(this.state);
+    return () => this.connectionStateListeners.delete(listener);
+  }
+
   replayCursors(): ReplayCursor[] {
     return [...this.sequences].map(([key, cursor]) => {
       const [sessionId, runtimeId] = key.split(":", 2) as [string, string];
@@ -344,13 +368,19 @@ export class PaduClient {
   }
 
   private markDisconnected(error: Error): void {
-    this.state = "disconnected";
+    this.setConnectionState("disconnected");
     this.socket = undefined;
     for (const pending of this.pending.values()) {
       clearTimeout(pending.timeout);
       pending.reject(error);
     }
     this.pending.clear();
+  }
+
+  private setConnectionState(state: PaduConnectionState): void {
+    if (this.state === state) return;
+    this.state = state;
+    for (const listener of this.connectionStateListeners) listener(state);
   }
 }
 

@@ -357,9 +357,11 @@ impl Padu {
         let status_action = current
             .filter(|_| !replace)
             .and_then(|goal| match goal.status {
-                ThreadGoalStatus::Active => {
-                    Some((ThreadGoalStatus::Paused, tr!("goal.pause"), "icons/stop.svg"))
-                }
+                ThreadGoalStatus::Active => Some((
+                    ThreadGoalStatus::Paused,
+                    tr!("goal.pause"),
+                    "icons/stop.svg",
+                )),
                 ThreadGoalStatus::Paused
                 | ThreadGoalStatus::Blocked
                 | ThreadGoalStatus::UsageLimited => Some((
@@ -468,12 +470,7 @@ impl Padu {
             &theme,
             |padu, window, cx| padu.confirm_goal_dialog(window, cx),
         );
-        let mut actions_column = div()
-            .p(px(8.0))
-            .flex()
-            .flex_col()
-            .gap(px(2.0))
-            .child(save);
+        let mut actions_column = div().p(px(8.0)).flex().flex_col().gap(px(2.0)).child(save);
         if let Some((status, label, icon_path)) = status_action {
             let toggle_weak = cx.entity().downgrade();
             actions_column = actions_column.child(render_goal_action_row(

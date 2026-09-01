@@ -1,0 +1,183 @@
+import type {
+  AgentSession,
+  Project,
+  ProviderKind,
+  RuntimeMode,
+  SequencedEvent,
+} from '@padu/client';
+
+export interface MobileRuntimeClock {
+  nowSeconds: () => number;
+  randomUUID: () => string;
+}
+
+export interface NewSessionOptions {
+  model?: string | null;
+  reasoningEffort?: string | null;
+  runtimeMode?: RuntimeMode;
+  /** Base branch for an isolated worktree; null means the project default. */
+  baseBranch?: string | null;
+}
+
+export function beginTurn(
+  session: AgentSession,
+  prompt: string,
+  clock: MobileRuntimeClock,
+): AgentSession {
+  const now = clock.nowSeconds();
+  const turnId = clock.randomUUID();
+  const visiblePrompt = prompt.trim();
+  return {
+    ...session,
+    auto_title:
+      session.messages.length === 0 && session.title === 'New task' && !session.auto_title
+        ? promptTitle(visiblePrompt)
+        : session.auto_title,
+    status: 'connecting',
+    updated_at: now,
+    last_reply_at: now,
+    messages: [
+      ...session.messages,
+      {
+        id: clock.randomUUID(),
+        turn_id: turnId,
+        role: 'user',
+        content: visiblePrompt,
+        created_at: now,
+        streaming: false,
+      },
+    ],
+    turns: [
+      ...session.turns,
+      {
+        id: turnId,
+        turn_count: session.turns.length + 1,
+        status: 'running',
+        provider_turn_started: false,
+        provider_resume_at: null,
+        started_at: now,
+        completed_at: null,
+        checkpoint: null,
+      },
+    ],
+  };
+}
+
+export function createSession(
+  projectId: string,
+  provider: ProviderKind,
+  isolated: boolean,
+  clock: MobileRuntimeClock,
+  options: NewSessionOptions = {},
+): AgentSession {
+  const now = clock.nowSeconds();
+  return {
+    id: clock.randomUUID(),
+    title: 'New task',
+    auto_title: null,
+    project_id: projectId,
+    workspace: isolated
+      ? { kind: 'newWorktree', baseBranch: options.baseBranch ?? null }
+      : { kind: 'local' },
+    provider,
+    model: options.model ?? null,
+    runtime_mode: options.runtimeMode ?? 'fullAccess',
+    interaction_mode: 'build',
+    reasoning_effort: options.reasoningEffort ?? null,
+    service_tier: null,
+    context_window: null,
+    agent_preset: null,
+    status: 'idle',
+    created_at: now,
+    updated_at: now,
+    last_reply_at: null,
+    provider_cursor: null,
+    available_commands: [],
+    context_usage: null,
+    provider_session_id: null,
+    messages: [],
+    transcript_blocks: [],
+    turns: [],
+    queued_messages: [],
+  };
+}
+
+/** Mirrors the web client's queueSubmission: a prompt sent while a turn is
+ * live becomes a persisted QueuedMessage that drains after the turn settles. */
+export function queueSubmission(
+  session: AgentSession,
+  prompt: string,
+  clock: MobileRuntimeClock,
+): AgentSession {
+  const now = clock.nowSeconds();
+  return {
+    ...session,
+    updated_at: now,
+    queued_messages: [
+      ...(session.queued_messages ?? []),
+      {
+        id: clock.randomUUID(),
+        content: prompt,
+        display_content: null,
+        attachments: [],
+        created_at: now,
+      },
+    ],
+  };
+}
+
+export function sessionBusy(session: Pick<AgentSession, 'status'>): boolean {
+  return (
+    session.status === 'connecting' || session.status === 'working' || session.status === 'waiting'
+  );
+}
+
+export interface SessionOptionChanges {
+  model?: string | null;
+  reasoningEffort?: string | null;
+  runtimeMode?: RuntimeMode;
+}
+
+export function applySessionOptions(
+  session: AgentSession,
+  changes: SessionOptionChanges,
+  clock: MobileRuntimeClock,
+): AgentSession {
+  return {
+    ...session,
+    model: changes.model !== undefined ? changes.model : session.model,
+    reasoning_effort:
+      changes.reasoningEffort !== undefined ? changes.reasoningEffort : session.reasoning_effort,
+    runtime_mode: changes.runtimeMode ?? session.runtime_mode,
+    updated_at: clock.nowSeconds(),
+  };
+}
+
+export function sessionCwd(session: AgentSession, project: Project): string {
+  return session.workspace?.kind === 'worktree' ? session.workspace.path : project.path;
+}
+
+export function runtimeEventAlreadyApplied(session: AgentSession, event: SequencedEvent): boolean {
+  const cursor = session.runtime_event_cursor;
+  return Boolean(
+    cursor && cursor.runtime_id === event.runtimeId && cursor.epoch === event.epoch &&
+      cursor.sequence >= event.sequence,
+  );
+}
+
+export function shouldApplyRuntimeEvent(
+  session: AgentSession,
+  event: SequencedEvent,
+): boolean {
+  if (!runtimeEventAlreadyApplied(session, event)) return true;
+  return session.status === 'waiting' && (
+    event.event.kind === 'permission' || event.event.kind === 'userInputRequested'
+  );
+}
+
+function promptTitle(prompt: string): string | null {
+  let title = prompt.split(/\s+/u).filter(Boolean).slice(0, 7).join(' ');
+  if (!title) return null;
+  if ([...title].length > 54) title = `${[...title].slice(0, 53).join('')}…`;
+  return title;
+}

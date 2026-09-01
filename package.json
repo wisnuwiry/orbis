@@ -12,7 +12,13 @@
     "web:build": "bun run --filter @padu/web build",
     "web:preview": "bun run --filter @padu/web preview",
     "web:typecheck": "bun run --filter @padu/web typecheck",
-    "web:test": "bun run --filter @padu/web test"
+    "web:test": "bun run --filter @padu/web test",
+    "mobile:start": "bun run --filter @padu/mobile start",
+    "mobile:ios": "bun run --filter @padu/mobile ios",
+    "mobile:android": "bun run --filter @padu/mobile android",
+    "mobile:web": "bun run --filter @padu/mobile web",
+    "mobile:typecheck": "bun run --filter @padu/mobile typecheck",
+    "mobile:test": "bun run --filter @padu/mobile test"
   },
   "private": true,
   "devDependencies": {
