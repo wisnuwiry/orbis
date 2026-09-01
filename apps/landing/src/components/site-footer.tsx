@@ -8,7 +8,7 @@ interface SiteFooterProps {
 export function SiteFooter() {
   const alternatives = getAlternativePages();
   return (
-    <footer className="w-full max-w-5xl p-6 md:p-20 md:pt-0 mx-auto">
+    <footer className="w-full max-w-7xl px-6 md:px-32 pb-16 mx-auto">
       <div className="border-t border-white/10 pt-10 pb-4 grid grid-cols-2 sm:grid-cols-5 gap-8 text-sm">
         <div className="space-y-3">
           <p className="text-white/70 font-medium text-xs uppercase tracking-wider">Docs</p>

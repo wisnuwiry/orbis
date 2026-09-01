@@ -9,20 +9,20 @@ interface SiteShellProps {
 
 export function SiteShell({ children, width = "default" }: SiteShellProps) {
   const contentWidthClasses =
-    width === "prose" ? "max-w-prose mx-auto" : "max-w-5xl mx-auto";
+    width === "prose" ? "max-w-prose mx-auto" : "w-full";
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Top Header - exactly identical to Home page container */}
-      <div className="w-full max-w-5xl p-6 md:p-20 pb-0 md:pb-0 mx-auto">
-        <div className="mb-16 md:mb-20">
+      {/* Top Header - exactly identical to Home page in padding and width */}
+      <div className="w-full max-w-7xl px-6 pt-4 md:px-32 md:pt-6 mx-auto">
+        <nav className="mb-16 md:mb-20">
           <SiteHeader />
-        </div>
+        </nav>
       </div>
 
       {/* Main Page Content */}
-      <main className={`flex-1 w-full px-6 md:px-20 pb-16 md:pb-24 ${contentWidthClasses}`}>
-        {children}
+      <main className="flex-1 w-full max-w-7xl px-6 md:px-32 pb-16 md:pb-24 mx-auto">
+        <div className={contentWidthClasses}>{children}</div>
       </main>
 
       {/* Footer */}
