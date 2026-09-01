@@ -49,7 +49,6 @@ Padu automatically discovers `codex` on your `PATH` and uses your local authenti
 ## Running Codex in Padu
 
 - **Desktop GUI:** Select **OpenAI Codex** from the provider dropdown.
-- **CLI:** Run `padu run --provider codex "refactor the API client"`.
 - **Integrated Terminal:** Run `codex` directly inside the workspace terminal.
 
 ## Troubleshooting Codex
@@ -60,16 +59,12 @@ If Codex shows as **Not installed** in Padu:
    ```bash
    which -a codex
    ```
-2. In Padu, open **Settings → Providers → Codex** and select **Refresh**.
-3. If necessary, provide the absolute path in `~/.padu/config.json`:
+2. In Padu Desktop, open **Settings → Providers → Codex** and select **Refresh**.
+3. If necessary, provide the absolute binary path in `~/.padu/settings.json`:
    ```json
    {
-     "agents": {
-       "providers": {
-         "codex": {
-           "command": ["/usr/local/bin/codex"]
-         }
-       }
+     "provider_binary_overrides": {
+       "codex": "/usr/local/bin/codex"
      }
    }
    ```
@@ -79,4 +74,4 @@ See [Troubleshooting](/docs/troubleshooting) for more details on `PATH` resoluti
 ## See also
 
 - [Supported providers](/docs/supported-providers) — Full catalog of agents supported in Padu.
-- [Custom providers](/docs/custom-providers) — Configure custom provider flags and endpoints.
+- [Configuration](/docs/configuration) — Configure daemon settings and binary overrides.

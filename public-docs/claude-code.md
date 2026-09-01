@@ -26,18 +26,17 @@ npm install -g @anthropic-ai/claude-code
 claude
 ```
 
-Padu automatically discovers the installed `claude` executable and uses your local authentication tokens when launching a Claude Code session.
+Padu automatically discovers the installed `claude` executable on your system `PATH` and uses your local authentication tokens when launching a Claude Code session.
 
 If your authentication session expires, re-authenticate via `claude` in your terminal, then launch or resume sessions in Padu.
 
 ## Running Claude Code in Padu
 
 - **Desktop GUI:** Select **Claude Code** from the provider picker when starting a new task or session.
-- **CLI:** Run `padu run --provider claude "implement new features"`.
 - **Integrated Terminal:** Open a terminal in any workspace and run `claude` directly with full PTY support.
 
 ## See also
 
 - [Supported providers](/docs/supported-providers) — List of all natively supported agent CLIs.
-- [Custom providers](/docs/custom-providers) — Configure custom binaries, environment flags, or multiple profiles.
+- [Configuration](/docs/configuration) — Configure binary overrides in `~/.padu/settings.json`.
 - [Troubleshooting](/docs/troubleshooting) — Diagnosing `PATH` resolution for installed CLI agents.

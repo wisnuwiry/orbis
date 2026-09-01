@@ -49,7 +49,7 @@ ${agents}
 - [Changelog](${SITE_URL}/changelog): Release notes for the Padu daemon, CLI, desktop, and mobile apps.
 - [Download](${SITE_URL}/download): Install Padu on Mac, Windows, Linux, iOS, Android, or run the web app.
 - [Privacy](${SITE_URL}/privacy): Privacy policy.
-- [Terms](${SITE_URL}/terms): Terms for the official relay and hosted Hub.
+- [Terms](${SITE_URL}/terms): Terms of service for Padu open-source software.
 - [GitHub](https://github.com/wisnusaputra/padu): Source code, issues, and releases.
 `;
 }

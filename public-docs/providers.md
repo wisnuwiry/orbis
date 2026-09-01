@@ -24,11 +24,11 @@ A **provider** defines the communication contract between Padu and an external a
 
 1. **Native Direct Drivers:** Built-in optimized drivers in `crates/padu-core` for top agents (Claude Code, Codex, OpenCode, Pi Agent, Amp, DeepSeek, Cursor CLI, Fx, Grok Build, Kimi Code).
 2. **Agent Client Protocol (ACP):** Universal support for any agent implementing the open [Agent Client Protocol (ACP)](https://agentclientprotocol.com) over standard I/O streams (`stdio`).
-3. **Custom Configurations:** Configured in `~/.padu/config.json` for custom enterprise endpoints, multiple accounts, or private models.
+3. **Daemon Overrides:** Configure binary paths or disable providers via `~/.padu/settings.json` or the Settings UI.
 
 ## Next Steps
 
 - [Supported providers](/docs/supported-providers) — Explore all natively supported agent CLIs.
 - [Claude Code guide](/docs/claude-code) — Setup and usage for Anthropic's Claude Code CLI.
 - [OpenAI Codex guide](/docs/codex) — Setup and usage for OpenAI's Codex CLI.
-- [Custom providers](/docs/custom-providers) — Add custom API endpoints, model maps, and profiles.
+- [Configuration & Settings](/docs/configuration) — Configure daemon settings and binary overrides.

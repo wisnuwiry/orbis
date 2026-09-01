@@ -1,48 +1,22 @@
 ---
 title: Self-hosting the web UI
-description: Serve the Padu web client directly from your daemon over LAN, Tailscale, reverse proxy, or tunnel.
+description: Access the Padu web client from any browser or host it with a reverse proxy.
 nav: Web UI
-order: 4
+order: 3
 category: Getting started
 ---
 
 # Self-hosting the web UI
 
-Padu's daemon can serve the browser web application directly from the same HTTP server it uses for the RPC API and WebSocket stream. You can access the official hosted client at [app.padu.dev](https://app.padu.dev) or self-host the entire interface locally.
+Padu includes a full-featured browser web client (`apps/web`). You can access the official hosted client at [app.padu.dev](https://app.padu.dev) or connect directly to a locally running daemon instance.
 
-## Enabling the Web UI
+## Connecting from the Browser
 
-To enable the bundled web UI on the daemon, start it with the `--web-ui` flag:
-
-```bash
-padu daemon start --web-ui
-```
-
-Or enable it persistently in `~/.padu/config.json`:
-
-```json
-{
-  "features": {
-    "webUi": {
-      "enabled": true
-    }
-  }
-}
-```
-
-Then open your browser and navigate to:
-
-```
-http://localhost:4789/
-```
-
-## How It Works
-
-The web client is served from the same origin as the daemon API. When you load the page in a browser, it automatically connects to the local WebSocket endpoint at `/ws`.
+When your daemon is running on `127.0.0.1:4789`, open your browser and connect via WebSocket. The web client provides feature parity with the desktop interface, including split diff inspection, multi-agent turns, and session switching.
 
 ## Reverse Proxy Configuration
 
-If you want to expose the web client securely over HTTPS on your domain, put a reverse proxy (such as Caddy or Nginx) in front of `127.0.0.1:4789`.
+If you host the daemon on a remote development machine and wish to access it over HTTPS, you can place a reverse proxy (such as Caddy or Nginx) in front of port `4789`.
 
 ### Caddy (Recommended)
 
@@ -95,8 +69,8 @@ server {
 ## Security Best Practices
 
 When exposing the daemon beyond `localhost`:
-1. **Set a daemon password:** Run `padu daemon set-password` so all requests require authentication.
-2. **Use HTTPS / TLS:** Protect credentials and WebSocket traffic across public networks.
-3. **Allow your domain:** Add your hostname to `daemon.hostnames` in `config.json` to pass DNS rebinding checks.
+1. Use private networks (such as Tailscale or WireGuard) whenever possible.
+2. Terminate TLS with valid certificates on public networks.
+3. Pass `--allow-origin` flags to the daemon to restrict cross-origin requests.
 
-See [Security](/docs/security) and [Configuration](/docs/configuration) for more details.
+See [Security & Privacy](/docs/security) and [Configuration](/docs/configuration) for more details.

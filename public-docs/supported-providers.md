@@ -8,9 +8,9 @@ category: Providers
 
 # Supported providers
 
-Padu communicates directly with locally installed agent CLIs via native process adapters and the open Agent Client Protocol (ACP).
+Padu communicates directly with locally installed agent CLIs via native process adapters in `crates/padu-core` and the open Agent Client Protocol (ACP).
 
-For an architectural overview, see [Providers](/docs/providers). To configure custom endpoints or flags, see [Custom providers](/docs/custom-providers).
+For an architectural overview, see [Providers overview](/docs/providers). To configure binary path overrides or disable providers, see [Configuration](/docs/configuration).
 
 ## Native Drivers
 

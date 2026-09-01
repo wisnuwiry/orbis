@@ -1,6 +1,6 @@
 ---
 title: Getting started
-description: Install Padu and orchestrate local AI coding agents from desktop, web, or terminal.
+description: Install Padu and orchestrate local AI coding agents from desktop or web.
 nav: Getting started
 order: 1
 category: Getting started
@@ -16,28 +16,21 @@ Download the native release for macOS, Linux, or Windows from [padu.dev/download
 
 The desktop app bundles its own lightweight daemon and starts it automatically on loopback (`127.0.0.1:4789`). No separate server install or cloud account is required.
 
-## 2. CLI Daemon (Headless / Devboxes)
+## 2. Headless Daemon (Remote Devboxes / Servers)
 
-For remote devboxes, headless Linux servers, or developers who prefer the terminal, install the Padu CLI binary:
-
-```bash
-# Download and install prebuilt binary, or build with Cargo:
-cargo install --path crates/padu-cli
-```
-
-Start the daemon in background or interactive mode:
+For remote devboxes, headless Linux servers, or continuous environments, you can run the standalone daemon binary:
 
 ```bash
-# Start the local daemon on 127.0.0.1:4789
-padu daemon start
+# Start the standalone daemon on loopback port 4789
+padu-daemon --bind 127.0.0.1:4789
 
-# Check status and connected agents
-padu daemon status
+# Or allow remote connections over private VPN / Tailscale
+padu-daemon --bind 100.101.102.103:4789 --allow-non-loopback
 ```
 
-The daemon can also serve the bundled web client directly from `http://127.0.0.1:4789/`. See [Self-hosting the web UI](/docs/web-ui).
+The daemon can also serve the bundled web client directly. See [Self-hosting the web UI](/docs/web-ui).
 
-Configuration and local state live under `PADU_HOME` (defaults to `~/.padu`).
+Configuration and local state live under `~/.padu/` (or your OS user data directory).
 
 ## 3. Prerequisites
 
@@ -47,15 +40,15 @@ Padu manages external agent CLIs; it does not bundle AI models itself. Before la
 - **[OpenAI Codex](/docs/codex):** `codex` (OpenAI CLI)
 - **[OpenCode](https://opencode.ai/):** `opencode`
 - **[Pi Agent](https://pi.dev):** `pi`
-- **Other ACP Agents:** Cursor, Gemini CLI, GitHub Copilot, Amp, Grok, Kimi, etc.
+- **Other ACP Agents:** Cursor CLI, Gemini CLI, GitHub Copilot, Amp, Grok Build, Kimi Code, etc.
 
 See [Supported providers](/docs/supported-providers) for the full list of supported agents.
 
 ## Next Steps
 
 - [Workspaces](/docs/workspaces) — Understand Padu's workspace, session, and worktree model.
-- [Git worktrees](/docs/worktrees) — Run concurrent agents in isolated branches with setup hooks.
-- [CLI Reference](/docs/cli) — Manage agents, workspaces, scripts, and daemons from your terminal.
+- [Git worktrees](/docs/worktrees) — Run concurrent agents in isolated branches.
 - [Connectivity](/docs/connectivity) — Connect remote web or mobile clients via LAN, Tailscale, or SSH.
 - [Performance Architecture](/docs/performance) — Learn how GPUI delivers 120 FPS rendering with zero UI-thread blocking.
-- [Configuration](/docs/configuration) — Configure `~/.padu/config.json`, ports, and logging.
+- [Security & Privacy](/docs/security) — How Padu protects your source code and credentials.
+- [Configuration & Settings](/docs/configuration) — Configure `~/.padu/settings.json` and provider binary overrides.

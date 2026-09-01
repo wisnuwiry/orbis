@@ -1,143 +1,59 @@
 ---
-title: Configuration
-description: Configure Padu via config.json, environment variables, and CLI overrides.
+title: Configuration & Settings
+description: Configure Padu daemon settings, provider binary overrides, and permissions in ~/.padu/settings.json.
 nav: Configuration
-order: 40
+order: 30
 category: Reference
 ---
 
-# Configuration
+# Configuration & Settings
 
-Padu loads configuration from a single JSON file located in your Padu home directory, with support for environment variables and command-line overrides.
-
-## Configuration File Location
-
-By default, Padu stores its configuration and state in `~/.padu`. The primary configuration file is:
+Padu persists daemon settings in a JSON file located in your user directory:
 
 ```bash
-~/.padu/config.json
+~/.padu/settings.json
 ```
 
-You can change the home directory by setting the `PADU_HOME` environment variable or passing `--home` to `padu daemon start`.
+Settings can be edited directly in the file or managed from the Padu Desktop **Settings** panel.
 
-## Precedence
-
-Configuration values are resolved in the following priority:
-
-1. Built-in defaults
-2. `config.json`
-3. Environment variables
-4. Command-line flags
-
-## Example Configuration
+## Settings Format
 
 ```json
 {
-  "$schema": "https://padu.dev/schemas/padu.config.v1.json",
-  "version": 1,
-  "daemon": {
-    "listen": "127.0.0.1:4789",
-    "hostnames": ["localhost", ".localhost"]
-  },
-  "worktrees": {
-    "root": "~/.padu/worktrees"
-  },
-  "features": {
-    "webUi": {
-      "enabled": false
-    }
+  "computer_use_enabled": false,
+  "computer_use_allowed_apps": [],
+  "disabled_providers": [],
+  "provider_binary_overrides": {
+    "claude": "/opt/homebrew/bin/claude",
+    "codex": "/usr/local/bin/codex"
   }
 }
 ```
 
-## Applying Changes
+## Settings Reference
 
-To reload changes from `config.json` into a running daemon without restarting active agent sessions:
+### `provider_binary_overrides`
+Maps provider IDs (`claude`, `codex`, `opencode`, `pi`, `cursor`, `amp`, etc.) to custom executable paths on disk. Useful when tools are installed in non-standard locations or managed by tool version managers (such as `nvm` or `mise`).
 
-```bash
-padu reload
-```
+### `disabled_providers`
+Array of provider IDs to hide from the provider selection menu in the user interface.
 
-Settings that affect server binding (such as `daemon.listen` and `daemon.auth`) require a full daemon restart:
+### `computer_use_enabled`
+Boolean flag enabling or disabling computer automation capabilities for providers that support tool use.
 
-```bash
-padu daemon restart
-```
+### `computer_use_allowed_apps`
+List of application bundle IDs granted permission for automated UI interaction.
 
-## Password Authentication
+## Daemon CLI Options
 
-To secure the daemon against unauthorized network requests:
+When starting the standalone daemon binary (`padu-daemon`), the following command-line flags are supported:
 
-```bash
-padu daemon set-password
-```
+- `--bind <ADDRESS>`: Network socket address to bind (e.g. `127.0.0.1:4789`).
+- `--allow-non-loopback`: Permits binding to external or VPN interfaces (such as Tailscale).
+- `--allow-origin <ORIGIN>`: Restricts allowed browser origins for WebSocket connections.
+- `--parent-pid <PID>`: Shuts down the daemon automatically when the parent process exits.
 
-This prompts for a password and writes the bcrypt hash into `~/.padu/config.json`:
+## See Also
 
-```json
-{
-  "daemon": {
-    "auth": {
-      "password": "$2b$12$..."
-    }
-  }
-}
-```
-
-Alternatively, provide `PADU_PASSWORD` via environment variable at startup:
-
-```bash
-PADU_PASSWORD=my-secret padu daemon start
-```
-
-## Worktree Directory Root
-
-By default, isolated Git worktrees are placed in `$PADU_HOME/worktrees/`. You can relocate this directory by setting `worktrees.root`:
-
-```json
-{
-  "worktrees": {
-    "root": "/mnt/fast-ssd/padu-worktrees"
-  }
-}
-```
-
-## Logging Configuration
-
-```json
-{
-  "log": {
-    "console": {
-      "level": "info",
-      "format": "pretty"
-    },
-    "file": {
-      "level": "trace",
-      "path": "daemon.log",
-      "rotate": {
-        "maxSize": "10m",
-        "maxFiles": 2
-      }
-    }
-  }
-}
-```
-
-## Common Environment Variables
-
-- `PADU_HOME` — Custom home directory (defaults to `~/.padu`)
-- `PADU_LISTEN` — Override daemon listening address and port (defaults to `127.0.0.1:4789`)
-- `PADU_PASSWORD` — Set authentication password for the daemon
-- `PADU_HOSTNAMES` — Comma-separated allowed hostnames for DNS rebinding protection
-- `PADU_WEB_UI_ENABLED` — Set to `true` to enable the bundled browser web interface
-- `PADU_LOG_CONSOLE_LEVEL` — Console log level (`debug`, `info`, `warn`, `error`)
-
-## JSON Schema Validation
-
-Add the following `$schema` property to `config.json` for editor validation and autocompletion:
-
-```json
-{
-  "$schema": "https://padu.dev/schemas/padu.config.v1.json"
-}
-```
+- [Troubleshooting](/docs/troubleshooting) — Fixing `PATH` resolution and provider discovery.
+- [Security & Privacy](/docs/security) — How Padu protects local credentials and network boundaries.
