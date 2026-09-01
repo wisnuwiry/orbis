@@ -1,22 +1,17 @@
 import * as React from "react";
 import {
   ArrowRight,
-  ExternalLink,
+  Cpu,
   GitFork,
-  Laptop,
+  Globe,
   RotateCcw,
   ShieldCheck,
   Smartphone,
-  Zap,
-  Cpu,
-  type LucideIcon,
+  Tablet,
 } from "lucide-react";
 import {
   motion,
   AnimatePresence,
-  useInView,
-  useScroll,
-  useTransform,
   type Transition,
 } from "framer-motion";
 
@@ -25,12 +20,10 @@ import {
 const FADE_IN_UP = { opacity: 0, y: 20 };
 const FADE_IN = { opacity: 1, y: 0 };
 const FADE_IN_UP_TINY = { opacity: 0, y: -10 };
-const FADE_IN_UP_XL = { opacity: 0, y: 30 };
 const FADE_IN_UP_40 = { opacity: 0, y: 40 };
 const FADE_IN_UP_4 = { opacity: 0, y: 4 };
 const FADE_OUT_UP_4 = { opacity: 0, y: 4 };
 
-const EASE_OUT_06_DELAY_01: Transition = { duration: 0.6, delay: 0.1, ease: "easeOut" };
 const EASE_OUT_08_DELAY_05: Transition = { duration: 0.8, delay: 0.5, ease: "easeOut" };
 const EASE_OUT_05: Transition = { duration: 0.5, ease: "easeOut" };
 const EASE_OUT_015: Transition = { duration: 0.15, ease: "easeOut" };
@@ -38,7 +31,6 @@ const DURATION_05: Transition = { duration: 0.5 };
 
 const VIEWPORT_60 = { once: true, margin: "-60px" };
 
-const PHONE_PERSPECTIVE_STYLE = { minHeight: 480, perspective: 700 };
 import { CursorFieldProvider } from "~/components/butterfly";
 import { AGENT_PAGES } from "~/data/agent-pages";
 import {
@@ -54,7 +46,7 @@ import {
   OpenCodeIcon,
   PiIcon,
 } from "~/components/agent-icons";
-import { ClaudeIcon, MobileChat, MobileDiff, MobileSidebar, PhoneFrame } from "~/components/mockup";
+import { ClaudeIcon } from "~/components/mockup";
 import { FAQItem } from "~/components/faq-item";
 import { SiteFooter } from "~/components/site-footer";
 import { SiteHeader } from "~/components/site-header";
@@ -89,14 +81,12 @@ export function LandingPage({ title, subtitle }: LandingPageProps) {
         </motion.div>
       </div>
 
-      {/* Phone showcase */}
-      <PhoneShowcase />
-
       {/* Content section */}
       <div className="landing-content bg-background border-t border-white/[0.06]">
         <main className="p-6 md:p-20 md:pt-32 max-w-5xl mx-auto">
           <div className="space-y-32">
             <ArchitectureSection />
+            <EcosystemBentoSection />
             <MultiProviderSection />
             <FAQ />
           </div>
@@ -316,6 +306,275 @@ function ArchitectureSection() {
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/* Device Schematic Placeholders for Ecosystem Bento                          */
+/* -------------------------------------------------------------------------- */
+
+function TabletPlaceholder() {
+  return (
+    <div className="w-full rounded-xl border border-white/10 bg-black/60 p-2.5 flex flex-col gap-2 font-mono text-[10px] text-zinc-400 select-none">
+      {/* Header bar */}
+      <div className="flex items-center justify-between border-b border-white/[0.06] pb-1.5 px-1">
+        <div className="flex items-center gap-1.5">
+          <div className="w-2 h-2 rounded-full bg-white/20" />
+          <div className="w-2 h-2 rounded-full bg-white/20" />
+          <div className="w-2 h-2 rounded-full bg-white/20" />
+          <span className="text-zinc-500 ml-1 text-[9px]">Padu iPadOS</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            Connected · Local Daemon
+          </span>
+        </div>
+      </div>
+      {/* Two-column layout */}
+      <div className="grid grid-cols-12 gap-2 h-36">
+        {/* Left column: Transcript & Chat */}
+        <div className="col-span-6 rounded border border-white/[0.06] bg-white/[0.01] p-2 flex flex-col justify-between">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-1.5 text-zinc-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+              <span className="font-semibold text-white">Claude Code</span>
+              <span className="text-zinc-500">turn #2</span>
+            </div>
+            <div className="text-[9px] text-zinc-400 bg-white/[0.02] p-1.5 rounded border border-white/[0.04]">
+              &gt; Refactored auth middleware with token refresh.
+            </div>
+            <div className="h-1.5 w-3/4 rounded bg-white/10" />
+            <div className="h-1.5 w-1/2 rounded bg-white/10" />
+          </div>
+          <div className="rounded border border-white/10 bg-white/[0.03] px-2 py-1 text-zinc-500 text-[9px] flex items-center justify-between">
+            <span>Send instruction...</span>
+            <span className="text-zinc-400">⏎</span>
+          </div>
+        </div>
+        {/* Right column: Split Diff */}
+        <div className="col-span-6 rounded border border-white/[0.06] bg-white/[0.01] p-2 flex flex-col justify-between">
+          <div className="space-y-1 text-[9px]">
+            <div className="flex items-center justify-between text-zinc-400 pb-1 border-b border-white/[0.04]">
+              <span>src/auth.ts</span>
+              <span className="text-emerald-400">+12 -3</span>
+            </div>
+            <div className="space-y-0.5 font-mono text-[8.5px]">
+              <div className="text-zinc-500">@@ -14,6 +14,8 @@</div>
+              <div className="bg-red-500/10 text-red-300 px-1 rounded">- const token = req.cookies.token;</div>
+              <div className="bg-emerald-500/10 text-emerald-300 px-1 rounded">+ const token = await extractBearerToken(req);</div>
+              <div className="bg-emerald-500/10 text-emerald-300 px-1 rounded">+ if (!token) throw new AuthError();</div>
+            </div>
+          </div>
+          <div className="text-right text-[8.5px] text-zinc-500">
+            <span>Diff Review · 1-click apply</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function IPhonePlaceholder() {
+  return (
+    <div className="w-full max-w-[200px] mx-auto rounded-2xl border border-white/10 bg-black/60 p-2.5 flex flex-col justify-between h-44 font-mono text-[9px] text-zinc-400 select-none">
+      {/* Notch & status */}
+      <div className="flex items-center justify-between px-1">
+        <span className="text-[8px] text-zinc-500">9:41</span>
+        <div className="w-10 h-2.5 rounded-full bg-white/15" />
+        <span className="text-[8px] text-zinc-500">5G</span>
+      </div>
+      {/* Mini chat bubble */}
+      <div className="space-y-1.5 my-auto">
+        <div className="bg-white/10 text-white px-2 py-1 rounded-lg rounded-br-none text-[8.5px] max-w-[85%] ml-auto">
+          Add login rate limiting
+        </div>
+        <div className="bg-white/[0.04] border border-white/[0.08] text-zinc-300 px-2 py-1.5 rounded-lg rounded-bl-none text-[8px] max-w-[90%] space-y-1">
+          <div className="flex items-center gap-1 text-purple-300">
+            <span className="w-1 h-1 rounded-full bg-purple-400 animate-pulse" />
+            <span>Codex CLI: editing...</span>
+          </div>
+          <div className="text-[7.5px] text-zinc-400">Added 5 req/min Redis rate limiter</div>
+        </div>
+      </div>
+      {/* Composer input */}
+      <div className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[8px] text-zinc-500 flex items-center justify-between">
+        <span>Steer agent...</span>
+        <span className="text-zinc-400">↑</span>
+      </div>
+    </div>
+  );
+}
+
+function AndroidPlaceholder() {
+  return (
+    <div className="w-full max-w-[200px] mx-auto rounded-xl border border-white/10 bg-black/60 p-2.5 flex flex-col justify-between h-44 font-mono text-[9px] text-zinc-400 select-none">
+      {/* Top bar */}
+      <div className="flex items-center justify-between px-1 border-b border-white/[0.06] pb-1">
+        <span className="text-[8.5px] text-zinc-300 font-semibold">Padu Android</span>
+        <span className="text-[7.5px] text-emerald-400 bg-emerald-500/10 px-1 rounded">Live</span>
+      </div>
+      {/* Session Card */}
+      <div className="space-y-1.5 my-auto">
+        <div className="rounded border border-white/[0.08] bg-white/[0.03] p-1.5 space-y-1">
+          <div className="flex items-center justify-between">
+            <span className="text-[8px] text-white font-medium">Session #49a</span>
+            <span className="text-[7px] text-zinc-500">Worktree: feat/ui</span>
+          </div>
+          <div className="text-[7.5px] text-zinc-400">Agent: OpenCode (8 turns)</div>
+          <div className="flex items-center gap-1 pt-0.5">
+            <span className="px-1 py-0.2 rounded bg-white/5 text-[7px] text-zinc-400 border border-white/10">3 files changed</span>
+            <span className="px-1 py-0.2 rounded bg-purple-500/10 text-[7px] text-purple-300">Ready</span>
+          </div>
+        </div>
+      </div>
+      {/* Bottom Action Bar */}
+      <div className="flex items-center justify-around text-[7.5px] text-zinc-500 pt-1 border-t border-white/[0.06]">
+        <span className="text-white">Sessions</span>
+        <span>Diffs</span>
+        <span>Settings</span>
+      </div>
+    </div>
+  );
+}
+
+function PwaPlaceholder() {
+  return (
+    <div className="w-full rounded-xl border border-white/10 bg-black/60 p-2.5 flex flex-col gap-2 font-mono text-[10px] text-zinc-400 select-none">
+      {/* Browser address bar */}
+      <div className="flex items-center gap-2 border-b border-white/[0.06] pb-1.5 px-1">
+        <div className="flex items-center gap-1">
+          <div className="w-2 h-2 rounded-full bg-white/20" />
+          <div className="w-2 h-2 rounded-full bg-white/20" />
+          <div className="w-2 h-2 rounded-full bg-white/20" />
+        </div>
+        <div className="flex-1 rounded bg-white/[0.04] border border-white/[0.06] px-2 py-0.5 text-center text-[9px] text-zinc-400">
+          https://app.padu.dev
+        </div>
+        <span className="text-[8px] text-zinc-500 font-sans">PWA</span>
+      </div>
+      {/* Browser content preview */}
+      <div className="grid grid-cols-12 gap-2 h-36">
+        <div className="col-span-4 rounded border border-white/[0.06] bg-white/[0.01] p-1.5 space-y-1 text-[8.5px]">
+          <div className="text-zinc-500 font-semibold uppercase text-[7.5px]">Connected Daemons</div>
+          <div className="bg-white/[0.04] p-1 rounded border border-white/[0.06] text-white">● local-devbox:4789</div>
+          <div className="p-1 text-zinc-500">○ vps-europe:4789</div>
+          <div className="p-1 text-zinc-500">○ homelab-server</div>
+        </div>
+        <div className="col-span-8 rounded border border-white/[0.06] bg-white/[0.01] p-2 flex flex-col justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-[9px]">
+              <span className="text-white font-medium">Terminal &amp; Transcript Stream</span>
+              <span className="text-emerald-400 text-[8px]">WebSocket Active</span>
+            </div>
+            <div className="font-mono text-[8px] text-zinc-400 bg-black/50 p-1.5 rounded border border-white/[0.04] space-y-0.5">
+              <div>$ git diff --stat</div>
+              <div className="text-zinc-500"> 2 files changed, 24 insertions(+), 6 deletions(-)</div>
+              <div className="text-purple-300">&gt; Claude Code completed turn in 1.4s</div>
+            </div>
+          </div>
+          <div className="text-[8px] text-zinc-500">
+            Works in Safari, Chrome, Firefox, Edge, and Arc without plugins
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EcosystemBentoSection() {
+  return (
+    <motion.section
+      initial={FADE_IN_UP}
+      whileInView={FADE_IN}
+      viewport={VIEWPORT_60}
+      transition={EASE_OUT_05}
+    >
+      <SectionHeader
+        eyebrow="Ecosystem"
+        title="Every device. Every screen."
+        description="Connect seamlessly to your active workspace from your iPad, iPhone, Android, or modern web browser with zero feature loss."
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* iPad / Tablet - 2 columns */}
+        <div className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all">
+          <div className="space-y-2.5 mb-5">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-[11px] text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-full">
+                iPad &amp; Tablets
+              </span>
+              <Tablet className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
+            </div>
+            <h3 className="text-lg font-semibold text-white tracking-tight">
+              Split-screen workspace &amp; diff review
+            </h3>
+            <p className="text-sm text-zinc-400 leading-relaxed max-w-lg">
+              Expansive multi-column view with live transcript streaming, file tree navigation, and
+              touch-optimized side-by-side diff inspection.
+            </p>
+          </div>
+          <TabletPlaceholder />
+        </div>
+
+        {/* iPhone (iOS) - 1 column */}
+        <div className="md:col-span-1 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all">
+          <div className="space-y-2.5 mb-5">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-[11px] text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-full">
+                iPhone &amp; iOS
+              </span>
+              <Smartphone className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
+            </div>
+            <h3 className="text-lg font-semibold text-white tracking-tight">
+              Prompt steering in your pocket
+            </h3>
+            <p className="text-sm text-zinc-400 leading-relaxed">
+              Steer running agents, queue follow-ups, and review changes on the go.
+            </p>
+          </div>
+          <IPhonePlaceholder />
+        </div>
+
+        {/* Android - 1 column */}
+        <div className="md:col-span-1 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all">
+          <div className="space-y-2.5 mb-5">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-[11px] text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-full">
+                Android
+              </span>
+              <Smartphone className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
+            </div>
+            <h3 className="text-lg font-semibold text-white tracking-tight">
+              Native companion app
+            </h3>
+            <p className="text-sm text-zinc-400 leading-relaxed">
+              Direct daemon connectivity over local Wi-Fi, VPN, or private tailnets.
+            </p>
+          </div>
+          <AndroidPlaceholder />
+        </div>
+
+        {/* PWA & Web - 2 columns */}
+        <div className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all">
+          <div className="space-y-2.5 mb-5">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-[11px] text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-full">
+                Web &amp; PWA
+              </span>
+              <Globe className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
+            </div>
+            <h3 className="text-lg font-semibold text-white tracking-tight">
+              Progressive Web App at app.padu.dev
+            </h3>
+            <p className="text-sm text-zinc-400 leading-relaxed max-w-lg">
+              Zero install required. Connect to any local or remote daemon from any modern browser
+              with full real-time WebSocket communication.
+            </p>
+          </div>
+          <PwaPlaceholder />
+        </div>
+      </div>
+    </motion.section>
+  );
+}
+
 function MultiProviderSection() {
   const providers = [
     { name: "Claude Code", icon: <ClaudeIcon size={24} />, slug: "claude-code" },
@@ -420,109 +679,9 @@ function OtherPlatformsButton() {
   );
 }
 
-function PhoneShowcase() {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const textInView = useInView(containerRef, { once: true, margin: "-80px" });
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "center center"],
-  });
-
-  const [slideDistance, setSlideDistance] = React.useState(260);
-  React.useEffect(() => {
-    function update() {
-      setSlideDistance(window.innerWidth < 768 ? 140 : 260);
-    }
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
-
-  const sideOpacity = useTransform(scrollYProgress, [0.2, 0.6], [0, 1]);
-  const leftX = useTransform(scrollYProgress, [0.2, 0.6], [0, -slideDistance]);
-  const rightX = useTransform(scrollYProgress, [0.2, 0.6], [0, slideDistance]);
-
-  const leftPhoneStyle = React.useMemo(
-    () => ({ opacity: sideOpacity, x: leftX, rotateY: -15, scale: 0.97 }),
-    [sideOpacity, leftX],
-  );
-  const rightPhoneStyle = React.useMemo(
-    () => ({ opacity: sideOpacity, x: rightX, rotateY: 15, scale: 0.97 }),
-    [sideOpacity, rightX],
-  );
-  const centerPhoneAnimate = React.useMemo(() => (textInView ? FADE_IN : {}), [textInView]);
-  const textAnimate = React.useMemo(() => (textInView ? FADE_IN : {}), [textInView]);
-
-  return (
-    <div ref={containerRef} className="flex flex-col items-center pt-8 pb-20 gap-16">
-      <motion.div
-        initial={FADE_IN_UP_TINY}
-        animate={textAnimate}
-        transition={DURATION_05}
-        className="flex flex-col items-center gap-2 px-6 text-center max-w-lg"
-      >
-        <span className="text-xs font-semibold tracking-wider uppercase text-purple-400">
-          Ecosystem
-        </span>
-        <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
-          Control your agents from anywhere.
-        </h2>
-        <p className="text-sm text-zinc-400 leading-relaxed">
-          Connect seamlessly to your local workstation or remote daemon with live streaming and diff inspection.
-        </p>
-      </motion.div>
-
-      {/* Phone trio */}
-      <div
-        className="relative flex items-center justify-center overflow-x-clip w-full"
-        style={PHONE_PERSPECTIVE_STYLE}
-      >
-        {/* Left phone — workspace drawer */}
-        <motion.div
-          style={leftPhoneStyle}
-          className="w-[160px] md:w-[240px] absolute"
-          role="img"
-          aria-label="Padu workspace drawer"
-        >
-          <PhoneFrame time="18:54" depth="right">
-            <MobileSidebar />
-          </PhoneFrame>
-        </motion.div>
-
-        {/* Center phone — agent chat */}
-        <motion.div
-          initial={FADE_IN_UP_XL}
-          animate={centerPhoneAnimate}
-          transition={EASE_OUT_06_DELAY_01}
-          className="w-[220px] md:w-[240px] relative z-10"
-          role="img"
-          aria-label="Padu agent chat"
-        >
-          <PhoneFrame time="18:53">
-            <MobileChat />
-          </PhoneFrame>
-        </motion.div>
-
-        {/* Right phone — diff view */}
-        <motion.div
-          style={rightPhoneStyle}
-          className="w-[160px] md:w-[240px] absolute"
-          role="img"
-          aria-label="Padu diff view"
-        >
-          <PhoneFrame time="18:55" depth="left">
-            <MobileDiff />
-          </PhoneFrame>
-        </motion.div>
-      </div>
-    </div>
-  );
-}
-
 function FAQ() {
   return (
-    <motion.div
+    <motion.section
       initial={FADE_IN_UP}
       whileInView={FADE_IN}
       viewport={VIEWPORT_60}
@@ -591,6 +750,6 @@ function FAQ() {
           on remote servers or cloud VMs using the CLI.
         </FAQItem>
       </div>
-    </motion.div>
+    </motion.section>
   );
 }
