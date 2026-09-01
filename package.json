@@ -7,7 +7,12 @@
     "protocol:generate": "cargo run -p padu-protocol --bin export_types",
     "protocol:check": "cargo run -p padu-protocol --bin export_types -- --check",
     "db:generate": "drizzle-kit generate",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "web:dev": "bun run --filter @padu/web dev",
+    "web:build": "bun run --filter @padu/web build",
+    "web:preview": "bun run --filter @padu/web preview",
+    "web:typecheck": "bun run --filter @padu/web typecheck",
+    "web:test": "bun run --filter @padu/web test"
   },
   "private": true,
   "devDependencies": {
