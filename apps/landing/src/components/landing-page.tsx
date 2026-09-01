@@ -16,19 +16,65 @@ import {
   motion,
   AnimatePresence,
   type Transition,
+  type Variants,
 } from "framer-motion";
 
-// Shared motion presets — hoisted so every JSX site receives the same object
-// reference and doesn't trigger jsx-no-new-object-as-prop.
-const FADE_IN_UP = { opacity: 0, y: 20 };
-const FADE_IN = { opacity: 1, y: 0 };
-const FADE_IN_UP_40 = { opacity: 0, y: 40 };
+// Apple-style easing curves and motion choreography
+const APPLE_EASE = [0.16, 1, 0.3, 1] as const;
+const SLIDE_EASE = [0.22, 0.61, 0.36, 1] as const;
 
-const EASE_OUT_08_DELAY_05: Transition = { duration: 0.8, delay: 0.5, ease: "easeOut" };
-const EASE_OUT_05: Transition = { duration: 0.5, ease: "easeOut" };
-const SLIDE_TRANSITION: Transition = { duration: 0.35, ease: [0.22, 0.61, 0.36, 1] };
+const SLIDE_TRANSITION: Transition = { duration: 0.35, ease: SLIDE_EASE };
 
-const VIEWPORT_60 = { once: true, margin: "-60px" };
+const VIEWPORT_CONFIG = { once: true, margin: "-60px" };
+
+const HERO_CONTAINER_VARIANTS: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.05,
+    },
+  },
+};
+
+const HERO_ITEM_VARIANTS: Variants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.65, ease: APPLE_EASE },
+  },
+};
+
+const SECTION_CONTAINER_VARIANTS: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: APPLE_EASE },
+  },
+};
+
+const STAGGER_CONTAINER_VARIANTS: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const CARD_ITEM_VARIANTS: Variants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: APPLE_EASE },
+  },
+};
 
 import { CursorFieldProvider } from "~/components/butterfly";
 import { AGENT_PAGES } from "~/data/agent-pages";
@@ -64,15 +110,22 @@ export function LandingPage({ eyebrow, title, subtitle }: LandingPageProps) {
         {/* Hero header & content */}
         <div className="relative px-6 pt-4 pb-10 md:px-32 md:pt-6 md:pb-12 max-w-7xl mx-auto">
           <Nav />
-          <Hero eyebrow={eyebrow} title={title} subtitle={subtitle} />
-          <GetStarted />
+          <motion.div
+            variants={HERO_CONTAINER_VARIANTS}
+            initial="hidden"
+            animate="visible"
+            className="flex flex-col items-center"
+          >
+            <Hero eyebrow={eyebrow} title={title} subtitle={subtitle} />
+            <GetStarted />
+          </motion.div>
         </div>
 
         {/* Mockup Frame */}
         <motion.div
-          initial={FADE_IN_UP_40}
-          animate={FADE_IN}
-          transition={EASE_OUT_08_DELAY_05}
+          initial={{ opacity: 0, y: 36, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.3, ease: APPLE_EASE }}
           className="relative px-6 md:px-8 pt-4 md:pt-8 pb-12 md:pb-20"
         >
           <div className="max-w-7xl mx-auto">
@@ -117,17 +170,26 @@ function Hero({
   return (
     <div className="space-y-4 text-center max-w-2xl mx-auto">
       {eyebrow && (
-        <p className="font-mono text-xs font-medium tracking-wider uppercase text-zinc-400">
+        <motion.p
+          variants={HERO_ITEM_VARIANTS}
+          className="font-mono text-xs font-medium tracking-wider uppercase text-zinc-400"
+        >
           {eyebrow}
-        </p>
+        </motion.p>
       )}
 
-      <h1 className="text-3xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.08] text-white">
+      <motion.h1
+        variants={HERO_ITEM_VARIANTS}
+        className="text-3xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.08] text-white"
+      >
         {title}
-      </h1>
-      <p className="text-sm sm:text-base md:text-lg leading-relaxed text-zinc-400 max-w-xl mx-auto font-normal">
+      </motion.h1>
+      <motion.p
+        variants={HERO_ITEM_VARIANTS}
+        className="text-sm sm:text-base md:text-lg leading-relaxed text-zinc-400 max-w-xl mx-auto font-normal"
+      >
         {subtitle}
-      </p>
+      </motion.p>
     </div>
   );
 }
@@ -275,10 +337,10 @@ function ArchitectureCarousel() {
 
   return (
     <motion.section
-      initial={FADE_IN_UP}
-      whileInView={FADE_IN}
-      viewport={VIEWPORT_60}
-      transition={EASE_OUT_05}
+      variants={SECTION_CONTAINER_VARIANTS}
+      initial="hidden"
+      whileInView="visible"
+      viewport={VIEWPORT_CONFIG}
     >
       <SectionHeader
         eyebrow="Architecture"
@@ -321,9 +383,9 @@ function ArchitectureCarousel() {
         <AnimatePresence mode="wait">
           <motion.div
             key={current.id}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            exit={{ opacity: 0, y: -12 }}
             transition={SLIDE_TRANSITION}
             className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center"
           >
@@ -415,16 +477,16 @@ function ArchitectureCarousel() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Ecosystem Bento Section with Gray Image Placeholders                       */
+/* Ecosystem Bento Section with Staggered Entrance Animations                */
 /* -------------------------------------------------------------------------- */
 
 function EcosystemBentoSection() {
   return (
     <motion.section
-      initial={FADE_IN_UP}
-      whileInView={FADE_IN}
-      viewport={VIEWPORT_60}
-      transition={EASE_OUT_05}
+      variants={SECTION_CONTAINER_VARIANTS}
+      initial="hidden"
+      whileInView="visible"
+      viewport={VIEWPORT_CONFIG}
     >
       <SectionHeader
         eyebrow="Ecosystem"
@@ -432,9 +494,16 @@ function EcosystemBentoSection() {
         description="Connect seamlessly to your active workspace from your iPad, iPhone, Android, or modern web browser with zero feature loss."
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <motion.div
+        variants={STAGGER_CONTAINER_VARIANTS}
+        className="grid grid-cols-1 md:grid-cols-3 gap-4"
+      >
         {/* iPad / Tablet - 2 columns */}
-        <div className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all">
+        <motion.div
+          variants={CARD_ITEM_VARIANTS}
+          whileHover={{ y: -2, transition: { duration: 0.2 } }}
+          className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-colors"
+        >
           <div className="space-y-2.5 mb-5">
             <div className="flex items-center justify-between">
               <span className="font-mono text-xs text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-md">
@@ -451,10 +520,14 @@ function EcosystemBentoSection() {
             </p>
           </div>
           <GrayPlaceholder label="iPad & Tablet Split-screen Preview" aspect="aspect-[16/9]" />
-        </div>
+        </motion.div>
 
         {/* iPhone (iOS) - 1 column */}
-        <div className="md:col-span-1 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all">
+        <motion.div
+          variants={CARD_ITEM_VARIANTS}
+          whileHover={{ y: -2, transition: { duration: 0.2 } }}
+          className="md:col-span-1 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-colors"
+        >
           <div className="space-y-2.5 mb-5">
             <div className="flex items-center justify-between">
               <span className="font-mono text-xs text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-md">
@@ -470,10 +543,14 @@ function EcosystemBentoSection() {
             </p>
           </div>
           <GrayPlaceholder label="iPhone Companion App Preview" aspect="aspect-[16/10] sm:aspect-[9/12]" />
-        </div>
+        </motion.div>
 
         {/* Android - 1 column */}
-        <div className="md:col-span-1 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all">
+        <motion.div
+          variants={CARD_ITEM_VARIANTS}
+          whileHover={{ y: -2, transition: { duration: 0.2 } }}
+          className="md:col-span-1 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-colors"
+        >
           <div className="space-y-2.5 mb-5">
             <div className="flex items-center justify-between">
               <span className="font-mono text-xs text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-md">
@@ -489,10 +566,14 @@ function EcosystemBentoSection() {
             </p>
           </div>
           <GrayPlaceholder label="Android Companion App Preview" aspect="aspect-[16/10] sm:aspect-[9/12]" />
-        </div>
+        </motion.div>
 
         {/* PWA & Web - 2 columns */}
-        <div className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all">
+        <motion.div
+          variants={CARD_ITEM_VARIANTS}
+          whileHover={{ y: -2, transition: { duration: 0.2 } }}
+          className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-colors"
+        >
           <div className="space-y-2.5 mb-5">
             <div className="flex items-center justify-between">
               <span className="font-mono text-xs text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-md">
@@ -509,8 +590,8 @@ function EcosystemBentoSection() {
             </p>
           </div>
           <GrayPlaceholder label="Web App & PWA Interface Preview" aspect="aspect-[16/9]" />
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </motion.section>
   );
 }
@@ -526,10 +607,10 @@ function MultiProviderSection() {
 
   return (
     <motion.section
-      initial={FADE_IN_UP}
-      whileInView={FADE_IN}
-      viewport={VIEWPORT_60}
-      transition={EASE_OUT_05}
+      variants={SECTION_CONTAINER_VARIANTS}
+      initial="hidden"
+      whileInView="visible"
+      viewport={VIEWPORT_CONFIG}
     >
       <SectionHeader
         eyebrow="Integrations"
@@ -537,34 +618,41 @@ function MultiProviderSection() {
         description="Padu communicates with your locally installed CLIs via native structured protocols. Switch between agents while preserving workspace state."
       />
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
+      <motion.div
+        variants={STAGGER_CONTAINER_VARIANTS}
+        className="grid grid-cols-2 sm:grid-cols-3 gap-3.5"
+      >
         {providers.map((p) => (
-          <a
+          <motion.a
             key={p.name}
             href={`/${p.slug}`}
-            className="flex items-center gap-3.5 rounded-2xl border border-white/10 bg-white/[0.02] p-4.5 hover:border-white/20 hover:bg-white/[0.04] transition-all group"
+            variants={CARD_ITEM_VARIANTS}
+            whileHover={{ y: -2, transition: { duration: 0.2 } }}
+            className="flex items-center gap-3.5 rounded-2xl border border-white/10 bg-white/[0.02] p-4.5 hover:border-white/20 hover:bg-white/[0.04] transition-colors group"
           >
             <span className="text-white/80 group-hover:text-white transition-colors">{p.icon}</span>
             <span className="font-medium text-sm text-white/90 group-hover:text-white transition-colors">
               {p.name}
             </span>
-          </a>
+          </motion.a>
         ))}
-        <a
+        <motion.a
           href="/agents"
-          className="flex items-center justify-center gap-2 rounded-2xl border border-dashed border-white/15 bg-white/[0.01] p-4.5 text-zinc-400 hover:text-white hover:border-white/30 hover:bg-white/[0.03] transition-all"
+          variants={CARD_ITEM_VARIANTS}
+          whileHover={{ y: -2, transition: { duration: 0.2 } }}
+          className="flex items-center justify-center gap-2 rounded-2xl border border-dashed border-white/15 bg-white/[0.01] p-4.5 text-zinc-400 hover:text-white hover:border-white/30 hover:bg-white/[0.03] transition-colors"
         >
           <span className="font-medium text-sm">+{ADDITIONAL_AGENT_COUNT} more agents</span>
           <ArrowRight className="h-3.5 w-3.5" />
-        </a>
-      </div>
+        </motion.a>
+      </motion.div>
     </motion.section>
   );
 }
 
 function GetStarted() {
   return (
-    <div className="pt-8">
+    <motion.div variants={HERO_ITEM_VARIANTS} className="pt-8 w-full">
       <div className="flex flex-row flex-wrap justify-center gap-3">
         <DownloadButton />
         <OtherPlatformsButton />
@@ -613,7 +701,7 @@ function GetStarted() {
           +{ADDITIONAL_AGENT_COUNT} more →
         </a>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -650,10 +738,10 @@ function OtherPlatformsButton() {
 function FAQ() {
   return (
     <motion.section
-      initial={FADE_IN_UP}
-      whileInView={FADE_IN}
-      viewport={VIEWPORT_60}
-      transition={EASE_OUT_05}
+      variants={SECTION_CONTAINER_VARIANTS}
+      initial="hidden"
+      whileInView="visible"
+      viewport={VIEWPORT_CONFIG}
       className="space-y-6"
     >
       <SectionHeader
