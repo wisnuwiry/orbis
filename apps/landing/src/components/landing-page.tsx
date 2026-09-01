@@ -818,60 +818,61 @@ function FAQ() {
     >
       <h2 className="text-3xl font-medium">FAQ</h2>
       <div className="space-y-6">
-        <FAQItem question="Is this free?">
-          Yes. Padu is free and open source. You need agent providers installed with your own
-          credentials.
+        <FAQItem question="What is Padu?">
+          Padu is a fast, native desktop and web interface for orchestrating local AI coding
+          agents. Built in Rust with GPUI (the GPU-accelerated UI engine behind Zed), Padu keeps
+          all your projects, sessions, transcripts, and credentials strictly on your machine.
+        </FAQItem>
+        <FAQItem question="Is Padu free and open source?">
+          Yes. Padu is completely free and licensed under the GNU General Public License v3.0
+          (GPL-3.0). You only need your own API credentials or subscriptions for the agent
+          providers you choose to run.
         </FAQItem>
         <FAQItem question="Does my code leave my machine?">
-          Padu doesn&apos;t send your code anywhere. Agents run locally and talk to their own APIs
-          as they normally would. For remote access, you can use the optional{" "}
-          <a href="/docs/connectivity" className="underline hover:text-white/80">
-            end-to-end encrypted relay
-          </a>
-          , connect directly over your local network, or use your own tunnel.
+          No. Padu is 100% local-first. It does not send your code, prompts, files, or agent
+          transcripts to any external servers, and includes zero telemetry or tracking. Agents
+          communicate directly with their respective provider APIs using credentials already
+          configured on your computer.
         </FAQItem>
-        <FAQItem question="What agents does it support?">
-          Padu supports many providers. It has custom implementations for Claude, Codex, OpenCode,
-          Pi, and OMP, and supports many more via ACP. See the full list here:{" "}
+        <FAQItem question="What agents does Padu support?">
+          Padu natively supports Claude Code, OpenAI Codex CLI, Cursor CLI, OpenCode, Pi, Amp, Fx,
+          Grok Build, Kimi Code, and any agent implementing the Agent Client Protocol (ACP). See
+          the full list in the{" "}
           <a href="/agents" className="underline hover:text-white/80">
-            all supported providers
-          </a>
-          .
+            supported providers
+          </a>{" "}
+          catalog.
         </FAQItem>
-        <FAQItem question="How does Padu run providers?">
-          Padu runs the providers installed on your machine as you&apos;d normally run them. Padu
-          doesn&apos;t modify or change their behavior.
+        <FAQItem question="How does Padu integrate with coding agents?">
+          Padu communicates with your locally installed agent CLIs through their native structured
+          protocols and process lifecycles. It does not intercept tokens or modify agent
+          behavior—it provides a unified native UI for streaming transcripts, switching models,
+          inspecting diffs, and queueing follow-up prompts.
         </FAQItem>
-        <FAQItem question="Do I need the desktop app?">
-          No. You can run the daemon headless and use any client to connect. The desktop app just
-          bundles the daemon with a UI.
-        </FAQItem>
-        <FAQItem question="Can I connect from outside my network?">
-          Yes. You can use the hosted relay (end-to-end encrypted, Padu can&apos;t read your
-          traffic), set up your own tunnel (Tailscale, Cloudflare Tunnel, etc.), or expose the
-          daemon port directly. See{" "}
-          <a href="/docs/configuration" className="underline hover:text-white/80">
-            configuration
-          </a>
-          .
-        </FAQItem>
-        <FAQItem question="Do I need git or GitHub?">
-          No. Padu works in any directory. Worktrees are optional and only relevant if you use git.
-          You can run agents anywhere you&apos;d normally work.
-        </FAQItem>
-        <FAQItem question="Can I get banned for using Padu?">
-          Padu is designed to use each provider&apos;s officially supported integration and does
-          not attempt to bypass its terms of service. It doesn&apos;t extract tokens or call
-          inference APIs directly.
-        </FAQItem>
-        <FAQItem question="How do worktrees work?">
-          When you launch an agent with the worktree option (from the app, desktop, or CLI), Padu
-          creates a git worktree and runs the agent inside it. The agent works on an isolated branch
-          without touching your main working directory. See the{" "}
+        <FAQItem question="How do Git worktrees and checkpoints work?">
+          When starting a task, Padu can run the agent inside an isolated Git worktree so it works
+          on a dedicated branch without modifying your main working tree. Padu also tracks
+          turn-by-turn checkpoints, allowing you to review diffs and rewind to earlier states.
+          See the{" "}
           <a href="/docs/worktrees" className="underline hover:text-white/80">
             worktrees docs
           </a>
           .
+        </FAQItem>
+        <FAQItem question="What platforms are supported?">
+          Padu provides native desktop builds for <strong>macOS</strong> (Apple Silicon & Intel),{" "}
+          <strong>Linux</strong> (Wayland & X11), and <strong>Windows</strong> (x86_64), alongside
+          a browser client and companion mobile apps.
+        </FAQItem>
+        <FAQItem question="Can I queue or steer messages while an agent is working?">
+          Yes. Padu supports live message queueing and steering, allowing you to send
+          follow-up instructions, extra context, or corrections while an agent is actively
+          executing a task.
+        </FAQItem>
+        <FAQItem question="Do I need a separate account or cloud service?">
+          No. Padu requires no cloud accounts, logins, or remote services. The desktop app
+          automatically manages its local daemon on loopback, and you can also run the daemon
+          headless on remote machines or home labs via the CLI.
         </FAQItem>
       </div>
     </motion.div>
