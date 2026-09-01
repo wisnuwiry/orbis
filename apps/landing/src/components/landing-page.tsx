@@ -209,14 +209,14 @@ function SectionTitle({
   return (
     <div className="mb-12 space-y-2">
       <div className="flex items-center gap-3">
-        <h2 className="text-3xl font-medium">{title}</h2>
+        <h2 className="text-3xl font-medium tracking-tight">{title}</h2>
         {badge && (
-          <span className="rounded-full bg-purple-400/10 px-2 py-1 text-xs text-purple-300 border border-purple-500/20">
+          <span className="rounded-full bg-purple-400/10 px-2.5 py-0.5 text-xs text-purple-300 border border-purple-500/20 font-medium">
             {badge}
           </span>
         )}
       </div>
-      <p className="text-base text-muted-foreground max-w-lg">{description}</p>
+      <p className="text-base text-muted-foreground max-w-lg leading-relaxed">{description}</p>
       {links ? (
         <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-xs">
           {links.map((link) => (
@@ -225,7 +225,7 @@ function SectionTitle({
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-extra-muted-foreground transition-colors hover:text-muted-foreground"
+              className="inline-flex items-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
             >
               {link.label}
               <ExternalLink className="h-3 w-3" />
@@ -255,10 +255,10 @@ function MultiProviderSection() {
         {providers.map((p) => (
           <div
             key={p.name}
-            className="flex items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-4"
+            className="flex items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-4 hover:border-white/20 transition-colors"
           >
             <span className="text-white/80">{p.icon}</span>
-            <span className="font-medium">{p.name}</span>
+            <span className="font-medium text-white/90">{p.name}</span>
           </div>
         ))}
         <a
@@ -337,7 +337,7 @@ function TurnkeyExtensionCard({
   ctaLabel: string;
 }) {
   return (
-    <div className="flex min-h-48 flex-col rounded-xl border border-white/10 bg-white/[0.025] p-5">
+    <div className="flex min-h-48 flex-col rounded-xl border border-white/10 bg-white/[0.025] p-5 hover:border-white/20 transition-colors">
       <div className="mb-5 flex items-center gap-3 text-muted-foreground">
         <Icon className="h-5 w-5" strokeWidth={1.5} />
       </div>
@@ -346,7 +346,7 @@ function TurnkeyExtensionCard({
       <div className="mt-auto pt-5">
         <a
           href={ctaHref}
-          className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-2.5 py-1.5 text-xs text-background transition-colors hover:bg-foreground/90"
+          className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-2.5 py-1.5 text-xs text-background transition-colors hover:bg-foreground/90 font-medium"
         >
           {ctaLabel}
           <ArrowRight className="h-3.5 w-3.5" />
@@ -424,7 +424,7 @@ function ServerInstallButton() {
     <CommandDialog
       trigger={SERVER_INSTALL_TRIGGER}
       title="Run agents on a remote machine"
-      description="For headless machines you want to connect to from the Padu apps. The desktop app already includes a built-in daemon"
+      description="For headless machines you want to connect to from the Padu apps. The desktop app already includes a built-in daemon."
       command="npm install -g @padu/cli && padu"
       footnote={SERVER_INSTALL_FOOTNOTE}
     />
@@ -486,16 +486,15 @@ function PhoneShowcase() {
           strokeLinecap="round"
           strokeLinejoin="round"
           viewBox="0 0 24 24"
-          className="text-white/20"
+          className="text-white/20 mb-2"
         >
           <path d="M12 5v14M5 12l7 7 7-7" />
         </svg>
-        <p className="text-lg text-white/80 text-center">
-          When you want to step away from your desk,
-          <br className="md:hidden" /> you can.
+        <p className="text-lg text-white/90 text-center font-medium">
+          Control your agents from any device, anywhere.
         </p>
-        <p className="text-sm text-white/50 text-center">
-          The native mobile app has full feature parity with desktop.
+        <p className="text-sm text-white/50 text-center max-w-md">
+          Connect seamlessly to your local or remote daemon with full feature parity, live streaming, and turn inspection.
         </p>
       </motion.div>
 
@@ -555,63 +554,67 @@ function FAQ() {
       transition={EASE_OUT_05}
       className="space-y-6"
     >
-      <h2 className="text-3xl font-medium">FAQ</h2>
-      <div className="space-y-6">
+      <div className="space-y-2 mb-8">
+        <h2 className="text-3xl font-medium tracking-tight">Frequently asked questions</h2>
+        <p className="text-base text-muted-foreground max-w-lg leading-relaxed">
+          Everything you need to know about Padu&apos;s architecture, privacy, and agent support.
+        </p>
+      </div>
+      <div className="space-y-4">
         <FAQItem question="What is Padu?">
-          Padu is a fast, native desktop and web interface for orchestrating local AI coding
-          agents. Built in Rust with GPUI (the GPU-accelerated UI engine behind Zed), Padu keeps
-          all your projects, sessions, transcripts, and credentials strictly on your machine.
+          Padu is a high-performance, native desktop and web workspace for orchestrating local AI
+          coding agents. Built in Rust with GPUI (the GPU-accelerated UI engine behind Zed), Padu
+          keeps all your projects, sessions, transcripts, and credentials strictly on your machine.
         </FAQItem>
         <FAQItem question="Is Padu free and open source?">
-          Yes. Padu is completely free and licensed under the GNU General Public License v3.0
-          (GPL-3.0). You only need your own API credentials or subscriptions for the agent
-          providers you choose to run.
+          Yes. Padu is 100% free and open source, licensed under the GNU General Public License v3.0
+          (GPL-3.0). You bring your own API credentials or subscriptions for the agent providers you
+          choose to run.
         </FAQItem>
-        <FAQItem question="Does my code leave my machine?">
-          No. Padu is 100% local-first. It does not send your code, prompts, files, or agent
-          transcripts to any external servers, and includes zero telemetry or tracking. Agents
-          communicate directly with their respective provider APIs using credentials already
-          configured on your computer.
+        <FAQItem question="Does my code or data leave my machine?">
+          No. Padu is strictly local-first. It never transmits your source code, prompts, files, or
+          agent transcripts to external servers, and includes zero telemetry or analytics tracking.
+          Agents communicate directly with their provider APIs using the credentials on your computer.
         </FAQItem>
-        <FAQItem question="What agents does Padu support?">
-          Padu natively supports Claude Code, OpenAI Codex CLI, Cursor CLI, OpenCode, Pi, Amp, Fx,
-          Grok Build, Kimi Code, and any agent implementing the Agent Client Protocol (ACP). See
-          the full list in the{" "}
-          <a href="/agents" className="underline hover:text-white/80">
-            supported providers
-          </a>{" "}
-          catalog.
-        </FAQItem>
-        <FAQItem question="How does Padu integrate with coding agents?">
-          Padu communicates with your locally installed agent CLIs through their native structured
-          protocols and process lifecycles. It does not intercept tokens or modify agent
-          behavior—it provides a unified native UI for streaming transcripts, switching models,
-          inspecting diffs, and queueing follow-up prompts.
-        </FAQItem>
-        <FAQItem question="How do Git worktrees and checkpoints work?">
-          When starting a task, Padu can run the agent inside an isolated Git worktree so it works
-          on a dedicated branch without modifying your main working tree. Padu also tracks
-          turn-by-turn checkpoints, allowing you to review diffs and rewind to earlier states.
-          See the{" "}
-          <a href="/docs/worktrees" className="underline hover:text-white/80">
-            worktrees docs
+        <FAQItem question="What AI coding agents does Padu support?">
+          Padu supports leading coding agents with native direct drivers and ACP (Agent Client
+          Protocol) integrations: Claude Code, OpenAI Codex CLI, OpenCode, Pi Agent, Amp, DeepSeek,
+          Cursor CLI, Fx, Grok Build, Kimi Code, GitHub Copilot, Google Gemini CLI, Cline, Goose, and
+          Mistral Vibe. See the full catalog on the{" "}
+          <a href="/agents" className="underline hover:text-white transition-colors">
+            supported agents page
           </a>
           .
         </FAQItem>
-        <FAQItem question="What platforms are supported?">
-          Padu provides native desktop builds for <strong>macOS</strong> (Apple Silicon & Intel),{" "}
+        <FAQItem question="How does Padu integrate with coding agents?">
+          Padu communicates directly with your locally installed agent CLIs via native structured
+          protocols and process lifecycles. It does not intercept tokens or alter agent
+          behavior—it provides a unified native UI for streaming live transcripts, switching models,
+          inspecting unified diffs, and queueing follow-up prompts.
+        </FAQItem>
+        <FAQItem question="How do Git worktrees and checkpoints work?">
+          When launching a task, Padu can run the agent inside an isolated Git worktree so it operates
+          on a separate branch without modifying your active working directory. Padu also tracks
+          turn-by-turn Git checkpoints, enabling 1-click diff reviews and exact state rewinds. Read
+          the{" "}
+          <a href="/docs/worktrees" className="underline hover:text-white transition-colors">
+            worktrees documentation
+          </a>
+          .
+        </FAQItem>
+        <FAQItem question="What platforms and operating systems are supported?">
+          Padu provides native desktop releases for <strong>macOS</strong> (Apple Silicon & Intel),{" "}
           <strong>Linux</strong> (Wayland & X11), and <strong>Windows</strong> (x86_64), alongside
-          a browser client and companion mobile apps.
+          a web client and companion mobile apps.
         </FAQItem>
-        <FAQItem question="Can I queue or steer messages while an agent is working?">
-          Yes. Padu supports live message queueing and steering, allowing you to send
-          follow-up instructions, extra context, or corrections while an agent is actively
-          executing a task.
+        <FAQItem question="Can I steer or queue prompts while an agent is actively working?">
+          Yes. Padu supports live message queueing and steering, allowing you to append new
+          instructions, additional context, or corrections while an agent is executing a turn.
         </FAQItem>
-        <FAQItem question="Do I need a separate account or cloud service?">
-          No. Padu requires no cloud accounts, logins, or remote services. The desktop app
-          automatically manages its local daemon on loopback, and you can also run the daemon
-          headless on remote machines or home labs via the CLI.
+        <FAQItem question="Do I need a separate account or cloud service to use Padu?">
+          No. Padu requires no cloud accounts, logins, or remote subscription fees. The desktop app
+          manages its local daemon automatically on loopback, and you can run the daemon headless
+          on remote servers or cloud VMs using the CLI.
         </FAQItem>
       </div>
     </motion.div>
