@@ -1,0 +1,51 @@
+name: Bug report
+description: Something in Padu does not work
+title: "[bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Security reports go to [advisories](https://github.com/wisnuwiry/padu/security/advisories/new), not here. Do not paste API keys.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - macOS
+        - Web
+        - Protocol
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, what you got.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Repro
+      description: Steps to reproduce the issue.
+      placeholder: |
+        1. `padu` (or `padu-debug`) in a git repo
+        2. …
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Version / OS
+      description: "`padu --version` (or tag/SHA) and OS/arch."
+      placeholder: "padu 0.1.0 · macOS 15 arm64"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs (optional)
+      description: Relevant log output or crash report. Redact secrets.
+      render: text
