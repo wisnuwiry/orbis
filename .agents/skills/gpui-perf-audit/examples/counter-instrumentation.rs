@@ -15,7 +15,7 @@ pub fn track_render_counters(cx: &mut gpui::ViewContext<crate::app::Padu>) {
 
     // Flushed once per second to file on background executor:
     static LAST_FLUSH: std::sync::Mutex<Option<Instant>> = std::sync::Mutex::new(None);
-    let mut last = LAST_FLUSH.lock().unwrap();
+    let mut last = LAST_FLUSH.lock().unwrap(); // safe: template counter mutex
     let now = Instant::now();
 
     if last.map_or(true, |t| now.duration_since(t).as_secs() >= 1) {
@@ -25,7 +25,7 @@ pub fn track_render_counters(cx: &mut gpui::ViewContext<crate::app::Padu>) {
         let commits = PUMP_COMMITS.swap(0, Ordering::Relaxed);
 
         cx.background_executor().spawn(async move {
-            eprintln!("[PERF] 1s slice -> frames: {}, transcript: {}, commits: {}", frames, renders, commits);
+            eprintln!("[PERF] 1s slice -> frames: {}, transcript: {}, commits: {}", frames, renders, commits); // keep: perf logging template
         }).detach();
     }
 }
