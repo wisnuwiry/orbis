@@ -4,8 +4,11 @@ import {
   ExternalLink,
   GitFork,
   Laptop,
-  Monitor,
+  RotateCcw,
+  ShieldCheck,
   Smartphone,
+  Zap,
+  Cpu,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -35,11 +38,6 @@ const DURATION_05: Transition = { duration: 0.5 };
 
 const VIEWPORT_60 = { once: true, margin: "-60px" };
 
-// A ~240px-wide phone rotated 15° only foreshortens a couple percent at
-// perspective 1200 — it reads as a flat, skewed card. The side phones already
-// sit on a correctly projecting plane (the frame and its scaled interior share
-// one flattened texture), so the interior just needs the projection to be
-// strong enough to see: a tighter perspective gives the trio a real book-fold.
 const PHONE_PERSPECTIVE_STYLE = { minHeight: 480, perspective: 700 };
 import { CursorFieldProvider } from "~/components/butterfly";
 import { CommandDialog } from "~/components/command-dialog";
@@ -58,7 +56,6 @@ import {
   OpenCodeIcon,
   PiIcon,
 } from "~/components/agent-icons";
-import { GitHubIcon } from "~/components/brand-icons";
 import { ClaudeIcon, MobileChat, MobileDiff, MobileSidebar, PhoneFrame } from "~/components/mockup";
 import { FAQItem } from "~/components/faq-item";
 import { SiteFooter } from "~/components/site-footer";
@@ -73,20 +70,26 @@ interface LandingPageProps {
 export function LandingPage({ title, subtitle }: LandingPageProps) {
   return (
     <CursorFieldProvider>
-      {/* Hero section with background image */}
-      <div className="relative bg-cover bg-center bg-no-repeat">
+      {/* Background ambient lighting */}
+      <div className="relative overflow-hidden bg-background">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] sm:w-[1000px] h-[550px] bg-gradient-to-b from-purple-500/12 via-sky-500/5 to-transparent blur-3xl opacity-70 rounded-full"
+        />
+
+        {/* Hero header & content */}
         <div className="relative px-6 pt-4 pb-10 md:px-32 md:pt-6 md:pb-12 max-w-7xl mx-auto">
           <Nav />
           <Hero title={title} subtitle={subtitle} />
           <GetStarted />
         </div>
 
-        {/* Mockup - inside hero so it's above the gradient, positioned to overflow into black section */}
+        {/* Mockup Frame */}
         <motion.div
           initial={FADE_IN_UP_40}
           animate={FADE_IN}
           transition={EASE_OUT_08_DELAY_05}
-          className="relative px-6 md:px-8 pt-4 md:pt-8 pb-8 md:pb-16"
+          className="relative px-6 md:px-8 pt-4 md:pt-8 pb-12 md:pb-20"
         >
           <div className="max-w-7xl mx-auto">
             <HeroMockup />
@@ -98,11 +101,11 @@ export function LandingPage({ title, subtitle }: LandingPageProps) {
       <PhoneShowcase />
 
       {/* Content section */}
-      <div className="landing-content bg-background">
-        <main className="p-6 md:p-20 md:pt-40 max-w-5xl mx-auto">
-          <div className="space-y-24">
+      <div className="landing-content bg-background border-t border-white/[0.06]">
+        <main className="p-6 md:p-20 md:pt-32 max-w-5xl mx-auto">
+          <div className="space-y-32">
+            <BentoFeatureSection />
             <MultiProviderSection />
-            <TurnkeySection />
             <FAQ />
           </div>
         </main>
@@ -114,7 +117,7 @@ export function LandingPage({ title, subtitle }: LandingPageProps) {
 
 function Nav() {
   return (
-    <nav className="mb-16 md:mb-20">
+    <nav className="mb-14 md:mb-20">
       <SiteHeader />
     </nav>
   );
@@ -122,20 +125,33 @@ function Nav() {
 
 function Hero({ title, subtitle }: { title: React.ReactNode; subtitle: React.ReactNode }) {
   return (
-    <div className="space-y-6 text-center">
-      <h1 className="text-4xl md:text-6xl font-medium tracking-tight leading-[0.95]">{title}</h1>
-      <p className="text-base leading-relaxed text-white/70 md:text-lg max-w-lg mx-auto">
+    <div className="space-y-6 text-center max-w-3xl mx-auto">
+      {/* Eyebrow badge */}
+      <motion.div
+        initial={FADE_IN_UP_TINY}
+        animate={FADE_IN}
+        transition={DURATION_05}
+        className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 text-xs font-medium text-white/80 backdrop-blur-xl shadow-sm"
+      >
+        <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+        Built with Rust & GPUI · 100% Local-First
+      </motion.div>
+
+      <h1 className="text-4xl sm:text-6xl md:text-7xl font-semibold tracking-[-0.03em] leading-[1.06] text-white">
+        {title}
+      </h1>
+      <p className="text-base sm:text-lg md:text-xl leading-relaxed text-zinc-400 max-w-2xl mx-auto font-normal">
         {subtitle}
       </p>
     </div>
   );
 }
 
-const CLAUDE_CODE_BADGE_ICON = <ClaudeCodeIcon className="h-6 w-6" />;
-const CODEX_BADGE_ICON = <CodexIcon className="h-6 w-6" />;
-const OPENCODE_BADGE_ICON = <OpenCodeIcon className="h-6 w-6" />;
-const PI_BADGE_ICON = <PiIcon className="h-6 w-6" />;
-const CURSOR_BADGE_ICON = <CursorIcon className="h-6 w-6" />;
+const CLAUDE_CODE_BADGE_ICON = <ClaudeCodeIcon className="h-5 w-5" />;
+const CODEX_BADGE_ICON = <CodexIcon className="h-5 w-5" />;
+const OPENCODE_BADGE_ICON = <OpenCodeIcon className="h-5 w-5" />;
+const PI_BADGE_ICON = <PiIcon className="h-5 w-5" />;
+const CURSOR_BADGE_ICON = <CursorIcon className="h-5 w-5" />;
 
 const FEATURED_AGENT_COUNT = 5;
 const ADDITIONAL_AGENT_COUNT = AGENT_PAGES.length - FEATURED_AGENT_COUNT;
@@ -147,7 +163,7 @@ function AgentBadge({ name, icon }: { name: string; icon: React.ReactNode }) {
 
   return (
     <span
-      className="relative inline-flex items-center justify-center rounded-full p-1.5 text-white/60"
+      className="relative inline-flex items-center justify-center rounded-full p-1.5 text-white/60 hover:text-white transition-colors"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -159,7 +175,7 @@ function AgentBadge({ name, icon }: { name: string; icon: React.ReactNode }) {
             animate={FADE_IN}
             exit={FADE_OUT_UP_4}
             transition={EASE_OUT_015}
-            className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-white text-black text-xs whitespace-nowrap pointer-events-none"
+            className="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-full bg-white text-black text-[11px] font-semibold whitespace-nowrap pointer-events-none shadow-md"
           >
             {name}
           </motion.span>
@@ -169,19 +185,27 @@ function AgentBadge({ name, icon }: { name: string; icon: React.ReactNode }) {
   );
 }
 
-function FeatureSection({
+function SectionHeader({
+  eyebrow,
   title,
   description,
-  badge,
-  links,
-  children,
 }: {
+  eyebrow: string;
   title: string;
   description: string;
-  badge?: string;
-  links?: ReadonlyArray<{ href: string; label: string }>;
-  children: React.ReactNode;
 }) {
+  return (
+    <div className="mb-12 space-y-3">
+      <span className="text-xs font-semibold tracking-wider uppercase text-purple-400">
+        {eyebrow}
+      </span>
+      <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-white">{title}</h2>
+      <p className="text-base text-zinc-400 max-w-xl leading-relaxed">{description}</p>
+    </div>
+  );
+}
+
+function BentoFeatureSection() {
   return (
     <motion.section
       initial={FADE_IN_UP}
@@ -189,187 +213,163 @@ function FeatureSection({
       viewport={VIEWPORT_60}
       transition={EASE_OUT_05}
     >
-      <SectionTitle title={title} description={description} badge={badge} links={links} />
-      {children}
-    </motion.section>
-  );
-}
+      <SectionHeader
+        eyebrow="Architecture"
+        title="Engineered like no other client."
+        description="Built in Rust with GPU acceleration. Instant cold startup, sub-millisecond turn updates, and fluid 120fps streaming."
+      />
 
-function SectionTitle({
-  title,
-  description,
-  badge,
-  links,
-}: {
-  title: string;
-  description: string;
-  badge?: string;
-  links?: ReadonlyArray<{ href: string; label: string }>;
-}) {
-  return (
-    <div className="mb-12 space-y-2">
-      <div className="flex items-center gap-3">
-        <h2 className="text-3xl font-medium tracking-tight">{title}</h2>
-        {badge && (
-          <span className="rounded-full bg-purple-400/10 px-2.5 py-0.5 text-xs text-purple-300 border border-purple-500/20 font-medium">
-            {badge}
-          </span>
-        )}
-      </div>
-      <p className="text-base text-muted-foreground max-w-lg leading-relaxed">{description}</p>
-      {links ? (
-        <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-xs">
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {link.label}
-              <ExternalLink className="h-3 w-3" />
-            </a>
-          ))}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Hero Bento Card - 120 FPS GPUI */}
+        <div className="md:col-span-3 rounded-2xl border border-white/10 bg-white/[0.02] p-8 md:p-10 relative overflow-hidden group hover:border-white/20 transition-all">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+            <div className="space-y-2 max-w-xl">
+              <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/20 bg-purple-500/10 px-3 py-1 text-xs font-medium text-purple-300">
+                <Cpu className="h-3.5 w-3.5" />
+                GPUI Native Engine
+              </div>
+              <h3 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
+                120 FPS GPU-Accelerated UI
+              </h3>
+              <p className="text-sm sm:text-base text-zinc-400 leading-relaxed">
+                Powered by GPUI, the rendering technology behind Zed. Zero Electron overhead, sub-millisecond
+                turn response, and smooth 120fps scrolling even with tens of thousands of streaming tokens.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-center">
+                <span className="block text-2xl font-semibold text-white">120</span>
+                <span className="text-[11px] uppercase tracking-wider text-zinc-500 font-medium">
+                  FPS Render
+                </span>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-center">
+                <span className="block text-2xl font-semibold text-white">&lt;10ms</span>
+                <span className="text-[11px] uppercase tracking-wider text-zinc-500 font-medium">
+                  Latency
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
-      ) : null}
-    </div>
+
+        {/* Bento Card 2 - Local First */}
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-7 flex flex-col justify-between hover:border-white/20 transition-all">
+          <div className="space-y-3">
+            <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-white/80">
+              <ShieldCheck className="h-5 w-5 text-emerald-400" strokeWidth={1.75} />
+            </div>
+            <h3 className="text-lg font-semibold text-white tracking-tight">
+              100% Local-First & Private
+            </h3>
+            <p className="text-sm text-zinc-400 leading-relaxed">
+              Your source code, prompts, credentials, and transcripts stay on your computer. Zero telemetry,
+              zero tracking, and no cloud lock-in.
+            </p>
+          </div>
+        </div>
+
+        {/* Bento Card 3 - Worktree Isolation */}
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-7 flex flex-col justify-between hover:border-white/20 transition-all">
+          <div className="space-y-3">
+            <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-white/80">
+              <GitFork className="h-5 w-5 text-sky-400" strokeWidth={1.75} />
+            </div>
+            <h3 className="text-lg font-semibold text-white tracking-tight">
+              Git Worktree Isolation
+            </h3>
+            <p className="text-sm text-zinc-400 leading-relaxed">
+              Launch multiple agents in parallel on isolated branches. Agents never touch your active
+              working tree or dirty edits.
+            </p>
+          </div>
+          <div className="pt-4">
+            <a
+              href="/docs/worktrees"
+              className="inline-flex items-center gap-1 text-xs font-medium text-purple-300 hover:text-purple-200 transition-colors"
+            >
+              Read docs <ArrowRight className="h-3 w-3" />
+            </a>
+          </div>
+        </div>
+
+        {/* Bento Card 4 - Checkpoint Rewinds */}
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-7 flex flex-col justify-between hover:border-white/20 transition-all">
+          <div className="space-y-3">
+            <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-white/80">
+              <RotateCcw className="h-5 w-5 text-purple-400" strokeWidth={1.75} />
+            </div>
+            <h3 className="text-lg font-semibold text-white tracking-tight">
+              Turn-by-Turn Checkpoints
+            </h3>
+            <p className="text-sm text-zinc-400 leading-relaxed">
+              Inspect structured diffs after every turn. Instantly rewind code, conversation, and runtime
+              state with 1-click.
+            </p>
+          </div>
+        </div>
+      </div>
+    </motion.section>
   );
 }
 
 function MultiProviderSection() {
   const providers = [
-    { name: "Claude Code", icon: <ClaudeIcon size={28} /> },
-    { name: "Codex", icon: <CodexIcon className="w-7 h-7" /> },
-    { name: "OpenCode", icon: <OpenCodeIcon className="w-7 h-7" /> },
-    { name: "Pi", icon: <PiIcon className="w-7 h-7" /> },
-    { name: "Cursor", icon: <CursorIcon className="w-7 h-7" /> },
+    { name: "Claude Code", icon: <ClaudeIcon size={24} />, slug: "claude-code" },
+    { name: "OpenAI Codex", icon: <CodexIcon className="w-6 h-6" />, slug: "codex" },
+    { name: "OpenCode", icon: <OpenCodeIcon className="w-6 h-6" />, slug: "opencode" },
+    { name: "Pi Agent", icon: <PiIcon className="w-6 h-6" />, slug: "pi" },
+    { name: "Cursor CLI", icon: <CursorIcon className="w-6 h-6" />, slug: "cursor" },
   ];
 
   return (
-    <FeatureSection
-      title="Multi-agent orchestration"
-      description="Switch between leading AI coding agents while keeping your local workspace context and credentials intact."
+    <motion.section
+      initial={FADE_IN_UP}
+      whileInView={FADE_IN}
+      viewport={VIEWPORT_60}
+      transition={EASE_OUT_05}
     >
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <SectionHeader
+        eyebrow="Compatibility"
+        title="All your favorite agents, unified."
+        description="Switch seamlessly between leading AI coding agents while keeping your local workspace context and credentials intact."
+      />
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
         {providers.map((p) => (
-          <div
+          <a
             key={p.name}
-            className="flex items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-4 hover:border-white/20 transition-colors"
+            href={`/${p.slug}`}
+            className="flex items-center gap-3.5 rounded-2xl border border-white/10 bg-white/[0.02] p-4.5 hover:border-white/20 hover:bg-white/[0.04] transition-all group"
           >
-            <span className="text-white/80">{p.icon}</span>
-            <span className="font-medium text-white/90">{p.name}</span>
-          </div>
+            <span className="text-white/80 group-hover:text-white transition-colors">{p.icon}</span>
+            <span className="font-medium text-sm text-white/90 group-hover:text-white transition-colors">
+              {p.name}
+            </span>
+          </a>
         ))}
         <a
           href="/agents"
-          className="flex items-center justify-center gap-3 rounded-xl border border-dashed border-white/10 bg-white/[0.01] px-5 py-4 text-white/50 hover:text-white/80 hover:border-white/20 hover:bg-white/[0.03] transition-colors"
+          className="flex items-center justify-center gap-2 rounded-2xl border border-dashed border-white/15 bg-white/[0.01] p-4.5 text-zinc-400 hover:text-white hover:border-white/30 hover:bg-white/[0.03] transition-all"
         >
-          <span className="font-medium">+{ADDITIONAL_AGENT_COUNT} more</span>
-        </a>
-      </div>
-    </FeatureSection>
-  );
-}
-
-function TurnkeySection() {
-  return (
-    <FeatureSection
-      title="Engineered for performance"
-      description="Run Padu natively with GPU-accelerated rendering, connect over your network, or run agents in isolated Git worktrees."
-    >
-      <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
-        <div className="flex flex-col gap-6 border-b border-white/10 p-6 sm:flex-row sm:items-center sm:justify-between md:p-8">
-          <div className="flex items-start gap-4">
-            <div className="rounded-xl border border-white/10 bg-white/[0.06] p-3 text-muted-foreground">
-              <Monitor className="h-6 w-6" strokeWidth={1.5} />
-            </div>
-            <div className="space-y-0.5">
-              <h3 className="text-xl font-medium text-white/90">Native desktop app</h3>
-              <p className="max-w-lg text-sm leading-relaxed text-white/50">
-                High-performance native app built in Rust and GPUI with instant startup and 120fps streaming.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="p-6 md:p-8">
-          <div className="grid gap-4 md:grid-cols-3">
-            <TurnkeyExtensionCard
-              icon={Smartphone}
-              title="Mobile and web"
-              description="Connect to the same workspace from browser and companion clients."
-              ctaHref="/download"
-              ctaLabel="Download"
-            />
-            <TurnkeyExtensionCard
-              icon={Laptop}
-              title="Remote daemon"
-              description="Run the Padu daemon headless on remote devboxes, home servers, or cloud VMs."
-              ctaHref="/docs/cli"
-              ctaLabel="Docs"
-            />
-            <TurnkeyExtensionCard
-              icon={GitFork}
-              title="Worktree isolation"
-              description="Run concurrent agents in separate Git worktrees without touching your active branch."
-              ctaHref="/docs/worktrees"
-              ctaLabel="Docs"
-            />
-          </div>
-        </div>
-      </div>
-    </FeatureSection>
-  );
-}
-
-function TurnkeyExtensionCard({
-  icon: Icon,
-  title,
-  description,
-  ctaHref,
-  ctaLabel,
-}: {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  ctaHref: string;
-  ctaLabel: string;
-}) {
-  return (
-    <div className="flex min-h-48 flex-col rounded-xl border border-white/10 bg-white/[0.025] p-5 hover:border-white/20 transition-colors">
-      <div className="mb-5 flex items-center gap-3 text-muted-foreground">
-        <Icon className="h-5 w-5" strokeWidth={1.5} />
-      </div>
-      <h3 className="font-medium text-white/85">{title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-white/45">{description}</p>
-      <div className="mt-auto pt-5">
-        <a
-          href={ctaHref}
-          className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-2.5 py-1.5 text-xs text-background transition-colors hover:bg-foreground/90 font-medium"
-        >
-          {ctaLabel}
+          <span className="font-medium text-sm">+{ADDITIONAL_AGENT_COUNT} more agents</span>
           <ArrowRight className="h-3.5 w-3.5" />
         </a>
       </div>
-    </div>
+    </motion.section>
   );
 }
 
-
 function GetStarted() {
   return (
-    <div className="pt-10">
+    <div className="pt-8">
       <div className="flex flex-row flex-wrap justify-center gap-3">
         <DownloadButton />
-        {/* App Store & Google Play buttons temporarily hidden until released */}
-        {/* <a href={appStoreUrl} ...><AppleIcon /></a> */}
-        {/* <a href={playStoreUrl} ...><PlayStoreIcon /></a> */}
         <ServerInstallButton />
       </div>
       <div className="flex items-center justify-center gap-2 pt-6">
-        <span className="text-xs text-muted-foreground">Supports</span>
-        <div className="flex items-center gap-1">
+        <span className="text-xs text-zinc-500 font-medium">Supports</span>
+        <div className="flex items-center gap-1 bg-white/[0.02] px-2.5 py-1 rounded-full border border-white/[0.06]">
           <AgentBadge name="Claude Code" icon={CLAUDE_CODE_BADGE_ICON} />
           <AgentBadge name="Codex" icon={CODEX_BADGE_ICON} />
           <AgentBadge name="OpenCode" icon={OPENCODE_BADGE_ICON} />
@@ -378,7 +378,7 @@ function GetStarted() {
         </div>
         <a
           href="/agents"
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          className="text-xs text-zinc-400 hover:text-white transition-colors font-medium ml-1"
         >
           +{ADDITIONAL_AGENT_COUNT} more
         </a>
@@ -398,7 +398,7 @@ function DownloadButton() {
       href={primary.href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-2 rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background hover:bg-foreground/90 transition-colors"
+      className="inline-flex items-center gap-2 rounded-full bg-white text-black px-6 py-2.5 text-sm font-semibold hover:bg-white/90 active:scale-95 transition-all shadow-[0_0_24px_rgba(255,255,255,0.2)]"
     >
       <PrimaryIcon className="h-4 w-4" />
       Download for {primary.label}
@@ -407,8 +407,9 @@ function DownloadButton() {
 }
 
 const SERVER_INSTALL_TRIGGER = (
-  <span className="inline-flex items-center justify-center rounded-lg border border-white/12 px-3 py-2 text-white hover:bg-white/10 transition-colors">
-    <TerminalIcon className="h-5 w-5" />
+  <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-medium text-white hover:bg-white/[0.08] active:scale-95 transition-all backdrop-blur-md">
+    <TerminalIcon className="h-4 w-4 text-white/70" />
+    Remote CLI
   </span>
 );
 
@@ -435,13 +436,11 @@ function PhoneShowcase() {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const textInView = useInView(containerRef, { once: true, margin: "-80px" });
 
-  // Scroll-linked animation: track how far through the container the user has scrolled
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "center center"],
   });
 
-  // Responsive slide distance
   const [slideDistance, setSlideDistance] = React.useState(260);
   React.useEffect(() => {
     function update() {
@@ -452,7 +451,6 @@ function PhoneShowcase() {
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  // Side phones start at x=0 (behind center) and slide out to final position
   const sideOpacity = useTransform(scrollYProgress, [0.2, 0.6], [0, 1]);
   const leftX = useTransform(scrollYProgress, [0.2, 0.6], [0, -slideDistance]);
   const rightX = useTransform(scrollYProgress, [0.2, 0.6], [0, slideDistance]);
@@ -469,41 +467,30 @@ function PhoneShowcase() {
   const textAnimate = React.useMemo(() => (textInView ? FADE_IN : {}), [textInView]);
 
   return (
-    <div ref={containerRef} className="flex flex-col items-center pt-4 pb-16 gap-20">
-      {/* Arrow + text */}
+    <div ref={containerRef} className="flex flex-col items-center pt-8 pb-20 gap-16">
       <motion.div
         initial={FADE_IN_UP_TINY}
         animate={textAnimate}
         transition={DURATION_05}
-        className="flex flex-col items-center gap-1.5 px-6"
+        className="flex flex-col items-center gap-2 px-6 text-center max-w-lg"
       >
-        <svg
-          width="24"
-          height="24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          viewBox="0 0 24 24"
-          className="text-white/20 mb-2"
-        >
-          <path d="M12 5v14M5 12l7 7 7-7" />
-        </svg>
-        <p className="text-lg text-white/90 text-center font-medium">
-          Control your agents from any device, anywhere.
-        </p>
-        <p className="text-sm text-white/50 text-center max-w-md">
-          Connect seamlessly to your local or remote daemon with full feature parity, live streaming, and turn inspection.
+        <span className="text-xs font-semibold tracking-wider uppercase text-purple-400">
+          Ecosystem
+        </span>
+        <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
+          Control your agents from anywhere.
+        </h2>
+        <p className="text-sm text-zinc-400 leading-relaxed">
+          Connect seamlessly to your local workstation or remote daemon with live streaming and diff inspection.
         </p>
       </motion.div>
 
-      {/* Phone trio — side phones are absolute, start behind center, slide outward with perspective rotation */}
+      {/* Phone trio */}
       <div
         className="relative flex items-center justify-center overflow-x-clip w-full"
         style={PHONE_PERSPECTIVE_STYLE}
       >
-        {/* Left phone — workspace drawer, rotated to face inward */}
+        {/* Left phone — workspace drawer */}
         <motion.div
           style={leftPhoneStyle}
           className="w-[160px] md:w-[240px] absolute"
@@ -529,7 +516,7 @@ function PhoneShowcase() {
           </PhoneFrame>
         </motion.div>
 
-        {/* Right phone — diff view, rotated to face inward */}
+        {/* Right phone — diff view */}
         <motion.div
           style={rightPhoneStyle}
           className="w-[160px] md:w-[240px] absolute"
@@ -554,13 +541,12 @@ function FAQ() {
       transition={EASE_OUT_05}
       className="space-y-6"
     >
-      <div className="space-y-2 mb-8">
-        <h2 className="text-3xl font-medium tracking-tight">Frequently asked questions</h2>
-        <p className="text-base text-muted-foreground max-w-lg leading-relaxed">
-          Everything you need to know about Padu&apos;s architecture, privacy, and agent support.
-        </p>
-      </div>
-      <div className="space-y-4">
+      <SectionHeader
+        eyebrow="FAQ"
+        title="Frequently asked questions."
+        description="Everything you need to know about Padu's architecture, privacy, and agent support."
+      />
+      <div className="divide-y divide-white/[0.08]">
         <FAQItem question="What is Padu?">
           Padu is a high-performance, native desktop and web workspace for orchestrating local AI
           coding agents. Built in Rust with GPUI (the GPU-accelerated UI engine behind Zed), Padu
@@ -620,4 +606,3 @@ function FAQ() {
     </motion.div>
   );
 }
-

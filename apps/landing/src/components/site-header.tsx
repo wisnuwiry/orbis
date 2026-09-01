@@ -8,42 +8,47 @@ export function SiteHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
-    <header className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-      <Link to="/" className="flex items-center gap-3 group">
-        <img
-          src="/padu.svg"
-          alt="Padu"
-          className="w-6 h-6 transition-transform group-hover:scale-105"
-        />
-        <span className="text-lg font-medium tracking-tight text-white">Padu</span>
+    <header className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between py-1">
+      <Link to="/" className="flex items-center gap-2.5 group">
+        <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white/[0.06] border border-white/10 group-hover:border-white/20 transition-all shadow-sm">
+          <img
+            src="/padu.svg"
+            alt="Padu"
+            className="w-4.5 h-4.5 transition-transform duration-200 group-hover:scale-110"
+          />
+        </div>
+        <span className="text-base font-semibold tracking-tight text-white">Padu</span>
       </Link>
-      <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-6">
+      <nav
+        aria-label="Main Navigation"
+        className="flex flex-wrap items-center justify-center gap-1 sm:gap-1.5 bg-white/[0.03] p-1.5 rounded-full border border-white/[0.08] backdrop-blur-xl shadow-lg shadow-black/20"
+      >
         <Link
           to="/docs"
-          className={`text-sm transition-colors ${
+          className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
             pathname.startsWith("/docs")
-              ? "text-white font-medium"
-              : "text-muted-foreground hover:text-foreground"
+              ? "bg-white/10 text-white shadow-sm"
+              : "text-zinc-400 hover:text-white hover:bg-white/[0.05]"
           }`}
         >
           Docs
         </Link>
         <Link
           to="/agents"
-          className={`text-sm transition-colors ${
+          className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
             pathname === "/agents"
-              ? "text-white font-medium"
-              : "text-muted-foreground hover:text-foreground"
+              ? "bg-white/10 text-white shadow-sm"
+              : "text-zinc-400 hover:text-white hover:bg-white/[0.05]"
           }`}
         >
           Agents
         </Link>
         <Link
           to="/changelog"
-          className={`text-sm transition-colors ${
+          className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
             pathname === "/changelog"
-              ? "text-white font-medium"
-              : "text-muted-foreground hover:text-foreground"
+              ? "bg-white/10 text-white shadow-sm"
+              : "text-zinc-400 hover:text-white hover:bg-white/[0.05]"
           }`}
         >
           Changelog
@@ -53,24 +58,22 @@ export function SiteHeader() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={stars ? `GitHub, ${stars} stars` : "GitHub"}
-          className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1.5"
+          className="px-3 py-1.5 rounded-full text-xs font-medium text-zinc-400 hover:text-white hover:bg-white/[0.05] transition-all inline-flex items-center gap-1.5"
         >
-          <GitHubIcon width="16" height="16" />
-          {stars && <span className="tabular-nums text-xs font-mono">{stars}</span>}
+          <GitHubIcon width="14" height="14" />
+          {stars && <span className="tabular-nums text-[11px] font-mono opacity-80">{stars}</span>}
         </a>
         <Link
           to="/download"
-          className={`inline-flex items-center justify-center rounded-lg px-3.5 py-1.5 text-xs font-medium transition-colors ${
+          className={`ml-1 inline-flex items-center justify-center rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
             pathname === "/download"
-              ? "bg-white text-black font-medium"
-              : "bg-white/10 hover:bg-white/15 border border-white/15 text-white"
+              ? "bg-white text-black font-semibold shadow-[0_0_12px_rgba(255,255,255,0.25)]"
+              : "bg-white text-black font-semibold hover:bg-white/90 active:scale-95 shadow-[0_0_12px_rgba(255,255,255,0.15)]"
           }`}
         >
           Download
         </Link>
-      </div>
+      </nav>
     </header>
   );
 }
-
-
