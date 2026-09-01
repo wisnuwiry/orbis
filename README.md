@@ -13,7 +13,8 @@
   <a href="https://github.com/wisnuwiry/padu/stargazers"><img src="https://img.shields.io/github/stars/wisnuwiry/padu?style=flat&label=Stars&labelColor=1e1e1e&color=ffd43b" alt="Stars"></a>&nbsp;
   <a href="https://github.com/wisnuwiry/padu/blob/main/LICENSE"><img src="https://img.shields.io/github/license/wisnuwiry/padu?style=flat&label=License&labelColor=1e1e1e&color=6bcb9e" alt="License"></a>&nbsp;
   <a href="https://github.com/wisnuwiry/padu/releases/latest"><img src="https://img.shields.io/github/v/release/wisnuwiry/padu?style=flat&label=Release&labelColor=1e1e1e&color=58a6ff" alt="Release"></a>&nbsp;
-  <a href="https://rustc-hash.vercel.app/"><img src="https://img.shields.io/badge/Rust-1.83+-de4d3a?style=flat&labelColor=1e1e1e&logo=rust&logoColor=fff" alt="Rust"></a>
+  <a href="https://rustc-hash.vercel.app/"><img src="https://img.shields.io/badge/Rust-1.83+-de4d3a?style=flat&labelColor=1e1e1e&logo=rust&logoColor=fff" alt="Rust"></a>&nbsp;
+  <a href="https://x.com/wsme_dev"><img src="https://img.shields.io/badge/X-@wsme__dev-000000?style=flat&labelColor=1e1e1e&logo=x&logoColor=fff" alt="@wsme_dev"></a>
 </p>
 
 <p align="center">
@@ -27,6 +28,9 @@
 
 ---
 
+> [!NOTE]
+> **Under Active Development**: Padu is in active development and early preview. You may encounter bugs, incomplete features, or rough edges. Bug reports and contributions are very welcome!
+>
 > **Notice**: Padu is a fork of [Waku](https://github.com/egoist/waku), originally created by [egoist](https://github.com/egoist), licensed under GPL-3.0. See [NOTICE.md](NOTICE.md) for full attribution and details.
 
 ## Overview

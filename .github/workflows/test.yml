@@ -3,27 +3,27 @@ name: Tests
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - "*.md"
-      - "docs/**"
-      - "website/**"
+    paths:
+      - "apps/desktop/**"
+      - "crates/**"
       - "assets/**"
       - "locales/**"
-      - "LICENSE"
-      - "NOTICE.md"
-      - "SECURITY.md"
-      - "CONTRIBUTING.md"
+      - "resources/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "rust-toolchain.toml"
+      - ".github/workflows/test.yml"
   pull_request:
-    paths-ignore:
-      - "*.md"
-      - "docs/**"
-      - "website/**"
+    paths:
+      - "apps/desktop/**"
+      - "crates/**"
       - "assets/**"
       - "locales/**"
-      - "LICENSE"
-      - "NOTICE.md"
-      - "SECURITY.md"
-      - "CONTRIBUTING.md"
+      - "resources/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "rust-toolchain.toml"
+      - ".github/workflows/test.yml"
 
 permissions:
   contents: read
@@ -33,6 +33,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  fmt:
+    name: Rust formatting
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install Rust
+        run: |
+          rustup toolchain install 1.96.0 --profile minimal --component rustfmt
+          rustup default 1.96.0
+
+      - name: Check formatting
+        run: cargo fmt --check
+
   test:
     name: Rust (${{ matrix.os }})
     strategy:
@@ -53,6 +69,14 @@ jobs:
 
       - name: Install Bun
         uses: oven-sh/setup-bun@v2
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v6
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ matrix.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            ${{ matrix.os }}-bun-
 
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
@@ -80,5 +104,5 @@ jobs:
           restore-keys: |
             ${{ matrix.os }}-rust-1.96.0-cargo-
 
-      - name: Run tests
-        run: cargo test --locked
+      - name: Run workspace tests
+        run: cargo test --locked --workspace
