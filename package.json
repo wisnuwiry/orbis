@@ -1,11 +1,11 @@
 {
-  "name": "orbis-workspace",
+  "name": "padu-workspace",
   "type": "module",
   "scripts": {
     "dev": "bun ./scripts/dev.ts",
     "release": "bun ./scripts/release.ts",
-    "protocol:generate": "cargo run -p orbis-protocol --bin export_types",
-    "protocol:check": "cargo run -p orbis-protocol --bin export_types -- --check",
+    "protocol:generate": "cargo run -p padu-protocol --bin export_types",
+    "protocol:check": "cargo run -p padu-protocol --bin export_types -- --check",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push"
   },

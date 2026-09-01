@@ -39,7 +39,7 @@ fn export_sparkle_public_key() {
         .filter(|value| !value.is_empty())
         .unwrap_or_else(|| panic!("{PLIST} has no SUPublicEDKey"));
 
-    println!("cargo:rustc-env=ORBIS_SPARKLE_PUBLIC_ED_KEY={value}");
+    println!("cargo:rustc-env=PADU_SPARKLE_PUBLIC_ED_KEY={value}");
 }
 
 #[cfg(target_os = "windows")]
@@ -54,7 +54,7 @@ fn embed_windows_resources() {
     let icon = icon.to_string_lossy().replace('\\', "\\\\");
 
     let package_version = std::env::var("CARGO_PKG_VERSION").unwrap_or_default();
-    // VERSIONINFO wants four numeric fields; Orbis's version has three.
+    // VERSIONINFO wants four numeric fields; Padu's version has three.
     let mut fields = package_version
         .split(['.', '-', '+'])
         .map(|field| field.parse::<u16>().unwrap_or(0))
@@ -84,12 +84,12 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "CompanyName", "Orbis\0"
+            VALUE "CompanyName", "Padu\0"
             VALUE "FileDescription", "{description}\0"
             VALUE "FileVersion", "{package_version}\0"
-            VALUE "InternalName", "orbis\0"
-            VALUE "OriginalFilename", "orbis.exe\0"
-            VALUE "ProductName", "Orbis\0"
+            VALUE "InternalName", "padu\0"
+            VALUE "OriginalFilename", "padu.exe\0"
+            VALUE "ProductName", "Padu\0"
             VALUE "ProductVersion", "{package_version}\0"
         END
     END
@@ -102,7 +102,7 @@ END
     );
 
     let out_dir = std::path::PathBuf::from(std::env::var("OUT_DIR").expect("cargo sets OUT_DIR"));
-    let script = out_dir.join("orbis.rc");
+    let script = out_dir.join("padu.rc");
     std::fs::write(&script, resources).expect("write the resource script");
 
     // GPUI embeds the application manifest through its own resource script,
