@@ -6,7 +6,7 @@ export const Route = createFileRoute("/")({
   head: () =>
     pageMeta(
       "Padu – Native, Local-First Desktop & Web Workspace for AI Coding Agents",
-      "High-performance, local-first control plane for Claude Code, Codex, OpenCode, Pi, Amp, and Cursor. Built in Rust with GPUI. Multi-agent orchestration, Git worktrees, and instant checkpoint rewind.",
+      "High-performance, local-first GUI for Claude Code, Codex, OpenCode, Pi, Amp, and Cursor. Built in Rust with GPUI. Multi-agent orchestration, Git worktrees, and instant checkpoint rewind.",
       "/",
     ),
   component: Home,
@@ -24,9 +24,9 @@ function Home() {
       }
       subtitle={
         <>
-          Orchestrate Claude Code, Codex, OpenCode, Pi, and Cursor in a blazing-fast, local-first client.
-          <br />
-          Built in Rust with GPUI. Zero cloud lock-in.
+          A high-performance desktop and web GUI for Claude Code, Codex, and local agent CLIs.
+          <br className="hidden sm:inline" />
+          {" "}Built in Rust with GPUI. 100% local-first and open source.
         </>
       }
     />
