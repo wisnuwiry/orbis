@@ -93,22 +93,6 @@ function AgentsPage() {
             ))}
           </div>
         </section>
-
-        {/* Custom providers */}
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-6 text-sm text-white/60 space-y-2">
-          <p className="font-medium text-white">Need to connect another agent or custom CLI?</p>
-          <p>
-            You can configure any custom agent command or ACP-compatible server in{" "}
-            <code className="font-mono text-purple-300 bg-white/5 px-1.5 py-0.5 rounded">
-              ~/.padu/settings.json
-            </code>
-            . Read the{" "}
-            <a href="/docs/custom-providers" className="underline hover:text-white transition-colors">
-              custom providers documentation
-            </a>
-            .
-          </p>
-        </div>
       </SiteShell>
     </CursorFieldProvider>
   );
