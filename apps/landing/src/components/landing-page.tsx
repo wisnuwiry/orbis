@@ -22,15 +22,10 @@ import {
 // reference and doesn't trigger jsx-no-new-object-as-prop.
 const FADE_IN_UP = { opacity: 0, y: 20 };
 const FADE_IN = { opacity: 1, y: 0 };
-const FADE_IN_UP_TINY = { opacity: 0, y: -10 };
 const FADE_IN_UP_40 = { opacity: 0, y: 40 };
-const FADE_IN_UP_4 = { opacity: 0, y: 4 };
-const FADE_OUT_UP_4 = { opacity: 0, y: 4 };
 
 const EASE_OUT_08_DELAY_05: Transition = { duration: 0.8, delay: 0.5, ease: "easeOut" };
 const EASE_OUT_05: Transition = { duration: 0.5, ease: "easeOut" };
-const EASE_OUT_015: Transition = { duration: 0.15, ease: "easeOut" };
-const DURATION_05: Transition = { duration: 0.5 };
 const SLIDE_TRANSITION: Transition = { duration: 0.35, ease: [0.22, 0.61, 0.36, 1] };
 
 const VIEWPORT_60 = { once: true, margin: "-60px" };
@@ -112,15 +107,9 @@ function Nav() {
 function Hero({ title, subtitle }: { title: React.ReactNode; subtitle: React.ReactNode }) {
   return (
     <div className="space-y-6 text-center max-w-3xl mx-auto">
-      {/* Eyebrow badge */}
-      <motion.div
-        initial={FADE_IN_UP_TINY}
-        animate={FADE_IN}
-        transition={DURATION_05}
-        className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-1 text-xs font-mono text-zinc-400"
-      >
-        Rust &amp; GPUI · Local-First
-      </motion.div>
+      <p className="font-mono text-xs font-medium tracking-wider uppercase text-zinc-400">
+        Rust &amp; GPUI · Local-First Control Plane
+      </p>
 
       <h1 className="text-4xl sm:text-6xl md:text-7xl font-semibold tracking-tight leading-[1.05] text-white">
         {title}
@@ -132,43 +121,8 @@ function Hero({ title, subtitle }: { title: React.ReactNode; subtitle: React.Rea
   );
 }
 
-const CLAUDE_CODE_BADGE_ICON = <ClaudeCodeIcon className="h-5 w-5" />;
-const CODEX_BADGE_ICON = <CodexIcon className="h-5 w-5" />;
-const OPENCODE_BADGE_ICON = <OpenCodeIcon className="h-5 w-5" />;
-const PI_BADGE_ICON = <PiIcon className="h-5 w-5" />;
-const CURSOR_BADGE_ICON = <CursorIcon className="h-5 w-5" />;
-
 const FEATURED_AGENT_COUNT = 5;
 const ADDITIONAL_AGENT_COUNT = AGENT_PAGES.length - FEATURED_AGENT_COUNT;
-
-function AgentBadge({ name, icon }: { name: string; icon: React.ReactNode }) {
-  const [hovered, setHovered] = React.useState(false);
-  const handleMouseEnter = React.useCallback(() => setHovered(true), []);
-  const handleMouseLeave = React.useCallback(() => setHovered(false), []);
-
-  return (
-    <span
-      className="relative inline-flex items-center justify-center rounded-full p-1.5 text-white/60 hover:text-white transition-colors"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      {icon}
-      <AnimatePresence>
-        {hovered && (
-          <motion.span
-            initial={FADE_IN_UP_4}
-            animate={FADE_IN}
-            exit={FADE_OUT_UP_4}
-            transition={EASE_OUT_015}
-            className="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-full bg-white text-black text-[11px] font-semibold whitespace-nowrap pointer-events-none shadow-md"
-          >
-            {name}
-          </motion.span>
-        )}
-      </AnimatePresence>
-    </span>
-  );
-}
 
 function SectionHeader({
   eyebrow,
@@ -181,9 +135,9 @@ function SectionHeader({
 }) {
   return (
     <div className="mb-10 space-y-2.5">
-      <span className="font-mono text-xs font-medium tracking-wider uppercase text-zinc-400">
+      <p className="font-mono text-xs font-medium tracking-wider uppercase text-zinc-400">
         {eyebrow}
-      </span>
+      </p>
       <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">{title}</h2>
       <p className="text-sm sm:text-base text-zinc-400 max-w-xl leading-relaxed">{description}</p>
     </div>
@@ -268,7 +222,7 @@ function GpuiPreview() {
     <div className="rounded-xl border border-white/10 bg-black/60 p-4 font-mono text-[11px] text-zinc-400 space-y-3 select-none">
       <div className="flex items-center justify-between border-b border-white/[0.06] pb-2 text-[10px]">
         <div className="flex items-center gap-1.5 text-zinc-300">
-          <span className="w-2 h-2 rounded-full bg-emerald-400" />
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
           <span>GPUI Native Render Pipeline</span>
         </div>
         <span className="text-zinc-500">120 Hz Target</span>
@@ -280,7 +234,7 @@ function GpuiPreview() {
           <span className="text-emerald-400 font-semibold">2.1ms / 8.3ms budget</span>
         </div>
         {/* Frame bar */}
-        <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden flex">
+        <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden flex">
           <div className="h-full bg-emerald-400 w-[25%]" />
           <div className="h-full bg-purple-400 w-[10%]" />
           <div className="h-full bg-white/20 w-[65%]" />
@@ -318,7 +272,7 @@ function WorktreePreview() {
           <GitFork className="h-3.5 w-3.5 text-sky-400" />
           <span>Git Worktree Manager</span>
         </div>
-        <span className="text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded text-[9px]">
+        <span className="text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-1.5 py-0.5 rounded text-[9px]">
           2 Active Worktrees
         </span>
       </div>
@@ -373,7 +327,7 @@ function CheckpointPreview() {
           <RotateCcw className="h-3.5 w-3.5 text-purple-400" />
           <span>Turn-by-Turn Checkpoint Timeline</span>
         </div>
-        <span className="text-purple-300 bg-purple-500/10 px-1.5 py-0.5 rounded text-[9px]">
+        <span className="text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-1.5 py-0.5 rounded text-[9px]">
           Time Travel Ready
         </span>
       </div>
@@ -401,14 +355,14 @@ function CheckpointPreview() {
         <div className="rounded border border-purple-500/30 bg-purple-500/[0.04] p-2.5 space-y-1.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-white font-medium">
-              <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
               <span>Turn 3: Unit test validation</span>
             </div>
-            <span className="text-purple-300 text-[9px] font-semibold">Latest Snapshot</span>
+            <span className="text-zinc-400 text-[9px]">Latest Snapshot</span>
           </div>
           <div className="flex items-center gap-2 pt-1">
             <span className="px-2 py-0.5 rounded bg-white/10 text-[9px] text-white">Review Diff</span>
-            <span className="px-2 py-0.5 rounded bg-purple-500/20 text-[9px] text-purple-300 border border-purple-500/30">
+            <span className="px-2 py-0.5 rounded bg-white/[0.06] text-[9px] text-zinc-300 border border-white/10">
               1-Click Rewind
             </span>
           </div>
@@ -443,12 +397,12 @@ function DaemonPreview() {
           </div>
         </div>
 
-        <div className="rounded border border-emerald-500/20 bg-emerald-500/[0.03] p-2.5 flex items-center justify-between">
+        <div className="rounded border border-white/10 bg-white/[0.02] p-2.5 flex items-center justify-between">
           <div className="space-y-0.5">
-            <div className="text-emerald-400 font-medium text-[10px]">Zero Cloud Telemetry</div>
+            <div className="text-white font-medium text-[10px]">Zero Cloud Telemetry</div>
             <div className="text-zinc-400 text-[9px]">Code, prompts, and credentials stay on your hardware.</div>
           </div>
-          <span className="text-emerald-400 font-bold text-sm">100% Local</span>
+          <span className="text-zinc-300 font-mono text-xs">100% Local</span>
         </div>
       </div>
     </div>
@@ -524,7 +478,7 @@ function ArchitectureCarousel() {
             {/* Left explanation side */}
             <div className="md:col-span-6 space-y-4">
               <div className="flex items-center gap-2">
-                <span className="font-mono text-[11px] text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-full">
+                <span className="font-mono text-xs text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-md">
                   {current.tag}
                 </span>
               </div>
@@ -548,7 +502,7 @@ function ArchitectureCarousel() {
                 <div className="pt-3">
                   <a
                     href={current.docHref}
-                    className="inline-flex items-center gap-1 text-xs font-medium text-purple-300 hover:text-purple-200 transition-colors"
+                    className="inline-flex items-center gap-1 text-xs font-medium text-zinc-300 hover:text-white transition-colors"
                   >
                     {current.docLabel ?? "Read documentation"} <ArrowRight className="h-3.5 w-3.5" />
                   </a>
@@ -624,7 +578,7 @@ function TabletPlaceholder() {
           <span className="text-zinc-500 ml-1 text-[9px]">Padu iPadOS</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/[0.04] text-zinc-300 border border-white/[0.08]">
             Connected · Local Daemon
           </span>
         </div>
@@ -688,8 +642,8 @@ function IPhonePlaceholder() {
           Add login rate limiting
         </div>
         <div className="bg-white/[0.04] border border-white/[0.08] text-zinc-300 px-2 py-1.5 rounded-lg rounded-bl-none text-[8px] max-w-[90%] space-y-1">
-          <div className="flex items-center gap-1 text-purple-300">
-            <span className="w-1 h-1 rounded-full bg-purple-400 animate-pulse" />
+          <div className="flex items-center gap-1 text-zinc-300">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
             <span>Codex CLI: editing...</span>
           </div>
           <div className="text-[7.5px] text-zinc-400">Added 5 req/min Redis rate limiter</div>
@@ -710,7 +664,7 @@ function AndroidPlaceholder() {
       {/* Top bar */}
       <div className="flex items-center justify-between px-1 border-b border-white/[0.06] pb-1">
         <span className="text-[8.5px] text-zinc-300 font-semibold">Padu Android</span>
-        <span className="text-[7.5px] text-emerald-400 bg-emerald-500/10 px-1 rounded">Live</span>
+        <span className="text-[7.5px] text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-1 rounded">Live</span>
       </div>
       {/* Session Card */}
       <div className="space-y-1.5 my-auto">
@@ -722,7 +676,7 @@ function AndroidPlaceholder() {
           <div className="text-[7.5px] text-zinc-400">Agent: OpenCode (8 turns)</div>
           <div className="flex items-center gap-1 pt-0.5">
             <span className="px-1 py-0.2 rounded bg-white/5 text-[7px] text-zinc-400 border border-white/10">3 files changed</span>
-            <span className="px-1 py-0.2 rounded bg-purple-500/10 text-[7px] text-purple-300">Ready</span>
+            <span className="px-1 py-0.2 rounded bg-white/[0.06] text-[7px] text-zinc-300">Ready</span>
           </div>
         </div>
       </div>
@@ -799,7 +753,7 @@ function EcosystemBentoSection() {
         <div className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all">
           <div className="space-y-2.5 mb-5">
             <div className="flex items-center justify-between">
-              <span className="font-mono text-[11px] text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-full">
+              <span className="font-mono text-xs text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-md">
                 iPad &amp; Tablets
               </span>
               <Tablet className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
@@ -819,7 +773,7 @@ function EcosystemBentoSection() {
         <div className="md:col-span-1 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all">
           <div className="space-y-2.5 mb-5">
             <div className="flex items-center justify-between">
-              <span className="font-mono text-[11px] text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-full">
+              <span className="font-mono text-xs text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-md">
                 iPhone &amp; iOS
               </span>
               <Smartphone className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
@@ -838,7 +792,7 @@ function EcosystemBentoSection() {
         <div className="md:col-span-1 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all">
           <div className="space-y-2.5 mb-5">
             <div className="flex items-center justify-between">
-              <span className="font-mono text-[11px] text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-full">
+              <span className="font-mono text-xs text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-md">
                 Android
               </span>
               <Smartphone className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
@@ -857,7 +811,7 @@ function EcosystemBentoSection() {
         <div className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all">
           <div className="space-y-2.5 mb-5">
             <div className="flex items-center justify-between">
-              <span className="font-mono text-[11px] text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-full">
+              <span className="font-mono text-xs text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-md">
                 Web &amp; PWA
               </span>
               <Globe className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
@@ -931,20 +885,48 @@ function GetStarted() {
         <DownloadButton />
         <OtherPlatformsButton />
       </div>
-      <div className="flex items-center justify-center gap-2 pt-6">
-        <span className="text-xs text-zinc-500 font-medium">Supports</span>
-        <div className="flex items-center gap-1 bg-white/[0.02] px-2.5 py-1 rounded-full border border-white/[0.06]">
-          <AgentBadge name="Claude Code" icon={CLAUDE_CODE_BADGE_ICON} />
-          <AgentBadge name="Codex" icon={CODEX_BADGE_ICON} />
-          <AgentBadge name="OpenCode" icon={OPENCODE_BADGE_ICON} />
-          <AgentBadge name="Pi" icon={PI_BADGE_ICON} />
-          <AgentBadge name="Cursor" icon={CURSOR_BADGE_ICON} />
-        </div>
+      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 pt-6 text-xs text-zinc-400">
+        <span className="font-mono text-zinc-500 text-[11px]">Supports</span>
+        <a
+          href="/claude-code"
+          className="flex items-center gap-1.5 hover:text-white transition-colors"
+        >
+          <ClaudeCodeIcon className="h-4 w-4" />
+          <span>Claude Code</span>
+        </a>
+        <a
+          href="/codex"
+          className="flex items-center gap-1.5 hover:text-white transition-colors"
+        >
+          <CodexIcon className="h-4 w-4" />
+          <span>Codex</span>
+        </a>
+        <a
+          href="/opencode"
+          className="flex items-center gap-1.5 hover:text-white transition-colors"
+        >
+          <OpenCodeIcon className="h-4 w-4" />
+          <span>OpenCode</span>
+        </a>
+        <a
+          href="/pi"
+          className="flex items-center gap-1.5 hover:text-white transition-colors"
+        >
+          <PiIcon className="h-4 w-4" />
+          <span>Pi</span>
+        </a>
+        <a
+          href="/cursor"
+          className="flex items-center gap-1.5 hover:text-white transition-colors"
+        >
+          <CursorIcon className="h-4 w-4" />
+          <span>Cursor</span>
+        </a>
         <a
           href="/agents"
-          className="text-xs text-zinc-400 hover:text-white transition-colors font-medium ml-1"
+          className="font-mono text-[11px] text-zinc-500 hover:text-zinc-300 transition-colors"
         >
-          +{ADDITIONAL_AGENT_COUNT} more
+          +{ADDITIONAL_AGENT_COUNT} more →
         </a>
       </div>
     </div>

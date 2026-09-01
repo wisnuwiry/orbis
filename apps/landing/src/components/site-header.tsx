@@ -67,8 +67,8 @@ export function SiteHeader() {
           to="/download"
           className={`ml-1 inline-flex items-center justify-center rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
             pathname === "/download"
-              ? "bg-white text-black font-semibold shadow-[0_0_12px_rgba(255,255,255,0.25)]"
-              : "bg-white text-black font-semibold hover:bg-white/90 active:scale-95 shadow-[0_0_12px_rgba(255,255,255,0.15)]"
+              ? "bg-white text-black font-semibold"
+              : "bg-white text-black font-semibold hover:bg-zinc-200 active:scale-95"
           }`}
         >
           Download
