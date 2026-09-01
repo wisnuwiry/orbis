@@ -2,16 +2,13 @@ import * as React from "react";
 import {
   ArrowRight,
   Bot,
-  BookOpen,
   Braces,
   ExternalLink,
   GitFork,
   Laptop,
   Monitor,
-  Puzzle,
   Smartphone,
   Terminal,
-  Users,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -71,7 +68,7 @@ import {
   OpenCodeIcon,
   PiIcon,
 } from "~/components/agent-icons";
-import { DiscordIcon, GitHubIcon, SlackIcon } from "~/components/brand-icons";
+import { GitHubIcon } from "~/components/brand-icons";
 import { ClaudeIcon, MobileChat, MobileDiff, MobileSidebar, PhoneFrame } from "~/components/mockup";
 import { FAQItem } from "~/components/faq-item";
 import { SiteFooter } from "~/components/site-footer";
@@ -114,13 +111,10 @@ export function LandingPage({ title, subtitle }: LandingPageProps) {
       <div className="landing-content bg-background">
         <main className="p-6 md:p-20 md:pt-40 max-w-5xl mx-auto">
           <div className="space-y-24">
-            <SocialProofWall />
             <MultiProviderSection />
             <TurnkeySection />
             <AutomationSection />
-            <ExtensibleSection />
             <FAQ />
-            <SponsorCTA />
           </div>
         </main>
         <SiteFooter />
@@ -156,88 +150,6 @@ const CURSOR_BADGE_ICON = <CursorIcon className="h-6 w-6" />;
 
 const FEATURED_AGENT_COUNT = 5;
 const ADDITIONAL_AGENT_COUNT = AGENT_PAGES.length - FEATURED_AGENT_COUNT;
-
-const SOCIAL_PROOF_TWEETS = [
-  {
-    name: "Alex C.",
-    handle: "@alex_dev",
-    date: "Apr 6, 2026",
-    avatar: "/avatar-placeholder.svg",
-    url: "https://github.com/wisnuwiry/padu",
-    text: "Without a doubt the cleanest coding-agent client right now. Fast, native GPUI rendering, and zero lag even on large diffs.",
-  },
-  {
-    name: "Elena R.",
-    handle: "@elena_builds",
-    date: "Apr 11, 2026",
-    avatar: "/avatar-placeholder.svg",
-    url: "https://github.com/wisnuwiry/padu",
-    text: "Drive Claude Code, OpenAI Codex, and Pi simultaneously on isolated Git worktrees. Changed the way I ship features.",
-  },
-  {
-    name: "Marcus K.",
-    handle: "@marcus_tech",
-    date: "Apr 16, 2026",
-    avatar: "/avatar-placeholder.svg",
-    url: "https://github.com/wisnuwiry/padu",
-    text: "Padu keeps everything local and private on my workstation. Best native developer UI for multi-agent workflows.",
-  },
-  {
-    name: "Sophie T.",
-    handle: "@sophie_codes",
-    date: "May 3, 2026",
-    avatar: "/avatar-placeholder.svg",
-    url: "https://github.com/wisnuwiry/padu",
-    text: "Being able to monitor agent progress and review diffs smoothly without losing context is incredible.",
-  },
-  {
-    name: "David H.",
-    handle: "@david_h_dev",
-    date: "May 11, 2026",
-    avatar: "/avatar-placeholder.svg",
-    url: "https://github.com/wisnuwiry/padu",
-    text: "Seamless switching between Codex, Claude Code, and custom MCP tools. Native performance makes a massive difference.",
-  },
-  {
-    name: "Ryan L.",
-    handle: "@ryan_l",
-    date: "May 29, 2026",
-    avatar: "/avatar-placeholder.svg",
-    url: "https://github.com/wisnuwiry/padu",
-    text: "Cross-platform daemon with end-to-end encrypted sync and local execution. Exactly what developers need.",
-  },
-  {
-    name: "Boris E.",
-    handle: "@boris_e",
-    date: "May 30, 2026",
-    avatar: "/avatar-placeholder.svg",
-    url: "https://github.com/wisnuwiry/padu",
-    text: "Sub-millisecond UI responsiveness and clean split panes. Padu sets a new bar for AI dev tools.",
-  },
-  {
-    name: "Arnold G.",
-    handle: "@arnold_g",
-    date: "May 28, 2026",
-    avatar: "/avatar-placeholder.svg",
-    url: "https://github.com/wisnuwiry/padu",
-    text: "Padu provides a unified timeline for all local agent tools. Beautiful design and zero bloat.",
-  },
-  {
-    name: "Daniel M.",
-    handle: "@daniel_m",
-    date: "Apr 12, 2026",
-    avatar: "/avatar-placeholder.svg",
-    url: "https://github.com/wisnuwiry/padu",
-    text: "Padu is blazing fast. The native desktop experience is on another level compared to web wrappers.",
-  },
-] as const;
-
-const SOCIAL_PROOF_ROWS = [
-  { id: "top", tweets: SOCIAL_PROOF_TWEETS.slice(0, 5), reverse: false },
-  { id: "bottom", tweets: SOCIAL_PROOF_TWEETS.slice(5), reverse: true },
-] as const;
-
-type SocialProofTweet = (typeof SOCIAL_PROOF_TWEETS)[number];
 
 function AgentBadge({ name, icon }: { name: string; icon: React.ReactNode }) {
   const [hovered, setHovered] = React.useState(false);
@@ -336,84 +248,6 @@ function SectionTitle({
   );
 }
 
-function SocialProofWall() {
-  return (
-    <motion.section
-      initial={FADE_IN_UP}
-      whileInView={FADE_IN}
-      viewport={VIEWPORT_60}
-      transition={EASE_OUT_05}
-    >
-      <SectionTitle
-        title="Loved by developers"
-        description="See what developers are saying about Padu"
-      />
-
-      <div className="social-proof-marquee space-y-4 overflow-hidden">
-        {SOCIAL_PROOF_ROWS.map((row) => (
-          <SocialProofRow key={row.id} tweets={row.tweets} reverse={row.reverse} />
-        ))}
-      </div>
-    </motion.section>
-  );
-}
-
-function SocialProofRow({
-  tweets,
-  reverse,
-}: {
-  tweets: readonly SocialProofTweet[];
-  reverse: boolean;
-}) {
-  return (
-    <div className="social-proof-row">
-      <div className={`social-proof-track ${reverse ? "social-proof-track-reverse" : ""}`}>
-        <div className="flex shrink-0 gap-4 pr-4">
-          {tweets.map((tweet) => (
-            <SocialProofCard key={tweet.url} tweet={tweet} />
-          ))}
-        </div>
-        <div className="flex shrink-0 gap-4 pr-4" aria-hidden="true">
-          {tweets.map((tweet) => (
-            <SocialProofCard key={`${tweet.url}-clone`} tweet={tweet} inert />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SocialProofCard({ tweet, inert }: { tweet: SocialProofTweet; inert?: boolean }) {
-  return (
-    <a
-      href={tweet.url}
-      target="_blank"
-      rel="noreferrer"
-      tabIndex={inert ? -1 : undefined}
-      className="group flex h-[154px] w-[320px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition-colors hover:border-white/20 hover:bg-white/[0.05] md:w-[420px]"
-      aria-label={`Read ${tweet.name}'s original post`}
-    >
-      <div>
-        <div className="flex min-w-0 items-center gap-3">
-          <img
-            src={tweet.avatar}
-            alt=""
-            width={28}
-            height={28}
-            loading="lazy"
-            decoding="async"
-            className="h-7 w-7 shrink-0 rounded-full bg-white/10 object-cover"
-          />
-          <p className="truncate text-sm font-medium text-white/60">{tweet.handle}</p>
-        </div>
-        <p className="social-proof-card-text mt-4 text-sm leading-relaxed text-white/72">
-          {tweet.text}
-        </p>
-      </div>
-    </a>
-  );
-}
-
 function MultiProviderSection() {
   const providers = [
     { name: "Claude Code", icon: <ClaudeIcon size={28} /> },
@@ -453,7 +287,7 @@ function TurnkeySection() {
   return (
     <FeatureSection
       title="Run it anywhere"
-      description="Use Padu locally, from another machine, or with a team"
+      description="Use Padu locally, from another machine, or in isolated worktrees"
     >
       <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
         <div className="flex flex-col gap-6 border-b border-white/10 p-6 sm:flex-row sm:items-center sm:justify-between md:p-8">
@@ -483,16 +317,15 @@ function TurnkeySection() {
               icon={Laptop}
               title="Remote machines"
               description="Run Padu on a home lab, or a cloud machine"
-              ctaHref="/docs#server--cli"
+              ctaHref="/docs/cli"
               ctaLabel="Docs"
             />
             <TurnkeyExtensionCard
-              icon={Users}
-              title="Teams and triggers"
-              description="Share access or start work from GitHub, Slack, and Discord"
-              ctaHref="/hub"
-              ctaLabel="Padu Hub"
-              showIntegrationIcons
+              icon={GitFork}
+              title="Worktree isolation"
+              description="Run agents in separate git worktrees without touching your branch"
+              ctaHref="/docs/worktrees"
+              ctaLabel="Docs"
             />
           </div>
         </div>
@@ -507,26 +340,17 @@ function TurnkeyExtensionCard({
   description,
   ctaHref,
   ctaLabel,
-  showIntegrationIcons = false,
 }: {
   icon: LucideIcon;
   title: string;
   description: string;
   ctaHref: string;
   ctaLabel: string;
-  showIntegrationIcons?: boolean;
 }) {
   return (
     <div className="flex min-h-48 flex-col rounded-xl border border-white/10 bg-white/[0.025] p-5">
       <div className="mb-5 flex items-center gap-3 text-muted-foreground">
         <Icon className="h-5 w-5" strokeWidth={1.5} />
-        {showIntegrationIcons ? (
-          <>
-            <GitHubIcon className="h-4 w-4" />
-            <SlackIcon className="h-4 w-4" />
-            <DiscordIcon className="h-4 w-4" />
-          </>
-        ) : null}
       </div>
       <h3 className="font-medium text-white/85">{title}</h3>
       <p className="mt-2 text-sm leading-relaxed text-white/45">{description}</p>
@@ -574,7 +398,7 @@ const AUTOMATION_OPTIONS: Array<{
 const AUTOMATION_LINKS = [
   { href: "/docs/mcp", label: "MCP docs" },
   { href: "/docs/cli", label: "CLI docs" },
-  { href: "/docs/sdk", label: "SDK docs" },
+  { href: "/docs/connectivity", label: "Connectivity docs" },
 ] as const;
 
 function AutomationSection() {
@@ -778,68 +602,6 @@ function SdkAutomationExample() {
   );
 }
 
-function ExtensibleSection() {
-  return (
-    <FeatureSection title="Make it yours" description="Extend Padu to work just the way you want">
-      <div className="grid gap-4 md:grid-cols-2">
-        <ExtensibleCard
-          icon={Puzzle}
-          title="Plugins"
-          description="Plugins can add server-side functionality and modify the client with custom components. They work across all clients, including mobile"
-          href="/docs/plugins"
-          linkLabel="Plugin documentation"
-          linkIcon="book"
-        />
-        <ExtensibleCard
-          icon={GitFork}
-          title="Fork the repo"
-          description="Padu is licensed under Apache 2.0. You can inspect the implementation, fork the project, and adapt it to your workflow or organization"
-          href="https://github.com/wisnuwiry/padu"
-          linkLabel="View the repository"
-          linkIcon="github"
-          external
-        />
-      </div>
-    </FeatureSection>
-  );
-}
-
-function ExtensibleCard({
-  icon: Icon,
-  title,
-  description,
-  href,
-  linkLabel,
-  linkIcon,
-  external = false,
-}: {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  href: string;
-  linkLabel: string;
-  linkIcon?: "book" | "github";
-  external?: boolean;
-}) {
-  return (
-    <div className="flex min-h-64 flex-col rounded-xl border border-white/10 bg-white/[0.025] p-6">
-      <div className="mb-8 text-muted-foreground">
-        <Icon className="h-6 w-6" strokeWidth={1.5} />
-      </div>
-      <h3 className="text-lg font-medium text-white/85">{title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-white/45">{description}</p>
-      <a
-        href={href}
-        {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-        className="mt-auto inline-flex items-center gap-2 pt-6 text-sm text-muted-foreground transition-colors hover:text-foreground"
-      >
-        {linkIcon === "book" ? <BookOpen className="h-4 w-4" /> : null}
-        {linkIcon === "github" ? <GitHubIcon className="h-4 w-4" /> : null}
-        {linkLabel}
-      </a>
-    </div>
-  );
-}
 
 function GetStarted() {
   return (
@@ -1058,13 +820,12 @@ function FAQ() {
       <div className="space-y-6">
         <FAQItem question="Is this free?">
           Yes. Padu is free and open source. You need agent providers installed with your own
-          credentials. Voice is local-first by default and can optionally use cloud speech providers
-          if you configure them.
+          credentials.
         </FAQItem>
         <FAQItem question="Does my code leave my machine?">
           Padu doesn&apos;t send your code anywhere. Agents run locally and talk to their own APIs
           as they normally would. For remote access, you can use the optional{" "}
-          <a href="/docs/security" className="underline hover:text-white/80">
+          <a href="/docs/connectivity" className="underline hover:text-white/80">
             end-to-end encrypted relay
           </a>
           , connect directly over your local network, or use your own tunnel.
@@ -1084,15 +845,6 @@ function FAQ() {
         <FAQItem question="Do I need the desktop app?">
           No. You can run the daemon headless and use any client to connect. The desktop app just
           bundles the daemon with a UI.
-        </FAQItem>
-        <FAQItem question="How does voice work?">
-          Voice runs locally on your device by default. You talk, the app transcribes and sends it
-          to your agent as text. Optionally, you can configure OpenAI speech providers for
-          higher-quality transcription and text-to-speech. See the{" "}
-          <a href="/docs/voice" className="underline hover:text-white/80">
-            voice docs
-          </a>
-          .
         </FAQItem>
         <FAQItem question="Can I connect from outside my network?">
           Yes. You can use the hosted relay (end-to-end encrypted, Padu can&apos;t read your
@@ -1126,44 +878,3 @@ function FAQ() {
   );
 }
 
-function SponsorCTA() {
-  return (
-    <motion.div
-      initial={FADE_IN_UP}
-      whileInView={FADE_IN}
-      viewport={VIEWPORT_60}
-      transition={EASE_OUT_05}
-      className="rounded-xl bg-white/5 border border-white/10 p-8 md:p-10 text-left space-y-4 max-w-xl mx-auto"
-    >
-      <div className="text-sm text-muted-foreground leading-relaxed space-y-3">
-        <p>Padu is an independent open source project for running coding agents.</p>
-        <p>Its guiding principle is optionality and freedom of choice.</p>
-        <p>
-          I wanted to use any provider without being locked into any ecosystem, run it on my own
-          infrastructure, access it from anywhere, and have it be fully automatable.
-        </p>
-        <p>I am hoping that you will enjoy Padu as much as we do.</p>
-        <p>If you like Padu, sponsorship is the best way to support continued development.</p>
-        <p>- Padu Team</p>
-      </div>
-      <div className="pt-2">
-        <a
-          href="/sponsor"
-          className="inline-flex items-center gap-2 rounded-lg bg-white/10 border border-white/20 px-5 py-2.5 text-sm font-medium text-white hover:bg-white/15 transition-colors"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="text-pink-400"
-          >
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-          </svg>
-          Sponsor Padu
-        </a>
-      </div>
-    </motion.div>
-  );
-}
