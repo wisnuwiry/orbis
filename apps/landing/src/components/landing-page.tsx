@@ -19,40 +19,41 @@ import {
   type Variants,
 } from "framer-motion";
 
-// Apple-style easing curves and motion choreography
-const APPLE_EASE = [0.16, 1, 0.3, 1] as const;
-const SLIDE_EASE = [0.22, 0.61, 0.36, 1] as const;
+// Apple-style quintic easing curves and refined motion parameters
+const APPLE_SMOOTH = [0.19, 1, 0.22, 1] as const;
+const TAB_SPRING: Transition = { type: "spring", stiffness: 420, damping: 32 };
+const SLIDE_TRANSITION: Transition = { duration: 0.4, ease: APPLE_SMOOTH };
 
-const SLIDE_TRANSITION: Transition = { duration: 0.35, ease: SLIDE_EASE };
-
-const VIEWPORT_CONFIG = { once: true, margin: "-60px" };
+const VIEWPORT_CONFIG = { once: true, margin: "-50px" };
 
 const HERO_CONTAINER_VARIANTS: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.05,
+      staggerChildren: 0.1,
+      delayChildren: 0.06,
     },
   },
 };
 
 const HERO_ITEM_VARIANTS: Variants = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { opacity: 0, y: 12, filter: "blur(3px)" },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.65, ease: APPLE_EASE },
+    filter: "blur(0px)",
+    transition: { duration: 0.75, ease: APPLE_SMOOTH },
   },
 };
 
 const SECTION_CONTAINER_VARIANTS: Variants = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 18, filter: "blur(3px)" },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: APPLE_EASE },
+    filter: "blur(0px)",
+    transition: { duration: 0.7, ease: APPLE_SMOOTH },
   },
 };
 
@@ -62,17 +63,18 @@ const STAGGER_CONTAINER_VARIANTS: Variants = {
     opacity: 1,
     transition: {
       staggerChildren: 0.08,
-      delayChildren: 0.1,
+      delayChildren: 0.05,
     },
   },
 };
 
 const CARD_ITEM_VARIANTS: Variants = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { opacity: 0, y: 14, filter: "blur(2px)" },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.55, ease: APPLE_EASE },
+    filter: "blur(0px)",
+    transition: { duration: 0.6, ease: APPLE_SMOOTH },
   },
 };
 
@@ -114,7 +116,7 @@ export function LandingPage({ eyebrow, title, subtitle }: LandingPageProps) {
             variants={HERO_CONTAINER_VARIANTS}
             initial="hidden"
             animate="visible"
-            className="flex flex-col items-center"
+            className="flex flex-col items-center transform-gpu"
           >
             <Hero eyebrow={eyebrow} title={title} subtitle={subtitle} />
             <GetStarted />
@@ -123,10 +125,10 @@ export function LandingPage({ eyebrow, title, subtitle }: LandingPageProps) {
 
         {/* Mockup Frame */}
         <motion.div
-          initial={{ opacity: 0, y: 36, scale: 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.3, ease: APPLE_EASE }}
-          className="relative px-6 md:px-8 pt-4 md:pt-8 pb-12 md:pb-20"
+          initial={{ opacity: 0, y: 24, scale: 0.985, filter: "blur(4px)" }}
+          animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+          transition={{ duration: 0.9, delay: 0.25, ease: APPLE_SMOOTH }}
+          className="relative px-6 md:px-8 pt-4 md:pt-8 pb-12 md:pb-20 transform-gpu"
         >
           <div className="max-w-7xl mx-auto">
             <HeroMockup />
@@ -341,6 +343,7 @@ function ArchitectureCarousel() {
       initial="hidden"
       whileInView="visible"
       viewport={VIEWPORT_CONFIG}
+      className="transform-gpu"
     >
       <SectionHeader
         eyebrow="Architecture"
@@ -367,7 +370,7 @@ function ArchitectureCarousel() {
               {selected && (
                 <motion.span
                   layoutId="arch-tab-pill"
-                  transition={SLIDE_TRANSITION}
+                  transition={TAB_SPRING}
                   className="absolute inset-0 rounded-xl bg-white/10 border border-white/15 shadow-sm"
                 />
               )}
@@ -383,11 +386,11 @@ function ArchitectureCarousel() {
         <AnimatePresence mode="wait">
           <motion.div
             key={current.id}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
+            initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
             transition={SLIDE_TRANSITION}
-            className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center"
+            className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center transform-gpu"
           >
             {/* Left explanation side */}
             <div className="md:col-span-6 space-y-4">
@@ -487,6 +490,7 @@ function EcosystemBentoSection() {
       initial="hidden"
       whileInView="visible"
       viewport={VIEWPORT_CONFIG}
+      className="transform-gpu"
     >
       <SectionHeader
         eyebrow="Ecosystem"
@@ -501,8 +505,8 @@ function EcosystemBentoSection() {
         {/* iPad / Tablet - 2 columns */}
         <motion.div
           variants={CARD_ITEM_VARIANTS}
-          whileHover={{ y: -2, transition: { duration: 0.2 } }}
-          className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-colors"
+          whileHover={{ y: -3, transition: { duration: 0.25, ease: APPLE_SMOOTH } }}
+          className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-colors transform-gpu"
         >
           <div className="space-y-2.5 mb-5">
             <div className="flex items-center justify-between">
@@ -525,8 +529,8 @@ function EcosystemBentoSection() {
         {/* iPhone (iOS) - 1 column */}
         <motion.div
           variants={CARD_ITEM_VARIANTS}
-          whileHover={{ y: -2, transition: { duration: 0.2 } }}
-          className="md:col-span-1 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-colors"
+          whileHover={{ y: -3, transition: { duration: 0.25, ease: APPLE_SMOOTH } }}
+          className="md:col-span-1 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-colors transform-gpu"
         >
           <div className="space-y-2.5 mb-5">
             <div className="flex items-center justify-between">
@@ -548,8 +552,8 @@ function EcosystemBentoSection() {
         {/* Android - 1 column */}
         <motion.div
           variants={CARD_ITEM_VARIANTS}
-          whileHover={{ y: -2, transition: { duration: 0.2 } }}
-          className="md:col-span-1 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-colors"
+          whileHover={{ y: -3, transition: { duration: 0.25, ease: APPLE_SMOOTH } }}
+          className="md:col-span-1 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-colors transform-gpu"
         >
           <div className="space-y-2.5 mb-5">
             <div className="flex items-center justify-between">
@@ -571,8 +575,8 @@ function EcosystemBentoSection() {
         {/* PWA & Web - 2 columns */}
         <motion.div
           variants={CARD_ITEM_VARIANTS}
-          whileHover={{ y: -2, transition: { duration: 0.2 } }}
-          className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-colors"
+          whileHover={{ y: -3, transition: { duration: 0.25, ease: APPLE_SMOOTH } }}
+          className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-colors transform-gpu"
         >
           <div className="space-y-2.5 mb-5">
             <div className="flex items-center justify-between">
@@ -611,6 +615,7 @@ function MultiProviderSection() {
       initial="hidden"
       whileInView="visible"
       viewport={VIEWPORT_CONFIG}
+      className="transform-gpu"
     >
       <SectionHeader
         eyebrow="Integrations"
@@ -627,8 +632,8 @@ function MultiProviderSection() {
             key={p.name}
             href={`/${p.slug}`}
             variants={CARD_ITEM_VARIANTS}
-            whileHover={{ y: -2, transition: { duration: 0.2 } }}
-            className="flex items-center gap-3.5 rounded-2xl border border-white/10 bg-white/[0.02] p-4.5 hover:border-white/20 hover:bg-white/[0.04] transition-colors group"
+            whileHover={{ y: -3, transition: { duration: 0.25, ease: APPLE_SMOOTH } }}
+            className="flex items-center gap-3.5 rounded-2xl border border-white/10 bg-white/[0.02] p-4.5 hover:border-white/20 hover:bg-white/[0.04] transition-colors group transform-gpu"
           >
             <span className="text-white/80 group-hover:text-white transition-colors">{p.icon}</span>
             <span className="font-medium text-sm text-white/90 group-hover:text-white transition-colors">
@@ -639,8 +644,8 @@ function MultiProviderSection() {
         <motion.a
           href="/agents"
           variants={CARD_ITEM_VARIANTS}
-          whileHover={{ y: -2, transition: { duration: 0.2 } }}
-          className="flex items-center justify-center gap-2 rounded-2xl border border-dashed border-white/15 bg-white/[0.01] p-4.5 text-zinc-400 hover:text-white hover:border-white/30 hover:bg-white/[0.03] transition-colors"
+          whileHover={{ y: -3, transition: { duration: 0.25, ease: APPLE_SMOOTH } }}
+          className="flex items-center justify-center gap-2 rounded-2xl border border-dashed border-white/15 bg-white/[0.01] p-4.5 text-zinc-400 hover:text-white hover:border-white/30 hover:bg-white/[0.03] transition-colors transform-gpu"
         >
           <span className="font-medium text-sm">+{ADDITIONAL_AGENT_COUNT} more agents</span>
           <ArrowRight className="h-3.5 w-3.5" />
@@ -742,7 +747,7 @@ function FAQ() {
       initial="hidden"
       whileInView="visible"
       viewport={VIEWPORT_CONFIG}
-      className="space-y-6"
+      className="space-y-6 transform-gpu"
     >
       <SectionHeader
         eyebrow="FAQ"
