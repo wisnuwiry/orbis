@@ -15,6 +15,7 @@ export const Route = createFileRoute("/")({
 function Home() {
   return (
     <LandingPage
+      eyebrow="Open Source · 100% Local-First"
       title={
         <>
           The native workspace
@@ -24,9 +25,9 @@ function Home() {
       }
       subtitle={
         <>
-          A high-performance desktop and web GUI for Claude Code, Codex, and local agent CLIs.
+          A GPU-accelerated client for Claude Code, Codex, and local agent CLIs.
           <br className="hidden sm:inline" />
-          {" "}Built in Rust with GPUI. 100% local-first and open source.
+          {" "}Built in Rust with GPUI, Git worktree isolation, and zero cloud telemetry.
         </>
       }
     />

@@ -52,18 +52,19 @@ import { SiteHeader } from "~/components/site-header";
 import "~/styles.css";
 
 interface LandingPageProps {
+  eyebrow?: React.ReactNode;
   title: React.ReactNode;
   subtitle: React.ReactNode;
 }
 
-export function LandingPage({ title, subtitle }: LandingPageProps) {
+export function LandingPage({ eyebrow, title, subtitle }: LandingPageProps) {
   return (
     <CursorFieldProvider>
       <div className="relative bg-background">
         {/* Hero header & content */}
         <div className="relative px-6 pt-4 pb-10 md:px-32 md:pt-6 md:pb-12 max-w-7xl mx-auto">
           <Nav />
-          <Hero title={title} subtitle={subtitle} />
+          <Hero eyebrow={eyebrow} title={title} subtitle={subtitle} />
           <GetStarted />
         </div>
 
@@ -104,11 +105,19 @@ function Nav() {
   );
 }
 
-function Hero({ title, subtitle }: { title: React.ReactNode; subtitle: React.ReactNode }) {
+function Hero({
+  eyebrow,
+  title,
+  subtitle,
+}: {
+  eyebrow?: React.ReactNode;
+  title: React.ReactNode;
+  subtitle: React.ReactNode;
+}) {
   return (
     <div className="space-y-6 text-center max-w-3xl mx-auto">
       <p className="font-mono text-xs font-medium tracking-wider uppercase text-zinc-400">
-        Rust &amp; GPUI · Local-First Control Plane
+        {eyebrow ?? "Open Source · 100% Local-First"}
       </p>
 
       <h1 className="text-4xl sm:text-6xl md:text-7xl font-semibold tracking-tight leading-[1.05] text-white">
