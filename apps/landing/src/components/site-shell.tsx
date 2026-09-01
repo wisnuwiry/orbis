@@ -15,7 +15,7 @@ export function SiteShell({ children, width = "default" }: SiteShellProps) {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Top Header - exactly identical to Home page in padding and width */}
       <div className="w-full max-w-7xl px-6 pt-4 md:px-32 md:pt-6 mx-auto">
-        <nav className="mb-16 md:mb-20">
+        <nav className="mb-10 sm:mb-14 md:mb-20">
           <SiteHeader />
         </nav>
       </div>

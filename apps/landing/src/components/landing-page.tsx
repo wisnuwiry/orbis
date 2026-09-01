@@ -99,7 +99,7 @@ export function LandingPage({ eyebrow, title, subtitle }: LandingPageProps) {
 
 function Nav() {
   return (
-    <nav className="mb-14 md:mb-20">
+    <nav className="mb-10 sm:mb-14 md:mb-20">
       <SiteHeader />
     </nav>
   );

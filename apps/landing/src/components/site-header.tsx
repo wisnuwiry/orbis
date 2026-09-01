@@ -1,4 +1,7 @@
+import * as React from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X } from "lucide-react";
 import "~/styles.css";
 import { GitHubIcon } from "~/components/brand-icons";
 import { useStars } from "~/routes/__root";
@@ -6,9 +9,20 @@ import { useStars } from "~/routes/__root";
 export function SiteHeader() {
   const { stars } = useStars();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+
+  // Auto-close mobile menu on route change
+  React.useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  const toggleMobileMenu = React.useCallback(() => {
+    setMobileMenuOpen((open) => !open);
+  }, []);
 
   return (
-    <header className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between py-1">
+    <header className="relative z-50 flex items-center justify-between w-full py-1">
+      {/* Brand logo & name */}
       <Link to="/" className="flex items-center gap-2.5 group">
         <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-white/[0.06] border border-white/10 group-hover:border-white/20 transition-all shadow-sm">
           <img
@@ -19,9 +33,11 @@ export function SiteHeader() {
         </div>
         <span className="text-base font-semibold tracking-tight text-white">Padu</span>
       </Link>
+
+      {/* Desktop Navigation Pill (hidden on mobile, visible on sm+) */}
       <nav
         aria-label="Main Navigation"
-        className="flex flex-wrap items-center justify-center gap-1 sm:gap-1.5 bg-white/[0.03] p-1.5 rounded-full border border-white/[0.08] backdrop-blur-xl shadow-lg shadow-black/20"
+        className="hidden sm:flex items-center gap-1 sm:gap-1.5 bg-white/[0.03] p-1.5 rounded-full border border-white/[0.08] backdrop-blur-xl shadow-lg shadow-black/20"
       >
         <Link
           to="/docs"
@@ -54,7 +70,7 @@ export function SiteHeader() {
           Changelog
         </Link>
         <a
-          href="https://github.com/wisnuwiry/padu"
+          href="https://github.com/wisnusaputra/padu"
           target="_blank"
           rel="noopener noreferrer"
           aria-label={stars ? `GitHub, ${stars} stars` : "GitHub"}
@@ -74,6 +90,86 @@ export function SiteHeader() {
           Download
         </Link>
       </nav>
+
+      {/* Mobile action buttons (visible on mobile only) */}
+      <div className="flex sm:hidden items-center gap-2">
+        <Link
+          to="/download"
+          className="inline-flex items-center justify-center rounded-full px-3.5 py-1.5 text-xs font-semibold bg-white text-black hover:bg-zinc-200 active:scale-95 transition-all"
+        >
+          Download
+        </Link>
+        <button
+          type="button"
+          onClick={toggleMobileMenu}
+          aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={mobileMenuOpen}
+          className="w-8 h-8 rounded-full border border-white/10 bg-white/[0.04] flex items-center justify-center text-zinc-300 hover:text-white active:scale-95 transition-all cursor-pointer"
+        >
+          {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+        </button>
+      </div>
+
+      {/* Mobile dropdown menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.98 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="absolute top-full left-0 right-0 mt-3 p-3 rounded-2xl border border-white/10 bg-[#0c0c0e]/95 backdrop-blur-2xl shadow-2xl shadow-black/80 flex flex-col gap-1 z-50 sm:hidden"
+          >
+            <Link
+              to="/docs"
+              className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                pathname.startsWith("/docs")
+                  ? "bg-white/10 text-white"
+                  : "text-zinc-400 hover:text-white hover:bg-white/[0.04]"
+              }`}
+            >
+              Docs
+            </Link>
+            <Link
+              to="/agents"
+              className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                pathname === "/agents"
+                  ? "bg-white/10 text-white"
+                  : "text-zinc-400 hover:text-white hover:bg-white/[0.04]"
+              }`}
+            >
+              Supported Agents
+            </Link>
+            <Link
+              to="/changelog"
+              className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                pathname === "/changelog"
+                  ? "bg-white/10 text-white"
+                  : "text-zinc-400 hover:text-white hover:bg-white/[0.04]"
+              }`}
+            >
+              Changelog
+            </Link>
+            <div className="h-px bg-white/[0.08] my-1" />
+            <a
+              href="https://github.com/wisnusaputra/padu"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2.5 rounded-xl text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/[0.04] transition-all flex items-center justify-between"
+            >
+              <span className="flex items-center gap-2">
+                <GitHubIcon width="16" height="16" />
+                GitHub Repository
+              </span>
+              {stars && (
+                <span className="tabular-nums text-xs font-mono text-zinc-400 bg-white/[0.04] px-2 py-0.5 rounded border border-white/[0.08]">
+                  {stars} ★
+                </span>
+              )}
+            </a>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
