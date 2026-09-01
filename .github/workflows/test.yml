@@ -6,9 +6,10 @@ on:
     paths-ignore:
       - "*.md"
       - "docs/**"
-      - "website/**"
-      - "assets/**"
-      - "locales/**"
+      - "public-docs/**"
+      - "apps/landing/**"
+      - "apps/web/**"
+      - "apps/mobile/**"
       - "LICENSE"
       - "NOTICE.md"
       - "SECURITY.md"
@@ -17,9 +18,10 @@ on:
     paths-ignore:
       - "*.md"
       - "docs/**"
-      - "website/**"
-      - "assets/**"
-      - "locales/**"
+      - "public-docs/**"
+      - "apps/landing/**"
+      - "apps/web/**"
+      - "apps/mobile/**"
       - "LICENSE"
       - "NOTICE.md"
       - "SECURITY.md"
@@ -33,8 +35,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  fmt:
+    name: Rust formatting
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install Rust
+        run: |
+          rustup toolchain install 1.96.0 --profile minimal --component rustfmt
+          rustup default 1.96.0
+
+      - name: Check formatting
+        run: cargo fmt --check
+
   test:
     name: Rust (${{ matrix.os }})
+    needs: fmt
     strategy:
       fail-fast: false
       matrix:
@@ -80,5 +99,5 @@ jobs:
           restore-keys: |
             ${{ matrix.os }}-rust-1.96.0-cargo-
 
-      - name: Run tests
-        run: cargo test --locked
+      - name: Run workspace tests
+        run: cargo test --locked --workspace

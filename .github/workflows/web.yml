@@ -1,12 +1,16 @@
-name: Web checks
+name: Client & Web checks
 
 on:
   push:
     branches: [main]
     paths:
-      - "packages/padu-client/**"
+      - "packages/**"
       - "apps/web/**"
+      - "apps/mobile/**"
+      - "apps/landing/**"
       - "crates/padu-protocol/**"
+      - "themes.json"
+      - "scripts/generate-themes.ts"
       - "Cargo.lock"
       - "bun.lock"
       - "package.json"
@@ -14,9 +18,13 @@ on:
       - ".github/workflows/web.yml"
   pull_request:
     paths:
-      - "packages/padu-client/**"
+      - "packages/**"
       - "apps/web/**"
+      - "apps/mobile/**"
+      - "apps/landing/**"
       - "crates/padu-protocol/**"
+      - "themes.json"
+      - "scripts/generate-themes.ts"
       - "Cargo.lock"
       - "bun.lock"
       - "package.json"
@@ -32,9 +40,9 @@ concurrency:
 
 jobs:
   check:
-    name: Protocol + web client
+    name: Protocol, client packages & apps
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
 
@@ -60,10 +68,28 @@ jobs:
       - name: Install JavaScript dependencies
         run: bun install --frozen-lockfile
 
-      - name: Check generated protocol
-        run: bun run protocol:check
+      - name: Check generated protocol & theme synchronization
+        run: |
+          bun run protocol:check
+          bun run theme:check
 
-      - name: Check web client
+      - name: Check client package (@padu/client)
         run: |
           bun run --filter @padu/client check
           bun run --filter @padu/client test
+
+      - name: Check web app (@padu/web)
+        run: |
+          bun run web:typecheck
+          bun run web:test
+          bun run web:build
+
+      - name: Check landing app (@padu/landing)
+        run: |
+          bun run landing:typecheck
+          bun run landing:build
+
+      - name: Check mobile app (@padu/mobile)
+        run: |
+          bun run mobile:typecheck
+          bun run mobile:test

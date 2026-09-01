@@ -28,12 +28,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Resolve version from Cargo.toml
+      - name: Resolve version from apps/desktop/Cargo.toml
         id: resolve
         run: |
-          version=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' apps/desktop/Cargo.toml | head -1)
           if [ -z "$version" ]; then
-            echo "::error::No version found in Cargo.toml"
+            echo "::error::No version found in apps/desktop/Cargo.toml"
             exit 1
           fi
           # Cargo.toml is the source of truth. A tag push must agree with it;
