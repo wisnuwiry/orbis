@@ -1,10 +1,16 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "padu",
+  "name": "padu-website",
   "compatibility_date": "2026-08-01",
   "compatibility_flags": ["nodejs_compat"],
-  "main": "@tanstack/react-start/server-entry",
+  "main": "./src/server-entry.ts",
   "observability": {
     "enabled": true
-  }
+  },
+  "kv_namespaces": [
+    {
+      "binding": "WEBSITE_CACHE",
+      "id": "cb4d8779806544e9b673142a80c1eb5f"
+    }
+  ]
 }
