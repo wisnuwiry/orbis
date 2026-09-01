@@ -3,10 +3,10 @@ set -eu
 
 profile="${1:-debug}"
 cargo_target_dir="${CARGO_TARGET_DIR:-target}"
-debug_identity_cache=".orbis-cache/codesign/debug-identity"
+debug_identity_cache=".padu-cache/codesign/debug-identity"
 codesign_identity_from_environment=0
-if [ -n "${ORBIS_CODESIGN_IDENTITY:-}" ]; then
-  codesign_identity="$ORBIS_CODESIGN_IDENTITY"
+if [ -n "${PADU_CODESIGN_IDENTITY:-}" ]; then
+  codesign_identity="$PADU_CODESIGN_IDENTITY"
   codesign_identity_from_environment=1
 else
   if [ "$profile" = "debug" ]; then
@@ -38,15 +38,15 @@ else
 fi
 case "$profile" in
   debug)
-    app_name="Orbis Debug"
-    helper_name="Orbis Debug Computer Use"
-    bundle_identifier="sh.orbis.dev"
+    app_name="Padu Debug"
+    helper_name="Padu Debug Computer Use"
+    bundle_identifier="dev.padu.dev"
     icon_file="AppIconDev.icns"
     ;;
   release)
-    app_name="Orbis"
-    helper_name="Orbis Computer Use"
-    bundle_identifier="sh.orbis"
+    app_name="Padu"
+    helper_name="Padu Computer Use"
+    bundle_identifier="dev.padu"
     icon_file="AppIcon.icns"
     ;;
   *)
@@ -59,21 +59,21 @@ if [ "$profile" = "debug" ] && [ "$codesign_identity_from_environment" = "0" ] &
   printf '%s\n' "$codesign_identity" > "$debug_identity_cache"
 fi
 debug_adhoc_requirement="=designated => identifier \"$bundle_identifier\""
-if [ "${ORBIS_SKIP_CARGO_BUILD:-0}" != "1" ]; then
+if [ "${PADU_SKIP_CARGO_BUILD:-0}" != "1" ]; then
   if [ "$profile" = "release" ]; then
-    cargo build --release --package orbis --bin orbis --bin orbis_js_repl --package orbis-daemon --bin orbis-daemon
+    cargo build --release --package padu --bin padu --bin padu_js_repl --package padu-daemon --bin padu-daemon
   else
-    cargo build --package orbis --bin orbis --bin orbis_js_repl
+    cargo build --package padu --bin padu --bin padu_js_repl
   fi
 fi
 
 bundle="$cargo_target_dir/$profile/$app_name.app"
 contents="$bundle/Contents"
 helper_bundle="$contents/Helpers/$helper_name.app"
-repl_executable="$contents/Resources/orbis_js_repl"
-daemon_executable="$contents/MacOS/orbis-daemon"
+repl_executable="$contents/Resources/padu_js_repl"
+daemon_executable="$contents/MacOS/padu-daemon"
 swift_module_cache="$cargo_target_dir/$profile/swift-module-cache"
-helper_source="resources/computer-use/OrbisComputerUse.swift"
+helper_source="resources/computer-use/PaduComputerUse.swift"
 menu_bar_cursor_resource="resources/computer-use/menubar-cursor.png"
 overlay_cursor_resource="resources/computer-use/overlay-cursor.svg"
 helper_fingerprint="$({
@@ -85,16 +85,16 @@ helper_fingerprint="$({
   printf '%s\n' "standalone-service-v2" "$helper_name" "$bundle_identifier.computer-use" "$codesign_identity" "$(uname -m)-apple-macos13.0"
   xcrun swiftc -version
 } | shasum -a 256 | awk '{ print $1 }')"
-helper_cache_root=".orbis-cache/computer-use/$profile"
+helper_cache_root=".padu-cache/computer-use/$profile"
 helper_cache_entry="$helper_cache_root/$helper_fingerprint"
 cached_helper_bundle="$helper_cache_entry/$helper_name.app"
 
 # Keep compiled helpers outside target so `cargo clean` does not force an
 # unnecessary Swift rebuild. The fingerprint includes the signing identity so
 # switching certificates can never reuse a helper signed as different code.
-# The cached app is copied into Orbis's standard Helpers directory as the
-# canonical packaged service. Orbis refreshes a stable standalone runtime copy
-# from it so Screen Recording is attributed to the helper rather than Orbis.
+# The cached app is copied into Padu's standard Helpers directory as the
+# canonical packaged service. Padu refreshes a stable standalone runtime copy
+# from it so Screen Recording is attributed to the helper rather than Padu.
 
 if [ ! -d "$cached_helper_bundle" ]; then
   helper_cache_staging="$helper_cache_root/.staging-$helper_fingerprint-$$"
@@ -104,7 +104,7 @@ if [ ! -d "$cached_helper_bundle" ]; then
   mkdir -p "$cached_helper_contents/MacOS" "$cached_helper_contents/Resources" "$swift_module_cache"
   cp resources/computer-use/Info.plist "$cached_helper_contents/Info.plist"
   cp "$menu_bar_cursor_resource" "$overlay_cursor_resource" "$cached_helper_contents/Resources/"
-  printf '%s\n' "$helper_fingerprint" > "$cached_helper_contents/Resources/.orbis-helper-fingerprint"
+  printf '%s\n' "$helper_fingerprint" > "$cached_helper_contents/Resources/.padu-helper-fingerprint"
   plutil -replace CFBundleDisplayName -string "$helper_name" "$cached_helper_contents/Info.plist"
   plutil -replace CFBundleExecutable -string "$helper_name" "$cached_helper_contents/Info.plist"
   plutil -replace CFBundleIdentifier -string "$bundle_identifier.computer-use" "$cached_helper_contents/Info.plist"
@@ -133,7 +133,7 @@ fi
 # `cargo clean` cannot evict it. Bump the version and checksum together.
 sparkle_version="2.9.4"
 sparkle_sha256="ce89daf967db1e1893ed3ebd67575ed82d3902563e3191ca92aaec9164fbdef9"
-sparkle_cache_root=".orbis-cache/sparkle"
+sparkle_cache_root=".padu-cache/sparkle"
 sparkle_cache_entry="$sparkle_cache_root/$sparkle_version"
 sparkle_framework_source="$sparkle_cache_entry/Sparkle.framework"
 
@@ -151,23 +151,23 @@ if [ ! -d "$sparkle_framework_source" ]; then
 fi
 
 rm -rf "$bundle"
-mkdir -p "$contents/MacOS" "$contents/Resources/computer-use" "$contents/Resources/skills/orbis-computer-use" "$contents/Helpers"
-cp "$cargo_target_dir/$profile/orbis" "$contents/MacOS/$app_name"
-cp "$cargo_target_dir/$profile/orbis_js_repl" "$repl_executable"
+mkdir -p "$contents/MacOS" "$contents/Resources/computer-use" "$contents/Resources/skills/padu-computer-use" "$contents/Helpers"
+cp "$cargo_target_dir/$profile/padu" "$contents/MacOS/$app_name"
+cp "$cargo_target_dir/$profile/padu_js_repl" "$repl_executable"
 chmod 755 "$repl_executable"
 if [ "$profile" = "release" ]; then
-  cp "$cargo_target_dir/$profile/orbis-daemon" "$daemon_executable"
+  cp "$cargo_target_dir/$profile/padu-daemon" "$daemon_executable"
   chmod 755 "$daemon_executable"
 fi
 cp resources/Info.plist "$contents/Info.plist"
 cp "resources/$icon_file" "$contents/Resources/AppIcon.icns"
 cp resources/computer-use/pi-extension.ts "$contents/Resources/computer-use/pi-extension.ts"
-cp resources/computer-use/SKILL.md "$contents/Resources/skills/orbis-computer-use/SKILL.md"
+cp resources/computer-use/SKILL.md "$contents/Resources/skills/padu-computer-use/SKILL.md"
 frameworks_directory="$contents/Frameworks"
 sparkle_framework="$frameworks_directory/Sparkle.framework"
 mkdir -p "$frameworks_directory"
 cp -R "$sparkle_framework_source" "$sparkle_framework"
-# Orbis is not sandboxed, so Sparkle's XPC services never run; drop them along
+# Padu is not sandboxed, so Sparkle's XPC services never run; drop them along
 # with the header and module folders so the shipped framework carries no dev
 # artifacts and no unsigned nested code.
 for sparkle_extra in XPCServices Headers PrivateHeaders Modules; do

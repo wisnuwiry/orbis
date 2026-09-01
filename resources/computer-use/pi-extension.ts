@@ -6,9 +6,9 @@ import { Type } from "typebox";
 type JsonObject = Record<string, unknown>;
 
 const jsToolDescription =
-  "Run JavaScript in Orbis's persistent QuickJS kernel for Computer Use. Initialize `sky` lazily with `await setupComputerUseRuntime({ globals: globalThis })`. Calls time out after 30000 ms (30 seconds) unless `timeout_ms` is provided. Use `nodeRepl.write(...)` for text and `await nodeRepl.emitImage(...)` for images. Bindings and scheduled timers persist until the JavaScript kernel is reset.";
+  "Run JavaScript in Padu's persistent QuickJS kernel for Computer Use. Initialize `sky` lazily with `await setupComputerUseRuntime({ globals: globalThis })`. Calls time out after 30000 ms (30 seconds) unless `timeout_ms` is provided. Use `nodeRepl.write(...)` for text and `await nodeRepl.emitImage(...)` for images. Bindings and scheduled timers persist until the JavaScript kernel is reset.";
 
-class OrbisMcpClient {
+class PaduMcpClient {
   private child: ChildProcessWithoutNullStreams | undefined;
   private starting: Promise<void> | undefined;
   private nextId = 0;
@@ -29,9 +29,9 @@ class OrbisMcpClient {
   }
 
   private async start(): Promise<void> {
-    const executable = process.env.ORBIS_JS_REPL_SERVER;
+    const executable = process.env.PADU_JS_REPL_SERVER;
     if (!executable) {
-      throw new Error("ORBIS_JS_REPL_SERVER is not configured");
+      throw new Error("PADU_JS_REPL_SERVER is not configured");
     }
     const child = spawn(executable, [], {
       env: process.env,
@@ -42,13 +42,13 @@ class OrbisMcpClient {
     lines.on("line", (line) => this.handleLine(line));
     child.stderr.on("data", (chunk) => {
       const message = String(chunk).trim();
-      if (message) console.error(`Orbis JavaScript REPL: ${message}`);
+      if (message) console.error(`Padu JavaScript REPL: ${message}`);
     });
     child.once("error", (error) => this.handleExit(error));
     child.once("exit", (code, signal) => {
       this.handleExit(
         new Error(
-          `Orbis JavaScript REPL exited${code === null ? "" : ` with ${code}`}${
+          `Padu JavaScript REPL exited${code === null ? "" : ` with ${code}`}${
             signal ? ` (${signal})` : ""
           }`,
         ),
@@ -57,7 +57,7 @@ class OrbisMcpClient {
     await this.requestWithoutStart("initialize", {
       protocolVersion: "2025-06-18",
       capabilities: {},
-      clientInfo: { name: "orbis-pi", version: "1" },
+      clientInfo: { name: "padu-pi", version: "1" },
     });
     this.notify("notifications/initialized", {});
   }
@@ -98,7 +98,7 @@ class OrbisMcpClient {
 
   private requestWithoutStart(method: string, params: JsonObject): Promise<unknown> {
     const child = this.child;
-    if (!child) return Promise.reject(new Error("Orbis JavaScript REPL is not running"));
+    if (!child) return Promise.reject(new Error("Padu JavaScript REPL is not running"));
     const id = ++this.nextId;
     return new Promise((resolve, reject) => {
       this.pending.set(id, { resolve, reject });
@@ -147,13 +147,13 @@ function toolResult(result: JsonObject) {
       )
       .map((item) => item.text)
       .join("\n");
-    throw new Error(message || "Orbis JavaScript execution failed");
+    throw new Error(message || "Padu JavaScript execution failed");
   }
   return { content, details: result._meta ?? {} };
 }
 
-export default function orbisComputerUse(pi: ExtensionAPI) {
-  const client = new OrbisMcpClient();
+export default function paduComputerUse(pi: ExtensionAPI) {
+  const client = new PaduMcpClient();
 
   pi.registerTool({
     name: "js",

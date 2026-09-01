@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 //
 // Sign the two Linux tarballs and merge them into architecture-specific
-// Sparkle-format feeds. Orbis's native Linux updater reads this same compact
+// Sparkle-format feeds. Padu's native Linux updater reads this same compact
 // contract as the Windows updater; Sparkle itself is not involved.
 //
 // Usage:
@@ -9,7 +9,7 @@
 //
 // Env:
 //   SPARKLE_PRIVATE_KEY        EdDSA private key, base64 (required)
-//   ORBIS_DOWNLOAD_URL_PREFIX   base URL for enclosure links
+//   PADU_DOWNLOAD_URL_PREFIX   base URL for enclosure links
 import { sign } from "node:crypto";
 import { readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -50,7 +50,7 @@ export function renderAppcast(
   return `<?xml version="1.0" encoding="utf-8"?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
   <channel>
-    <title>Orbis (Linux ${arch})</title>
+    <title>Padu (Linux ${arch})</title>
 ${entries}
   </channel>
 </rss>
@@ -80,7 +80,7 @@ export async function generateLinuxAppcasts(
   const present = new Set(readdirSync(assetsDir));
   const written: string[] = [];
   for (const arch of architectures) {
-    const archive = `orbis-${version}-${targetTriple(arch)}.tar.gz`;
+    const archive = `padu-${version}-${targetTriple(arch)}.tar.gz`;
     if (!present.has(archive)) {
       console.warn(`No ${archive} in ${assetsDir}; leaving that feed alone.`);
       continue;
@@ -104,7 +104,7 @@ export async function generateLinuxAppcasts(
     console.log(`Wrote ${feedPath} (${item.length} bytes signed)`);
   }
   if (written.length === 0) {
-    throw new Error(`No orbis-${version}-<target>.tar.gz found in ${assetsDir}`);
+    throw new Error(`No padu-${version}-<target>.tar.gz found in ${assetsDir}`);
   }
   return written;
 }
@@ -118,7 +118,7 @@ if (import.meta.main) {
   await generateLinuxAppcasts(
     assetsDir,
     version,
-    process.env.ORBIS_DOWNLOAD_URL_PREFIX ?? defaultDownloadUrlPrefix,
+    process.env.PADU_DOWNLOAD_URL_PREFIX ?? defaultDownloadUrlPrefix,
     new Date().toUTCString(),
   );
 }

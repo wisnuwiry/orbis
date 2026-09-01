@@ -5,15 +5,15 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>en</string>
     <key>CFBundleDisplayName</key>
-    <string>Orbis Computer Use</string>
+    <string>Padu Computer Use</string>
     <key>CFBundleExecutable</key>
-    <string>Orbis Computer Use</string>
+    <string>Padu Computer Use</string>
     <key>CFBundleIdentifier</key>
-    <string>sh.orbis.computer-use</string>
+    <string>dev.padu.computer-use</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>Orbis Computer Use</string>
+    <string>Padu Computer Use</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
@@ -25,8 +25,8 @@
     <key>LSUIElement</key>
     <true/>
     <key>NSAccessibilityUsageDescription</key>
-    <string>Orbis uses Accessibility access only when you approve an agent controlling another app.</string>
+    <string>Padu uses Accessibility access only when you approve an agent controlling another app.</string>
     <key>NSScreenCaptureUsageDescription</key>
-    <string>Orbis uses Screen Recording access to show the agent the app window you approve.</string>
+    <string>Padu uses Screen Recording access to show the agent the app window you approve.</string>
 </dict>
 </plist>
