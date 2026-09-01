@@ -1,65 +1,50 @@
 ---
 title: Orchestration skills
-description: "Padu orchestration skills: teach coding agents to spawn, coordinate, and manage other agents using slash commands."
+description: "Padu orchestration skills: package multi-agent workflows into reusable slash commands."
 nav: Skills
-order: 32
+order: 31
 category: Orchestration
 ---
 
 # Orchestration skills
 
-Padu ships orchestration skills that teach coding agents how to use Padu tools and the CLI to spawn, coordinate, and manage other agents. Skills package common workflows as slash commands, so agents know how to orchestrate without you writing the briefing and safety rails each time.
+Padu ships built-in orchestration skills that teach coding agents how to leverage Padu's CLI and MCP tools to spawn, coordinate, and review work from other agents.
 
-Start with [Orchestration](/docs/orchestration) if you want the mental model, or [Common workflows](/docs/orchestration-workflows) for prompts you can use without installing skills.
+## Installation & Setup
 
-## Installation
+Skills are stored in `.agents/skills/` or `~/.agents/skills/` and can be invoked directly in conversation prompts or slash commands.
 
-Two ways to install:
+## Available Skills
 
-- **Padu app:** Connect to the host, then open Settings → Host → Agents → Orchestration skills. The selected host installs the skills on its own machine.
-- **Manual:** `npx skills add wisnuwiry/padu`, this installs to `~/.agents/skills/` and sets up symlinks for each agent.
-
-When a daemon finds installed Padu skills, it keeps the selected bundled skills up to date on startup without removing deselected directories. Use the host's Orchestration skills card to install, update, choose, or uninstall skills. Removal always asks for confirmation.
-
-## `/padu`, Padu Reference
-
-The foundational skill. Padu reference for managing projects, workspaces, and agents. Load it when an agent needs to register a project, create agents, send them prompts, or manage workspace isolation.
-
-Not typically invoked directly by users, it's a reference that other skills depend on.
+### `/padu` — Reference Skill
+Provides agents with the complete Padu CLI and MCP reference for creating workspaces, branching worktrees, and inspecting live transcripts.
 
 ```
-/padu show me the Padu CLI surface for creating an agent in a worktree-isolated workspace
+/padu show me how to launch a subagent in a separate worktree branch
 ```
 
-## `/padu-handoff`, Task Handoff
-
-Hands off the current task to another agent with full context. Use it when you say "handoff", "hand off", "hand this to", or want to pass work to another agent.
-
-The receiving agent gets a self-contained briefing with the task, context, relevant files, current state, what's been tried, decisions, acceptance criteria, and constraints. Provider comes from orchestration preferences unless you name one. Supports worktree-isolated workspaces when you ask for one.
+### `/padu-handoff` — Task Delegation
+Hands off the active task to a specialized agent provider with a structured context briefing: task objective, files modified, error logs, and acceptance criteria.
 
 ```
-/padu-handoff hand off the auth fix to codex in a worktree-isolated workspace
-/padu-handoff hand this to claude opus for review
+/padu-handoff hand off the Redis rate limiter implementation to codex in a worktree
 ```
 
-## `/padu-committee`, Committee Planning
-
-Forms a committee of two high-reasoning agents to step back, do root cause analysis, and produce a plan. Use it when stuck, looping, tunnel-visioning, or facing a hard planning problem.
-
-Committee members do analysis only. They do not edit, create, or delete files. The orchestrating agent synthesizes their plans, implements, then sends the diff back for review.
+### `/padu-committee` — Multi-Agent Planning
+Spins up two high-reasoning agents (e.g. Claude Opus and OpenAI Codex) in parallel to analyze a complex architectural problem without modifying code, then synthesizes their findings into an implementation plan.
 
 ```
-/padu-committee why are the websocket connections dropping under load?
-/padu-committee plan the auth system migration
+/padu-committee analyze memory leaks in the WebSocket connection pool
 ```
 
-## `/padu-advisor`, Advisor
-
-Spins up a single agent as an advisor, a second opinion on the current task. Use it when you say "advisor", "second opinion", "what does X think", or want an outside take without delegating the work itself.
-
-The advisor gives a judgment. You decide what to do. The advisor prompt is analysis-only and ends with a no-edits instruction.
+### `/padu-advisor` — Second Opinion
+Queries an external agent as an advisor for code review, edge case analysis, or UX sanity checks.
 
 ```
-/padu-advisor did I miss anything in this migration plan?
-/padu-advisor --provider claude/opus what is the UX risk in this flow?
+/padu-advisor are there any concurrency bugs in this transaction isolation logic?
 ```
+
+## See Also
+
+- [Tools reference](/docs/mcp) — Complete reference for Padu's agent and workspace MCP tools.
+- [Workspaces](/docs/workspaces) — Understanding Padu's session and workspace hierarchy.

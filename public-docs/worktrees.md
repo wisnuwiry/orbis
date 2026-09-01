@@ -212,11 +212,11 @@ Services launched from the same workspace see each other's ports and proxy URLs.
 
 ```
 PADU_PORT=3000                         # this service's port
-PADU_URL=http://web--my-app.localhost:6767  # this service's proxy URL
+PADU_URL=http://web--my-app.localhost:4789  # this service's proxy URL
 PADU_SERVICE_API_PORT=51732
-PADU_SERVICE_API_URL=http://api--my-app.localhost:6767
+PADU_SERVICE_API_URL=http://api--my-app.localhost:4789
 PADU_SERVICE_WEB_PORT=3000
-PADU_SERVICE_WEB_URL=http://web--my-app.localhost:6767
+PADU_SERVICE_WEB_URL=http://web--my-app.localhost:4789
 ```
 
 Script names are upper-cased and non-alphanumerics become `_`. Point your frontend at `$PADU_SERVICE_API_URL` instead of hard-coding a port.

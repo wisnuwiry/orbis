@@ -1,6 +1,6 @@
 ---
 title: Getting started
-description: Install Padu and start running coding agents from anywhere.
+description: Install Padu and orchestrate local AI coding agents from desktop, web, or terminal.
 nav: Getting started
 order: 1
 category: Getting started
@@ -8,61 +8,54 @@ category: Getting started
 
 # Getting started
 
-Padu runs your coding agents on your machine and gives you a mobile, desktop, web, and CLI client to drive them from anywhere. Three common ways to install.
+Padu is a high-performance, native desktop and web workspace for orchestrating local AI coding agents. Built in Rust with GPUI (the GPU-accelerated engine behind Zed), Padu runs directly on your machine, keeping all code, transcripts, checkpoints, and credentials 100% local.
 
-## Desktop app (recommended)
+## 1. Desktop App (Recommended)
 
-Download from [padu.dev/download](https://padu.dev/download) or the [GitHub releases page](https://github.com/wisnuwiry/padu/releases). Open it and you're done.
+Download the native release for macOS, Linux, or Windows from [padu.dev/download](https://padu.dev/download) or the [GitHub releases page](https://github.com/wisnusaputra/padu/releases).
 
-The desktop app bundles its own daemon and starts it automatically, no separate install required. On first launch you'll see a brief startup screen, then connect from your phone using **Settings → your host → Pair Device**.
+The desktop app bundles its own lightweight daemon and starts it automatically on loopback (`127.0.0.1:4789`). No separate server install or cloud account is required.
 
-## Server / CLI
+## 2. CLI Daemon (Headless / Devboxes)
 
-For headless machines, dev boxes, or any setup where you want the daemon running without the desktop UI:
+For remote devboxes, headless Linux servers, or developers who prefer the terminal, install the Padu CLI binary:
 
 ```bash
-npm install -g @padu/cli
-padu
+# Download and install prebuilt binary, or build with Cargo:
+cargo install --path crates/padu-cli
 ```
 
-Padu starts the daemon locally, then asks whether to enable the end-to-end encrypted relay and print a pairing QR code. If you decline, enter the daemon address manually over TCP, Tailscale, or another VPN.
+Start the daemon in background or interactive mode:
 
-The daemon can also serve the browser web app itself, so you can use the full UI without the hosted app. See [Self-hosting the web UI](/docs/web-ui).
+```bash
+# Start the local daemon on 127.0.0.1:4789
+padu daemon start
+
+# Check status and connected agents
+padu daemon status
+```
+
+The daemon can also serve the bundled web client directly from `http://127.0.0.1:4789/`. See [Self-hosting the web UI](/docs/web-ui).
 
 Configuration and local state live under `PADU_HOME` (defaults to `~/.padu`).
 
-## Docker
+## 3. Prerequisites
 
-For servers, dev boxes, NAS devices, or homelab hosts, run the official image:
+Padu manages external agent CLIs; it does not bundle AI models itself. Before launching an agent in Padu, make sure you have installed and authenticated at least one supported agent CLI:
 
-```bash
-docker run -d --name padu \
-  -p 6767:6767 \
-  -e PADU_PASSWORD=change-me \
-  -v "$PWD/padu-home:/home/padu" \
-  -v "$PWD:/workspace" \
-  ghcr.io/wisnuwiry/padu:latest
-```
+- **[Claude Code](/docs/claude-code):** `claude` (Anthropic CLI)
+- **[OpenAI Codex](/docs/codex):** `codex` (OpenAI CLI)
+- **[OpenCode](https://opencode.ai/):** `opencode`
+- **[Pi Agent](https://pi.dev):** `pi`
+- **Other ACP Agents:** Cursor, Gemini CLI, GitHub Copilot, Amp, Grok, Kimi, etc.
 
-Then open `http://localhost:6767`.
+See [Supported providers](/docs/supported-providers) for the full list of supported agents.
 
-The image runs the daemon and serves the bundled web UI. It does not bundle agent CLIs, so extend it with the agents you use. See [Docker](/docs/docker) for Compose, reverse proxy, agent install, and security examples.
+## Next Steps
 
-## Where next
-
-- [Connectivity](/docs/connectivity), connect through the relay or Tailscale.
-- [Docker](/docs/docker), run the daemon and bundled web UI in a container.
-- [Workspaces](/docs/workspaces), the project, workspace, and session model Padu is built around.
-- [Providers](/docs/providers), what a provider is and how Padu wraps existing CLIs.
-- [Orchestration](/docs/orchestration), let one agent delegate work to other providers and models.
-- [Plugins](/docs/plugins), add trusted local surfaces, sidebar actions, daemon behavior, and composer attachments.
-- [CLI reference](/docs/cli), every command.
-- [Self-hosting the web UI](/docs/web-ui), serve the browser app from your own daemon.
-- [GitHub repo](https://github.com/wisnuwiry/padu)
-- [Report an issue](https://github.com/wisnuwiry/padu/issues)
-
-## Prerequisites
-
-Padu manages other agents, it doesn't ship one. Before it's useful, install at least one provider CLI yourself and make sure it works with your credentials. See [Supported providers](/docs/supported-providers) for the full list.
-
-You'll also want the [GitHub CLI](https://cli.github.com/) (`gh`) installed and authenticated, Padu uses it for PR-aware worktrees and a few orchestration features.
+- [Workspaces](/docs/workspaces) — Understand Padu's workspace, session, and worktree model.
+- [Git worktrees](/docs/worktrees) — Run concurrent agents in isolated branches with setup hooks.
+- [CLI Reference](/docs/cli) — Manage agents, workspaces, scripts, and daemons from your terminal.
+- [Connectivity](/docs/connectivity) — Connect remote web or mobile clients via LAN, Tailscale, or SSH.
+- [Performance Architecture](/docs/performance) — Learn how GPUI delivers 120 FPS rendering with zero UI-thread blocking.
+- [Configuration](/docs/configuration) — Configure `~/.padu/config.json`, ports, and logging.

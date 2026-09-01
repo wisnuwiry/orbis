@@ -1,123 +1,74 @@
 ---
-title: MCP reference
-description: Reference for the Padu tools agents use to manage agents, workspaces, scripts, terminals, and schedules.
-nav: MCP reference
-order: 33
+title: MCP & Tools reference
+description: Reference for the built-in MCP tools agents use to manage subagents, workspaces, scripts, and terminals.
+nav: Tools reference
+order: 30
 category: Orchestration
 ---
 
-# MCP reference
+# Tools & MCP reference
 
-This is the complete catalog behind the workflows in [Orchestration](/docs/orchestration) and [Common workflows](/docs/orchestration-workflows). You normally ask for an outcome in natural language and let the agent choose the tools.
+Padu provides a comprehensive set of native tool definitions and an Model Context Protocol (MCP) server so that autonomous coding agents can spawn subagents, isolate workspaces, run test scripts, and coordinate parallel workflows.
 
-Padu can inject these tools into every new agent it launches. Open **Settings → your host → Agents** and turn on **Enable Padu tools**, or set `daemon.mcp.injectIntoAgents` to `true`.
-
-Depending on the provider, Padu delivers the catalog through its native tool interface or MCP. The capabilities are the same either way.
-
-The MCP server itself is controlled by `daemon.mcp.enabled`. Existing agents may need a reload.
+Padu can inject these tools into new agent sessions automatically, or serve them over standard MCP transport.
 
 ## Mental model
 
-Workspaces decide where work happens; agent parentage decides who owns the work.
+- **Workspaces:** Define where code changes and branch isolation occur.
+- **Parentage:** Tracks which lead agent spawned a worker subagent.
+- An agent calling `create_agent` without a `workspaceId` spawns a subagent inside its existing workspace.
+- Providing a `workspaceId` places the subagent in an isolated Git worktree workspace.
 
-- An agent that calls `create_agent` without a `workspaceId` gets a subagent in its own workspace.
-- Passing a `workspaceId` places that subagent in another workspace without detaching it from its parent.
-- A top-level MCP caller without a workspace gets a new local workspace.
-- Create a workspace first when you need worktree isolation, a specific branch, or a pull request checkout.
-
-MCP does not expose an agent-detach tool. Detaching is a manual user action in the app or CLI.
-
-## Tools
-
-### Agents
+## Agent Management Tools
 
 | Tool                 | Function                                                                                |
 | -------------------- | --------------------------------------------------------------------------------------- |
 | `create_agent`       | Create an agent, optionally placing it in an existing workspace with `workspaceId`.     |
 | `send_agent_prompt`  | Send a task to a running agent.                                                         |
-| `get_agent_status`   | Return the latest snapshot for an agent.                                                |
-| `list_agents`        | List recent agents as compact metadata.                                                 |
-| `cancel_agent`       | Abort an agent's current run but keep the agent alive.                                  |
-| `archive_agent`      | Soft-delete an agent and remove it from the active list.                                |
-| `kill_agent`         | Terminate an agent session permanently.                                                 |
-| `update_agent`       | Update an agent name, labels, or runtime settings such as mode/model/thinking/features. |
-| `get_agent_activity` | Return recent agent timeline entries as a curated summary.                              |
-| `set_agent_mode`     | Switch an agent's session mode.                                                         |
+| `get_agent_status`   | Return the latest state snapshot for an agent session.                                  |
+| `list_agents`        | List active and historical agent sessions.                                              |
+| `cancel_agent`       | Abort an agent's active turn while preserving session context.                          |
+| `archive_agent`      | Soft-delete an agent session and remove it from the active sidebar.                     |
+| `kill_agent`         | Terminate an agent process permanently.                                                 |
+| `update_agent`       | Update an agent title, model selection, thinking level, or runtime options.             |
+| `get_agent_activity` | Return recent agent transcript entries, reasoning tokens, and tool calls.               |
+| `set_agent_mode`     | Switch an agent's operational mode (e.g. plan mode, bypass mode).                       |
 
-### Workspaces
+## Workspace & Worktree Tools
 
 | Tool                | Function                                                                                              |
 | ------------------- | ----------------------------------------------------------------------------------------------------- |
 | `create_workspace`  | Create a local or worktree-isolated workspace. Worktrees can branch off, check out a branch, or a PR. |
-| `list_workspaces`   | List active workspaces and their directories and isolation.                                           |
-| `rename_workspace`  | Change the user-visible name of the current or specified workspace.                                   |
-| `archive_workspace` | Archive a workspace and the sessions it owns.                                                         |
+| `list_workspaces`   | List active workspaces, paths, and branch isolation details.                                          |
+| `rename_workspace`  | Change the user-visible name of a workspace.                                                          |
+| `archive_workspace` | Archive a workspace and clean up its managed worktree files.                                          |
 
-For worktree isolation, `create_workspace` accepts the same useful choices as the app: branch off from a base, check out an existing branch, or check out a pull request. The worktree remains an implementation detail of the workspace lifecycle.
+## Workspace Script Tools
 
-### Workspace scripts
-
-These tools manage scripts configured in a workspace's `padu.json`. Each requires an explicit `workspaceId`; start and stop also require the configured `scriptName`.
+These tools manage commands defined in the project's `padu.json`:
 
 | Tool                     | Function                                                                                |
 | ------------------------ | --------------------------------------------------------------------------------------- |
-| `list_workspace_scripts` | List configured scripts with lifecycle, terminal, port, proxy URL, and health metadata. |
-| `start_workspace_script` | Start a configured script through Padu's managed launcher.                             |
-| `stop_workspace_script`  | Stop a running script through its supervised terminal.                                  |
+| `list_workspace_scripts` | List configured scripts with lifecycle, port, proxy URL, and health metadata.          |
+| `start_workspace_script` | Start a configured script or development server.                                        |
+| `stop_workspace_script`  | Stop a running supervised process.                                                      |
 
-See [Git worktrees](/docs/worktrees#scripts-and-services) for `padu.json` configuration.
+See [Git worktrees](/docs/worktrees#scripts-and-services) for `padu.json` syntax.
 
-### Terminals
+## Terminal Supervision Tools
 
 | Tool                 | Function                                                                     |
 | -------------------- | ---------------------------------------------------------------------------- |
-| `list_terminals`     | List terminal sessions for one working directory or all working directories. |
-| `create_terminal`    | Create a terminal session for a working directory.                           |
-| `kill_terminal`      | Kill a terminal session.                                                     |
-| `capture_terminal`   | Capture plain-text output from a terminal session.                           |
-| `send_terminal_keys` | Send text or special key tokens to a terminal session.                       |
+| `list_terminals`     | List active terminal sessions for the workspace.                             |
+| `create_terminal`    | Create a new terminal session in a given directory.                          |
+| `kill_terminal`      | Close and terminate a terminal session.                                      |
+| `capture_terminal`   | Capture recent plain-text output from a terminal stream.                     |
+| `send_terminal_keys` | Send input or control keys to a running terminal.                            |
 
-### Schedules and heartbeats
-
-Both use the same cron engine, but they have deliberately different interfaces.
-
-| Tool                | Function                                                                     |
-| ------------------- | ---------------------------------------------------------------------------- |
-| `create_schedule`   | Create a cron schedule that starts a new agent for each run.                 |
-| `list_schedules`    | List new-agent schedules managed by the daemon.                              |
-| `inspect_schedule`  | Inspect a schedule and its run history.                                      |
-| `pause_schedule`    | Pause an active schedule.                                                    |
-| `resume_schedule`   | Resume a paused schedule.                                                    |
-| `update_schedule`   | Change a schedule's cron, prompt, agent settings, limits, or other settings. |
-| `schedule_logs`     | Return recent runs and output for a schedule.                                |
-| `run_schedule_once` | Start one new-agent schedule run without changing its cron.                  |
-| `delete_schedule`   | Delete a new-agent schedule permanently.                                     |
-| `create_heartbeat`  | Send a recurring cron-backed prompt into the current agent.                  |
-| `delete_heartbeat`  | Delete one of the current agent's heartbeats.                                |
-
-MCP heartbeats are ephemeral: create or delete them. To change one, delete it and create a replacement. Pause, resume, update, inspect, logs, and run-once apply to new-agent schedules only.
-
-### Providers
+## Provider Inspection Tools
 
 | Tool               | Function                                                          |
 | ------------------ | ----------------------------------------------------------------- |
-| `list_providers`   | List configured agent providers, availability, and modes.         |
-| `list_models`      | List models for an agent provider.                                |
-| `inspect_provider` | Inspect compact provider capabilities and draft feature settings. |
-
-### Permissions
-
-| Tool                       | Function                                          |
-| -------------------------- | ------------------------------------------------- |
-| `list_pending_permissions` | Return pending permission requests across agents. |
-| `respond_to_permission`    | Approve or deny a pending permission request.     |
-
-### Browser
-
-Browser automation is opt-in and adds tools for opening tabs, reading pages, clicking, typing, and taking screenshots. See the [Browser tools reference](/docs/browser-tools).
-
-### Voice
-
-| Tool    | Function                                                                                  |
-| ------- | ----------------------------------------------------------------------------------------- |
-| `speak` | Speak text through daemon-managed voice output. Available only in voice-enabled sessions. |
+| `list_providers`   | List available local agent providers and operational modes.       |
+| `list_models`      | List available models for a given provider.                       |
+| `inspect_provider` | Inspect provider capabilities, context windows, and feature flags. |

@@ -1,102 +1,26 @@
 ---
 title: Custom providers
-description: Configure custom providers, alternative endpoints, profiles, custom binaries, and ACP agents in ~/.padu/config.json.
+description: Configure custom providers, alternative endpoints, multiple profiles, custom binaries, and ACP agents in ~/.padu/config.json.
 nav: Custom providers
-order: 22
+order: 24
 category: Providers
 ---
 
 # Custom providers
 
-Everything beyond the [supported providers](/docs/supported-providers) lives under `agents.providers` in `~/.padu/config.json`. You can:
+Padu supports custom provider configurations under `agents.providers` in `~/.padu/config.json`. You can:
 
-- **Extend** a first-class provider to point at a different API (Z.AI, Alibaba/Qwen, a proxy, a self-hosted endpoint).
-- **Add profiles**, multiple entries against the same underlying provider with different credentials or curated model lists.
-- **Override the binary**, run a nightly build, a wrapper script, or a Docker image instead of the installed CLI.
-- **Add ACP agents**, Gemini CLI, Hermes, or any agent speaking the Agent Client Protocol over stdio.
-- **Disable** a provider you don't use.
+- **Extend a built-in provider** to point at alternative API endpoints (proxies, enterprise gateways, or self-hosted models).
+- **Configure multiple profiles** for the same provider (e.g., Personal vs Work credentials).
+- **Override the binary path** to target nightly builds, wrappers, or isolated environments.
+- **Add ACP-compatible agents** speaking the Agent Client Protocol over `stdio`.
+- **Disable** providers you don't use.
 
-Run `padu reload` after editing the file. Provider changes apply to future launches without restarting the daemon.
+Run `padu reload` after editing `~/.padu/config.json`. Changes apply immediately to new sessions without restarting running agents.
 
-Provider IDs must be lowercase alphanumeric with hyphens (`/^[a-z][a-z0-9-]*$/`). Every custom entry needs `extends` (a first-class provider ID or `"acp"`) and a `label`.
+## 1. Multiple Profiles for Built-in Providers
 
-The examples below are a quick tour. The full, up-to-date reference is on GitHub: [docs/custom-providers.md](https://github.com/wisnuwiry/padu/blob/main/docs/custom-providers.md).
-
-## Extending a first-class provider
-
-```json
-{
-  "agents": {
-    "providers": {
-      "my-claude": {
-        "extends": "claude",
-        "label": "My Claude",
-        "env": {
-          "ANTHROPIC_API_KEY": "sk-ant-...",
-          "ANTHROPIC_BASE_URL": "https://my-proxy.example.com/v1"
-        }
-      }
-    }
-  }
-}
-```
-
-## Z.AI (GLM) coding plan
-
-Z.AI exposes GLM models through an Anthropic-compatible endpoint. Point `ANTHROPIC_BASE_URL` at their API and use `ANTHROPIC_AUTH_TOKEN` for the key. Third-party endpoints don't support Anthropic's server-side tools, so disable `WebSearch`.
-
-```json
-{
-  "agents": {
-    "providers": {
-      "zai": {
-        "extends": "claude",
-        "label": "ZAI",
-        "env": {
-          "ANTHROPIC_AUTH_TOKEN": "<your-zai-api-key>",
-          "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
-          "API_TIMEOUT_MS": "3000000"
-        },
-        "disallowedTools": ["WebSearch"],
-        "models": [
-          { "id": "glm-5-turbo", "label": "GLM 5 Turbo", "isDefault": true },
-          { "id": "glm-5.1", "label": "GLM 5.1" }
-        ]
-      }
-    }
-  }
-}
-```
-
-## Alibaba Cloud (Qwen) coding plan
-
-Alibaba's coding plan routes Claude Code to Qwen models via an Anthropic-compatible API. Subscription keys look like `sk-sp-...` and must be created in the Singapore region.
-
-```json
-{
-  "agents": {
-    "providers": {
-      "qwen": {
-        "extends": "claude",
-        "label": "Qwen (Alibaba)",
-        "env": {
-          "ANTHROPIC_AUTH_TOKEN": "sk-sp-<coding-plan-key>",
-          "ANTHROPIC_BASE_URL": "https://coding-intl.dashscope.aliyuncs.com/apps/anthropic"
-        },
-        "disallowedTools": ["WebSearch"],
-        "models": [
-          { "id": "qwen3.5-plus", "label": "Qwen 3.5 Plus", "isDefault": true },
-          { "id": "qwen3-coder-next", "label": "Qwen 3 Coder Next" }
-        ]
-      }
-    }
-  }
-}
-```
-
-## Multiple profiles
-
-Create as many entries as you want against the same first-class provider. Each one shows up as a separate option in the app with its own credentials and models.
+Declare multiple profiles with separate API credentials or custom model lists:
 
 ```json
 {
@@ -105,72 +29,55 @@ Create as many entries as you want against the same first-class provider. Each o
       "claude-work": {
         "extends": "claude",
         "label": "Claude (Work)",
-        "env": { "ANTHROPIC_API_KEY": "sk-ant-work-..." }
+        "env": {
+          "ANTHROPIC_API_KEY": "sk-ant-work-..."
+        }
       },
       "claude-personal": {
         "extends": "claude",
         "label": "Claude (Personal)",
-        "env": { "ANTHROPIC_API_KEY": "sk-ant-personal-..." }
+        "env": {
+          "ANTHROPIC_API_KEY": "sk-ant-personal-..."
+        }
       }
     }
   }
 }
 ```
 
-## Custom binary
+## 2. Custom Binary Path
 
-`command` is an array, first element is the binary, the rest are arguments. It fully replaces the default launch command for that provider.
+To pin a specific binary location:
 
 ```json
 {
   "agents": {
     "providers": {
       "claude": {
-        "command": ["/opt/claude-nightly/claude"]
+        "command": ["/opt/claude-nightly/bin/claude"]
       }
     }
   }
 }
 ```
 
-## ACP providers
+## 3. Alternative Endpoints (Anthropic-Compatible APIs)
 
-Any agent that speaks [ACP](https://agentclientprotocol.com) over stdio can be added with `extends: "acp"` and a `command`. Padu spawns the process, sends an `initialize` JSON-RPC request, and the agent reports its capabilities, modes, and models at runtime.
-
-```json
-{
-  "agents": {
-    "providers": {
-      "gemini": {
-        "extends": "acp",
-        "label": "Google Gemini",
-        "command": ["gemini", "--acp"]
-      },
-      "hermes": {
-        "extends": "acp",
-        "label": "Hermes",
-        "command": ["hermes", "acp"]
-      }
-    }
-  }
-}
-```
-
-## Adding or relabeling models
-
-`models` replaces the model list entirely. `additionalModels` merges with runtime-discovered models (ACP) or with `models`, use it to add an extra entry or relabel a discovered one without redeclaring the full list. An entry with the same `id` as a discovered model updates it in place.
+Route Claude Code through an Anthropic-compatible API gateway or regional proxy:
 
 ```json
 {
   "agents": {
     "providers": {
-      "gemini": {
-        "extends": "acp",
-        "label": "Google Gemini",
-        "command": ["gemini", "--acp"],
-        "additionalModels": [
-          { "id": "experimental-model", "label": "Experimental", "isDefault": true },
-          { "id": "gemini-2.5-pro", "label": "Gemini 2.5 Pro (preferred)" }
+      "custom-claude": {
+        "extends": "claude",
+        "label": "Custom Gateway",
+        "env": {
+          "ANTHROPIC_API_KEY": "your-key",
+          "ANTHROPIC_BASE_URL": "https://gateway.internal.example.com/v1"
+        },
+        "models": [
+          { "id": "claude-3-7-sonnet-20250219", "label": "Sonnet 3.7", "isDefault": true }
         ]
       }
     }
@@ -178,18 +85,42 @@ Any agent that speaks [ACP](https://agentclientprotocol.com) over stdio can be a
 }
 ```
 
-## Disabling a provider
+## 4. Generic ACP Agents
+
+Any agent speaking the [Agent Client Protocol (ACP)](https://agentclientprotocol.com) over standard input/output (`stdio`) can be registered with `extends: "acp"`:
 
 ```json
 {
   "agents": {
     "providers": {
-      "copilot": { "enabled": false }
+      "gemini-acp": {
+        "extends": "acp",
+        "label": "Google Gemini (ACP)",
+        "command": ["gemini", "--acp"]
+      }
     }
   }
 }
 ```
 
-## Full reference
+## 5. Disabling a Provider
 
-For the complete field reference (`extends`, `label`, `command`, `env`, `models`, `additionalModels`, `disallowedTools`, `enabled`, `order`), model and thinking-option schemas, and deeper examples for each plan, see [docs/custom-providers.md](https://github.com/wisnuwiry/padu/blob/main/docs/custom-providers.md) on GitHub.
+To hide a provider from the GUI selection menu:
+
+```json
+{
+  "agents": {
+    "providers": {
+      "copilot": {
+        "enabled": false
+      }
+    }
+  }
+}
+```
+
+## See Also
+
+- [Providers overview](/docs/providers) — Understanding Padu's agent adapter system.
+- [Supported providers](/docs/supported-providers) — Full list of natively supported coding agents.
+- [Troubleshooting](/docs/troubleshooting) — Fixing `PATH` resolution and command execution issues.

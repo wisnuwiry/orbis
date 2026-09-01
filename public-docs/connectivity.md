@@ -1,128 +1,85 @@
 ---
 title: Connectivity
-description: Connect a Padu client to your daemon through SSH, the relay, or Tailscale.
+description: Connect Padu desktop, web, and mobile clients to your daemon through local loopback, SSH, or Tailscale.
 nav: Connectivity
-order: 4
+order: 3
 category: Getting started
 ---
 
 # Connectivity
 
-Your Padu app connects to the daemon running on your computer or server. Padu Desktop and the CLI can tunnel through SSH. Mobile clients can connect through the Padu relay or directly with Tailscale.
+Padu follows a local-first client-server model. The desktop GUI, browser client, or mobile app communicates with a lightweight daemon (`padu daemon`) running on your machine or remote devbox over loopback sockets or WebSocket transport.
 
-This is client-to-daemon transport. If you are looking for the service that starts agents from GitHub, Slack, and Discord events, that is [Hub](/docs/hub).
+## 1. Local Loopback (Default)
 
-- [SSH](#ssh)
-- [Padu relay](#padu-relay)
-- [Tailscale](#tailscale)
+When running the Padu desktop application on your computer, the daemon is started automatically on `127.0.0.1:4789`. No network setup is required.
 
-## SSH
+## 2. Remote SSH Tunneling
 
-SSH transport connects to an existing daemon through your local OpenSSH client. It does not install, start, or configure Padu on the remote host.
-
-Before connecting:
-
-1. Start the Padu daemon on the remote host.
-2. Confirm `ssh user@host` works with a key or SSH agent. Padu uses non-interactive SSH and follows your OpenSSH config.
-
-The CLI accepts an SSH URI as its host:
+You can run the Padu daemon on a remote Linux server or devbox and control it securely through OpenSSH from your desktop or CLI without exposing any ports publicly:
 
 ```bash
-padu ls -a --host ssh://user@host
+# Connect CLI to remote host via SSH
+padu ls -a --host ssh://user@devbox.internal
+
+# If daemon is running on a custom port
+padu ls -a --host 'ssh://user@devbox.internal?daemonPort=4789'
 ```
 
-The daemon is expected at `127.0.0.1:6767` on the remote host. The port in the SSH URL is the SSH server port:
+In Padu Desktop, open **Settings → Add host → Remote SSH** and enter `ssh://user@devbox.internal`. Padu leverages your existing `~/.ssh/config` and SSH keys.
 
-```bash
-padu ls -a --host ssh://user@host:2222
-```
+## 3. Tailscale / Private VPN (Recommended for Mobile)
 
-Set a different remote daemon port with `daemonPort`:
+To connect from mobile companion apps or external laptops without opening firewall ports, use a private mesh network like [Tailscale](https://tailscale.com) or WireGuard.
 
-```bash
-padu ls -a --host 'ssh://user@host?daemonPort=7777'
-```
+### Step 1: Find the daemon's Tailscale IP
 
-`--host` belongs after the command. `padu daemon status` checks only the local daemon; use `padu ls --host ...` to verify a remote connection. `padu run --host ...` also requires `--cwd` with a path that exists on the remote host.
-
-In Padu Desktop, open **Settings → Add host → Remote SSH** and enter the same `ssh://` destination.
-
-## Padu relay
-
-The relay works without Tailscale, port forwarding, or network configuration. Traffic is end-to-end encrypted.
-
-Relay is disabled until you enable it.
-
-### Enable relay from Padu Desktop
-
-1. Open **Settings → your host → Pair a device**.
-2. Select **Enable relay**.
-3. Scan the QR code with Padu on your phone, or copy the pairing link and paste it into the phone app.
-
-### Enable relay from the CLI
-
-Run:
-
-```bash
-padu daemon pair
-```
-
-Confirm when prompted. Padu prints a QR code and pairing link. Scan the QR code with Padu on your phone, or choose **Paste pairing link** in the phone app.
-
-## Tailscale
-
-Install [Tailscale](https://tailscale.com/download) on the daemon machine and your phone. Sign in to the same tailnet on both devices.
-
-### 1. Find the daemon machine's Tailscale IP
-
-Run this on the daemon machine:
+On the host running the Padu daemon:
 
 ```bash
 tailscale ip -4
+# Example output: 100.101.102.103
 ```
 
-Copy the address it prints. The example below uses `100.101.102.103`.
+### Step 2: Configure daemon listen address
 
-### 2. Configure the daemon
-
-Open `~/.padu/config.json` and set `daemon.listen` to the Tailscale IP:
+In `~/.padu/config.json`, set the `daemon.listen` address to your Tailscale IP:
 
 ```json
 {
   "$schema": "https://padu.dev/schemas/padu.config.v1.json",
   "version": 1,
   "daemon": {
-    "listen": "100.101.102.103:6767"
+    "listen": "100.101.102.103:4789"
   }
 }
 ```
 
-Keep the other settings already in the file. If it has a `daemon` object, add `listen` inside that object.
-
-To restrict access with a password, see [Password authentication](/docs/configuration#password-authentication).
-
-Restart the daemon:
+Restart or reload the daemon:
 
 ```bash
 padu daemon restart
 ```
 
-If Padu Desktop manages the daemon, use **Settings → your host → Overview → Restart daemon**.
+### Step 3: Connect client
 
-### 3. Connect the phone app
+1. Open Padu on your mobile device or browser.
+2. Go to **Settings → Add host → Direct connection**.
+3. Enter the Tailscale IP (`100.101.102.103`) and port `4789`.
+4. If a password is configured in `config.json`, enter it and tap **Connect**.
 
-1. Connect Tailscale on your phone.
-2. Open Padu and go to **Settings → Add host → Direct connection**.
-3. Enter the Tailscale IP in **Host**.
-4. Enter `6767` in **Port**.
-5. Leave **Use SSL** off and select **Connect**.
+## 4. Password Protection
 
-If the host was already paired through the relay, Padu adds the direct connection to the same host.
+When binding beyond localhost, protect your daemon with password authentication:
 
-## Troubleshooting
+```bash
+padu daemon set-password
+```
 
-- **SSH authentication failed:** Run `ssh user@host` in a terminal and fix the key, agent, host key, or `~/.ssh/config` entry there. Padu does not prompt for SSH passwords.
-- **SSH connects but Padu is refused:** Run `padu daemon status` on the remote host. SSH transport does not start the daemon.
-- **Connection timed out:** Check that Tailscale is connected on both devices and that you used the daemon machine's Tailscale IP.
-- **Connection refused:** Run `padu daemon status` and confirm the daemon is running on the configured IP and port.
-- **Config change has no effect:** Run `padu reload`. `daemon.listen` is a startup setting, so restart when the command reports it.
+Or set the environment variable:
+
+```bash
+PADU_PASSWORD=your-secret-password padu daemon start
+```
+
+When password authentication is enabled, all HTTP and WebSocket requests must authenticate. See [Configuration](/docs/configuration#password-authentication) for hashing details.
