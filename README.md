@@ -1,30 +1,51 @@
-# Padu
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="website/public/logo-wordmark.svg">
+    <img alt="Padu" src="website/public/logo-wordmark.svg" width="240">
+  </picture>
+</p>
+
+<p align="center">
+  <em>One native app for all your coding agents.</em>
+</p>
+
+<p align="center">
+  <a href="https://github.com/wisnuwiry/padu/stargazers"><img src="https://img.shields.io/github/stars/wisnuwiry/padu?style=flat&label=Stars&labelColor=1e1e1e&color=ffd43b" alt="Stars"></a>&nbsp;
+  <a href="https://github.com/wisnuwiry/padu/blob/main/LICENSE"><img src="https://img.shields.io/github/license/wisnuwiry/padu?style=flat&label=License&labelColor=1e1e1e&color=6bcb9e" alt="License"></a>&nbsp;
+  <a href="https://github.com/wisnuwiry/padu/releases/latest"><img src="https://img.shields.io/github/v/release/wisnuwiry/padu?style=flat&label=Release&labelColor=1e1e1e&color=58a6ff" alt="Release"></a>&nbsp;
+  <a href="https://rustc-hash.vercel.app/"><img src="https://img.shields.io/badge/Rust-1.83+-de4d3a?style=flat&labelColor=1e1e1e&logo=rust&logoColor=fff" alt="Rust"></a>
+</p>
+
+<p align="center">
+  <a href="#overview">Overview</a>&nbsp;·
+  <a href="#supported-agents">Agents</a>&nbsp;·
+  <a href="#highlights">Highlights</a>&nbsp;·
+  <a href="#architecture">Architecture</a>&nbsp;·
+  <a href="#development">Development</a>&nbsp;·
+  <a href="#license">License</a>
+</p>
+
+---
 
 > **Notice**: Padu is a fork of [Waku](https://github.com/egoist/waku), originally created by [egoist](https://github.com/egoist), licensed under GPL-3.0. See [NOTICE.md](NOTICE.md) for full attribution and details.
 
-Padu is a fast, native desktop app for working with local coding agents. It is
-built in Rust with [GPUI](https://github.com/zed-industries/zed/tree/main/crates/gpui)
-and keeps projects, sessions, transcripts on your machine.
+## Overview
+
+Padu is a fast, native desktop app for working with local coding agents. Built
+in Rust with [GPUI](https://github.com/zed-industries/zed/tree/main/crates/gpui),
+it keeps projects, sessions, and transcripts entirely on your machine.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="website/public/app-screenshot-dark.png">
+  <img alt="Padu app preview" src="website/public/app-screenshot-light.png" width="100%">
+</picture>
 
 ## Install
 
-On macOS, [download the signed `.dmg`](https://padu.dev). It updates itself.
-
-On Linux:
-
-```sh
-curl -fsSL https://padu.dev/install.sh | sh
-```
-
-The script installs into `~/.local` without root. See
-[docs/linux.md](docs/linux.md) for requirements, manual installation, and
-uninstalling.
-
-On Windows, run `Padu-<version>-<arch>-Setup.exe` from the
-[latest release](https://github.com/wisnuwiry/padu/releases/latest). It installs
-per-user and updates itself. A portable `.zip` is published alongside it. See
-[docs/windows.md](docs/windows.md) for requirements and what is not available
-there yet.
+> **Coming soon** — Padu is not yet ready for general use. Pre-built binaries
+> will be available at [padu.dev](https://padu.dev) once the first stable
+> release ships. In the meantime, see [Development](#development) to build from
+> source.
 
 ## Supported agents
 
@@ -46,11 +67,14 @@ structured protocol and session continuity.
 
 ## Highlights
 
-- Keep projects and independent agent sessions in one native app.
-- Switch models, reasoning effort, and access modes from a shared interface.
-- Queue or steer follow-up messages while an agent is working.
-- Rewind Git-backed tasks with conversation-aware checkpoints.
-- Store app state locally, with no Padu account or remote service required.
+- **Unified workspace** — Keep projects and independent agent sessions in one
+  native app.
+- **Shared controls** — Switch models, reasoning effort, and access modes from
+  a single interface.
+- **Queue & steer** — Send follow-up messages while an agent is still working.
+- **Rewind** — Git-backed task history with conversation-aware checkpoints.
+- **Local-first** — Everything stays on your machine. No Padu account or remote
+  service required.
 
 ## Architecture
 
@@ -115,7 +139,8 @@ Release maintainers should also read [RELEASING.md](RELEASING.md).
 
 ## Sponsorship
 
-You can support the project development via [GitHub Sponsors](https://github.com/sponsors/wisnuwiry).
+You can support the project development via
+[GitHub Sponsors](https://github.com/sponsors/wisnuwiry).
 
 ## License
 
