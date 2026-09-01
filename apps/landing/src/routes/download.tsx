@@ -91,12 +91,6 @@ function Download() {
             </PillGroup>
           </PlatformRow>
 
-          {!onBeta && (
-            <PlatformRow icon={TerminalIcon} label="Homebrew">
-              <CodeBlock size="sm">brew install --cask padu</CodeBlock>
-            </PlatformRow>
-          )}
-
           <PlatformRow icon={WindowsIcon} label="Windows">
             <PillGroup>
               <DownloadPill
@@ -135,14 +129,6 @@ function Download() {
               {onBeta
                 ? "npm install -g @padu/cli@beta && padu"
                 : "npm install -g @padu/cli && padu"}
-            </CodeBlock>
-          </PlatformRow>
-
-          <PlatformRow icon={TerminalIcon} label="Nix">
-            <CodeBlock size="sm">
-              {onBeta
-                ? `nix run github:wisnuwiry/padu/v${version}`
-                : "nix run github:wisnuwiry/padu"}
             </CodeBlock>
           </PlatformRow>
         </div>
