@@ -1,12 +1,3 @@
-# Pull Request Description Template
-
-Use this structure for every Padu Pull Request. Delete sections that don't
-apply, but don't remove the checks — marking them ❌ with a reason is better
-than omitting them silently.
-
----
-
-```markdown
 ## Summary
 
 <!-- One paragraph: what problem does this solve and what approach was chosen. -->
@@ -16,13 +7,13 @@ than omitting them silently.
 <!-- Bulleted list of what was done, grouped by area. -->
 
 ### Native Desktop (`src/`)
-- ...
+- 
 
 ### Web Client (`apps/web/`)
-- ...
+- 
 
 ### Protocol / Shared (`crates/`, `packages/`)
-- ...
+- 
 
 ## Checks
 
@@ -30,13 +21,13 @@ than omitting them silently.
 
 | Check | Status |
 | :--- | :--- |
-| `cargo fmt ... --check` | ✅ |
-| `cargo check` | ✅ |
-| `cargo test` | ✅ |
-| `bun run protocol:check` | ✅ |
-| `@padu/client check & test` | ✅ |
-| `@padu/web typecheck & test` | ✅ / ➖ no web changes |
-| Manual validation in debug app | ✅ |
+| `cargo fmt ... --check` |  |
+| `cargo check` |  |
+| `cargo test` |  |
+| `bun run protocol:check` |  |
+| `@padu/client check & test` |  |
+| `@padu/web typecheck & test` |  |
+| Manual validation in debug app |  |
 
 ## Performance
 
@@ -70,9 +61,8 @@ than omitting them silently.
 
 ## Limitations & Follow-ups
 
-- ...
+- 
 
 ## Related Issues
 
-Closes #<issue_number>
-```
+Closes #
