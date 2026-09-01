@@ -1766,7 +1766,9 @@ impl Padu {
                     let title = crate::i18n::translate(title_key).to_lowercase();
                     let desc = crate::i18n::translate(desc_key).to_lowercase();
                     let shortcut_lower = shortcut.to_lowercase();
-                    title.contains(&query) || desc.contains(&query) || shortcut_lower.contains(&query)
+                    title.contains(&query)
+                        || desc.contains(&query)
+                        || shortcut_lower.contains(&query)
                 })
                 .collect();
 
@@ -1785,7 +1787,8 @@ impl Padu {
 
             for (index, (title_key, desc_key, shortcut)) in matching_shortcuts.iter().enumerate() {
                 if index > 0 {
-                    section_card = section_card.child(div().mx(px(20.0)).h(px(1.0)).bg(theme.border));
+                    section_card =
+                        section_card.child(div().mx(px(20.0)).h(px(1.0)).bg(theme.border));
                 }
 
                 let row = div()

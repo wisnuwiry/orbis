@@ -2,10 +2,10 @@ use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use ts_rs::{Config, TS};
 use padu_protocol::{
     ClientMessage, DaemonReady, MAX_WIRE_MESSAGE_BYTES, PROTOCOL_VERSION, ServerMessage,
 };
+use ts_rs::{Config, TS};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let output = generated_output();

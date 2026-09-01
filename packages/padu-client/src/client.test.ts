@@ -22,8 +22,13 @@ class FakeSocket implements WebSocketLike {
     this.sent.push(data);
   }
 
-  close(): void {
+  close(code = 1000, reason = ""): void {
     this.readyState = 3;
+    this.emit("close", { code, reason });
+  }
+
+  error(): void {
+    this.emit("error");
   }
 
   open(): void {
@@ -66,6 +71,25 @@ async function connect(client: PaduClient, sockets: FakeSocket[]): Promise<FakeS
 }
 
 describe("PaduClient", () => {
+  test("reports connection state changes, including remote closure", async () => {
+    const { client, sockets } = fixture();
+    const states: string[] = [];
+    client.subscribeConnectionState((state) => states.push(state));
+    expect(states).toEqual(["disconnected"]);
+
+    const connected = client.connect();
+    expect(states).toEqual(["disconnected", "connecting"]);
+    const socket = sockets[0]!;
+    socket.open();
+    socket.receive({ type: "hello", protocolVersion: PROTOCOL_VERSION, daemonVersion: "test" });
+    await connected;
+    expect(states).toEqual(["disconnected", "connecting", "connected"]);
+
+    socket.close(1000, "clean shutdown");
+    expect(states).toEqual(["disconnected", "connecting", "connected", "disconnected"]);
+    expect(client.connected).toBe(false);
+  });
+
   test("authenticates and correlates typed responses", async () => {
     const { client, sockets } = fixture();
     const connected = client.connect();
@@ -154,6 +178,17 @@ describe("PaduClient", () => {
     second.open();
     second.receive({ type: "hello", protocolVersion: PROTOCOL_VERSION, daemonVersion: "test" });
     await expect(secondConnection).resolves.toBeUndefined();
+  });
+
+  test("surfaces the native socket failure reason", async () => {
+    const { client, sockets } = fixture();
+    const connected = client.connect();
+    const socket = sockets[0]!;
+    socket.error();
+    socket.close(1006, "The operation couldn’t be completed. Connection refused");
+    await expect(connected).rejects.toThrow(
+      "The operation couldn’t be completed. Connection refused",
+    );
   });
 
   test("accepts sequence one again when the daemon epoch changes", async () => {

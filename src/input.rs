@@ -74,11 +74,7 @@ pub fn init(cx: &mut App) {
         KeyBinding::new("shift-end", SelectToEnd, Some("TextInput")),
         KeyBinding::new("alt-left", MoveToPreviousWord, Some("TextInput")),
         KeyBinding::new("alt-right", MoveToNextWord, Some("TextInput")),
-        KeyBinding::new(
-            "alt-shift-left",
-            SelectToPreviousWord,
-            Some("TextInput"),
-        ),
+        KeyBinding::new("alt-shift-left", SelectToPreviousWord, Some("TextInput")),
         KeyBinding::new("alt-shift-right", SelectToNextWord, Some("TextInput")),
         KeyBinding::new("secondary-a", SelectAll, Some("TextInput")),
         KeyBinding::new("secondary-v", Paste, Some("TextInput")),
@@ -125,19 +121,11 @@ pub fn init(cx: &mut App) {
     // The word-motion chords Windows and the Linux desktops share.
     #[cfg(not(target_os = "macos"))]
     cx.bind_keys([
-        KeyBinding::new(
-            "ctrl-backspace",
-            DeleteToPreviousWord,
-            Some("TextInput"),
-        ),
+        KeyBinding::new("ctrl-backspace", DeleteToPreviousWord, Some("TextInput")),
         KeyBinding::new("ctrl-delete", DeleteToNextWord, Some("TextInput")),
         KeyBinding::new("ctrl-left", MoveToPreviousWord, Some("TextInput")),
         KeyBinding::new("ctrl-right", MoveToNextWord, Some("TextInput")),
-        KeyBinding::new(
-            "ctrl-shift-left",
-            SelectToPreviousWord,
-            Some("TextInput"),
-        ),
+        KeyBinding::new("ctrl-shift-left", SelectToPreviousWord, Some("TextInput")),
         KeyBinding::new("ctrl-shift-right", SelectToNextWord, Some("TextInput")),
     ]);
 }
@@ -2618,7 +2606,8 @@ impl ComposerInput {
     }
 
     pub fn set_content(&mut self, content: impl Into<SharedString>, cx: &mut Context<Self>) {
-        self.input.update(cx, |input, cx| input.set_content(content, cx));
+        self.input
+            .update(cx, |input, cx| input.set_content(content, cx));
     }
 
     pub fn set_placeholder(

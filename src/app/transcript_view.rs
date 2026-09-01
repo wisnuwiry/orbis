@@ -1292,12 +1292,12 @@ impl Padu {
                         .collect();
                     let attachments_can_reveal = !self.daemon.is_remote();
                     let menu = self.menu_handle(format!("message-{}", message.id), cx);
-                    let metrics = self.scaled_markdown_metrics(if message.role == MessageRole::User
-                    {
-                        MarkdownMetrics::USER_MESSAGE
-                    } else {
-                        MarkdownMetrics::BODY
-                    });
+                    let metrics =
+                        self.scaled_markdown_metrics(if message.role == MessageRole::User {
+                            MarkdownMetrics::USER_MESSAGE
+                        } else {
+                            MarkdownMetrics::BODY
+                        });
                     let animate_streaming = message.streaming && !cx.reduce_motion();
                     let mut ctx = self.markdown_ctx(
                         format!("message-{}", message.id),
@@ -2429,18 +2429,15 @@ impl Padu {
                                     )),
                             );
                         } else {
-                            section_view = section_view.child(
-                                div()
-                                    .w_full()
-                                    .min_w_0()
-                                    .child(md::render::plain_text(
-                                        content.clone(),
-                                        md::render::MONO_FAMILY,
-                                        FontWeight::NORMAL,
-                                        theme.text_secondary,
-                                        &ctx,
-                                    )),
-                            );
+                            section_view = section_view.child(div().w_full().min_w_0().child(
+                                md::render::plain_text(
+                                    content.clone(),
+                                    md::render::MONO_FAMILY,
+                                    FontWeight::NORMAL,
+                                    theme.text_secondary,
+                                    &ctx,
+                                ),
+                            ));
                         }
                     }
                     detail_card = detail_card.child(section_view);

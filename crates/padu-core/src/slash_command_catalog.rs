@@ -12,9 +12,9 @@ use std::sync::mpsc::{self, Receiver};
 use std::thread;
 use std::time::{Duration, Instant};
 
-use serde_json::{Value, json};
 use padu_protocol::composer::{CommandScope, SlashCommand};
 use padu_protocol::model::ProviderKind;
+use serde_json::{Value, json};
 
 const CLI_PROBE_TIMEOUT: Duration = Duration::from_secs(10);
 const MAX_CAPTURE_BYTES: usize = 4 * 1024 * 1024;

@@ -311,12 +311,11 @@ impl Padu {
                 .flex()
                 .items_start()
                 .gap(px(13.0))
-                .child(
-                    div()
-                        .pt(px(2.0))
-                        .flex_none()
-                        .child(icon(item_icon, 15.0, theme.text_secondary)),
-                )
+                .child(div().pt(px(2.0)).flex_none().child(icon(
+                    item_icon,
+                    15.0,
+                    theme.text_secondary,
+                )))
                 .child(
                     div()
                         .flex()

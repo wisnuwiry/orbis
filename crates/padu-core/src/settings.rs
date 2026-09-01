@@ -4,9 +4,9 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
+pub use padu_protocol::settings::DaemonSettings;
 use parking_lot::Mutex;
 use uuid::Uuid;
-pub use padu_protocol::settings::DaemonSettings;
 
 pub struct DaemonSettingsStore {
     path: PathBuf,
@@ -106,9 +106,9 @@ fn to_io_error(error: impl std::error::Error + Send + Sync + 'static) -> io::Err
 #[cfg(test)]
 mod tests {
     use super::*;
+    use padu_protocol::model::ProviderKind;
     use serde_json::Value;
     use uuid::Uuid;
-    use padu_protocol::model::ProviderKind;
 
     #[test]
     fn legacy_combined_settings_keep_only_daemon_fields() {

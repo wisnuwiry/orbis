@@ -873,7 +873,11 @@ pub struct ThreadGoal {
 /// come back asynchronously as [`DriverEvent::GoalUpdated`]; failures surface
 /// through [`DriverEvent::Error`].
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize, TS)]
-#[serde(tag = "kind", rename_all = "camelCase", rename_all_fields = "camelCase")]
+#[serde(
+    tag = "kind",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
 pub enum GoalOperation {
     /// Re-read the provider's current goal without changing it.
     Refresh,

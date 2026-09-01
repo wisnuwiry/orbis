@@ -2594,11 +2594,7 @@ mod tests {
     #[test]
     fn goal_set_responses_become_goal_updates() {
         let harness = GoalHarness::new();
-        harness
-            .goals
-            .lock()
-            .pending
-            .insert(42, PendingGoalRpc::Set);
+        harness.goals.lock().pending.insert(42, PendingGoalRpc::Set);
         harness.handle(json!({"id": 42, "result": {"goal": goal_json()}}));
 
         let Ok(DriverEvent::GoalUpdated(Some(goal))) = harness.received.try_recv() else {

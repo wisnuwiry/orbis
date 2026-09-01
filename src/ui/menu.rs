@@ -29,9 +29,9 @@ use std::rc::Rc;
 use gpui::{
     AnyElement, App, Bounds, Display, Element, ElementId, FocusHandle, FontWeight, GlobalElementId,
     InspectorElementId, InteractiveElement, IntoElement, KeyDownEvent, LayoutId, MouseButton,
-    MouseDownEvent, ParentElement, Pixels, Point, Position, RenderOnce, SharedString, Size, Style,
-    StatefulInteractiveElement, Styled, Window, actions, anchored, canvas, deferred, div, img,
-    prelude::FluentBuilder, px,
+    MouseDownEvent, ParentElement, Pixels, Point, Position, RenderOnce, SharedString, Size,
+    StatefulInteractiveElement, Style, Styled, Window, actions, anchored, canvas, deferred, div,
+    img, prelude::FluentBuilder, px,
 };
 
 actions!(
@@ -1715,11 +1715,9 @@ mod tests {
 
     #[test]
     fn submenus_are_focusable() {
-        let items = vec![MenuItem::submenu_with_value(
-            "Grouping",
-            "Updated",
-            |_| Vec::new(),
-        )];
+        let items = vec![MenuItem::submenu_with_value("Grouping", "Updated", |_| {
+            Vec::new()
+        })];
         assert_eq!(*focusable_indexes(&items), vec![0]);
     }
 

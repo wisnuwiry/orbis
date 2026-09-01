@@ -212,8 +212,11 @@ impl Palette {
             code_wash: theme.code_wash,
             selection: theme.selection,
             search_match: search_yellow.opacity(if theme.is_dark { 0.18 } else { 0.20 }),
-            active_search_match: active_search_orange
-                .opacity(if theme.is_dark { 0.78 } else { 0.70 }),
+            active_search_match: active_search_orange.opacity(if theme.is_dark {
+                0.78
+            } else {
+                0.70
+            }),
             accent: theme.accent,
             added: theme.success,
             removed: theme.danger,

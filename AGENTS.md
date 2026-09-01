@@ -114,3 +114,18 @@
 - Validate visible changes in the freshly rebuilt, signed app managed by the
   dev watcher against the exact provider interaction; a successful Rust build
   alone is insufficient.
+
+## Pre-PR code review process
+
+- Before submitting or preparing a Pull Request, conduct a mandatory pre-PR code
+  review using `.agents/skills/pre-pr-review/SKILL.md` (or invoke the
+  `pre-pr-reviewer` subagent).
+- Execute the automated checks script (`.agents/skills/pre-pr-review/scripts/run-checks.sh`
+  or run `cargo fmt`, `cargo check`, `cargo test`, `bun run protocol:check`,
+  and client/web checks).
+- Audit all diffs against base branch for UI thread safety (no blocking I/O in
+  `render`), client parity between `src/` and `apps/web/`, keyboard accessibility,
+  and error handling.
+- Prepare a structured review report and PR description following
+  `CONTRIBUTING.md` standards.
+

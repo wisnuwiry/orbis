@@ -35,10 +35,7 @@ impl Padu {
             Query::Ready(result) => match result.as_ref() {
                 Ok(Some(snapshot)) => {
                     let snapshot = snapshot.clone();
-                    self.cache_sidebar_branch_label(
-                        &workspace_path,
-                        snapshot.display_branch(),
-                    );
+                    self.cache_sidebar_branch_label(&workspace_path, snapshot.display_branch());
                     self.visible_branch_snapshot = Some((workspace_path, snapshot.clone()));
                     Some(snapshot)
                 }
@@ -87,10 +84,8 @@ impl Padu {
                             return;
                         }
                         match &result {
-                            Ok(Some(snapshot)) => padu.cache_sidebar_branch_label(
-                                &fetch_path,
-                                snapshot.display_branch(),
-                            ),
+                            Ok(Some(snapshot)) => padu
+                                .cache_sidebar_branch_label(&fetch_path, snapshot.display_branch()),
                             Ok(None) => padu.cache_sidebar_branch_label(&fetch_path, None),
                             Err(_) => {}
                         }
