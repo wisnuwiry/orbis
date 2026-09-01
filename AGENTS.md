@@ -129,3 +129,24 @@
 - Prepare a structured review report and PR description following
   `CONTRIBUTING.md` standards.
 
+## Workspace skills & workflows
+
+Use the specialized skills in `.agents/skills/` for core tasks:
+- **`protocol-parity-sync`** (`.agents/skills/protocol-parity-sync/SKILL.md`):
+  Sync wire protocol types, codegen, `@padu/client` reducers, and UI parity.
+- **`gpui-perf-audit`** (`.agents/skills/gpui-perf-audit/SKILL.md`):
+  Audit and profile streaming cadence, pane caching, and zero UI thread blocking.
+- **`provider-driver-dev`** (`.agents/skills/provider-driver-dev/SKILL.md`):
+  Implement and test AI agent provider drivers in `crates/padu-core/src/driver/`.
+- **`multiplatform-release`** (`.agents/skills/multiplatform-release/SKILL.md`):
+  Package and test macOS, Linux, and Windows release bundles and appcasts.
+
+## Commit guidelines
+
+- Organize changes into **multiple granular, logical commits** structured by
+  context (e.g. protocol changes, reducers, desktop UI, web UI, documentation)
+  rather than squashing everything into a single monolithic commit.
+- Use Conventional Commit prefixes: `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `perf:`.
+- Ensure each commit represents a coherent, buildable increment.
+
+
