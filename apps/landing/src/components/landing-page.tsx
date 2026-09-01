@@ -70,13 +70,7 @@ interface LandingPageProps {
 export function LandingPage({ title, subtitle }: LandingPageProps) {
   return (
     <CursorFieldProvider>
-      {/* Background ambient lighting */}
-      <div className="relative overflow-hidden bg-background">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] sm:w-[1000px] h-[550px] bg-gradient-to-b from-purple-500/12 via-sky-500/5 to-transparent blur-3xl opacity-70 rounded-full"
-        />
-
+      <div className="relative bg-background">
         {/* Hero header & content */}
         <div className="relative px-6 pt-4 pb-10 md:px-32 md:pt-6 md:pb-12 max-w-7xl mx-auto">
           <Nav />
@@ -131,13 +125,12 @@ function Hero({ title, subtitle }: { title: React.ReactNode; subtitle: React.Rea
         initial={FADE_IN_UP_TINY}
         animate={FADE_IN}
         transition={DURATION_05}
-        className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 text-xs font-medium text-white/80 backdrop-blur-xl shadow-sm"
+        className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-1 text-xs font-mono text-zinc-400"
       >
-        <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-        Built with Rust & GPUI · 100% Local-First
+        Rust &amp; GPUI · Local-First
       </motion.div>
 
-      <h1 className="text-4xl sm:text-6xl md:text-7xl font-semibold tracking-[-0.03em] leading-[1.06] text-white">
+      <h1 className="text-4xl sm:text-6xl md:text-7xl font-semibold tracking-tight leading-[1.05] text-white">
         {title}
       </h1>
       <p className="text-base sm:text-lg md:text-xl leading-relaxed text-zinc-400 max-w-2xl mx-auto font-normal">
@@ -410,7 +403,7 @@ function DownloadButton() {
       href={primary.href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-2 rounded-full bg-white text-black px-6 py-2.5 text-sm font-semibold hover:bg-white/90 active:scale-95 transition-all shadow-[0_0_24px_rgba(255,255,255,0.2)]"
+      className="inline-flex items-center gap-2 rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background hover:bg-foreground/90 active:scale-[0.98] transition-all"
     >
       <PrimaryIcon className="h-4 w-4" />
       Download for {primary.label}
@@ -419,7 +412,7 @@ function DownloadButton() {
 }
 
 const SERVER_INSTALL_TRIGGER = (
-  <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-medium text-white hover:bg-white/[0.08] active:scale-95 transition-all backdrop-blur-md">
+  <span className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm font-medium text-white hover:bg-white/[0.08] active:scale-[0.98] transition-all">
     <TerminalIcon className="h-4 w-4 text-white/70" />
     Remote CLI
   </span>
