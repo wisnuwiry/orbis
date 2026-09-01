@@ -1,28 +1,34 @@
 ---
 title: Providers
-description: How Padu thinks about coding agents, wrapping existing CLIs, native vs ACP support, and where to go next.
+description: How Padu orchestrates external coding agent CLIs via native direct drivers and the Agent Client Protocol (ACP).
 nav: Providers
 order: 20
 category: Providers
 ---
 
-# Providers
+# Providers overview
 
-Padu doesn't ship its own coding agent. It launches and supervises **existing CLIs you've already installed and authenticated**, Claude Code, Codex, OpenCode, Cursor, Gemini, and the rest. Your subscriptions, your config, your skills, your MCP servers all stay intact. Padu just gives you a UI, a CLI, a relay, and orchestration on top.
+Padu is a native control plane and workspace for AI coding agents. It launches and supervises **locally installed coding agent CLIs** (Claude Code, OpenAI Codex, OpenCode, Pi Agent, Cursor CLI, and more).
 
-## Mental model
+Your API keys, subscriptions, configuration files, and MCP servers remain directly in your control on your machine. Padu provides the native GPUI workspace, split-diff inspection, multi-agent orchestration, and worktree isolation on top.
 
-A provider is the contract between Padu and one external agent CLI: how to launch it, how to stream its output, how to send input back, what modes it supports. The actual binary lives on your machine and runs as a normal subprocess.
+## Mental Model
 
-## Two tiers
+A **provider** defines the communication contract between Padu and an external agent CLI:
+- How to spawn and supervise the CLI subprocess.
+- How to parse streaming output, reasoning tokens, and tool execution events.
+- How to deliver user steering messages and approval responses.
+- Which models, thinking levels, and operational modes are supported.
 
-- **Native support**, Padu ships a bundled adapter for the major agents (Claude Code, Codex, OpenCode, pi). Auto-discovered when the underlying CLI is installed, with mode metadata and voice support where applicable.
-- **ACP catalog**, any agent speaking the [Agent Client Protocol](https://agentclientprotocol.com) is supported through a generic adapter. Padu ships a curated catalog of one-click installs (Cursor, Gemini, GitHub Copilot, Hermes, Kimi, Qwen Code, and 25+ more), and you can add any other ACP agent yourself.
+## Integration Tiers
 
-Either way, **you install the underlying CLI**. Padu runs it.
+1. **Native Direct Drivers:** Built-in optimized drivers in `crates/padu-core` for top agents (Claude Code, Codex, OpenCode, Pi Agent, Amp, DeepSeek, Cursor CLI, Fx, Grok Build, Kimi Code).
+2. **Agent Client Protocol (ACP):** Universal support for any agent implementing the open [Agent Client Protocol (ACP)](https://agentclientprotocol.com) over standard I/O streams (`stdio`).
+3. **Daemon Overrides:** Configure binary paths or disable providers via `~/.padu/settings.json` or the Settings UI.
 
-## Where to go next
+## Next Steps
 
-- [Supported providers](/docs/supported-providers), the full list with install links.
-- [Custom providers](/docs/custom-providers), add your own provider, point an existing one at a different endpoint, run multiple profiles, or override the binary in `~/.padu/config.json`.
-- [padu.dev/agents](/agents), per-agent landing page for each supported provider.
+- [Supported providers](/docs/supported-providers) — Explore all natively supported agent CLIs.
+- [Claude Code guide](/docs/claude-code) — Setup and usage for Anthropic's Claude Code CLI.
+- [OpenAI Codex guide](/docs/codex) — Setup and usage for OpenAI's Codex CLI.
+- [Configuration & Settings](/docs/configuration) — Configure daemon settings and binary overrides.

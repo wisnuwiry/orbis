@@ -1,66 +1,88 @@
 import * as React from "react";
 import {
   ArrowRight,
-  Bot,
-  BookOpen,
-  Braces,
-  ExternalLink,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Cpu,
   GitFork,
-  Laptop,
-  Monitor,
-  Puzzle,
+  Globe,
+  RotateCcw,
+  ShieldCheck,
   Smartphone,
-  Terminal,
-  Users,
-  type LucideIcon,
+  Tablet,
 } from "lucide-react";
 import {
   motion,
   AnimatePresence,
-  useInView,
-  useScroll,
-  useTransform,
   type Transition,
+  type Variants,
 } from "framer-motion";
 
-// Shared motion presets — hoisted so every JSX site receives the same object
-// reference and doesn't trigger jsx-no-new-object-as-prop.
-const FADE_IN_UP = { opacity: 0, y: 20 };
-const FADE_IN = { opacity: 1, y: 0 };
-const FADE_IN_UP_TINY = { opacity: 0, y: -10 };
-const FADE_IN_UP_XL = { opacity: 0, y: 30 };
-const FADE_IN_UP_40 = { opacity: 0, y: 40 };
-const FADE_IN_UP_4 = { opacity: 0, y: 4 };
-const FADE_OUT_UP_4 = { opacity: 0, y: 4 };
+// Apple-style quintic easing curves and refined motion parameters
+const APPLE_SMOOTH = [0.19, 1, 0.22, 1] as const;
+const TAB_SPRING: Transition = { type: "spring", stiffness: 420, damping: 32 };
+const SLIDE_TRANSITION: Transition = { duration: 0.4, ease: APPLE_SMOOTH };
 
-const EASE_OUT_06_DELAY_01: Transition = { duration: 0.6, delay: 0.1, ease: "easeOut" };
-const EASE_OUT_08_DELAY_05: Transition = { duration: 0.8, delay: 0.5, ease: "easeOut" };
-const EASE_OUT_05: Transition = { duration: 0.5, ease: "easeOut" };
-const EASE_OUT_015: Transition = { duration: 0.15, ease: "easeOut" };
-const DURATION_05: Transition = { duration: 0.5 };
+const VIEWPORT_CONFIG = { once: true, margin: "-50px" };
 
-const VIEWPORT_60 = { once: true, margin: "-60px" };
-const AGENT_LIST_GRID_STYLE = {
-  gridTemplateColumns: "auto auto auto minmax(0, 1fr)",
+const HERO_CONTAINER_VARIANTS: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.06,
+    },
+  },
 };
 
-// A ~240px-wide phone rotated 15° only foreshortens a couple percent at
-// perspective 1200 — it reads as a flat, skewed card. The side phones already
-// sit on a correctly projecting plane (the frame and its scaled interior share
-// one flattened texture), so the interior just needs the projection to be
-// strong enough to see: a tighter perspective gives the trio a real book-fold.
-const PHONE_PERSPECTIVE_STYLE = { minHeight: 480, perspective: 700 };
+const HERO_ITEM_VARIANTS: Variants = {
+  hidden: { opacity: 0, y: 12, filter: "blur(3px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.75, ease: APPLE_SMOOTH },
+  },
+};
+
+const SECTION_CONTAINER_VARIANTS: Variants = {
+  hidden: { opacity: 0, y: 18, filter: "blur(3px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.7, ease: APPLE_SMOOTH },
+  },
+};
+
+const STAGGER_CONTAINER_VARIANTS: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.05,
+    },
+  },
+};
+
+const CARD_ITEM_VARIANTS: Variants = {
+  hidden: { opacity: 0, y: 14, filter: "blur(2px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.6, ease: APPLE_SMOOTH },
+  },
+};
+
 import { CursorFieldProvider } from "~/components/butterfly";
-import { CommandDialog } from "~/components/command-dialog";
 import { AGENT_PAGES } from "~/data/agent-pages";
 import {
-  appStoreUrl,
-  playStoreUrl,
   getDownloadOptions,
   useDetectedPlatform,
-  AppleIcon,
-  PlayStoreIcon,
-  TerminalIcon,
 } from "~/downloads";
 import { useRelease } from "~/routes/__root";
 import { HeroMockup } from "~/components/hero-mockup";
@@ -71,35 +93,42 @@ import {
   OpenCodeIcon,
   PiIcon,
 } from "~/components/agent-icons";
-import { DiscordIcon, GitHubIcon, SlackIcon } from "~/components/brand-icons";
-import { ClaudeIcon, MobileChat, MobileDiff, MobileSidebar, PhoneFrame } from "~/components/mockup";
+import { ClaudeIcon } from "~/components/mockup";
 import { FAQItem } from "~/components/faq-item";
 import { SiteFooter } from "~/components/site-footer";
 import { SiteHeader } from "~/components/site-header";
 import "~/styles.css";
 
 interface LandingPageProps {
+  eyebrow?: React.ReactNode;
   title: React.ReactNode;
   subtitle: React.ReactNode;
 }
 
-export function LandingPage({ title, subtitle }: LandingPageProps) {
+export function LandingPage({ eyebrow, title, subtitle }: LandingPageProps) {
   return (
     <CursorFieldProvider>
-      {/* Hero section with background image */}
-      <div className="relative bg-cover bg-center bg-no-repeat">
+      <div className="relative bg-background">
+        {/* Hero header & content */}
         <div className="relative px-6 pt-4 pb-10 md:px-32 md:pt-6 md:pb-12 max-w-7xl mx-auto">
           <Nav />
-          <Hero title={title} subtitle={subtitle} />
-          <GetStarted />
+          <motion.div
+            variants={HERO_CONTAINER_VARIANTS}
+            initial="hidden"
+            animate="visible"
+            className="flex flex-col items-center transform-gpu"
+          >
+            <Hero eyebrow={eyebrow} title={title} subtitle={subtitle} />
+            <GetStarted />
+          </motion.div>
         </div>
 
-        {/* Mockup - inside hero so it's above the gradient, positioned to overflow into black section */}
+        {/* Mockup Frame */}
         <motion.div
-          initial={FADE_IN_UP_40}
-          animate={FADE_IN}
-          transition={EASE_OUT_08_DELAY_05}
-          className="relative px-6 md:px-8 pt-4 md:pt-8 pb-8 md:pb-16"
+          initial={{ opacity: 0, y: 24, scale: 0.985, filter: "blur(4px)" }}
+          animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+          transition={{ duration: 0.9, delay: 0.25, ease: APPLE_SMOOTH }}
+          className="relative px-6 md:px-8 pt-4 md:pt-8 pb-12 md:pb-20 transform-gpu"
         >
           <div className="max-w-7xl mx-auto">
             <HeroMockup />
@@ -107,20 +136,14 @@ export function LandingPage({ title, subtitle }: LandingPageProps) {
         </motion.div>
       </div>
 
-      {/* Phone showcase */}
-      <PhoneShowcase />
-
       {/* Content section */}
-      <div className="landing-content bg-background">
-        <main className="p-6 md:p-20 md:pt-40 max-w-5xl mx-auto">
-          <div className="space-y-24">
-            <SocialProofWall />
+      <div className="landing-content bg-background border-t border-white/[0.06]">
+        <main className="p-6 md:p-20 md:pt-32 max-w-5xl mx-auto">
+          <div className="space-y-32">
+            <ArchitectureCarousel />
+            <EcosystemBentoSection />
             <MultiProviderSection />
-            <TurnkeySection />
-            <AutomationSection />
-            <ExtensibleSection />
             <FAQ />
-            <SponsorCTA />
           </div>
         </main>
         <SiteFooter />
@@ -131,758 +154,559 @@ export function LandingPage({ title, subtitle }: LandingPageProps) {
 
 function Nav() {
   return (
-    <nav className="mb-20 md:mb-24">
+    <nav className="mb-10 sm:mb-14 md:mb-20">
       <SiteHeader />
     </nav>
   );
 }
 
-function Hero({ title, subtitle }: { title: React.ReactNode; subtitle: React.ReactNode }) {
+function Hero({
+  eyebrow,
+  title,
+  subtitle,
+}: {
+  eyebrow?: React.ReactNode;
+  title: React.ReactNode;
+  subtitle: React.ReactNode;
+}) {
   return (
-    <div className="space-y-6 text-center">
-      <h1 className="text-4xl md:text-6xl font-medium tracking-tight leading-[0.95]">{title}</h1>
-      <p className="text-base leading-relaxed text-white/70 md:text-lg max-w-lg mx-auto">
+    <div className="space-y-4 text-center max-w-2xl mx-auto">
+      {eyebrow && (
+        <motion.p
+          variants={HERO_ITEM_VARIANTS}
+          className="font-mono text-xs font-medium tracking-wider uppercase text-zinc-400"
+        >
+          {eyebrow}
+        </motion.p>
+      )}
+
+      <motion.h1
+        variants={HERO_ITEM_VARIANTS}
+        className="text-3xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.08] text-white"
+      >
+        {title}
+      </motion.h1>
+      <motion.p
+        variants={HERO_ITEM_VARIANTS}
+        className="text-sm sm:text-base md:text-lg leading-relaxed text-zinc-400 max-w-xl mx-auto font-normal"
+      >
         {subtitle}
-      </p>
+      </motion.p>
     </div>
   );
 }
-
-const CLAUDE_CODE_BADGE_ICON = <ClaudeCodeIcon className="h-6 w-6" />;
-const CODEX_BADGE_ICON = <CodexIcon className="h-6 w-6" />;
-const OPENCODE_BADGE_ICON = <OpenCodeIcon className="h-6 w-6" />;
-const PI_BADGE_ICON = <PiIcon className="h-6 w-6" />;
-const CURSOR_BADGE_ICON = <CursorIcon className="h-6 w-6" />;
 
 const FEATURED_AGENT_COUNT = 5;
 const ADDITIONAL_AGENT_COUNT = AGENT_PAGES.length - FEATURED_AGENT_COUNT;
 
-const SOCIAL_PROOF_TWEETS = [
-  {
-    name: "Alex C.",
-    handle: "@alex_dev",
-    date: "Apr 6, 2026",
-    avatar: "/avatar-placeholder.svg",
-    url: "https://github.com/wisnuwiry/padu",
-    text: "Without a doubt the cleanest coding-agent client right now. Fast, native GPUI rendering, and zero lag even on large diffs.",
-  },
-  {
-    name: "Elena R.",
-    handle: "@elena_builds",
-    date: "Apr 11, 2026",
-    avatar: "/avatar-placeholder.svg",
-    url: "https://github.com/wisnuwiry/padu",
-    text: "Drive Claude Code, OpenAI Codex, and Pi simultaneously on isolated Git worktrees. Changed the way I ship features.",
-  },
-  {
-    name: "Marcus K.",
-    handle: "@marcus_tech",
-    date: "Apr 16, 2026",
-    avatar: "/avatar-placeholder.svg",
-    url: "https://github.com/wisnuwiry/padu",
-    text: "Padu keeps everything local and private on my workstation. Best native developer UI for multi-agent workflows.",
-  },
-  {
-    name: "Sophie T.",
-    handle: "@sophie_codes",
-    date: "May 3, 2026",
-    avatar: "/avatar-placeholder.svg",
-    url: "https://github.com/wisnuwiry/padu",
-    text: "Being able to monitor agent progress and review diffs smoothly without losing context is incredible.",
-  },
-  {
-    name: "David H.",
-    handle: "@david_h_dev",
-    date: "May 11, 2026",
-    avatar: "/avatar-placeholder.svg",
-    url: "https://github.com/wisnuwiry/padu",
-    text: "Seamless switching between Codex, Claude Code, and custom MCP tools. Native performance makes a massive difference.",
-  },
-  {
-    name: "Ryan L.",
-    handle: "@ryan_l",
-    date: "May 29, 2026",
-    avatar: "/avatar-placeholder.svg",
-    url: "https://github.com/wisnuwiry/padu",
-    text: "Cross-platform daemon with end-to-end encrypted sync and local execution. Exactly what developers need.",
-  },
-  {
-    name: "Boris E.",
-    handle: "@boris_e",
-    date: "May 30, 2026",
-    avatar: "/avatar-placeholder.svg",
-    url: "https://github.com/wisnuwiry/padu",
-    text: "Sub-millisecond UI responsiveness and clean split panes. Padu sets a new bar for AI dev tools.",
-  },
-  {
-    name: "Arnold G.",
-    handle: "@arnold_g",
-    date: "May 28, 2026",
-    avatar: "/avatar-placeholder.svg",
-    url: "https://github.com/wisnuwiry/padu",
-    text: "Padu provides a unified timeline for all local agent tools. Beautiful design and zero bloat.",
-  },
-  {
-    name: "Daniel M.",
-    handle: "@daniel_m",
-    date: "Apr 12, 2026",
-    avatar: "/avatar-placeholder.svg",
-    url: "https://github.com/wisnuwiry/padu",
-    text: "Padu is blazing fast. The native desktop experience is on another level compared to web wrappers.",
-  },
-] as const;
-
-const SOCIAL_PROOF_ROWS = [
-  { id: "top", tweets: SOCIAL_PROOF_TWEETS.slice(0, 5), reverse: false },
-  { id: "bottom", tweets: SOCIAL_PROOF_TWEETS.slice(5), reverse: true },
-] as const;
-
-type SocialProofTweet = (typeof SOCIAL_PROOF_TWEETS)[number];
-
-function AgentBadge({ name, icon }: { name: string; icon: React.ReactNode }) {
-  const [hovered, setHovered] = React.useState(false);
-  const handleMouseEnter = React.useCallback(() => setHovered(true), []);
-  const handleMouseLeave = React.useCallback(() => setHovered(false), []);
-
-  return (
-    <span
-      className="relative inline-flex items-center justify-center rounded-full p-1.5 text-white/60"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      {icon}
-      <AnimatePresence>
-        {hovered && (
-          <motion.span
-            initial={FADE_IN_UP_4}
-            animate={FADE_IN}
-            exit={FADE_OUT_UP_4}
-            transition={EASE_OUT_015}
-            className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-white text-black text-xs whitespace-nowrap pointer-events-none"
-          >
-            {name}
-          </motion.span>
-        )}
-      </AnimatePresence>
-    </span>
-  );
-}
-
-function FeatureSection({
+function SectionHeader({
+  eyebrow,
   title,
   description,
-  badge,
-  links,
-  children,
 }: {
+  eyebrow: string;
   title: string;
   description: string;
-  badge?: string;
-  links?: ReadonlyArray<{ href: string; label: string }>;
-  children: React.ReactNode;
 }) {
   return (
-    <motion.section
-      initial={FADE_IN_UP}
-      whileInView={FADE_IN}
-      viewport={VIEWPORT_60}
-      transition={EASE_OUT_05}
-    >
-      <SectionTitle title={title} description={description} badge={badge} links={links} />
-      {children}
-    </motion.section>
-  );
-}
-
-function SectionTitle({
-  title,
-  description,
-  badge,
-  links,
-}: {
-  title: string;
-  description: string;
-  badge?: string;
-  links?: ReadonlyArray<{ href: string; label: string }>;
-}) {
-  return (
-    <div className="mb-12 space-y-2">
-      <div className="flex items-center gap-3">
-        <h2 className="text-3xl font-medium">{title}</h2>
-        {badge && (
-          <span className="rounded-full bg-purple-400/10 px-2 py-1 text-xs text-purple-300 border border-purple-500/20">
-            {badge}
-          </span>
-        )}
-      </div>
-      <p className="text-base text-muted-foreground max-w-lg">{description}</p>
-      {links ? (
-        <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-xs">
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-extra-muted-foreground transition-colors hover:text-muted-foreground"
-            >
-              {link.label}
-              <ExternalLink className="h-3 w-3" />
-            </a>
-          ))}
-        </div>
-      ) : null}
+    <div className="mb-10 space-y-2.5">
+      <p className="font-mono text-xs font-medium tracking-wider uppercase text-zinc-400">
+        {eyebrow}
+      </p>
+      <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">{title}</h2>
+      <p className="text-sm sm:text-base text-zinc-400 max-w-xl leading-relaxed">{description}</p>
     </div>
   );
 }
 
-function SocialProofWall() {
+/* -------------------------------------------------------------------------- */
+/* Clean Gray Placeholder Component                                          */
+/* -------------------------------------------------------------------------- */
+
+function GrayPlaceholder({
+  label,
+  aspect = "aspect-[16/10]",
+}: {
+  label: string;
+  aspect?: string;
+}) {
+  return (
+    <div
+      className={`w-full ${aspect} rounded-xl border border-white/10 bg-white/[0.02] flex flex-col items-center justify-center gap-2.5 p-6 text-center select-none`}
+    >
+      <div className="w-9 h-9 rounded-lg border border-white/[0.08] bg-white/[0.03] flex items-center justify-center text-zinc-500">
+        <svg
+          className="w-4.5 h-4.5 text-zinc-600"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        >
+          <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+          <circle cx="9" cy="9" r="2" />
+          <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+        </svg>
+      </div>
+      <span className="font-mono text-xs text-zinc-500">{label}</span>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Architecture Tab Carousel (Apple Style)                                    */
+/* -------------------------------------------------------------------------- */
+
+const ARCHITECTURE_TABS = [
+  {
+    id: "gpui",
+    name: "GPUI Engine",
+    tag: "gpui / rust",
+    icon: Cpu,
+    title: "GPU-accelerated native rendering",
+    description:
+      "Built on GPUI—the high-performance GPU UI framework developed for Zed. No Electron, no DOM overhead, and direct rendering to Metal, Vulkan, and DirectX at native refresh rates.",
+    points: [
+      "Sub-millisecond turn updates under massive streaming token volume",
+      "Direct Metal/Vulkan draw calls without browser engine reflow",
+      "Virtualized list rendering handling 100k+ line session transcripts",
+    ],
+    docHref: "/docs",
+    docLabel: "Read architecture docs",
+    preview: <GrayPlaceholder label="GPUI Rendering Architecture" />,
+  },
+  {
+    id: "worktrees",
+    name: "Git Worktrees",
+    tag: "git worktree",
+    icon: GitFork,
+    title: "Parallel worktree branch isolation",
+    description:
+      "Spawn concurrent agent sessions in dedicated worktree directories. Agents write code, execute commands, and run tests on independent branches without mutating your active staging or unstaged files.",
+    points: [
+      "Launch multiple agent tasks in parallel on separate branches",
+      "Active working tree stays clean and untouched",
+      "Automated lifecycle cleanup when tasks settle",
+    ],
+    docHref: "/docs/worktrees",
+    docLabel: "Read worktrees docs",
+    preview: <GrayPlaceholder label="Git Worktree Isolation Diagram" />,
+  },
+  {
+    id: "checkpoints",
+    name: "Checkpoints",
+    tag: "checkpoints / time-travel",
+    icon: RotateCcw,
+    title: "Turn-by-turn checkpoint rewind",
+    description:
+      "Padu captures automated Git snapshots before and after every turn. Review structured file diffs in real time, or rewind code, prompts, and conversation state back to any historical point.",
+    points: [
+      "Automated Git commit snapshot on every agent turn",
+      "Unified diff review with side-by-side hunk inspection",
+      "1-click rollback of code and conversation context",
+    ],
+    preview: <GrayPlaceholder label="Turn Checkpoints & Rewind Timeline" />,
+  },
+  {
+    id: "daemon",
+    name: "Local Daemon",
+    tag: "local-first / stdio",
+    icon: ShieldCheck,
+    title: "Supervised local processes & zero cloud intermediary",
+    description:
+      "The lightweight background daemon manages agent CLIs via stdio/PTY and structured RPC. Credentials stay in your local OS keychain, and source code never leaves your computer.",
+    points: [
+      "Loopback RPC communication over local Unix sockets/TCP",
+      "100% local data storage with zero analytics or telemetry",
+      "Run headless on remote devboxes and connect over private network",
+    ],
+    docHref: "/docs/cli",
+    docLabel: "Read CLI docs",
+    preview: <GrayPlaceholder label="Local Daemon Supervision Architecture" />,
+  },
+];
+
+function ArchitectureCarousel() {
+  const [activeTab, setActiveTab] = React.useState(0);
+  const current = ARCHITECTURE_TABS[activeTab];
+
+  const handlePrev = React.useCallback(() => {
+    setActiveTab((i) => (i === 0 ? ARCHITECTURE_TABS.length - 1 : i - 1));
+  }, []);
+
+  const handleNext = React.useCallback(() => {
+    setActiveTab((i) => (i === ARCHITECTURE_TABS.length - 1 ? 0 : i + 1));
+  }, []);
+
   return (
     <motion.section
-      initial={FADE_IN_UP}
-      whileInView={FADE_IN}
-      viewport={VIEWPORT_60}
-      transition={EASE_OUT_05}
+      variants={SECTION_CONTAINER_VARIANTS}
+      initial="hidden"
+      whileInView="visible"
+      viewport={VIEWPORT_CONFIG}
+      className="transform-gpu"
     >
-      <SectionTitle
-        title="Loved by developers"
-        description="See what developers are saying about Padu"
+      <SectionHeader
+        eyebrow="Architecture"
+        title="A native runtime built for developer control."
+        description="Padu runs directly on your hardware. The desktop client renders natively with GPUI, communicating with a lightweight background daemon that supervises your local agent CLIs."
       />
 
-      <div className="social-proof-marquee space-y-4 overflow-hidden">
-        {SOCIAL_PROOF_ROWS.map((row) => (
-          <SocialProofRow key={row.id} tweets={row.tweets} reverse={row.reverse} />
-        ))}
+      {/* Apple-style Tab Bar */}
+      <div className="mb-6 flex flex-wrap items-center gap-1 sm:gap-2 bg-white/[0.03] p-1.5 rounded-2xl border border-white/[0.08] backdrop-blur-xl w-full">
+        {ARCHITECTURE_TABS.map((tab, idx) => {
+          const selected = activeTab === idx;
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(idx)}
+              aria-selected={selected}
+              role="tab"
+              className={`relative flex-1 min-w-[120px] cursor-pointer rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+                selected ? "text-white" : "text-zinc-400 hover:text-white hover:bg-white/[0.02]"
+              }`}
+            >
+              {selected && (
+                <motion.span
+                  layoutId="arch-tab-pill"
+                  transition={TAB_SPRING}
+                  className="absolute inset-0 rounded-xl bg-white/10 border border-white/15 shadow-sm"
+                />
+              )}
+              <Icon className="h-4 w-4 shrink-0 relative z-10" />
+              <span className="relative z-10 truncate">{tab.name}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Active Tab Slide Content Container */}
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-8 md:p-10 relative overflow-hidden min-h-[380px]">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={current.id}
+            initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
+            transition={SLIDE_TRANSITION}
+            className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center transform-gpu"
+          >
+            {/* Left explanation side */}
+            <div className="md:col-span-6 space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-xs text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-md">
+                  {current.tag}
+                </span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-semibold tracking-tight text-white">
+                {current.title}
+              </h3>
+              <p className="text-sm text-zinc-400 leading-relaxed">
+                {current.description}
+              </p>
+
+              <ul className="space-y-2 pt-2 text-xs sm:text-sm text-zinc-300">
+                {current.points.map((point) => (
+                  <li key={point} className="flex items-start gap-2">
+                    <Check className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {current.docHref && (
+                <div className="pt-3">
+                  <a
+                    href={current.docHref}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-zinc-300 hover:text-white transition-colors"
+                  >
+                    {current.docLabel ?? "Read documentation"} <ArrowRight className="h-3.5 w-3.5" />
+                  </a>
+                </div>
+              )}
+            </div>
+
+            {/* Right placeholder preview */}
+            <div className="md:col-span-6 w-full">
+              {current.preview}
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* Carousel controls located underneath the content */}
+      <div className="mt-5 flex items-center justify-between px-2">
+        <div className="flex items-center gap-2">
+          {ARCHITECTURE_TABS.map((tab, idx) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(idx)}
+              aria-label={`Go to ${tab.name}`}
+              className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                activeTab === idx ? "w-8 bg-white" : "w-2 bg-white/20 hover:bg-white/40"
+              }`}
+            />
+          ))}
+        </div>
+
+        <div className="flex items-center gap-3">
+          <span className="font-mono text-xs text-zinc-500">
+            0{activeTab + 1} / 0{ARCHITECTURE_TABS.length}
+          </span>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={handlePrev}
+              aria-label="Previous architecture feature"
+              className="w-8 h-8 rounded-full border border-white/10 bg-white/[0.03] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/20 active:scale-95 transition-all cursor-pointer"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={handleNext}
+              aria-label="Next architecture feature"
+              className="w-8 h-8 rounded-full border border-white/10 bg-white/[0.03] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/20 active:scale-95 transition-all cursor-pointer"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
       </div>
     </motion.section>
   );
 }
 
-function SocialProofRow({
-  tweets,
-  reverse,
-}: {
-  tweets: readonly SocialProofTweet[];
-  reverse: boolean;
-}) {
-  return (
-    <div className="social-proof-row">
-      <div className={`social-proof-track ${reverse ? "social-proof-track-reverse" : ""}`}>
-        <div className="flex shrink-0 gap-4 pr-4">
-          {tweets.map((tweet) => (
-            <SocialProofCard key={tweet.url} tweet={tweet} />
-          ))}
-        </div>
-        <div className="flex shrink-0 gap-4 pr-4" aria-hidden="true">
-          {tweets.map((tweet) => (
-            <SocialProofCard key={`${tweet.url}-clone`} tweet={tweet} inert />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
+/* -------------------------------------------------------------------------- */
+/* Ecosystem Bento Section with Staggered Entrance Animations                */
+/* -------------------------------------------------------------------------- */
 
-function SocialProofCard({ tweet, inert }: { tweet: SocialProofTweet; inert?: boolean }) {
+function EcosystemBentoSection() {
   return (
-    <a
-      href={tweet.url}
-      target="_blank"
-      rel="noreferrer"
-      tabIndex={inert ? -1 : undefined}
-      className="group flex h-[154px] w-[320px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition-colors hover:border-white/20 hover:bg-white/[0.05] md:w-[420px]"
-      aria-label={`Read ${tweet.name}'s original post`}
+    <motion.section
+      variants={SECTION_CONTAINER_VARIANTS}
+      initial="hidden"
+      whileInView="visible"
+      viewport={VIEWPORT_CONFIG}
+      className="transform-gpu"
     >
-      <div>
-        <div className="flex min-w-0 items-center gap-3">
-          <img
-            src={tweet.avatar}
-            alt=""
-            width={28}
-            height={28}
-            loading="lazy"
-            decoding="async"
-            className="h-7 w-7 shrink-0 rounded-full bg-white/10 object-cover"
-          />
-          <p className="truncate text-sm font-medium text-white/60">{tweet.handle}</p>
-        </div>
-        <p className="social-proof-card-text mt-4 text-sm leading-relaxed text-white/72">
-          {tweet.text}
-        </p>
-      </div>
-    </a>
+      <SectionHeader
+        eyebrow="Ecosystem"
+        title="Every device. Every screen."
+        description="Connect seamlessly to your active workspace from your iPad, iPhone, Android, or modern web browser with zero feature loss."
+      />
+
+      <motion.div
+        variants={STAGGER_CONTAINER_VARIANTS}
+        className="grid grid-cols-1 md:grid-cols-3 gap-4"
+      >
+        {/* iPad / Tablet - 2 columns */}
+        <motion.div
+          variants={CARD_ITEM_VARIANTS}
+          whileHover={{ y: -3, transition: { duration: 0.25, ease: APPLE_SMOOTH } }}
+          className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-colors transform-gpu"
+        >
+          <div className="space-y-2.5 mb-5">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-xs text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-md">
+                iPad &amp; Tablets
+              </span>
+              <Tablet className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
+            </div>
+            <h3 className="text-lg font-semibold text-white tracking-tight">
+              Split-screen workspace &amp; diff review
+            </h3>
+            <p className="text-sm text-zinc-400 leading-relaxed max-w-lg">
+              Expansive multi-column view with live transcript streaming, file tree navigation, and
+              touch-optimized side-by-side diff inspection.
+            </p>
+          </div>
+          <GrayPlaceholder label="iPad & Tablet Split-screen Preview" aspect="aspect-[16/9]" />
+        </motion.div>
+
+        {/* iPhone (iOS) - 1 column */}
+        <motion.div
+          variants={CARD_ITEM_VARIANTS}
+          whileHover={{ y: -3, transition: { duration: 0.25, ease: APPLE_SMOOTH } }}
+          className="md:col-span-1 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-colors transform-gpu"
+        >
+          <div className="space-y-2.5 mb-5">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-xs text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-md">
+                iPhone &amp; iOS
+              </span>
+              <Smartphone className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
+            </div>
+            <h3 className="text-lg font-semibold text-white tracking-tight">
+              Prompt steering in your pocket
+            </h3>
+            <p className="text-sm text-zinc-400 leading-relaxed">
+              Steer running agents, queue follow-ups, and review changes on the go.
+            </p>
+          </div>
+          <GrayPlaceholder label="iPhone Companion App Preview" aspect="aspect-[16/10] sm:aspect-[9/12]" />
+        </motion.div>
+
+        {/* Android - 1 column */}
+        <motion.div
+          variants={CARD_ITEM_VARIANTS}
+          whileHover={{ y: -3, transition: { duration: 0.25, ease: APPLE_SMOOTH } }}
+          className="md:col-span-1 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-colors transform-gpu"
+        >
+          <div className="space-y-2.5 mb-5">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-xs text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-md">
+                Android
+              </span>
+              <Smartphone className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
+            </div>
+            <h3 className="text-lg font-semibold text-white tracking-tight">
+              Native companion app
+            </h3>
+            <p className="text-sm text-zinc-400 leading-relaxed">
+              Direct daemon connectivity over local Wi-Fi, VPN, or private tailnets.
+            </p>
+          </div>
+          <GrayPlaceholder label="Android Companion App Preview" aspect="aspect-[16/10] sm:aspect-[9/12]" />
+        </motion.div>
+
+        {/* PWA & Web - 2 columns */}
+        <motion.div
+          variants={CARD_ITEM_VARIANTS}
+          whileHover={{ y: -3, transition: { duration: 0.25, ease: APPLE_SMOOTH } }}
+          className="md:col-span-2 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-colors transform-gpu"
+        >
+          <div className="space-y-2.5 mb-5">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-xs text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-md">
+                Web &amp; PWA
+              </span>
+              <Globe className="h-4 w-4 text-zinc-400" strokeWidth={1.5} />
+            </div>
+            <h3 className="text-lg font-semibold text-white tracking-tight">
+              Progressive Web App at app.padu.dev
+            </h3>
+            <p className="text-sm text-zinc-400 leading-relaxed max-w-lg">
+              Zero install required. Connect to any local or remote daemon from any modern browser
+              with full real-time WebSocket communication.
+            </p>
+          </div>
+          <GrayPlaceholder label="Web App & PWA Interface Preview" aspect="aspect-[16/9]" />
+        </motion.div>
+      </motion.div>
+    </motion.section>
   );
 }
 
 function MultiProviderSection() {
   const providers = [
-    { name: "Claude Code", icon: <ClaudeIcon size={28} /> },
-    { name: "Codex", icon: <CodexIcon className="w-7 h-7" /> },
-    { name: "OpenCode", icon: <OpenCodeIcon className="w-7 h-7" /> },
-    { name: "Pi", icon: <PiIcon className="w-7 h-7" /> },
-    { name: "Cursor", icon: <CursorIcon className="w-7 h-7" /> },
+    { name: "Claude Code", icon: <ClaudeIcon size={24} />, slug: "claude-code" },
+    { name: "OpenAI Codex", icon: <CodexIcon className="w-6 h-6" />, slug: "codex" },
+    { name: "OpenCode", icon: <OpenCodeIcon className="w-6 h-6" />, slug: "opencode" },
+    { name: "Pi Agent", icon: <PiIcon className="w-6 h-6" />, slug: "pi" },
+    { name: "Cursor CLI", icon: <CursorIcon className="w-6 h-6" />, slug: "cursor" },
   ];
 
   return (
-    <FeatureSection
-      title="Works with your tools"
-      description="Bring your subscriptions, skills and configuration"
+    <motion.section
+      variants={SECTION_CONTAINER_VARIANTS}
+      initial="hidden"
+      whileInView="visible"
+      viewport={VIEWPORT_CONFIG}
+      className="transform-gpu"
     >
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {providers.map((p) => (
-          <div
-            key={p.name}
-            className="flex items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-4"
-          >
-            <span className="text-white/80">{p.icon}</span>
-            <span className="font-medium">{p.name}</span>
-          </div>
-        ))}
-        <a
-          href="/agents"
-          className="flex items-center justify-center gap-3 rounded-xl border border-dashed border-white/10 bg-white/[0.01] px-5 py-4 text-white/50 hover:text-white/80 hover:border-white/20 hover:bg-white/[0.03] transition-colors"
-        >
-          <span className="font-medium">+{ADDITIONAL_AGENT_COUNT} more</span>
-        </a>
-      </div>
-    </FeatureSection>
-  );
-}
+      <SectionHeader
+        eyebrow="Integrations"
+        title="Direct drivers for your local agents."
+        description="Padu communicates with your locally installed CLIs via native structured protocols. Switch between agents while preserving workspace state."
+      />
 
-function TurnkeySection() {
-  return (
-    <FeatureSection
-      title="Run it anywhere"
-      description="Use Padu locally, from another machine, or with a team"
-    >
-      <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
-        <div className="flex flex-col gap-6 border-b border-white/10 p-6 sm:flex-row sm:items-center sm:justify-between md:p-8">
-          <div className="flex items-start gap-4">
-            <div className="rounded-xl border border-white/10 bg-white/[0.06] p-3 text-muted-foreground">
-              <Monitor className="h-6 w-6" strokeWidth={1.5} />
-            </div>
-            <div className="space-y-0.5">
-              <h3 className="text-xl font-medium text-white/90">Desktop app</h3>
-              <p className="max-w-lg text-sm leading-relaxed text-white/50">
-                The one click experience, download the app and it just works
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="p-6 md:p-8">
-          <div className="grid gap-4 md:grid-cols-3">
-            <TurnkeyExtensionCard
-              icon={Smartphone}
-              title="Mobile and web"
-              description="Connect to the same workspaces from any client"
-              ctaHref="/download"
-              ctaLabel="Download"
-            />
-            <TurnkeyExtensionCard
-              icon={Laptop}
-              title="Remote machines"
-              description="Run Padu on a home lab, or a cloud machine"
-              ctaHref="/docs#server--cli"
-              ctaLabel="Docs"
-            />
-            <TurnkeyExtensionCard
-              icon={Users}
-              title="Teams and triggers"
-              description="Share access or start work from GitHub, Slack, and Discord"
-              ctaHref="/hub"
-              ctaLabel="Padu Hub"
-              showIntegrationIcons
-            />
-          </div>
-        </div>
-      </div>
-    </FeatureSection>
-  );
-}
-
-function TurnkeyExtensionCard({
-  icon: Icon,
-  title,
-  description,
-  ctaHref,
-  ctaLabel,
-  showIntegrationIcons = false,
-}: {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  ctaHref: string;
-  ctaLabel: string;
-  showIntegrationIcons?: boolean;
-}) {
-  return (
-    <div className="flex min-h-48 flex-col rounded-xl border border-white/10 bg-white/[0.025] p-5">
-      <div className="mb-5 flex items-center gap-3 text-muted-foreground">
-        <Icon className="h-5 w-5" strokeWidth={1.5} />
-        {showIntegrationIcons ? (
-          <>
-            <GitHubIcon className="h-4 w-4" />
-            <SlackIcon className="h-4 w-4" />
-            <DiscordIcon className="h-4 w-4" />
-          </>
-        ) : null}
-      </div>
-      <h3 className="font-medium text-white/85">{title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-white/45">{description}</p>
-      <div className="mt-auto pt-5">
-        <a
-          href={ctaHref}
-          className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-2.5 py-1.5 text-xs text-background transition-colors hover:bg-foreground/90"
-        >
-          {ctaLabel}
-          <ArrowRight className="h-3.5 w-3.5" />
-        </a>
-      </div>
-    </div>
-  );
-}
-
-type AutomationKind = "mcp" | "cli" | "sdk";
-
-const AUTOMATION_OPTIONS: Array<{
-  kind: AutomationKind;
-  label: string;
-  caption: string;
-  icon: LucideIcon;
-}> = [
-  {
-    kind: "mcp",
-    label: "MCP",
-    caption: "From another agent",
-    icon: Bot,
-  },
-  {
-    kind: "cli",
-    label: "CLI",
-    caption: "From the terminal",
-    icon: Terminal,
-  },
-  {
-    kind: "sdk",
-    label: "SDK",
-    caption: "From code",
-    icon: Braces,
-  },
-];
-
-const AUTOMATION_LINKS = [
-  { href: "/docs/mcp", label: "MCP docs" },
-  { href: "/docs/cli", label: "CLI docs" },
-  { href: "/docs/sdk", label: "SDK docs" },
-] as const;
-
-function AutomationSection() {
-  const [activeKind, setActiveKind] = React.useState<AutomationKind>("mcp");
-
-  return (
-    <FeatureSection
-      title="Built for automation"
-      description="Use MCP, the CLI, or the TypeScript SDK to automate Padu"
-      links={AUTOMATION_LINKS}
-    >
-      <div className="grid gap-4 md:grid-cols-[14rem_minmax(0,1fr)]">
-        <div className="grid self-start gap-2" role="tablist">
-          {AUTOMATION_OPTIONS.map((option) => (
-            <AutomationSelector
-              key={option.kind}
-              option={option}
-              active={option.kind === activeKind}
-              onSelect={setActiveKind}
-            />
-          ))}
-        </div>
-        <AutomationDetail kind={activeKind} />
-      </div>
-    </FeatureSection>
-  );
-}
-
-function AutomationSelector({
-  option,
-  active,
-  onSelect,
-}: {
-  option: (typeof AUTOMATION_OPTIONS)[number];
-  active: boolean;
-  onSelect: (kind: AutomationKind) => void;
-}) {
-  const Icon = option.icon;
-  const handleClick = React.useCallback(() => onSelect(option.kind), [onSelect, option.kind]);
-
-  return (
-    <button
-      type="button"
-      role="tab"
-      aria-selected={active}
-      onClick={handleClick}
-      className={`flex items-center gap-3 rounded-xl border p-3 text-left transition-colors md:block md:p-4 ${
-        active
-          ? "border-white/20 bg-white/[0.07]"
-          : "border-white/10 bg-white/[0.025] hover:border-white/15 hover:bg-white/[0.04]"
-      }`}
-    >
-      <div className="flex shrink-0 items-center gap-2 text-muted-foreground md:mb-1">
-        <Icon className="h-3 w-3" strokeWidth={1.5} />
-        <span className="text-[10px]">{option.label}</span>
-      </div>
-      <p className="text-xs leading-snug text-white/85 md:text-sm">{option.caption}</p>
-    </button>
-  );
-}
-
-function AutomationDetail({ kind }: { kind: AutomationKind }) {
-  return (
-    <div
-      role="tabpanel"
-      className="min-h-80 min-w-0 overflow-hidden rounded-xl border border-white/10 bg-black/20 p-5 md:h-[26rem] md:p-6"
-    >
-      {kind === "mcp" ? <McpAutomationTranscript /> : null}
-      {kind === "cli" ? <CliAutomationExample /> : null}
-      {kind === "sdk" ? <SdkAutomationExample /> : null}
-    </div>
-  );
-}
-
-function McpAutomationTranscript() {
-  return (
-    <div className="space-y-5">
-      <div className="ml-auto w-fit max-w-xl rounded-xl rounded-tr-none bg-white/[0.07] px-4 py-3">
-        <p className="text-sm leading-relaxed text-white/75">
-          Take the open GitHub issues labeled ready and fan them out to separate worktree agents.
-        </p>
-      </div>
-      <div className="flex items-start gap-3">
-        <Bot className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" strokeWidth={1.5} />
-        <div className="min-w-0 flex-1 space-y-4">
-          <p className="text-sm leading-relaxed text-white/55">
-            I found two ready issues. I will run each in its own worktree.
-          </p>
-          <div className="space-y-2 font-mono text-[11px]">
-            <McpAgentCall issue="#412" provider="claude/opus-4.6" />
-            <McpAgentCall issue="#417" provider="codex/gpt-5.6-sol" />
-          </div>
-          <p className="text-sm leading-relaxed text-white/55">
-            Done, two agents are running. I will let you know when they finish.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function McpAgentCall({ issue, provider }: { issue: string; provider: string }) {
-  return (
-    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-md border border-white/[0.07] bg-white/[0.025] px-3 py-2">
-      <span className="text-sky-300/80">create_agent</span>
-      <span className="text-white/25">{issue}</span>
-      <span className="text-white/35">{provider}</span>
-      <span className="text-white/25">worktree</span>
-    </div>
-  );
-}
-
-function CliAutomationExample() {
-  return (
-    <div className="font-mono text-[11px] leading-5 text-white/60">
-      <div className="space-y-6">
-        <div>
-          <ShellPrompt>
-            <span className="text-white">padu run</span> <span className="text-white/35">\</span>
-          </ShellPrompt>
-          <div className="pl-5">
-            <span className="text-sky-300/75">--provider</span>{" "}
-            <span className="text-white/75">codex/gpt-5.6-sol</span>{" "}
-            <span className="text-white/35">\</span>
-          </div>
-          <div className="pl-5 text-purple-300/80">{'"Fix issue #412 and add tests."'}</div>
-          <div className="mt-1 text-purple-300/65">✓ Started agent a7f3c2</div>
-        </div>
-
-        <div className="space-y-1">
-          <ShellPrompt>
-            <span className="text-white">padu ls</span>
-          </ShellPrompt>
-          <AgentListOutput />
-        </div>
-
-        <div>
-          <div className="text-white/30"># Target another host</div>
-          <ShellPrompt>
-            <span className="text-white">padu ls</span>{" "}
-            <span className="text-sky-300/75">--host</span>{" "}
-            <span className="text-white/75">devbox:6767</span>
-          </ShellPrompt>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ShellPrompt({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="whitespace-nowrap">
-      <span className="select-none text-white/25">$ </span>
-      {children}
-    </div>
-  );
-}
-
-function AgentListOutput() {
-  return (
-    <div className="grid gap-x-5" style={AGENT_LIST_GRID_STYLE}>
-      <span className="text-white/30">AGENT</span>
-      <span className="text-white/30">STATUS</span>
-      <span className="text-white/30">PROVIDER/MODEL</span>
-      <span className="text-white/30">TITLE</span>
-      <span className="text-white/55">a7f3c2</span>
-      <span className="text-purple-300/70">running</span>
-      <span className="text-white/55">codex/gpt-5.6-sol</span>
-      <span className="text-white/55">Fix issue #412 and add tests.</span>
-    </div>
-  );
-}
-
-function SdkAutomationExample() {
-  return (
-    <pre className="overflow-x-auto font-mono text-[11px] leading-5 text-white/60">
-      <span className="text-purple-300">import</span> {"{"} createPaduClient {"}"}{" "}
-      <span className="text-purple-300">from</span>{" "}
-      <span className="text-purple-300/80">{'"@padu/client"'}</span>;{"\n\n"}
-      <span className="text-purple-300">const</span> client ={" "}
-      <span className="text-sky-300">createPaduClient</span>({"{"}
-      {"\n"} url: <span className="text-purple-300/80">{'"ws://127.0.0.1:6767/ws"'}</span>,{"\n"}
-      {"}"});
-      {"\n"}
-      <span className="text-purple-300">await</span> client.
-      <span className="text-sky-300">connect</span>();
-      {"\n\n"}
-      <span className="text-purple-300">const</span> agent ={" "}
-      <span className="text-purple-300">await</span> client.agents.
-      <span className="text-sky-300">create</span>({"{"}
-      {"\n"} config: {"{"} provider:{" "}
-      <span className="text-purple-300/80">{'"codex/gpt-5.6-sol"'}</span> {"}"},{"\n"} cwd:{" "}
-      <span className="text-purple-300/80">{'"/Users/me/dev/padu"'}</span>,{"\n"} prompt:{" "}
-      <span className="text-purple-300/80">{'"Fix issue #412 and add tests."'}</span>,{"\n"}
-      {"}"});
-      {"\n\n"}
-      <span className="text-purple-300">const</span> result ={" "}
-      <span className="text-purple-300">await</span> agent.
-      <span className="text-sky-300">waitForFinish</span>();
-    </pre>
-  );
-}
-
-function ExtensibleSection() {
-  return (
-    <FeatureSection title="Make it yours" description="Extend Padu to work just the way you want">
-      <div className="grid gap-4 md:grid-cols-2">
-        <ExtensibleCard
-          icon={Puzzle}
-          title="Plugins"
-          description="Plugins can add server-side functionality and modify the client with custom components. They work across all clients, including mobile"
-          href="/docs/plugins"
-          linkLabel="Plugin documentation"
-          linkIcon="book"
-        />
-        <ExtensibleCard
-          icon={GitFork}
-          title="Fork the repo"
-          description="Padu is licensed under Apache 2.0. You can inspect the implementation, fork the project, and adapt it to your workflow or organization"
-          href="https://github.com/wisnuwiry/padu"
-          linkLabel="View the repository"
-          linkIcon="github"
-          external
-        />
-      </div>
-    </FeatureSection>
-  );
-}
-
-function ExtensibleCard({
-  icon: Icon,
-  title,
-  description,
-  href,
-  linkLabel,
-  linkIcon,
-  external = false,
-}: {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  href: string;
-  linkLabel: string;
-  linkIcon?: "book" | "github";
-  external?: boolean;
-}) {
-  return (
-    <div className="flex min-h-64 flex-col rounded-xl border border-white/10 bg-white/[0.025] p-6">
-      <div className="mb-8 text-muted-foreground">
-        <Icon className="h-6 w-6" strokeWidth={1.5} />
-      </div>
-      <h3 className="text-lg font-medium text-white/85">{title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-white/45">{description}</p>
-      <a
-        href={href}
-        {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-        className="mt-auto inline-flex items-center gap-2 pt-6 text-sm text-muted-foreground transition-colors hover:text-foreground"
+      <motion.div
+        variants={STAGGER_CONTAINER_VARIANTS}
+        className="grid grid-cols-2 sm:grid-cols-3 gap-3.5"
       >
-        {linkIcon === "book" ? <BookOpen className="h-4 w-4" /> : null}
-        {linkIcon === "github" ? <GitHubIcon className="h-4 w-4" /> : null}
-        {linkLabel}
-      </a>
-    </div>
+        {providers.map((p) => (
+          <motion.a
+            key={p.name}
+            href={`/${p.slug}`}
+            variants={CARD_ITEM_VARIANTS}
+            whileHover={{ y: -3, transition: { duration: 0.25, ease: APPLE_SMOOTH } }}
+            className="flex items-center gap-3.5 rounded-2xl border border-white/10 bg-white/[0.02] p-4.5 hover:border-white/20 hover:bg-white/[0.04] transition-colors group transform-gpu"
+          >
+            <span className="text-white/80 group-hover:text-white transition-colors">{p.icon}</span>
+            <span className="font-medium text-sm text-white/90 group-hover:text-white transition-colors">
+              {p.name}
+            </span>
+          </motion.a>
+        ))}
+        <motion.a
+          href="/agents"
+          variants={CARD_ITEM_VARIANTS}
+          whileHover={{ y: -3, transition: { duration: 0.25, ease: APPLE_SMOOTH } }}
+          className="flex items-center justify-center gap-2 rounded-2xl border border-dashed border-white/15 bg-white/[0.01] p-4.5 text-zinc-400 hover:text-white hover:border-white/30 hover:bg-white/[0.03] transition-colors transform-gpu"
+        >
+          <span className="font-medium text-sm">+{ADDITIONAL_AGENT_COUNT} more agents</span>
+          <ArrowRight className="h-3.5 w-3.5" />
+        </motion.a>
+      </motion.div>
+    </motion.section>
   );
 }
 
 function GetStarted() {
   return (
-    <div className="pt-10">
+    <motion.div variants={HERO_ITEM_VARIANTS} className="pt-8 w-full">
       <div className="flex flex-row flex-wrap justify-center gap-3">
         <DownloadButton />
-        <a
-          href={appStoreUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center rounded-lg border border-white/12 px-3 py-2 text-white hover:bg-white/10 transition-colors"
-          aria-label="App Store"
-        >
-          <AppleIcon className="h-5 w-5" />
-        </a>
-        <a
-          href={playStoreUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center rounded-lg border border-white/12 px-3 py-2 text-white hover:bg-white/10 transition-colors"
-          aria-label="Google Play"
-        >
-          <PlayStoreIcon className="h-5 w-5" />
-        </a>
-        <ServerInstallButton />
+        <OtherPlatformsButton />
       </div>
-      <div className="flex items-center justify-center gap-2 pt-6">
-        <span className="text-xs text-muted-foreground">Supports</span>
-        <div className="flex items-center gap-1">
-          <AgentBadge name="Claude Code" icon={CLAUDE_CODE_BADGE_ICON} />
-          <AgentBadge name="Codex" icon={CODEX_BADGE_ICON} />
-          <AgentBadge name="OpenCode" icon={OPENCODE_BADGE_ICON} />
-          <AgentBadge name="Pi" icon={PI_BADGE_ICON} />
-          <AgentBadge name="Cursor" icon={CURSOR_BADGE_ICON} />
-        </div>
+      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 pt-6 text-xs text-zinc-400">
+        <span className="font-mono text-zinc-500 text-[11px]">Supports</span>
+        <a
+          href="/claude-code"
+          className="flex items-center gap-1.5 hover:text-white transition-colors"
+        >
+          <ClaudeCodeIcon className="h-4 w-4" />
+          <span>Claude Code</span>
+        </a>
+        <a
+          href="/codex"
+          className="flex items-center gap-1.5 hover:text-white transition-colors"
+        >
+          <CodexIcon className="h-4 w-4" />
+          <span>Codex</span>
+        </a>
+        <a
+          href="/opencode"
+          className="flex items-center gap-1.5 hover:text-white transition-colors"
+        >
+          <OpenCodeIcon className="h-4 w-4" />
+          <span>OpenCode</span>
+        </a>
+        <a
+          href="/pi"
+          className="flex items-center gap-1.5 hover:text-white transition-colors"
+        >
+          <PiIcon className="h-4 w-4" />
+          <span>Pi</span>
+        </a>
+        <a
+          href="/cursor"
+          className="flex items-center gap-1.5 hover:text-white transition-colors"
+        >
+          <CursorIcon className="h-4 w-4" />
+          <span>Cursor</span>
+        </a>
         <a
           href="/agents"
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          className="font-mono text-[11px] text-zinc-500 hover:text-zinc-300 transition-colors"
         >
-          +{ADDITIONAL_AGENT_COUNT} more
+          +{ADDITIONAL_AGENT_COUNT} more →
         </a>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -897,7 +721,7 @@ function DownloadButton() {
       href={primary.href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-2 rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background hover:bg-foreground/90 transition-colors"
+      className="inline-flex items-center gap-2 rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background hover:bg-foreground/90 active:scale-[0.98] transition-all"
     >
       <PrimaryIcon className="h-4 w-4" />
       Download for {primary.label}
@@ -905,265 +729,88 @@ function DownloadButton() {
   );
 }
 
-const SERVER_INSTALL_TRIGGER = (
-  <span className="inline-flex items-center justify-center rounded-lg border border-white/12 px-3 py-2 text-white hover:bg-white/10 transition-colors">
-    <TerminalIcon className="h-5 w-5" />
-  </span>
-);
-
-const SERVER_INSTALL_FOOTNOTE = (
-  <>
-    Requires Node.js 18+. Run <span className="font-mono text-white/40">padu</span> to start the
-    daemon.
-  </>
-);
-
-function ServerInstallButton() {
+function OtherPlatformsButton() {
   return (
-    <CommandDialog
-      trigger={SERVER_INSTALL_TRIGGER}
-      title="Run agents on a remote machine"
-      description="For headless machines you want to connect to from the Padu apps. The desktop app already includes a built-in daemon"
-      command="npm install -g @padu/cli && padu"
-      footnote={SERVER_INSTALL_FOOTNOTE}
-    />
-  );
-}
-
-function PhoneShowcase() {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const textInView = useInView(containerRef, { once: true, margin: "-80px" });
-
-  // Scroll-linked animation: track how far through the container the user has scrolled
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "center center"],
-  });
-
-  // Responsive slide distance
-  const [slideDistance, setSlideDistance] = React.useState(260);
-  React.useEffect(() => {
-    function update() {
-      setSlideDistance(window.innerWidth < 768 ? 140 : 260);
-    }
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
-
-  // Side phones start at x=0 (behind center) and slide out to final position
-  const sideOpacity = useTransform(scrollYProgress, [0.2, 0.6], [0, 1]);
-  const leftX = useTransform(scrollYProgress, [0.2, 0.6], [0, -slideDistance]);
-  const rightX = useTransform(scrollYProgress, [0.2, 0.6], [0, slideDistance]);
-
-  const leftPhoneStyle = React.useMemo(
-    () => ({ opacity: sideOpacity, x: leftX, rotateY: -15, scale: 0.97 }),
-    [sideOpacity, leftX],
-  );
-  const rightPhoneStyle = React.useMemo(
-    () => ({ opacity: sideOpacity, x: rightX, rotateY: 15, scale: 0.97 }),
-    [sideOpacity, rightX],
-  );
-  const centerPhoneAnimate = React.useMemo(() => (textInView ? FADE_IN : {}), [textInView]);
-  const textAnimate = React.useMemo(() => (textInView ? FADE_IN : {}), [textInView]);
-
-  return (
-    <div ref={containerRef} className="flex flex-col items-center pt-4 pb-16 gap-20">
-      {/* Arrow + text */}
-      <motion.div
-        initial={FADE_IN_UP_TINY}
-        animate={textAnimate}
-        transition={DURATION_05}
-        className="flex flex-col items-center gap-1.5 px-6"
-      >
-        <svg
-          width="24"
-          height="24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          viewBox="0 0 24 24"
-          className="text-white/20"
-        >
-          <path d="M12 5v14M5 12l7 7 7-7" />
-        </svg>
-        <p className="text-lg text-white/80 text-center">
-          When you want to step away from your desk,
-          <br className="md:hidden" /> you can.
-        </p>
-        <p className="text-sm text-white/50 text-center">
-          The native mobile app has full feature parity with desktop.
-        </p>
-      </motion.div>
-
-      {/* Phone trio — side phones are absolute, start behind center, slide outward with perspective rotation */}
-      <div
-        className="relative flex items-center justify-center overflow-x-clip w-full"
-        style={PHONE_PERSPECTIVE_STYLE}
-      >
-        {/* Left phone — workspace drawer, rotated to face inward */}
-        <motion.div
-          style={leftPhoneStyle}
-          className="w-[160px] md:w-[240px] absolute"
-          role="img"
-          aria-label="Padu workspace drawer"
-        >
-          <PhoneFrame time="18:54" depth="right">
-            <MobileSidebar />
-          </PhoneFrame>
-        </motion.div>
-
-        {/* Center phone — agent chat */}
-        <motion.div
-          initial={FADE_IN_UP_XL}
-          animate={centerPhoneAnimate}
-          transition={EASE_OUT_06_DELAY_01}
-          className="w-[220px] md:w-[240px] relative z-10"
-          role="img"
-          aria-label="Padu agent chat"
-        >
-          <PhoneFrame time="18:53">
-            <MobileChat />
-          </PhoneFrame>
-        </motion.div>
-
-        {/* Right phone — diff view, rotated to face inward */}
-        <motion.div
-          style={rightPhoneStyle}
-          className="w-[160px] md:w-[240px] absolute"
-          role="img"
-          aria-label="Padu diff view"
-        >
-          <PhoneFrame time="18:55" depth="left">
-            <MobileDiff />
-          </PhoneFrame>
-        </motion.div>
-      </div>
-    </div>
+    <a
+      href="/download"
+      className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-4.5 py-2.5 text-sm font-medium text-white hover:bg-white/[0.08] active:scale-[0.98] transition-all"
+    >
+      Other platforms
+    </a>
   );
 }
 
 function FAQ() {
   return (
-    <motion.div
-      initial={FADE_IN_UP}
-      whileInView={FADE_IN}
-      viewport={VIEWPORT_60}
-      transition={EASE_OUT_05}
-      className="space-y-6"
+    <motion.section
+      variants={SECTION_CONTAINER_VARIANTS}
+      initial="hidden"
+      whileInView="visible"
+      viewport={VIEWPORT_CONFIG}
+      className="space-y-6 transform-gpu"
     >
-      <h2 className="text-3xl font-medium">FAQ</h2>
-      <div className="space-y-6">
-        <FAQItem question="Is this free?">
-          Yes. Padu is free and open source. You need agent providers installed with your own
-          credentials. Voice is local-first by default and can optionally use cloud speech providers
-          if you configure them.
+      <SectionHeader
+        eyebrow="FAQ"
+        title="Frequently asked questions."
+        description="Everything you need to know about Padu's architecture, privacy, and agent support."
+      />
+      <div className="divide-y divide-white/[0.08]">
+        <FAQItem question="What is Padu?">
+          Padu is a high-performance, native desktop and web workspace for orchestrating local AI
+          coding agents. Built in Rust with GPUI (the GPU-accelerated UI engine behind Zed), Padu
+          keeps all your projects, sessions, transcripts, and credentials strictly on your machine.
         </FAQItem>
-        <FAQItem question="Does my code leave my machine?">
-          Padu doesn&apos;t send your code anywhere. Agents run locally and talk to their own APIs
-          as they normally would. For remote access, you can use the optional{" "}
-          <a href="/docs/security" className="underline hover:text-white/80">
-            end-to-end encrypted relay
-          </a>
-          , connect directly over your local network, or use your own tunnel.
+        <FAQItem question="Is Padu free and open source?">
+          Yes. Padu is 100% free and open source, licensed under the GNU General Public License v3.0
+          (GPL-3.0). You bring your own API credentials or subscriptions for the agent providers you
+          choose to run.
         </FAQItem>
-        <FAQItem question="What agents does it support?">
-          Padu supports many providers. It has custom implementations for Claude, Codex, OpenCode,
-          Pi, and OMP, and supports many more via ACP. See the full list here:{" "}
-          <a href="/agents" className="underline hover:text-white/80">
-            all supported providers
-          </a>
-          .
+        <FAQItem question="Does my code or data leave my machine?">
+          No. Padu is strictly local-first. It never transmits your source code, prompts, files, or
+          agent transcripts to external servers, and includes zero telemetry or analytics tracking.
+          Agents communicate directly with their provider APIs using the credentials on your computer.
         </FAQItem>
-        <FAQItem question="How does Padu run providers?">
-          Padu runs the providers installed on your machine as you&apos;d normally run them. Padu
-          doesn&apos;t modify or change their behavior.
-        </FAQItem>
-        <FAQItem question="Do I need the desktop app?">
-          No. You can run the daemon headless and use any client to connect. The desktop app just
-          bundles the daemon with a UI.
-        </FAQItem>
-        <FAQItem question="How does voice work?">
-          Voice runs locally on your device by default. You talk, the app transcribes and sends it
-          to your agent as text. Optionally, you can configure OpenAI speech providers for
-          higher-quality transcription and text-to-speech. See the{" "}
-          <a href="/docs/voice" className="underline hover:text-white/80">
-            voice docs
+        <FAQItem question="What AI coding agents does Padu support?">
+          Padu supports leading coding agents with native direct drivers and ACP (Agent Client
+          Protocol) integrations: Claude Code, OpenAI Codex CLI, OpenCode, Pi Agent, Amp, DeepSeek,
+          Cursor CLI, Fx, Grok Build, Kimi Code, GitHub Copilot, Google Gemini CLI, Cline, Goose, and
+          Mistral Vibe. See the full catalog on the{" "}
+          <a href="/agents" className="underline hover:text-white transition-colors">
+            supported agents page
           </a>
           .
         </FAQItem>
-        <FAQItem question="Can I connect from outside my network?">
-          Yes. You can use the hosted relay (end-to-end encrypted, Padu can&apos;t read your
-          traffic), set up your own tunnel (Tailscale, Cloudflare Tunnel, etc.), or expose the
-          daemon port directly. See{" "}
-          <a href="/docs/configuration" className="underline hover:text-white/80">
-            configuration
+        <FAQItem question="How does Padu integrate with coding agents?">
+          Padu communicates directly with your locally installed agent CLIs via native structured
+          protocols and process lifecycles. It does not intercept tokens or alter agent
+          behavior—it provides a unified native UI for streaming live transcripts, switching models,
+          inspecting unified diffs, and queueing follow-up prompts.
+        </FAQItem>
+        <FAQItem question="How do Git worktrees and checkpoints work?">
+          When launching a task, Padu can run the agent inside an isolated Git worktree so it operates
+          on a separate branch without modifying your active working directory. Padu also tracks
+          turn-by-turn Git checkpoints, enabling 1-click diff reviews and exact state rewinds. Read
+          the{" "}
+          <a href="/docs/worktrees" className="underline hover:text-white transition-colors">
+            worktrees documentation
           </a>
           .
         </FAQItem>
-        <FAQItem question="Do I need git or GitHub?">
-          No. Padu works in any directory. Worktrees are optional and only relevant if you use git.
-          You can run agents anywhere you&apos;d normally work.
+        <FAQItem question="What platforms and operating systems are supported?">
+          Padu provides native desktop releases for <strong>macOS</strong> (Apple Silicon & Intel),{" "}
+          <strong>Linux</strong> (Wayland & X11), and <strong>Windows</strong> (x86_64), alongside
+          a web client and companion mobile apps.
         </FAQItem>
-        <FAQItem question="Can I get banned for using Padu?">
-          Padu is designed to use each provider&apos;s officially supported integration and does
-          not attempt to bypass its terms of service. It doesn&apos;t extract tokens or call
-          inference APIs directly.
+        <FAQItem question="Can I steer or queue prompts while an agent is actively working?">
+          Yes. Padu supports live message queueing and steering, allowing you to append new
+          instructions, additional context, or corrections while an agent is executing a turn.
         </FAQItem>
-        <FAQItem question="How do worktrees work?">
-          When you launch an agent with the worktree option (from the app, desktop, or CLI), Padu
-          creates a git worktree and runs the agent inside it. The agent works on an isolated branch
-          without touching your main working directory. See the{" "}
-          <a href="/docs/worktrees" className="underline hover:text-white/80">
-            worktrees docs
-          </a>
-          .
+        <FAQItem question="Do I need a separate account or cloud service to use Padu?">
+          No. Padu requires no cloud accounts, logins, or remote subscription fees. The desktop app
+          manages its local daemon automatically on loopback, and you can run the daemon headless
+          on remote servers or cloud VMs using the CLI.
         </FAQItem>
       </div>
-    </motion.div>
-  );
-}
-
-function SponsorCTA() {
-  return (
-    <motion.div
-      initial={FADE_IN_UP}
-      whileInView={FADE_IN}
-      viewport={VIEWPORT_60}
-      transition={EASE_OUT_05}
-      className="rounded-xl bg-white/5 border border-white/10 p-8 md:p-10 text-left space-y-4 max-w-xl mx-auto"
-    >
-      <div className="text-sm text-muted-foreground leading-relaxed space-y-3">
-        <p>Padu is an independent open source project for running coding agents.</p>
-        <p>Its guiding principle is optionality and freedom of choice.</p>
-        <p>
-          I wanted to use any provider without being locked into any ecosystem, run it on my own
-          infrastructure, access it from anywhere, and have it be fully automatable.
-        </p>
-        <p>I am hoping that you will enjoy Padu as much as we do.</p>
-        <p>If you like Padu, sponsorship is the best way to support continued development.</p>
-        <p>- Padu Team</p>
-      </div>
-      <div className="pt-2">
-        <a
-          href="/sponsor"
-          className="inline-flex items-center gap-2 rounded-lg bg-white/10 border border-white/20 px-5 py-2.5 text-sm font-medium text-white hover:bg-white/15 transition-colors"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="text-pink-400"
-          >
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-          </svg>
-          Sponsor Padu
-        </a>
-      </div>
-    </motion.div>
+    </motion.section>
   );
 }

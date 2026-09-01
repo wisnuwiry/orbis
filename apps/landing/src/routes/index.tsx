@@ -5,8 +5,8 @@ import { pageMeta } from "~/meta";
 export const Route = createFileRoute("/")({
   head: () =>
     pageMeta(
-      "Padu – Run Claude Code, Codex, Copilot, OpenCode from anywhere",
-      "Self-hosted daemon for Claude Code, Codex, Copilot, OpenCode, and Pi. Agents run on your machine with your full dev environment. Connect from phone, desktop, or web.",
+      "Padu – Native, Local-First Desktop & Web Workspace for AI Coding Agents",
+      "High-performance, local-first GUI for Claude Code, Codex, OpenCode, Pi, Amp, and Cursor. Built in Rust with GPUI. Multi-agent orchestration, Git worktrees, and instant checkpoint rewind.",
       "/",
     ),
   component: Home,
@@ -17,16 +17,16 @@ function Home() {
     <LandingPage
       title={
         <>
-          The control plane
+          The native workspace
           <br />
-          for coding agents
+          for AI coding agents
         </>
       }
       subtitle={
         <>
-          Run any coding agent from anywhere.
-          <br />
-          Self-hosted, multi-provider, open source
+          A GPU-accelerated client for Claude Code, Codex, and local agent CLIs.
+          <br className="hidden sm:inline" />
+          {" "}Built in Rust with GPUI, Git worktree isolation, and zero cloud telemetry.
         </>
       }
     />

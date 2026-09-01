@@ -6,7 +6,7 @@ export const Route = createFileRoute("/privacy")({
   head: () =>
     pageMeta(
       "Privacy Policy - Padu",
-      "What stays on your machines, what the encrypted relay can see, and what Padu Hub stores.",
+      "Padu is 100% local-first and open source. Your code, prompts, credentials, and transcripts never leave your hardware.",
       "/privacy",
     ),
   component: Privacy,
@@ -14,185 +14,120 @@ export const Route = createFileRoute("/privacy")({
 
 function Privacy() {
   return (
-    <LegalPage title="Privacy Policy" lastUpdated="August 29, 2026">
+    <LegalPage title="Privacy Policy" lastUpdated="September 1, 2026">
       <p>
-        Padu is local-first. Installing or using the open-source software does not send us your
-        code, prompts, files, terminal output, or agent conversations. This policy explains the
-        separate data boundaries for local Padu, the optional official relay, the hosted Padu Hub,
-        and padu.dev.
+        Padu is designed from the ground up as a <strong>100% local-first</strong> developer workspace.
+        Installing and running the Padu desktop application, background daemon, web client, or mobile companion
+        does not transmit your source code, prompts, file contents, terminal output, or agent transcripts
+        to our servers. We do not operate data harvesting pipelines, analytics trackers, or telemetry beacons.
       </p>
 
       <section>
-        <h2>Who is responsible</h2>
+        <h2>1. Who We Are</h2>
         <PaduLegalIdentity />
         <p>
-          Mohamed Boudra Ziani is the data controller for personal data processed through the
-          official Padu website, relay, and hosted Hub. Independently self-hosted daemons, Hubs,
-          and relays are controlled by their operators and are not covered by this policy.
+          Padu is an open-source software project licensed under the GNU General Public License v3.0 (GPL-3.0).
+          This privacy policy describes how data is handled across the Padu native software, the marketing website
+          (padu.dev), and self-hosted instances.
         </p>
       </section>
 
       <section>
-        <h2>Local Padu apps and daemons</h2>
+        <h2>2. Local Application and Daemon Architecture</h2>
         <p>
-          Padu runs on your machines. It does not send us analytics, telemetry, advertising
-          identifiers, or crash reports.
+          Padu runs directly on your computer hardware. All session management, Git worktree isolation,
+          checkpoint tracking, and process supervision are handled locally by the background daemon (<code>padu daemon</code>)
+          communicating over loopback sockets (<code>127.0.0.1:4789</code>).
         </p>
-        <p>
-          Packaged desktop apps check GitHub Releases for updates. GitHub receives the ordinary
-          network information needed to answer that request under its own privacy policy.
-        </p>
-        <p>
-          Agents such as Claude Code, Codex, and OpenCode communicate with their providers using
-          credentials on your machine. Padu does not manage or intercept those provider API calls.
-        </p>
-      </section>
-
-      <section>
-        <h2>The official relay</h2>
-        <p>The relay is optional. To connect your client and daemon, it processes:</p>
         <ul>
-          <li>IP addresses and connection timing</li>
-          <li>Session identifiers and public handshake keys</li>
-          <li>Message sizes and aggregate bandwidth</li>
-          <li>Temporary connection and routing state</li>
+          <li><strong>Zero Telemetry:</strong> Padu contains no analytics SDKs, telemetry beacons, user tracking, or advertising identifiers.</li>
+          <li><strong>Zero Remote File Storage:</strong> Your projects, files, and Git branches reside exclusively on your local filesystem.</li>
+          <li><strong>Zero Conversation Logging:</strong> Transcripts and checkpoints are saved in your local workspace directory (<code>.padu/</code>) and local application data folders.</li>
+          <li><strong>No Crash Telemetry:</strong> Crash logs remain on your device. Crash reports are only shared if you manually choose to submit a diagnostic log via a public GitHub issue.</li>
         </ul>
+      </section>
+
+      <section>
+        <h2>3. Agent Credentials and API Keys</h2>
         <p>
-          Your client and daemon encrypt application traffic end-to-end with NaCl box encryption.
-          The relay carries ciphertext and cannot read your code, prompts, terminal output, or agent
-          conversations. Payloads exist in relay memory only while being forwarded. We do not store
-          message contents. Infrastructure may retain limited operational logs and aggregate metrics
-          for security, capacity planning, and troubleshooting.
+          Padu connects to AI coding agents (including Claude Code, OpenAI Codex, OpenCode, Pi Agent, Amp, DeepSeek,
+          Cursor CLI, and ACP-compatible drivers) installed on your system.
+        </p>
+        <p>
+          API tokens and provider credentials remain in your operating system&apos;s native keychain (macOS Keychain,
+          Linux Secret Service, Windows Credential Manager) or your local environment files. Padu never proxies, intercepts,
+          collects, or transmits your API keys to any external servers.
         </p>
       </section>
 
       <section>
-        <h2>Padu Hub</h2>
-        <p>When you create or use a hosted Hub account, we process:</p>
-        <ul>
-          <li>Your name, email, account credentials, sessions, IP address, and user agent</li>
-          <li>Your organization, members, roles, invitations, and daemon registrations</li>
-          <li>Identifiers and credentials for services you connect</li>
-          <li>
-            Webhook events, messages, comments, attachment metadata, and related context received
-            from those services
-          </li>
-          <li>
-            Workflow configurations, trigger inputs, outputs, execution state, activity, and audit
-            records
-          </li>
-          <li>Stripe customer identifiers and subscription information needed to provide access</li>
-        </ul>
+        <h2>4. Direct Communication with AI Model Providers</h2>
         <p>
-          Your repositories, local files, and agent-provider credentials remain on your
-          infrastructure unless a workflow explicitly sends information to Hub or a connected
-          service. Hub does not provide AI inference.
+          When you prompt an agent, the subprocess executing on your computer communicates directly with the respective
+          AI provider&apos;s endpoints (for example, <code>api.anthropic.com</code> or <code>api.openai.com</code>) using
+          your own API keys or CLI authentication tokens.
+        </p>
+        <p>
+          Your interactions with AI providers are governed strictly by your agreement and privacy terms with each
+          individual provider. Padu does not act as an API middleman, does not proxy tokens, and cannot inspect or store
+          the data exchanged between your local agent process and the provider.
         </p>
       </section>
 
       <section>
-        <h2>Who controls workflow data</h2>
+        <h2>5. Remote Daemon Connectivity (Web &amp; Mobile)</h2>
         <p>
-          Padu controls account, billing, security, and service-operation data. When an
-          organization uses Hub to process personal data in its workflows, that organization decides
-          why the data is processed and Padu processes it on the organization&apos;s behalf.
+          Padu supports connecting remote clients (the Progressive Web App at <code>app.padu.dev</code> or companion mobile apps)
+          to your devbox daemon.
+        </p>
+        <p>
+          These connections are established <strong>peer-to-peer or directly</strong> across your own private network infrastructure
+          (such as Tailscale, WireGuard, local Wi-Fi, or an SSH tunnel). Padu does not route your unencrypted workspace traffic
+          through proprietary centralized relay clouds.
         </p>
       </section>
 
       <section>
-        <h2>Why we process data</h2>
-        <p>We process data to:</p>
-        <ul>
-          <li>Provide accounts, Hub workflows, relay connectivity, billing, and support</li>
-          <li>Authenticate users, daemons, and connected services</li>
-          <li>Prevent abuse and protect the services</li>
-          <li>Maintain operational and audit records</li>
-          <li>Meet accounting, tax, and other legal obligations</li>
-        </ul>
+        <h2>6. Marketing Website and Update Checks</h2>
         <p>
-          The legal bases are performance of our contract with you, our legitimate interests in
-          operating and protecting the services, and compliance with legal obligations.
+          <strong>padu.dev Website:</strong> The static marketing website is hosted via global CDN networks. Standard transient
+          HTTP server logs (such as IP address and user-agent) may be processed temporarily for DDoS mitigation and infrastructure security.
+          We do not use tracking, advertising, or third-party profiling cookies.
+        </p>
+        <p>
+          <strong>Software Update Checks:</strong> Packaged desktop releases check the public GitHub Releases API for new version
+          availability. GitHub receives standard network requests according to its own privacy policy.
         </p>
       </section>
 
       <section>
-        <h2>Service providers</h2>
+        <h2>7. Security &amp; Vulnerability Disclosure</h2>
         <p>
-          We use Fly.io for hosted infrastructure, Stripe for subscriptions and payments, and GitHub
-          for software releases and connected GitHub features. Slack, Discord, Linear, and other
-          services receive data only when you choose to connect or use them.
-        </p>
-        <p>
-          Some providers may process data outside the European Economic Area. Where required, we use
-          appropriate contractual safeguards for those transfers.
-        </p>
-        <p>
-          We do not sell personal data, share it with advertisers, or use it to train AI models.
-        </p>
-      </section>
-
-      <section>
-        <h2>Retention and deletion</h2>
-        <p>
-          We keep account and organization data while your account remains active. We retain
-          operational, workflow, and audit records while needed to provide and protect the service.
-          Billing records may be kept for legally required accounting and tax periods. Short-lived
-          authorization codes and sessions expire automatically.
-        </p>
-        <p>
-          You can request account deletion by emailing us. Some records may remain where the law
-          requires it or where they form part of another organization&apos;s legitimate audit
-          history.
-        </p>
-      </section>
-
-      <section>
-        <h2>Cookies</h2>
-        <p>
-          The marketing website does not use analytics or advertising cookies. Hub uses only the
-          session and security cookies needed to sign you in and operate your account.
-        </p>
-      </section>
-
-      <section>
-        <h2>Your rights</h2>
-        <p>
-          Depending on applicable law, you may request access, correction, deletion, restriction,
-          objection, or portability of your personal data. Email{" "}
-          <a href="mailto:support@padu.dev">support@padu.dev</a>.
-        </p>
-      </section>
-
-      <section>
-        <h2>Security</h2>
-        <p>
-          We use access controls, encrypted transport, and limited service permissions. No online
-          service can guarantee absolute security. Read Padu&apos;s{" "}
+          We take software security seriously. If you discover a potential security vulnerability in Padu, please review our{" "}
           <a
-            href="https://github.com/wisnuwiry/padu/blob/main/SECURITY.md"
+            href="https://github.com/wisnusaputra/padu/blob/main/SECURITY.md"
             target="_blank"
             rel="noopener noreferrer"
           >
-            security model
+            Security Policy
           </a>{" "}
-          or report a vulnerability privately to{" "}
+          or report it confidentially to{" "}
           <a href="mailto:support@padu.dev">support@padu.dev</a>.
         </p>
       </section>
 
       <section>
-        <h2>Children</h2>
+        <h2>8. Contact &amp; Inquiries</h2>
         <p>
-          The official services are for professional developers and are not directed at children
-          under 16.
-        </p>
-      </section>
-
-      <section>
-        <h2>Changes</h2>
-        <p>
-          We will update this page and its date when our services or data practices materially
-          change.
+          If you have questions about this Privacy Policy or Padu&apos;s data practices, please contact us at{" "}
+          <a href="mailto:support@padu.dev">support@padu.dev</a> or open a discussion on our{" "}
+          <a
+            href="https://github.com/wisnusaputra/padu/discussions"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub repository
+          </a>.
         </p>
       </section>
     </LegalPage>

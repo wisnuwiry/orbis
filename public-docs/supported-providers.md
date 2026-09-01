@@ -1,6 +1,6 @@
 ---
 title: Supported providers
-description: Every coding agent Padu can launch, natively supported providers and the ACP catalog.
+description: Every coding agent CLI Padu can launch and orchestrate, natively supported drivers and the ACP catalog.
 nav: Supported providers
 order: 21
 category: Providers
@@ -8,55 +8,35 @@ category: Providers
 
 # Supported providers
 
-For the concept and how Padu manages providers, see [Providers](/docs/providers). To add or configure your own, see [Custom providers](/docs/custom-providers).
+Padu communicates directly with locally installed agent CLIs via native process adapters in `crates/padu-core` and the open Agent Client Protocol (ACP).
 
-## Native support
+For an architectural overview, see [Providers overview](/docs/providers). To configure binary path overrides or disable providers, see [Configuration](/docs/configuration).
 
-Work out of the box once the underlying CLI is installed and authenticated.
+## Native Drivers
 
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Anthropic's coding agent with MCP support, streaming, and deep reasoning.
-- [Codex](/docs/codex). OpenAI's workspace agent with sandbox controls and optional network access.
-- [OpenCode](https://opencode.ai/). Open-source coding assistant with multi-provider model support.
-- [Pi](https://pi.dev). Minimal terminal-based coding agent with multi-provider LLM support.
+These providers include first-class driver implementations with structured token streaming, checkpoint capture, and reasoning token demuxing:
 
-## ACP catalog
+- **[Claude Code](/docs/claude-code)** — Anthropic's official coding agent CLI with tool streaming and deep reasoning.
+- **[OpenAI Codex](/docs/codex)** — OpenAI's workspace agent with sandbox execution and model switching.
+- **[OpenCode](https://opencode.ai/)** — Open-source terminal assistant with multi-provider model routing.
+- **[Pi Agent](https://pi.dev)** — Minimal, fast terminal coding agent with multi-provider support.
+- **[Cursor CLI](https://cursor.com)** — Cursor's autonomous terminal coding companion.
+- **[Amp](https://github.com/tao12345666333/amp-acp)** — Frontier coding agent with worktree capabilities.
+- **[DeepSeek TUI](https://deepseek.com)** — High-reasoning open model assistant.
+- **[Grok Build](https://docs.x.ai/build/overview)** — xAI's agentic coding CLI.
+- **[Kimi Code](https://github.com/MoonshotAI/kimi-code)** — Moonshot AI's long-context assistant.
 
-Pick any of these from the in-app provider catalog. Each entry is a one-click install of the underlying CLI.
+## ACP (Agent Client Protocol) Catalog
 
-- [Agoragentic](https://agoragentic.com), agent marketplace with 174+ AI capabilities.
-- [Amp](https://github.com/tao12345666333/amp-acp), frontier coding agent.
-- [Auggie CLI](https://www.augmentcode.com/), Augment Code's agent backed by their context engine.
-- [Autohand Code](https://www.autohand.ai/cli/), Autohand AI's coding agent.
-- [Cline](https://cline.bot/cli), autonomous coding agent.
-- [Codebuddy Code](https://www.codebuddy.cn/cli/), Tencent Cloud's coding tool.
-- [CodeWhale](https://codewhale.net/), terminal coding agent for DeepSeek V4 and open models.
-- [Cortex Code](https://docs.snowflake.com/en/user-guide/cortex-code/cortex-code-cli), Snowflake's coding agent.
-- [Corust Agent](https://github.com/Corust-ai/corust-agent-release/releases), Rust-focused coding partner.
-- [crow-cli](https://crow-ai.dev/), minimal ACP-native coding agent.
-- [Cursor](https://cursor.com/docs/cli/overview), Cursor's coding agent.
-- [DeepAgents](https://docs.langchain.com/oss/javascript/deepagents/overview), LangChain-powered coding agent.
-- [DimCode](https://dimcode.dev/docs/acp.html), multi-model coding agent.
-- [Dirac](https://dirac.run), open-source agent with hash-anchored parallel edits.
-- [Factory Droid](https://factory.ai/product/cli), Factory AI's coding agent.
-- [fast-agent](https://fast-agent.ai/acp/), multi-provider coding agent.
-- [Gemini CLI](https://geminicli.com), Google's official Gemini CLI.
-- [GitHub Copilot](https://github.com/features/copilot/cli/), GitHub's AI pair programmer via ACP.
-- [GLM Agent](https://github.com/stefandevo/glm-acp-agent), Zhipu AI's GLM coding agent.
-- [goose](https://block.github.io/goose/), Block's local open-source AI agent.
-- [Grok](https://docs.x.ai/build/overview), xAI's Grok Build agentic coding CLI.
-- [Hermes Agent](https://hermes-agent.nousresearch.com/docs/user-guide/features/acp), Nous Research's self-improving agent.
-- [Junie](https://junie.jetbrains.com/docs/junie-cli-acp.html), JetBrains' coding agent.
-- [Kilo Code](https://kilo.ai/docs/code-with-ai/platforms/cli), open-source coding agent.
-- [Kimi Code CLI](https://github.com/MoonshotAI/kimi-code), Moonshot AI's coding assistant.
-- [Minion Code](https://github.com/femto/minion-code), Minion-framework coding agent.
-- [Mistral Vibe](https://github.com/mistralai/mistral-vibe), Mistral's open-source CLI assistant.
-- [Nova](https://www.compassap.ai/portfolio/nova.html), Compass AI's software engineer.
-- [Poolside](https://docs.poolside.ai/cli/pool), Poolside's coding agent.
-- [Qoder](https://qoder.com), agentic coding assistant.
-- [Qwen Code](https://qwenlm.github.io/qwen-code-docs/en/users/overview), Alibaba's Qwen coding assistant.
-- [siGit Code](https://github.com/getsigit/sigit), local-first coding agent with optional on-device LLM.
-- [Stakpak](https://stakpak.dev/), Rust-based DevOps agent.
-- [TRAE CLI](https://docs.trae.cn/cli_get-started-with-trae-cli), ByteDance's official TRAE coding agent.
-- [VT Code](https://github.com/vinhnx/VTCode/blob/main/docs/guides/zed-acp.md), open-source multi-provider coding agent.
+Any agent speaking the [Agent Client Protocol (ACP)](https://agentclientprotocol.com) over standard I/O streams (`stdio`) is supported out of the box:
 
-The in-app catalog is the canonical, version-pinned source. Anything not listed here can still be added manually, see [Custom providers](/docs/custom-providers).
+- **Cline** — Autonomous coding agent with file and terminal tools.
+- **Gemini CLI** — Google's official Gemini developer CLI.
+- **GitHub Copilot CLI** — GitHub's AI pair programmer.
+- **Goose** — Block's local open-source AI agent.
+- **Mistral Vibe** — Mistral's open-source CLI assistant.
+- **Hermes Agent** — Nous Research's autonomous agent.
+- **Qwen Code** — Alibaba's Qwen coding assistant.
+- **Augment / Auggie CLI** — Context engine-powered assistant.
+
+View the full interactive catalog on [padu.dev/agents](/agents).

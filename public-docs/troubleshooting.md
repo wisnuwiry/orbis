@@ -1,102 +1,50 @@
 ---
 title: Troubleshooting
-description: Why Padu can't find a provider you've installed, and how to fix the PATH and environment mismatches behind most setup issues.
-nav: Common problems
-order: 90
-category: Troubleshooting
+description: Why Padu can't find an installed provider CLI, and how to fix PATH and environment mismatches.
+nav: Troubleshooting
+order: 31
+category: Reference
 ---
 
 # Troubleshooting
 
-Almost every "it works in my terminal but not in Padu" problem is the same thing: Padu and your terminal aren't searching the same `PATH`. This page covers how to spot that and fix it.
+Most setup questions come down to `PATH` environment resolution: when a CLI tool runs in your interactive terminal but Padu reports it as not installed.
 
-## Padu can't find my provider
+## Provider Shows as "Not Installed"
 
-A provider you've installed shows as **Not installed**.
+Padu launches existing agent CLIs installed on your machine; it does not bundle them. It searches the system `PATH` captured during startup.
 
-Padu launches the agent CLIs you've already installed, it doesn't bundle them (see [Providers](/docs/providers)). So it has to find the command on its own `PATH`. If your shell only adds that location to `PATH` under certain conditions, Padu can miss it.
+### 1. Fixing PATH for Desktop App
 
-### See what Padu sees
+When launching the desktop application from the macOS Dock or Linux app launcher, the operating system launches GUI applications with a minimal system environment.
 
-Open **Settings → your host → Providers**, tap the provider, then tap **Diagnostic**. The rows that matter:
+Padu automatically spawns a login shell (`$SHELL -l -c`) at startup to inherit environment variables from your `.zshrc`, `.bashrc`, or `.profile`. If your shell configuration has errors or takes too long to load, Padu falls back to the system environment.
 
-- **Resolved path** — where Padu found the binary, or `not found`.
-- **Daemon PATH** — the `PATH` Padu is searching. Compare it to `echo $PATH` in a fresh terminal.
-- **Version** — whether the binary actually runs.
+Ensure your tool version managers (such as `nvm`, `mise`, `asdf`, or Homebrew) are initialized in `.zprofile` / `.zshenv` or exported for non-interactive login shells.
 
-From a terminal or agent, request the same diagnostic from the affected daemon:
+### 2. Pinning Binary Paths Manually
 
-```bash
-padu provider diagnostic <provider>
-padu provider diagnostic <provider> --host <host:port> --json
-```
-
-Use `--host` when the affected daemon is not the CLI's default local daemon.
-
-`not found` together with a **Daemon PATH** that's missing your binary's directory is the common case: that directory is on your terminal's `PATH` but not on Padu's.
-
-### Fix it
-
-The durable fix is to make sure the command is on `PATH` for a normal login shell, then restart Padu, see [why Padu's environment can differ](#why-padus-environment-can-differ-from-your-terminal) for why that's the test that matters.
-
-If you'd rather pin it directly, set the binary path in `~/.padu/config.json`:
+If you prefer to explicitly specify binary locations, open **Settings → Providers** in Padu Desktop or edit `~/.padu/settings.json`:
 
 ```json
 {
-  "agents": {
-    "providers": {
-      "claude": {
-        "command": ["/absolute/path/to/claude"]
-      }
-    }
+  "provider_binary_overrides": {
+    "claude": "/opt/homebrew/bin/claude",
+    "codex": "/usr/local/bin/codex",
+    "opencode": "/Users/you/.local/bin/opencode"
   }
 }
 ```
 
-`command` is `[binary, ...args]` and fully replaces the default launch command for that provider. Find the real path with `which -a claude`. `type -a claude` also tells you if `claude` is only a shell alias or function, those won't work, Padu runs the binary directly, so use the path it points to. Reload the configuration after editing (see [below](#i-changed-configjson-but-nothing-happened)).
+## Logs & Diagnostics
 
-For alternative endpoints, multiple profiles, custom binaries, and ACP agents, see [Custom providers](/docs/custom-providers). For per-agent install links, see [Supported providers](/docs/supported-providers).
+- **Desktop App Logs:**
+  - macOS: `~/Library/Logs/Padu/main.log`
+  - Linux: `~/.config/Padu/logs/main.log`
+  - Windows: `%APPDATA%\Padu\logs\main.log`
 
-## Why Padu's environment can differ from your terminal
+## See Also
 
-The same mismatch shows up anywhere Padu runs your tools, an agent, or a terminal, reporting `command not found` for something you use every day.
-
-When you open the **desktop app** from the Dock or Finder, the OS hands it a stripped-down environment, not your terminal's `PATH`. To compensate, Padu runs your login shell once at startup (`$SHELL -i -l -c`), captures its environment, and hands that to the daemon and everything it spawns. The rule of thumb: **if a brand-new terminal can run the command, Padu should too.** That's also the test, open a fresh terminal and try it there.
-
-When you start the daemon yourself from a terminal (`padu`), there's no login-shell step, it simply inherits that terminal's environment.
-
-Either way, the fix for a missing tool lives in your shell config (`.zshrc`, `.zprofile`, …), not in Padu. Tools installed through version managers (asdf, mise, nvm, …) are the usual offenders, make sure they initialize for a clean login shell, not only inside one you've already opened.
-
-This login-shell step runs on macOS and Linux. On Windows, Padu uses the environment it was launched with.
-
-## Reading the logs
-
-- **Desktop app** — the login-shell resolution is logged here. Look for `[login-shell-env]`: `applied` means it worked (it logs the `PATH` before and after); `failed; keeping inherited env` means it fell back to the stripped-down environment, with a `reason` (a timeout, a non-zero exit from your shell config, no output, …). A slow or erroring `.zshrc`/`.zprofile` is the usual cause.
-- **Daemon** — `~/.padu/daemon.log` (`$PADU_HOME/daemon.log` if you've set a custom home).
-
-Desktop app log location:
-
-| Platform | Path                            |
-| -------- | ------------------------------- |
-| macOS    | `~/Library/Logs/Padu/main.log` |
-| Linux    | `~/.config/Padu/logs/main.log` |
-| Windows  | `%APPDATA%\Padu\logs\main.log` |
-
-## I changed config.json but nothing happened
-
-Reload the file after editing:
-
-```bash
-padu reload
-```
-
-Padu applies runtime-safe settings and names any paths that require a restart. Invalid JSON or a schema error applies nothing; fix the reported error and run the command again. If a launch environment variable or flag owns a changed setting, reload reports it separately.
-
-Run `padu daemon restart` only when reload requests it. In the app, open **Settings → your host → Overview** and use **Restart daemon**. Running agents keep going, and clients reconnect automatically.
-
-## Still stuck?
-
-- [Custom providers](/docs/custom-providers) — endpoints, profiles, binaries, ACP agents.
-- [Configuration](/docs/configuration) — `config.json`, environment variables, logging.
-- [How Padu resolves your login shell](https://github.com/wisnuwiry/padu/blob/main/packages/desktop/src/login-shell-env.ts) — the exact code that loads your shell environment.
-- [Report an issue](https://github.com/wisnuwiry/padu/issues).
+- [Configuration & Settings](/docs/configuration) — Full `settings.json` reference.
+- [Supported providers](/docs/supported-providers) — List of all supported agent CLIs.
+- [GitHub Issues](https://github.com/wisnuwiry/padu/issues) — Report bugs and request features.

@@ -1,35 +1,42 @@
 ---
 title: Claude Code
-description: Run Claude Code in Padu using your existing Claude plan.
+description: Run Claude Code in Padu using your existing Claude plan and local CLI.
 nav: Claude Code
-order: 23
+order: 22
 category: Providers
 ---
 
 # Claude Code
 
-Padu runs Claude Code through the official `claude` CLI using the Claude Agent SDK.
+Padu runs Claude Code through Anthropic's official `claude` CLI and the Claude Agent SDK.
 
 ## Does Claude Code cost extra in Padu?
 
-No. Claude Code usage in Padu counts against your normal Claude plan limits. It does not require a separate pool of Agent SDK credits.
-
-You still need a Claude plan that includes Claude Code, and your plan's usual usage limits apply.
+No. Claude Code usage in Padu counts against your normal Anthropic Claude plan limits or API usage. Padu does not charge any additional fees.
 
 ## Getting started
 
-Install and sign in to the Claude Code CLI on the machine running Padu. Padu uses that existing installation and account when you start a Claude Code agent.
+Install and sign in to the Claude Code CLI on the machine running Padu:
 
-If your Claude login expires, re-authenticate with the Claude Code CLI, then start a new Claude Code session in Padu. Existing Padu sessions keep the authentication they started with, so re-authenticating does not update a session that is already running.
+```bash
+# Install Claude Code CLI
+npm install -g @anthropic-ai/claude-code
 
-## Use Claude Code in the Padu terminal
+# Authenticate with your Anthropic account
+claude
+```
 
-Claude Code also works great inside the Padu terminal. If you prefer the standard CLI experience, open a terminal in your workspace and run `claude` as usual.
+Padu automatically discovers the installed `claude` executable on your system `PATH` and uses your local authentication tokens when launching a Claude Code session.
 
-You can use the terminal from Padu's desktop, web, or mobile app while keeping access to your workspace, git changes, and other Padu tools.
+If your authentication session expires, re-authenticate via `claude` in your terminal, then launch or resume sessions in Padu.
+
+## Running Claude Code in Padu
+
+- **Desktop GUI:** Select **Claude Code** from the provider picker when starting a new task or session.
+- **Integrated Terminal:** Open a terminal in any workspace and run `claude` directly with full PTY support.
 
 ## See also
 
-- [Supported providers](/docs/supported-providers), for other agents you can run alongside Claude Code.
-- [Custom providers](/docs/custom-providers), for custom binaries, third-party endpoints, or multiple Claude profiles.
-- [Padu vs Claude Desktop](/alternatives/claude-desktop), for a feature comparison.
+- [Supported providers](/docs/supported-providers) — List of all natively supported agent CLIs.
+- [Configuration](/docs/configuration) — Configure binary overrides in `~/.padu/settings.json`.
+- [Troubleshooting](/docs/troubleshooting) — Diagnosing `PATH` resolution for installed CLI agents.

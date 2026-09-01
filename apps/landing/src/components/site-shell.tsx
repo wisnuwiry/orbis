@@ -4,21 +4,30 @@ import { SiteHeader } from "~/components/site-header";
 
 interface SiteShellProps {
   children: ReactNode;
-  width: "default" | "prose";
+  width?: "default" | "prose";
 }
 
-export function SiteShell({ children, width }: SiteShellProps) {
-  const mainClasses =
-    width === "prose" ? "max-w-prose p-6 md:p-12 mx-auto" : "max-w-5xl p-6 md:p-20 mx-auto";
+export function SiteShell({ children, width = "default" }: SiteShellProps) {
+  const contentWidthClasses =
+    width === "prose" ? "max-w-prose mx-auto" : "w-full";
+
   return (
-    <div className="min-h-screen bg-background">
-      <main className={mainClasses}>
-        <div className="mb-12">
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Top Header - exactly identical to Home page in padding and width */}
+      <div className="w-full max-w-7xl px-6 pt-4 md:px-32 md:pt-6 mx-auto">
+        <nav className="mb-10 sm:mb-14 md:mb-20">
           <SiteHeader />
-        </div>
-        {children}
+        </nav>
+      </div>
+
+      {/* Main Page Content */}
+      <main className="flex-1 w-full max-w-7xl px-6 md:px-32 pb-16 md:pb-24 mx-auto">
+        <div className={contentWidthClasses}>{children}</div>
       </main>
-      <SiteFooter width={width} />
+
+      {/* Footer */}
+      <SiteFooter />
     </div>
   );
 }
+
