@@ -42,6 +42,7 @@ mod query;
 mod review_diff;
 mod terminal;
 mod theme;
+mod theme_palette;
 mod ui;
 mod updater;
 
