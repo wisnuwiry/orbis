@@ -11,50 +11,26 @@
 import { Route as rootRouteImport } from "./routes/__root";
 import { Route as IndexRouteImport } from "./routes/index";
 import { Route as AgentsRouteImport } from "./routes/agents";
-import { Route as AgoragenticRouteImport } from "./routes/agoragentic";
 import { Route as AmpRouteImport } from "./routes/amp";
-import { Route as AuggieRouteImport } from "./routes/auggie";
-import { Route as AutohandRouteImport } from "./routes/autohand";
 import { Route as ChangelogRouteImport } from "./routes/changelog";
 import { Route as ClaudeCodeRouteImport } from "./routes/claude-code";
 import { Route as ClineRouteImport } from "./routes/cline";
-import { Route as CodebuddyRouteImport } from "./routes/codebuddy";
 import { Route as CodexRouteImport } from "./routes/codex";
 import { Route as CopilotRouteImport } from "./routes/copilot";
-import { Route as CortexCodeRouteImport } from "./routes/cortex-code";
-import { Route as CorustRouteImport } from "./routes/corust";
-import { Route as CrowRouteImport } from "./routes/crow";
 import { Route as CursorRouteImport } from "./routes/cursor";
-import { Route as DeepagentsRouteImport } from "./routes/deepagents";
 import { Route as DeepseekTuiRouteImport } from "./routes/deepseek-tui";
-import { Route as DimcodeRouteImport } from "./routes/dimcode";
-import { Route as DiracRouteImport } from "./routes/dirac";
 import { Route as DocsRouteImport } from "./routes/docs";
 import { Route as DownloadRouteImport } from "./routes/download";
-import { Route as FactoryDroidRouteImport } from "./routes/factory-droid";
-import { Route as FastAgentRouteImport } from "./routes/fast-agent";
+import { Route as FxRouteImport } from "./routes/fx";
 import { Route as GeminiRouteImport } from "./routes/gemini";
-import { Route as GlmRouteImport } from "./routes/glm";
 import { Route as GooseRouteImport } from "./routes/goose";
 import { Route as GrokRouteImport } from "./routes/grok";
-import { Route as HermesRouteImport } from "./routes/hermes";
-import { Route as JunieRouteImport } from "./routes/junie";
-import { Route as KiloRouteImport } from "./routes/kilo";
 import { Route as KimiRouteImport } from "./routes/kimi";
-import { Route as MinionCodeRouteImport } from "./routes/minion-code";
 import { Route as MistralVibeRouteImport } from "./routes/mistral-vibe";
-import { Route as NovaRouteImport } from "./routes/nova";
-import { Route as OmpRouteImport } from "./routes/omp";
 import { Route as OpencodeRouteImport } from "./routes/opencode";
 import { Route as PiRouteImport } from "./routes/pi";
-import { Route as PoolsideRouteImport } from "./routes/poolside";
 import { Route as PrivacyRouteImport } from "./routes/privacy";
-import { Route as QoderRouteImport } from "./routes/qoder";
-import { Route as QwenCodeRouteImport } from "./routes/qwen-code";
-import { Route as SigitRouteImport } from "./routes/sigit";
-import { Route as StakpakRouteImport } from "./routes/stakpak";
 import { Route as TermsRouteImport } from "./routes/terms";
-import { Route as VtcodeRouteImport } from "./routes/vtcode";
 import { Route as AlternativesClaudeDesktopRouteImport } from "./routes/alternatives/claude-desktop";
 import { Route as AlternativesCodexAppRouteImport } from "./routes/alternatives/codex-app";
 import { Route as AlternativesConductorRouteImport } from "./routes/alternatives/conductor";
@@ -75,24 +51,9 @@ const AgentsRoute = AgentsRouteImport.update({
   path: "/agents",
   getParentRoute: () => rootRouteImport,
 } as any);
-const AgoragenticRoute = AgoragenticRouteImport.update({
-  id: "/agoragentic",
-  path: "/agoragentic",
-  getParentRoute: () => rootRouteImport,
-} as any);
 const AmpRoute = AmpRouteImport.update({
   id: "/amp",
   path: "/amp",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const AuggieRoute = AuggieRouteImport.update({
-  id: "/auggie",
-  path: "/auggie",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const AutohandRoute = AutohandRouteImport.update({
-  id: "/autohand",
-  path: "/autohand",
   getParentRoute: () => rootRouteImport,
 } as any);
 const ChangelogRoute = ChangelogRouteImport.update({
@@ -110,11 +71,6 @@ const ClineRoute = ClineRouteImport.update({
   path: "/cline",
   getParentRoute: () => rootRouteImport,
 } as any);
-const CodebuddyRoute = CodebuddyRouteImport.update({
-  id: "/codebuddy",
-  path: "/codebuddy",
-  getParentRoute: () => rootRouteImport,
-} as any);
 const CodexRoute = CodexRouteImport.update({
   id: "/codex",
   path: "/codex",
@@ -125,44 +81,14 @@ const CopilotRoute = CopilotRouteImport.update({
   path: "/copilot",
   getParentRoute: () => rootRouteImport,
 } as any);
-const CortexCodeRoute = CortexCodeRouteImport.update({
-  id: "/cortex-code",
-  path: "/cortex-code",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const CorustRoute = CorustRouteImport.update({
-  id: "/corust",
-  path: "/corust",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const CrowRoute = CrowRouteImport.update({
-  id: "/crow",
-  path: "/crow",
-  getParentRoute: () => rootRouteImport,
-} as any);
 const CursorRoute = CursorRouteImport.update({
   id: "/cursor",
   path: "/cursor",
   getParentRoute: () => rootRouteImport,
 } as any);
-const DeepagentsRoute = DeepagentsRouteImport.update({
-  id: "/deepagents",
-  path: "/deepagents",
-  getParentRoute: () => rootRouteImport,
-} as any);
 const DeepseekTuiRoute = DeepseekTuiRouteImport.update({
   id: "/deepseek-tui",
   path: "/deepseek-tui",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const DimcodeRoute = DimcodeRouteImport.update({
-  id: "/dimcode",
-  path: "/dimcode",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const DiracRoute = DiracRouteImport.update({
-  id: "/dirac",
-  path: "/dirac",
   getParentRoute: () => rootRouteImport,
 } as any);
 const DocsRoute = DocsRouteImport.update({
@@ -175,24 +101,14 @@ const DownloadRoute = DownloadRouteImport.update({
   path: "/download",
   getParentRoute: () => rootRouteImport,
 } as any);
-const FactoryDroidRoute = FactoryDroidRouteImport.update({
-  id: "/factory-droid",
-  path: "/factory-droid",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const FastAgentRoute = FastAgentRouteImport.update({
-  id: "/fast-agent",
-  path: "/fast-agent",
+const FxRoute = FxRouteImport.update({
+  id: "/fx",
+  path: "/fx",
   getParentRoute: () => rootRouteImport,
 } as any);
 const GeminiRoute = GeminiRouteImport.update({
   id: "/gemini",
   path: "/gemini",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const GlmRoute = GlmRouteImport.update({
-  id: "/glm",
-  path: "/glm",
   getParentRoute: () => rootRouteImport,
 } as any);
 const GooseRoute = GooseRouteImport.update({
@@ -205,44 +121,14 @@ const GrokRoute = GrokRouteImport.update({
   path: "/grok",
   getParentRoute: () => rootRouteImport,
 } as any);
-const HermesRoute = HermesRouteImport.update({
-  id: "/hermes",
-  path: "/hermes",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const JunieRoute = JunieRouteImport.update({
-  id: "/junie",
-  path: "/junie",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const KiloRoute = KiloRouteImport.update({
-  id: "/kilo",
-  path: "/kilo",
-  getParentRoute: () => rootRouteImport,
-} as any);
 const KimiRoute = KimiRouteImport.update({
   id: "/kimi",
   path: "/kimi",
   getParentRoute: () => rootRouteImport,
 } as any);
-const MinionCodeRoute = MinionCodeRouteImport.update({
-  id: "/minion-code",
-  path: "/minion-code",
-  getParentRoute: () => rootRouteImport,
-} as any);
 const MistralVibeRoute = MistralVibeRouteImport.update({
   id: "/mistral-vibe",
   path: "/mistral-vibe",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const NovaRoute = NovaRouteImport.update({
-  id: "/nova",
-  path: "/nova",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const OmpRoute = OmpRouteImport.update({
-  id: "/omp",
-  path: "/omp",
   getParentRoute: () => rootRouteImport,
 } as any);
 const OpencodeRoute = OpencodeRouteImport.update({
@@ -255,44 +141,14 @@ const PiRoute = PiRouteImport.update({
   path: "/pi",
   getParentRoute: () => rootRouteImport,
 } as any);
-const PoolsideRoute = PoolsideRouteImport.update({
-  id: "/poolside",
-  path: "/poolside",
-  getParentRoute: () => rootRouteImport,
-} as any);
 const PrivacyRoute = PrivacyRouteImport.update({
   id: "/privacy",
   path: "/privacy",
   getParentRoute: () => rootRouteImport,
 } as any);
-const QoderRoute = QoderRouteImport.update({
-  id: "/qoder",
-  path: "/qoder",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const QwenCodeRoute = QwenCodeRouteImport.update({
-  id: "/qwen-code",
-  path: "/qwen-code",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const SigitRoute = SigitRouteImport.update({
-  id: "/sigit",
-  path: "/sigit",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const StakpakRoute = StakpakRouteImport.update({
-  id: "/stakpak",
-  path: "/stakpak",
-  getParentRoute: () => rootRouteImport,
-} as any);
 const TermsRoute = TermsRouteImport.update({
   id: "/terms",
   path: "/terms",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const VtcodeRoute = VtcodeRouteImport.update({
-  id: "/vtcode",
-  path: "/vtcode",
   getParentRoute: () => rootRouteImport,
 } as any);
 const AlternativesClaudeDesktopRoute =
@@ -346,50 +202,26 @@ const DocsSplatRoute = DocsSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute;
   "/agents": typeof AgentsRoute;
-  "/agoragentic": typeof AgoragenticRoute;
   "/amp": typeof AmpRoute;
-  "/auggie": typeof AuggieRoute;
-  "/autohand": typeof AutohandRoute;
   "/changelog": typeof ChangelogRoute;
   "/claude-code": typeof ClaudeCodeRoute;
   "/cline": typeof ClineRoute;
-  "/codebuddy": typeof CodebuddyRoute;
   "/codex": typeof CodexRoute;
   "/copilot": typeof CopilotRoute;
-  "/cortex-code": typeof CortexCodeRoute;
-  "/corust": typeof CorustRoute;
-  "/crow": typeof CrowRoute;
   "/cursor": typeof CursorRoute;
-  "/deepagents": typeof DeepagentsRoute;
   "/deepseek-tui": typeof DeepseekTuiRoute;
-  "/dimcode": typeof DimcodeRoute;
-  "/dirac": typeof DiracRoute;
   "/docs": typeof DocsRouteWithChildren;
   "/download": typeof DownloadRoute;
-  "/factory-droid": typeof FactoryDroidRoute;
-  "/fast-agent": typeof FastAgentRoute;
+  "/fx": typeof FxRoute;
   "/gemini": typeof GeminiRoute;
-  "/glm": typeof GlmRoute;
   "/goose": typeof GooseRoute;
   "/grok": typeof GrokRoute;
-  "/hermes": typeof HermesRoute;
-  "/junie": typeof JunieRoute;
-  "/kilo": typeof KiloRoute;
   "/kimi": typeof KimiRoute;
-  "/minion-code": typeof MinionCodeRoute;
   "/mistral-vibe": typeof MistralVibeRoute;
-  "/nova": typeof NovaRoute;
-  "/omp": typeof OmpRoute;
   "/opencode": typeof OpencodeRoute;
   "/pi": typeof PiRoute;
-  "/poolside": typeof PoolsideRoute;
   "/privacy": typeof PrivacyRoute;
-  "/qoder": typeof QoderRoute;
-  "/qwen-code": typeof QwenCodeRoute;
-  "/sigit": typeof SigitRoute;
-  "/stakpak": typeof StakpakRoute;
   "/terms": typeof TermsRoute;
-  "/vtcode": typeof VtcodeRoute;
   "/alternatives/claude-desktop": typeof AlternativesClaudeDesktopRoute;
   "/alternatives/codex-app": typeof AlternativesCodexAppRoute;
   "/alternatives/conductor": typeof AlternativesConductorRoute;
@@ -403,49 +235,25 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/agents": typeof AgentsRoute;
-  "/agoragentic": typeof AgoragenticRoute;
   "/amp": typeof AmpRoute;
-  "/auggie": typeof AuggieRoute;
-  "/autohand": typeof AutohandRoute;
   "/changelog": typeof ChangelogRoute;
   "/claude-code": typeof ClaudeCodeRoute;
   "/cline": typeof ClineRoute;
-  "/codebuddy": typeof CodebuddyRoute;
   "/codex": typeof CodexRoute;
   "/copilot": typeof CopilotRoute;
-  "/cortex-code": typeof CortexCodeRoute;
-  "/corust": typeof CorustRoute;
-  "/crow": typeof CrowRoute;
   "/cursor": typeof CursorRoute;
-  "/deepagents": typeof DeepagentsRoute;
   "/deepseek-tui": typeof DeepseekTuiRoute;
-  "/dimcode": typeof DimcodeRoute;
-  "/dirac": typeof DiracRoute;
   "/download": typeof DownloadRoute;
-  "/factory-droid": typeof FactoryDroidRoute;
-  "/fast-agent": typeof FastAgentRoute;
+  "/fx": typeof FxRoute;
   "/gemini": typeof GeminiRoute;
-  "/glm": typeof GlmRoute;
   "/goose": typeof GooseRoute;
   "/grok": typeof GrokRoute;
-  "/hermes": typeof HermesRoute;
-  "/junie": typeof JunieRoute;
-  "/kilo": typeof KiloRoute;
   "/kimi": typeof KimiRoute;
-  "/minion-code": typeof MinionCodeRoute;
   "/mistral-vibe": typeof MistralVibeRoute;
-  "/nova": typeof NovaRoute;
-  "/omp": typeof OmpRoute;
   "/opencode": typeof OpencodeRoute;
   "/pi": typeof PiRoute;
-  "/poolside": typeof PoolsideRoute;
   "/privacy": typeof PrivacyRoute;
-  "/qoder": typeof QoderRoute;
-  "/qwen-code": typeof QwenCodeRoute;
-  "/sigit": typeof SigitRoute;
-  "/stakpak": typeof StakpakRoute;
   "/terms": typeof TermsRoute;
-  "/vtcode": typeof VtcodeRoute;
   "/alternatives/claude-desktop": typeof AlternativesClaudeDesktopRoute;
   "/alternatives/codex-app": typeof AlternativesCodexAppRoute;
   "/alternatives/conductor": typeof AlternativesConductorRoute;
@@ -460,50 +268,26 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport;
   "/": typeof IndexRoute;
   "/agents": typeof AgentsRoute;
-  "/agoragentic": typeof AgoragenticRoute;
   "/amp": typeof AmpRoute;
-  "/auggie": typeof AuggieRoute;
-  "/autohand": typeof AutohandRoute;
   "/changelog": typeof ChangelogRoute;
   "/claude-code": typeof ClaudeCodeRoute;
   "/cline": typeof ClineRoute;
-  "/codebuddy": typeof CodebuddyRoute;
   "/codex": typeof CodexRoute;
   "/copilot": typeof CopilotRoute;
-  "/cortex-code": typeof CortexCodeRoute;
-  "/corust": typeof CorustRoute;
-  "/crow": typeof CrowRoute;
   "/cursor": typeof CursorRoute;
-  "/deepagents": typeof DeepagentsRoute;
   "/deepseek-tui": typeof DeepseekTuiRoute;
-  "/dimcode": typeof DimcodeRoute;
-  "/dirac": typeof DiracRoute;
   "/docs": typeof DocsRouteWithChildren;
   "/download": typeof DownloadRoute;
-  "/factory-droid": typeof FactoryDroidRoute;
-  "/fast-agent": typeof FastAgentRoute;
+  "/fx": typeof FxRoute;
   "/gemini": typeof GeminiRoute;
-  "/glm": typeof GlmRoute;
   "/goose": typeof GooseRoute;
   "/grok": typeof GrokRoute;
-  "/hermes": typeof HermesRoute;
-  "/junie": typeof JunieRoute;
-  "/kilo": typeof KiloRoute;
   "/kimi": typeof KimiRoute;
-  "/minion-code": typeof MinionCodeRoute;
   "/mistral-vibe": typeof MistralVibeRoute;
-  "/nova": typeof NovaRoute;
-  "/omp": typeof OmpRoute;
   "/opencode": typeof OpencodeRoute;
   "/pi": typeof PiRoute;
-  "/poolside": typeof PoolsideRoute;
   "/privacy": typeof PrivacyRoute;
-  "/qoder": typeof QoderRoute;
-  "/qwen-code": typeof QwenCodeRoute;
-  "/sigit": typeof SigitRoute;
-  "/stakpak": typeof StakpakRoute;
   "/terms": typeof TermsRoute;
-  "/vtcode": typeof VtcodeRoute;
   "/alternatives/claude-desktop": typeof AlternativesClaudeDesktopRoute;
   "/alternatives/codex-app": typeof AlternativesCodexAppRoute;
   "/alternatives/conductor": typeof AlternativesConductorRoute;
@@ -519,50 +303,26 @@ export interface FileRouteTypes {
   fullPaths:
     | "/"
     | "/agents"
-    | "/agoragentic"
     | "/amp"
-    | "/auggie"
-    | "/autohand"
     | "/changelog"
     | "/claude-code"
     | "/cline"
-    | "/codebuddy"
     | "/codex"
     | "/copilot"
-    | "/cortex-code"
-    | "/corust"
-    | "/crow"
     | "/cursor"
-    | "/deepagents"
     | "/deepseek-tui"
-    | "/dimcode"
-    | "/dirac"
     | "/docs"
     | "/download"
-    | "/factory-droid"
-    | "/fast-agent"
+    | "/fx"
     | "/gemini"
-    | "/glm"
     | "/goose"
     | "/grok"
-    | "/hermes"
-    | "/junie"
-    | "/kilo"
     | "/kimi"
-    | "/minion-code"
     | "/mistral-vibe"
-    | "/nova"
-    | "/omp"
     | "/opencode"
     | "/pi"
-    | "/poolside"
     | "/privacy"
-    | "/qoder"
-    | "/qwen-code"
-    | "/sigit"
-    | "/stakpak"
     | "/terms"
-    | "/vtcode"
     | "/alternatives/claude-desktop"
     | "/alternatives/codex-app"
     | "/alternatives/conductor"
@@ -576,49 +336,25 @@ export interface FileRouteTypes {
   to:
     | "/"
     | "/agents"
-    | "/agoragentic"
     | "/amp"
-    | "/auggie"
-    | "/autohand"
     | "/changelog"
     | "/claude-code"
     | "/cline"
-    | "/codebuddy"
     | "/codex"
     | "/copilot"
-    | "/cortex-code"
-    | "/corust"
-    | "/crow"
     | "/cursor"
-    | "/deepagents"
     | "/deepseek-tui"
-    | "/dimcode"
-    | "/dirac"
     | "/download"
-    | "/factory-droid"
-    | "/fast-agent"
+    | "/fx"
     | "/gemini"
-    | "/glm"
     | "/goose"
     | "/grok"
-    | "/hermes"
-    | "/junie"
-    | "/kilo"
     | "/kimi"
-    | "/minion-code"
     | "/mistral-vibe"
-    | "/nova"
-    | "/omp"
     | "/opencode"
     | "/pi"
-    | "/poolside"
     | "/privacy"
-    | "/qoder"
-    | "/qwen-code"
-    | "/sigit"
-    | "/stakpak"
     | "/terms"
-    | "/vtcode"
     | "/alternatives/claude-desktop"
     | "/alternatives/codex-app"
     | "/alternatives/conductor"
@@ -632,50 +368,26 @@ export interface FileRouteTypes {
     | "__root__"
     | "/"
     | "/agents"
-    | "/agoragentic"
     | "/amp"
-    | "/auggie"
-    | "/autohand"
     | "/changelog"
     | "/claude-code"
     | "/cline"
-    | "/codebuddy"
     | "/codex"
     | "/copilot"
-    | "/cortex-code"
-    | "/corust"
-    | "/crow"
     | "/cursor"
-    | "/deepagents"
     | "/deepseek-tui"
-    | "/dimcode"
-    | "/dirac"
     | "/docs"
     | "/download"
-    | "/factory-droid"
-    | "/fast-agent"
+    | "/fx"
     | "/gemini"
-    | "/glm"
     | "/goose"
     | "/grok"
-    | "/hermes"
-    | "/junie"
-    | "/kilo"
     | "/kimi"
-    | "/minion-code"
     | "/mistral-vibe"
-    | "/nova"
-    | "/omp"
     | "/opencode"
     | "/pi"
-    | "/poolside"
     | "/privacy"
-    | "/qoder"
-    | "/qwen-code"
-    | "/sigit"
-    | "/stakpak"
     | "/terms"
-    | "/vtcode"
     | "/alternatives/claude-desktop"
     | "/alternatives/codex-app"
     | "/alternatives/conductor"
@@ -690,50 +402,26 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute;
   AgentsRoute: typeof AgentsRoute;
-  AgoragenticRoute: typeof AgoragenticRoute;
   AmpRoute: typeof AmpRoute;
-  AuggieRoute: typeof AuggieRoute;
-  AutohandRoute: typeof AutohandRoute;
   ChangelogRoute: typeof ChangelogRoute;
   ClaudeCodeRoute: typeof ClaudeCodeRoute;
   ClineRoute: typeof ClineRoute;
-  CodebuddyRoute: typeof CodebuddyRoute;
   CodexRoute: typeof CodexRoute;
   CopilotRoute: typeof CopilotRoute;
-  CortexCodeRoute: typeof CortexCodeRoute;
-  CorustRoute: typeof CorustRoute;
-  CrowRoute: typeof CrowRoute;
   CursorRoute: typeof CursorRoute;
-  DeepagentsRoute: typeof DeepagentsRoute;
   DeepseekTuiRoute: typeof DeepseekTuiRoute;
-  DimcodeRoute: typeof DimcodeRoute;
-  DiracRoute: typeof DiracRoute;
   DocsRoute: typeof DocsRouteWithChildren;
   DownloadRoute: typeof DownloadRoute;
-  FactoryDroidRoute: typeof FactoryDroidRoute;
-  FastAgentRoute: typeof FastAgentRoute;
+  FxRoute: typeof FxRoute;
   GeminiRoute: typeof GeminiRoute;
-  GlmRoute: typeof GlmRoute;
   GooseRoute: typeof GooseRoute;
   GrokRoute: typeof GrokRoute;
-  HermesRoute: typeof HermesRoute;
-  JunieRoute: typeof JunieRoute;
-  KiloRoute: typeof KiloRoute;
   KimiRoute: typeof KimiRoute;
-  MinionCodeRoute: typeof MinionCodeRoute;
   MistralVibeRoute: typeof MistralVibeRoute;
-  NovaRoute: typeof NovaRoute;
-  OmpRoute: typeof OmpRoute;
   OpencodeRoute: typeof OpencodeRoute;
   PiRoute: typeof PiRoute;
-  PoolsideRoute: typeof PoolsideRoute;
   PrivacyRoute: typeof PrivacyRoute;
-  QoderRoute: typeof QoderRoute;
-  QwenCodeRoute: typeof QwenCodeRoute;
-  SigitRoute: typeof SigitRoute;
-  StakpakRoute: typeof StakpakRoute;
   TermsRoute: typeof TermsRoute;
-  VtcodeRoute: typeof VtcodeRoute;
   AlternativesClaudeDesktopRoute: typeof AlternativesClaudeDesktopRoute;
   AlternativesCodexAppRoute: typeof AlternativesCodexAppRoute;
   AlternativesConductorRoute: typeof AlternativesConductorRoute;
@@ -759,32 +447,11 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AgentsRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/agoragentic": {
-      id: "/agoragentic";
-      path: "/agoragentic";
-      fullPath: "/agoragentic";
-      preLoaderRoute: typeof AgoragenticRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
     "/amp": {
       id: "/amp";
       path: "/amp";
       fullPath: "/amp";
       preLoaderRoute: typeof AmpRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/auggie": {
-      id: "/auggie";
-      path: "/auggie";
-      fullPath: "/auggie";
-      preLoaderRoute: typeof AuggieRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/autohand": {
-      id: "/autohand";
-      path: "/autohand";
-      fullPath: "/autohand";
-      preLoaderRoute: typeof AutohandRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/changelog": {
@@ -808,13 +475,6 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof ClineRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/codebuddy": {
-      id: "/codebuddy";
-      path: "/codebuddy";
-      fullPath: "/codebuddy";
-      preLoaderRoute: typeof CodebuddyRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
     "/codex": {
       id: "/codex";
       path: "/codex";
@@ -829,27 +489,6 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof CopilotRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/cortex-code": {
-      id: "/cortex-code";
-      path: "/cortex-code";
-      fullPath: "/cortex-code";
-      preLoaderRoute: typeof CortexCodeRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/corust": {
-      id: "/corust";
-      path: "/corust";
-      fullPath: "/corust";
-      preLoaderRoute: typeof CorustRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/crow": {
-      id: "/crow";
-      path: "/crow";
-      fullPath: "/crow";
-      preLoaderRoute: typeof CrowRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
     "/cursor": {
       id: "/cursor";
       path: "/cursor";
@@ -857,32 +496,11 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof CursorRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/deepagents": {
-      id: "/deepagents";
-      path: "/deepagents";
-      fullPath: "/deepagents";
-      preLoaderRoute: typeof DeepagentsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
     "/deepseek-tui": {
       id: "/deepseek-tui";
       path: "/deepseek-tui";
       fullPath: "/deepseek-tui";
       preLoaderRoute: typeof DeepseekTuiRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/dimcode": {
-      id: "/dimcode";
-      path: "/dimcode";
-      fullPath: "/dimcode";
-      preLoaderRoute: typeof DimcodeRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/dirac": {
-      id: "/dirac";
-      path: "/dirac";
-      fullPath: "/dirac";
-      preLoaderRoute: typeof DiracRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/docs": {
@@ -899,18 +517,11 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DownloadRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/factory-droid": {
-      id: "/factory-droid";
-      path: "/factory-droid";
-      fullPath: "/factory-droid";
-      preLoaderRoute: typeof FactoryDroidRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/fast-agent": {
-      id: "/fast-agent";
-      path: "/fast-agent";
-      fullPath: "/fast-agent";
-      preLoaderRoute: typeof FastAgentRouteImport;
+    "/fx": {
+      id: "/fx";
+      path: "/fx";
+      fullPath: "/fx";
+      preLoaderRoute: typeof FxRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/gemini": {
@@ -918,13 +529,6 @@ declare module "@tanstack/react-router" {
       path: "/gemini";
       fullPath: "/gemini";
       preLoaderRoute: typeof GeminiRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/glm": {
-      id: "/glm";
-      path: "/glm";
-      fullPath: "/glm";
-      preLoaderRoute: typeof GlmRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/goose": {
@@ -941,27 +545,6 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof GrokRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/hermes": {
-      id: "/hermes";
-      path: "/hermes";
-      fullPath: "/hermes";
-      preLoaderRoute: typeof HermesRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/junie": {
-      id: "/junie";
-      path: "/junie";
-      fullPath: "/junie";
-      preLoaderRoute: typeof JunieRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/kilo": {
-      id: "/kilo";
-      path: "/kilo";
-      fullPath: "/kilo";
-      preLoaderRoute: typeof KiloRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
     "/kimi": {
       id: "/kimi";
       path: "/kimi";
@@ -969,32 +552,11 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof KimiRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/minion-code": {
-      id: "/minion-code";
-      path: "/minion-code";
-      fullPath: "/minion-code";
-      preLoaderRoute: typeof MinionCodeRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
     "/mistral-vibe": {
       id: "/mistral-vibe";
       path: "/mistral-vibe";
       fullPath: "/mistral-vibe";
       preLoaderRoute: typeof MistralVibeRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/nova": {
-      id: "/nova";
-      path: "/nova";
-      fullPath: "/nova";
-      preLoaderRoute: typeof NovaRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/omp": {
-      id: "/omp";
-      path: "/omp";
-      fullPath: "/omp";
-      preLoaderRoute: typeof OmpRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/opencode": {
@@ -1011,13 +573,6 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof PiRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/poolside": {
-      id: "/poolside";
-      path: "/poolside";
-      fullPath: "/poolside";
-      preLoaderRoute: typeof PoolsideRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
     "/privacy": {
       id: "/privacy";
       path: "/privacy";
@@ -1025,46 +580,11 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof PrivacyRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/qoder": {
-      id: "/qoder";
-      path: "/qoder";
-      fullPath: "/qoder";
-      preLoaderRoute: typeof QoderRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/qwen-code": {
-      id: "/qwen-code";
-      path: "/qwen-code";
-      fullPath: "/qwen-code";
-      preLoaderRoute: typeof QwenCodeRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/sigit": {
-      id: "/sigit";
-      path: "/sigit";
-      fullPath: "/sigit";
-      preLoaderRoute: typeof SigitRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/stakpak": {
-      id: "/stakpak";
-      path: "/stakpak";
-      fullPath: "/stakpak";
-      preLoaderRoute: typeof StakpakRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
     "/terms": {
       id: "/terms";
       path: "/terms";
       fullPath: "/terms";
       preLoaderRoute: typeof TermsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/vtcode": {
-      id: "/vtcode";
-      path: "/vtcode";
-      fullPath: "/vtcode";
-      preLoaderRoute: typeof VtcodeRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/alternatives/claude-desktop": {
@@ -1148,50 +668,26 @@ const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren);
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AgentsRoute: AgentsRoute,
-  AgoragenticRoute: AgoragenticRoute,
   AmpRoute: AmpRoute,
-  AuggieRoute: AuggieRoute,
-  AutohandRoute: AutohandRoute,
   ChangelogRoute: ChangelogRoute,
   ClaudeCodeRoute: ClaudeCodeRoute,
   ClineRoute: ClineRoute,
-  CodebuddyRoute: CodebuddyRoute,
   CodexRoute: CodexRoute,
   CopilotRoute: CopilotRoute,
-  CortexCodeRoute: CortexCodeRoute,
-  CorustRoute: CorustRoute,
-  CrowRoute: CrowRoute,
   CursorRoute: CursorRoute,
-  DeepagentsRoute: DeepagentsRoute,
   DeepseekTuiRoute: DeepseekTuiRoute,
-  DimcodeRoute: DimcodeRoute,
-  DiracRoute: DiracRoute,
   DocsRoute: DocsRouteWithChildren,
   DownloadRoute: DownloadRoute,
-  FactoryDroidRoute: FactoryDroidRoute,
-  FastAgentRoute: FastAgentRoute,
+  FxRoute: FxRoute,
   GeminiRoute: GeminiRoute,
-  GlmRoute: GlmRoute,
   GooseRoute: GooseRoute,
   GrokRoute: GrokRoute,
-  HermesRoute: HermesRoute,
-  JunieRoute: JunieRoute,
-  KiloRoute: KiloRoute,
   KimiRoute: KimiRoute,
-  MinionCodeRoute: MinionCodeRoute,
   MistralVibeRoute: MistralVibeRoute,
-  NovaRoute: NovaRoute,
-  OmpRoute: OmpRoute,
   OpencodeRoute: OpencodeRoute,
   PiRoute: PiRoute,
-  PoolsideRoute: PoolsideRoute,
   PrivacyRoute: PrivacyRoute,
-  QoderRoute: QoderRoute,
-  QwenCodeRoute: QwenCodeRoute,
-  SigitRoute: SigitRoute,
-  StakpakRoute: StakpakRoute,
   TermsRoute: TermsRoute,
-  VtcodeRoute: VtcodeRoute,
   AlternativesClaudeDesktopRoute: AlternativesClaudeDesktopRoute,
   AlternativesCodexAppRoute: AlternativesCodexAppRoute,
   AlternativesConductorRoute: AlternativesConductorRoute,
