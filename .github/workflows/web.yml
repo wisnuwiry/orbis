@@ -87,6 +87,7 @@ jobs:
       - name: Check landing app (@padu/landing)
         run: |
           bun run landing:typecheck
+          bun run landing:test
           bun run landing:build
 
       - name: Check mobile app (@padu/mobile)
