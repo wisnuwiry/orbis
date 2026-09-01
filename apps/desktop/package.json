@@ -1,0 +1,12 @@
+{
+  "name": "@padu/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun ../../scripts/dev.ts",
+    "build": "cargo build --package padu --bin padu --bin padu_js_repl",
+    "check": "cargo check --package padu",
+    "test": "cargo test --package padu"
+  }
+}

@@ -29,7 +29,7 @@ A provider title therefore never overwrites a name the user typed.
 [`set_title_from_prompt`](../crates/padu-protocol/src/model.rs#L964) takes the
 **first seven words** of the first prompt, capped at 54 characters, and writes
 them into `auto_title`. It is called once per session from
-[runtime.rs:2949](../src/app/runtime.rs#L2949) and no-ops if the session
+[runtime.rs:2949](../apps/desktop/src/app/runtime.rs#L2949) and no-ops if the session
 already has a second message, a user title, or any `auto_title`.
 
 This is a placeholder, not a title. It shares the `auto_title` field precisely
@@ -42,10 +42,10 @@ fast it replaces that placeholder, not merely on whether it eventually does.
 ## The three delivery shapes
 
 Every provider funnels into `DriverEvent::AutoTitleUpdated(Option<String>)`,
-consumed once in [streaming.rs:258](../src/app/streaming.rs#L258) →
+consumed once in [streaming.rs:258](../apps/desktop/src/app/streaming.rs#L258) →
 `set_auto_title`, which trims, maps empty to `None`, and is the universal
 last-stage normalizer. `AutoTitleUpdated` is in the `force_save` set
-([runtime.rs](../src/app/runtime.rs)), so a title persists the moment it lands.
+([runtime.rs](../apps/desktop/src/app/runtime.rs)), so a title persists the moment it lands.
 
 What differs is how the title reaches that event:
 

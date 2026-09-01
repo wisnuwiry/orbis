@@ -40,7 +40,7 @@
 - Streaming CPU is governed by two cadences — stream commits at ≤ ~8.3 Hz and
   pulse-clock ticks at ≤ ~30 Hz — and by what one frame can see. Read
   [docs/performance.md](docs/performance.md) before touching the event pump,
-  the pulse clock (`src/ui/motion.rs`), veils, overlay scrollbars, pane
+  the pulse clock (`apps/desktop/src/ui/motion.rs`), veils, overlay scrollbars, pane
   caching, or anything else a streaming frame reaches; it also records the
   counter-based measurement playbook that actually finds regressions.
 
@@ -66,9 +66,9 @@
 
 ## Client synchronization and feature parity
 
-- Keep the native desktop app (`src/`) and the browser client (`apps/web/`) in
+- Keep the native desktop app (`apps/desktop/`) and the browser client (`apps/web/`) in
   lockstep. Whenever adding a feature, modifying workflows, or making UI/UX
-  changes, update both `src/` and `apps/web/` together in the same change set.
+  changes, update both `apps/desktop/` and `apps/web/` together in the same change set.
 - Never implement or update user-facing features, components, or UI behaviors in
   only one client while leaving the other behind, unless a capability is
   explicitly platform-exclusive by design (e.g. native macOS window chrome or
@@ -79,7 +79,7 @@
   remain strictly type-safe and synchronized with the daemon backend.
 - Ensure visual hierarchy, state representation, controls, and interaction
   models remain consistent across both surfaces, while respecting native GPUI
-  idioms in `src/` and modern web patterns in `apps/web/`.
+  idioms in `apps/desktop/` and modern web patterns in `apps/web/`.
 
 ## Product reference
 
@@ -95,9 +95,9 @@
 - Use [Zed](https://github.com/zed-industries/zed) source code as a reference
   when a task concerns GPUI implementation — layout and styling idioms, focus
   and key dispatch, virtualized lists, menus and popovers, window and platform
-  behavior — or when an in-house `src/ui` primitive needs a proven native
+  behavior — or when an in-house `apps/desktop/src/ui` primitive needs a proven native
   precedent. Zed is the canonical GPUI codebase; read its crates rather than
-  `gpui-component`, and read the gpui revision pinned in `Cargo.toml` so the
+  `gpui-component`, and read the gpui revision pinned in `apps/desktop/Cargo.toml` so the
   APIs match what Padu builds against.
 - Split the two references by concern: T3 Code answers what a coding-agent
   client should do, Zed answers how a polished GPUI app implements it. The
@@ -124,7 +124,7 @@
   or run `cargo fmt`, `cargo check`, `cargo test`, `bun run protocol:check`,
   and client/web checks).
 - Audit all diffs against base branch for UI thread safety (no blocking I/O in
-  `render`), client parity between `src/` and `apps/web/`, keyboard accessibility,
+  `render`), client parity between `apps/desktop/` and `apps/web/`, keyboard accessibility,
   and error handling.
 - Prepare a structured review report and PR description following
   `CONTRIBUTING.md` standards.

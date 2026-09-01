@@ -3,7 +3,7 @@ name: protocol-parity-sync
 description: >-
   Step-by-step runbook and verification tool for synchronizing wire protocol changes,
   generating TypeScript bindings, updating shared reducers, and ensuring UI/feature
-  parity between Padu's native desktop (src/), web (apps/web/), and mobile (apps/mobile/) clients.
+  parity between Padu's native desktop (apps/desktop/), web (apps/web/), and mobile (apps/mobile/) clients.
 ---
 
 # Protocol & Cross-Client Parity Skill
@@ -54,7 +54,7 @@ Verify the generated files in `packages/padu-client/src/generated/` and commit t
 ---
 
 ### Step 4: Implement Desktop UI (GPUI)
-1. Update `src/ui/` or `src/app/` to reflect the new state/event.
+1. Update `apps/desktop/src/ui/` or `apps/desktop/src/app/` to reflect the new state/event.
 2. Adhere to GPUI native idioms, keyboard accessibility (`track_focus`, `focus_visible`), and zero blocking I/O on UI thread.
 
 ---

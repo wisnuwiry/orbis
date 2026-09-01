@@ -100,7 +100,7 @@ MOBILE_CHANGED=false
 PROTOCOL_CHANGED=false
 CLIENT_PKG_CHANGED=false
 
-if echo "$CHANGED_FILES" | grep -qE '^(src/|crates/|Cargo\.|build\.rs)'; then
+if echo "$CHANGED_FILES" | grep -qE '^(apps/desktop/|crates/|Cargo\.|build\.rs)'; then
     RUST_CHANGED=true
 fi
 if echo "$CHANGED_FILES" | grep -qE '^apps/web/'; then
@@ -137,7 +137,7 @@ echo ""
 echo -e "${BOLD}━━━ 2. Anti-Pattern Scans ━━━${NC}"
 
 # Debug code in Rust
-run_warn_check "Debug macros in Rust (dbg!, println! in src/)" \
+run_warn_check "Debug macros in Rust (dbg!, println! in apps/desktop/)" \
     "git diff ${BASE_REF}...HEAD -- '*.rs' | grep -n '^\+' | grep -E '(dbg!\(|println!\(|eprintln!\()' | grep -v '// keep' | grep -v '#\[cfg(test)\]' | head -20"
 
 # Debug code in TypeScript
@@ -237,7 +237,7 @@ echo -e "\n${BOLD}━━━ 8. Parity Heuristic ━━━${NC}"
 
 if $RUST_CHANGED && ! $WEB_CHANGED; then
     # Check if any of the changed Rust files have UI/feature implications
-    UI_RUST=$(echo "$CHANGED_FILES" | grep -E '^src/(app|ui|input|browser|terminal)' || true)
+    UI_RUST=$(echo "$CHANGED_FILES" | grep -E '^apps/desktop/src/(app|ui|input|browser|terminal)' || true)
     if [ -n "$UI_RUST" ]; then
         echo -e "${YELLOW}  ⚠ Rust UI files changed but no web files updated — verify parity:${NC}"
         echo "$UI_RUST" | sed 's/^/    /'

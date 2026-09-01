@@ -376,7 +376,7 @@ pub fn open_with_default_app(path: &std::path::Path, cx: &gpui::App) {
 pub fn linux_app_icon() -> Option<std::sync::Arc<image::RgbaImage>> {
     static ICON: std::sync::LazyLock<Option<std::sync::Arc<image::RgbaImage>>> =
         std::sync::LazyLock::new(|| {
-            image::load_from_memory(include_bytes!("../apps/landing/public/app-icon.png"))
+            image::load_from_memory(include_bytes!("../../landing/public/app-icon.png"))
                 .ok()
                 .map(|image| std::sync::Arc::new(image.into_rgba8()))
         });
