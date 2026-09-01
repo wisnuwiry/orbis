@@ -12,7 +12,7 @@ describe('remembered navigation', () => {
     const storage = memoryStorage()
     writeRememberedNavigation(storage, 'ws://first', {
       kind: 'newTask',
-      projectId: 'orbis',
+      projectId: 'padu',
     })
     writeRememberedNavigation(storage, 'ws://second', {
       kind: 'session',
@@ -21,7 +21,7 @@ describe('remembered navigation', () => {
 
     expect(readRememberedNavigation(storage, 'ws://first')).toEqual({
       kind: 'newTask',
-      projectId: 'orbis',
+      projectId: 'padu',
     })
     expect(readRememberedNavigation(storage, 'ws://second')).toEqual({
       kind: 'session',
@@ -51,7 +51,7 @@ describe('browser route transitions', () => {
 
 describe('selected task removal', () => {
   test('opens the newest remaining task in the same project', () => {
-    const project = { ...createProject('/repos/orbis'), id: 'orbis' }
+    const project = { ...createProject('/repos/padu'), id: 'padu' }
     const removed = { ...createSession(project.id, 'codex', false), id: 'removed' }
     const older = {
       ...createSession(project.id, 'codex', false),
@@ -73,7 +73,7 @@ describe('selected task removal', () => {
   })
 
   test('opens a fresh task in the same ordinary project when history is empty', () => {
-    const project = { ...createProject('/repos/orbis'), id: 'orbis' }
+    const project = { ...createProject('/repos/padu'), id: 'padu' }
     const removed = createSession(project.id, 'codex', false)
     expect(taskRemovalDestination([project], [project], [], removed)).toEqual({
       kind: 'newTask',
@@ -83,7 +83,7 @@ describe('selected task removal', () => {
 
   test('creates a fresh projectless workspace after deleting its last task', () => {
     const project = {
-      ...createProject('/home/user/.orbis/projects/old-task'),
+      ...createProject('/home/user/.padu/projects/old-task'),
       id: 'projectless',
       name: 'No project',
     }
@@ -96,7 +96,7 @@ describe('selected task removal', () => {
 
 function memoryStorage(initial?: string) {
   const values = new Map<string, string>()
-  if (initial !== undefined) values.set('orbis.navigation', initial)
+  if (initial !== undefined) values.set('padu.navigation', initial)
   return {
     getItem: (key: string) => values.get(key) ?? null,
     setItem: (key: string, value: string) => { values.set(key, value) },

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import type { ProviderAgentPreset } from '@orbis/client'
+import type { ProviderAgentPreset } from '@padu/client'
 import {
   agentPresetDescription,
   agentPresetIdLabel,

@@ -1,5 +1,5 @@
 [package]
-name = "orbis"
+name = "padu"
 version = "0.1.0"
 edition = "2024"
 description = "A fast, native control plane for local coding agents"
@@ -7,17 +7,17 @@ license = "GPL-3.0-only"
 
 [workspace]
 members = [
-    "crates/orbis-client",
-    "crates/orbis-core",
-    "crates/orbis-daemon",
-    "crates/orbis-protocol",
+    "crates/padu-client",
+    "crates/padu-core",
+    "crates/padu-daemon",
+    "crates/padu-protocol",
 ]
 default-members = [
     ".",
-    "crates/orbis-client",
-    "crates/orbis-core",
-    "crates/orbis-daemon",
-    "crates/orbis-protocol",
+    "crates/padu-client",
+    "crates/padu-core",
+    "crates/padu-daemon",
+    "crates/padu-protocol",
 ]
 resolver = "2"
 
@@ -45,8 +45,8 @@ serde_json = "1.0"
 unicode-segmentation = "1.12"
 url = "2"
 uuid = { version = "1.18", features = ["v4", "serde"] }
-orbis-client = { path = "crates/orbis-client" }
-orbis-protocol = { path = "crates/orbis-protocol" }
+padu-client = { path = "crates/padu-client" }
+padu-protocol = { path = "crates/padu-protocol" }
 pulldown-cmark = "0.13"
 regex = "1"
 rust-i18n = "4"
@@ -156,7 +156,7 @@ embed-resource = "3.0"
 [target.'cfg(target_os = "windows")'.dependencies]
 raw-window-handle = "0.6"
 # The browser surface. WebView2 is evergreen on Windows 10 and in-box on 11.
-# Orbis drives it through `webview2-com` rather than wry because it needs the
+# Padu drives it through `webview2-com` rather than wry because it needs the
 # *composition* controller, which renders into a DirectComposition visual
 # instead of a child HWND — see `browser::host` for why, and note that only
 # the environment can create one, so it cannot be reached from wry's
@@ -172,7 +172,7 @@ windows = { version = "0.61", features = [
     "Win32_UI_WindowsAndMessaging",
 ] }
 windows-core = "0.61"
-# GPUI does not read the Windows animation preference, so Orbis asks
+# GPUI does not read the Windows animation preference, so Padu asks
 # `SystemParametersInfoW` itself. Same major version as the one already in the
 # graph through GPUI.
 windows-sys = { version = "0.61", features = [

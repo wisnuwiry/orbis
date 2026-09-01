@@ -1,6 +1,6 @@
 use super::*;
 
-impl Orbis {
+impl Padu {
     pub(super) fn finish_streaming_assistant(&mut self, session_id: Uuid) {
         if let Some(session) = self.state.session_mut(session_id) {
             for message in &mut session.messages {

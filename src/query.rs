@@ -1,6 +1,6 @@
 //! A small keyed cache for values that have to be fetched.
 //!
-//! Orbis had grown three hand-rolled versions of the same thing — the git branch
+//! Padu had grown three hand-rolled versions of the same thing — the git branch
 //! per project, the diff file list, session transcripts — each with its own
 //! generation counter to stop a slow result from overwriting a newer one. This
 //! is that pattern once, borrowing the shape of TanStack Query: read from
@@ -16,10 +16,10 @@
 //!     Query::Ready(branch) => branch.clone(),
 //!     Query::Pending => None,        // draw the last known value
 //!     Query::Missing(token) => {     // first asker starts the work
-//!         cx.spawn(async move |orbis, cx| {
+//!         cx.spawn(async move |padu, cx| {
 //!             let branch = cx.background_executor().spawn(fetch).await;
-//!             orbis.update(cx, |orbis, cx| {
-//!                 if orbis.branches.fulfill(token, branch) {
+//!             padu.update(cx, |padu, cx| {
+//!                 if padu.branches.fulfill(token, branch) {
 //!                     cx.notify();
 //!                 }
 //!             })

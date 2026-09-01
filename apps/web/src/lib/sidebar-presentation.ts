@@ -1,4 +1,4 @@
-import type { AgentSession, Project } from '@orbis/client'
+import type { AgentSession, Project } from '@padu/client'
 import { isProjectlessProject, projectDisplayName } from './project-presentation'
 
 export type SidebarGrouping = 'project' | 'updated'

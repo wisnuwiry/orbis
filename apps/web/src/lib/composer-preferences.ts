@@ -1,6 +1,6 @@
-import type { AgentSession, ProviderKind } from '@orbis/client'
+import type { AgentSession, ProviderKind } from '@padu/client'
 
-const STORAGE_KEY = 'orbis.composer-preferences.v1'
+const STORAGE_KEY = 'padu.composer-preferences.v1'
 
 type StorageLike = Pick<Storage, 'getItem' | 'setItem'>
 

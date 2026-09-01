@@ -1,6 +1,6 @@
 use gpui::{App, Global, Hsla, Rems, Window, WindowAppearance, hsla, rems, rgb, transparent_black};
 
-pub use orbis_client::theme::ThemePreference;
+pub use padu_client::theme::ThemePreference;
 
 /// Scaled pixels: a dimension authored at the default 14px UI font size,
 /// expressed in rems so the UI font size setting scales it. The window's rem
@@ -12,7 +12,7 @@ pub use orbis_client::theme::ThemePreference;
 /// editor, diff rows, tool-output mono — stay in `px` so they never scale
 /// twice.
 pub fn sp(value: f32) -> Rems {
-    rems(value / orbis_client::persistence::DEFAULT_UI_FONT_SIZE)
+    rems(value / padu_client::persistence::DEFAULT_UI_FONT_SIZE)
 }
 
 fn resolves_to_dark(preference: ThemePreference, system_appearance: WindowAppearance) -> bool {
@@ -34,7 +34,7 @@ fn native_override(preference: ThemePreference) -> Option<bool> {
     }
 }
 
-/// Orbis's visual language, take two: neutral graphite surfaces in the spirit
+/// Padu's visual language, take two: neutral graphite surfaces in the spirit
 /// of Cursor — color is reserved for meaning. On macOS the sidebar's semantic
 /// tint is installed as a native layer above Sidebar vibrancy; keeping this
 /// GPUI surface clear avoids incorrectly accumulating the alpha of nested Metal
@@ -92,8 +92,8 @@ pub struct Theme {
 
 impl Theme {
     pub fn current(cx: &App) -> Self {
-        if cx.has_global::<ActiveOrbisTheme>() {
-            cx.global::<ActiveOrbisTheme>().0
+        if cx.has_global::<ActivePaduTheme>() {
+            cx.global::<ActivePaduTheme>().0
         } else {
             Self::dark()
         }
@@ -195,14 +195,14 @@ impl Theme {
 }
 
 #[derive(Clone, Copy)]
-struct ActiveOrbisTheme(Theme);
+struct ActivePaduTheme(Theme);
 
-impl Global for ActiveOrbisTheme {}
+impl Global for ActivePaduTheme {}
 
 /// Publish the resolved palette. [`Theme::current`] reads it back from the
 /// global, which is how every view gets its colors.
 fn set_active_theme(theme: Theme, cx: &mut App) {
-    cx.set_global(ActiveOrbisTheme(theme));
+    cx.set_global(ActivePaduTheme(theme));
 }
 
 /// Resolve and publish the startup palette, before any window exists.

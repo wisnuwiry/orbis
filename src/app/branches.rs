@@ -5,7 +5,7 @@ enum BranchOperation {
     Create(String),
 }
 
-impl Orbis {
+impl Padu {
     pub(super) fn sync_branch_picker_rows(&self, rows: &[crate::git_branch::BranchEntry]) {
         let mut cached = self.branch_picker_row_cache.borrow_mut();
         if cached.as_slice() == rows {
@@ -58,19 +58,19 @@ impl Orbis {
             Query::Pending => fallback,
             Query::Missing(token) => {
                 let fetch_path = workspace_path.clone();
-                let workspace = orbis_client::WorkspaceClient::new(self.daemon.client());
-                cx.spawn(async move |orbis, cx| {
+                let workspace = padu_client::WorkspaceClient::new(self.daemon.client());
+                cx.spawn(async move |padu, cx| {
                     let result = cx
                         .background_executor()
                         .spawn({
                             let fetch_path = fetch_path.clone();
                             async move {
                                 match workspace.request(
-                                    orbis_client::WorkspaceOperation::InspectBranches {
+                                    padu_client::WorkspaceOperation::InspectBranches {
                                         cwd: fetch_path.clone(),
                                     },
                                 ) {
-                                    Ok(orbis_client::WorkspaceResult::Branches { snapshot }) => {
+                                    Ok(padu_client::WorkspaceResult::Branches { snapshot }) => {
                                         Ok(snapshot)
                                     }
                                     Ok(_) => {
@@ -82,19 +82,19 @@ impl Orbis {
                             }
                         })
                         .await;
-                    let _ = orbis.update(cx, |orbis, cx| {
-                        if !orbis.branch_snapshots.fulfill(token, result.clone()) {
+                    let _ = padu.update(cx, |padu, cx| {
+                        if !padu.branch_snapshots.fulfill(token, result.clone()) {
                             return;
                         }
                         match &result {
-                            Ok(Some(snapshot)) => orbis.cache_sidebar_branch_label(
+                            Ok(Some(snapshot)) => padu.cache_sidebar_branch_label(
                                 &fetch_path,
                                 snapshot.display_branch(),
                             ),
-                            Ok(None) => orbis.cache_sidebar_branch_label(&fetch_path, None),
+                            Ok(None) => padu.cache_sidebar_branch_label(&fetch_path, None),
                             Err(_) => {}
                         }
-                        let selected = orbis
+                        let selected = padu
                             .selected_workspace_path()
                             .is_some_and(|path| path == fetch_path);
                         if selected {
@@ -102,7 +102,7 @@ impl Orbis {
                                 Ok(Some(snapshot)) => {
                                     let mut persisted_branch_changed = false;
                                     if let Some(current) = snapshot.current.as_deref()
-                                        && let Some(session) = orbis.selected_session_mut()
+                                        && let Some(session) = padu.selected_session_mut()
                                         && let SessionWorkspace::Worktree { branch, .. } =
                                             &mut session.workspace
                                         && branch != current
@@ -110,12 +110,12 @@ impl Orbis {
                                         *branch = current.to_owned();
                                         persisted_branch_changed = true;
                                     }
-                                    orbis.visible_branch_snapshot = Some((fetch_path, snapshot));
+                                    padu.visible_branch_snapshot = Some((fetch_path, snapshot));
                                     if persisted_branch_changed {
-                                        orbis.save();
+                                        padu.save();
                                     }
                                 }
-                                Ok(None) => orbis.visible_branch_snapshot = None,
+                                Ok(None) => padu.visible_branch_snapshot = None,
                                 Err(_) => {}
                             }
                             cx.notify();
@@ -145,7 +145,7 @@ impl Orbis {
     /// real `git switch` on the background executor.
     ///
     /// `true` asks the caller to dismiss the picker after this entity update
-    /// ends. Closing sooner runs the toggle observer, which re-enters `Orbis`
+    /// ends. Closing sooner runs the toggle observer, which re-enters `Padu`
     /// and double-leases the entity.
     pub(super) fn choose_workspace_branch(
         &mut self,
@@ -287,7 +287,7 @@ impl Orbis {
     }
 
     /// Apply the keyboard-selected action, returning whether the caller should
-    /// dismiss the picker after releasing its `Orbis` update lease.
+    /// dismiss the picker after releasing its `Padu` update lease.
     pub(super) fn confirm_branch_picker_action(
         &mut self,
         actions: &[BranchPickerAction],
@@ -322,8 +322,8 @@ impl Orbis {
         }
         self.branch_operation_pending = true;
         cx.notify();
-        let workspace = orbis_client::WorkspaceClient::new(self.daemon.client());
-        cx.spawn(async move |orbis, cx| {
+        let workspace = padu_client::WorkspaceClient::new(self.daemon.client());
+        cx.spawn(async move |padu, cx| {
             let result = cx
                 .background_executor()
                 .spawn({
@@ -334,13 +334,13 @@ impl Orbis {
                             BranchOperation::Create(branch) => (branch, true),
                         };
                         match workspace.request(
-                            orbis_client::WorkspaceOperation::CheckoutBranch {
+                            padu_client::WorkspaceOperation::CheckoutBranch {
                                 cwd: path,
                                 branch,
                                 create,
                             },
                         )? {
-                            orbis_client::WorkspaceResult::BranchChanged { snapshot } => {
+                            padu_client::WorkspaceResult::BranchChanged { snapshot } => {
                                 Ok(snapshot)
                             }
                             _ => anyhow::bail!("the daemon returned an invalid branch response"),
@@ -348,32 +348,32 @@ impl Orbis {
                     }
                 })
                 .await;
-            let _ = orbis.update(cx, |orbis, cx| {
-                orbis.branch_operation_pending = false;
+            let _ = padu.update(cx, |padu, cx| {
+                padu.branch_operation_pending = false;
                 match result {
                     Ok(snapshot) => {
                         let current = snapshot.current.clone();
-                        orbis.cache_sidebar_branch_label(&path, snapshot.display_branch());
-                        orbis.visible_branch_snapshot = Some((path.clone(), snapshot));
-                        orbis.branch_snapshots.invalidate(&path);
-                        let selected_path = orbis
+                        padu.cache_sidebar_branch_label(&path, snapshot.display_branch());
+                        padu.visible_branch_snapshot = Some((path.clone(), snapshot));
+                        padu.branch_snapshots.invalidate(&path);
+                        let selected_path = padu
                             .selected_workspace_path()
                             .map(std::path::Path::to_path_buf);
                         if selected_path.as_ref() == Some(&path) {
                             if let Some(current) = current
-                                && let Some(session) = orbis.selected_session_mut()
+                                && let Some(session) = padu.selected_session_mut()
                                 && let SessionWorkspace::Worktree { branch, .. } =
                                     &mut session.workspace
                             {
                                 *branch = current;
                             }
-                            orbis.invalidate_workspace_queries(cx);
-                            orbis.reload_clean_right_panel_file_editors(cx);
-                            orbis.save();
+                            padu.invalidate_workspace_queries(cx);
+                            padu.reload_clean_right_panel_file_editors(cx);
+                            padu.save();
                         }
                     }
                     Err(error) => {
-                        orbis.show_toast(tr!("errors.change_branch", error = error));
+                        padu.show_toast(tr!("errors.change_branch", error = error));
                     }
                 }
                 cx.notify();

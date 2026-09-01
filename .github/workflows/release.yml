@@ -110,12 +110,12 @@ jobs:
       # release's bundles are still sitting in `target/release` when this one
       # starts. Cargo does not own them, so nothing else clears them.
       - name: Clear stale bundles
-        run: rm -f target/release/orbis-*.tar.gz
+        run: rm -f target/release/padu-*.tar.gz
 
       - name: Bundle
         env:
-          ORBIS_ANALYTICS_ENDPOINT: ${{ secrets.ORBIS_ANALYTICS_ENDPOINT }}
-          ORBIS_ANALYTICS_WEBSITE_ID: ${{ secrets.ORBIS_ANALYTICS_WEBSITE_ID }}
+          PADU_ANALYTICS_ENDPOINT: ${{ secrets.PADU_ANALYTICS_ENDPOINT }}
+          PADU_ANALYTICS_WEBSITE_ID: ${{ secrets.PADU_ANALYTICS_WEBSITE_ID }}
         run: ./scripts/bundle-linux.sh
 
       - uses: actions/upload-artifact@v7
@@ -124,7 +124,7 @@ jobs:
           # Named exactly, not globbed: `if-no-files-found: error` is then a
           # real check that this version built, rather than something an older
           # bundle can satisfy.
-          path: target/release/orbis-${{ needs.version.outputs.version }}-x86_64-unknown-linux-gnu.tar.gz
+          path: target/release/padu-${{ needs.version.outputs.version }}-x86_64-unknown-linux-gnu.tar.gz
           if-no-files-found: error
 
   linux-arm64:
@@ -169,18 +169,18 @@ jobs:
       # release's bundles are still sitting in `target/release` when this one
       # starts. Cargo does not own them, so nothing else clears them.
       - name: Clear stale bundles
-        run: rm -f target/release/orbis-*.tar.gz
+        run: rm -f target/release/padu-*.tar.gz
 
       - name: Bundle
         env:
-          ORBIS_ANALYTICS_ENDPOINT: ${{ secrets.ORBIS_ANALYTICS_ENDPOINT }}
-          ORBIS_ANALYTICS_WEBSITE_ID: ${{ secrets.ORBIS_ANALYTICS_WEBSITE_ID }}
+          PADU_ANALYTICS_ENDPOINT: ${{ secrets.PADU_ANALYTICS_ENDPOINT }}
+          PADU_ANALYTICS_WEBSITE_ID: ${{ secrets.PADU_ANALYTICS_WEBSITE_ID }}
         run: ./scripts/bundle-linux.sh
 
       - uses: actions/upload-artifact@v7
         with:
           name: linux-arm64
-          path: target/release/orbis-${{ needs.version.outputs.version }}-aarch64-unknown-linux-gnu.tar.gz
+          path: target/release/padu-${{ needs.version.outputs.version }}-aarch64-unknown-linux-gnu.tar.gz
           if-no-files-found: error
 
   windows-x86_64:
@@ -217,12 +217,12 @@ jobs:
       # release's bundles are still sitting in `target/release` when this one
       # starts. Cargo does not own them, so nothing else clears them.
       - name: Clear stale bundles
-        run: Remove-Item -Force -ErrorAction SilentlyContinue target/release/orbis-*.zip, target/release/Orbis-*-Setup.exe
+        run: Remove-Item -Force -ErrorAction SilentlyContinue target/release/padu-*.zip, target/release/Padu-*-Setup.exe
 
       - name: Bundle
         env:
-          ORBIS_ANALYTICS_ENDPOINT: ${{ secrets.ORBIS_ANALYTICS_ENDPOINT }}
-          ORBIS_ANALYTICS_WEBSITE_ID: ${{ secrets.ORBIS_ANALYTICS_WEBSITE_ID }}
+          PADU_ANALYTICS_ENDPOINT: ${{ secrets.PADU_ANALYTICS_ENDPOINT }}
+          PADU_ANALYTICS_WEBSITE_ID: ${{ secrets.PADU_ANALYTICS_WEBSITE_ID }}
           WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
           WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
         run: bun scripts/bundle-windows.ts
@@ -231,8 +231,8 @@ jobs:
         with:
           name: windows-x86_64
           path: |
-            target/release/orbis-${{ needs.version.outputs.version }}-x86_64-pc-windows-msvc.zip
-            target/release/Orbis-${{ needs.version.outputs.version }}-x86_64-Setup.exe
+            target/release/padu-${{ needs.version.outputs.version }}-x86_64-pc-windows-msvc.zip
+            target/release/Padu-${{ needs.version.outputs.version }}-x86_64-Setup.exe
           if-no-files-found: error
 
   windows-arm64:
@@ -269,12 +269,12 @@ jobs:
       # release's bundles are still sitting in `target/release` when this one
       # starts. Cargo does not own them, so nothing else clears them.
       - name: Clear stale bundles
-        run: Remove-Item -Force -ErrorAction SilentlyContinue target/release/orbis-*.zip, target/release/Orbis-*-Setup.exe
+        run: Remove-Item -Force -ErrorAction SilentlyContinue target/release/padu-*.zip, target/release/Padu-*-Setup.exe
 
       - name: Bundle
         env:
-          ORBIS_ANALYTICS_ENDPOINT: ${{ secrets.ORBIS_ANALYTICS_ENDPOINT }}
-          ORBIS_ANALYTICS_WEBSITE_ID: ${{ secrets.ORBIS_ANALYTICS_WEBSITE_ID }}
+          PADU_ANALYTICS_ENDPOINT: ${{ secrets.PADU_ANALYTICS_ENDPOINT }}
+          PADU_ANALYTICS_WEBSITE_ID: ${{ secrets.PADU_ANALYTICS_WEBSITE_ID }}
           WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
           WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
         run: bun scripts/bundle-windows.ts
@@ -283,8 +283,8 @@ jobs:
         with:
           name: windows-arm64
           path: |
-            target/release/orbis-${{ needs.version.outputs.version }}-aarch64-pc-windows-msvc.zip
-            target/release/Orbis-${{ needs.version.outputs.version }}-aarch64-Setup.exe
+            target/release/padu-${{ needs.version.outputs.version }}-aarch64-pc-windows-msvc.zip
+            target/release/Padu-${{ needs.version.outputs.version }}-aarch64-Setup.exe
           if-no-files-found: error
 
   macos:
@@ -345,9 +345,9 @@ jobs:
 
       - name: Release
         env:
-          ORBIS_SIGNING_IDENTITY: ${{ secrets.ORBIS_SIGNING_IDENTITY }}
-          ORBIS_ANALYTICS_ENDPOINT: ${{ secrets.ORBIS_ANALYTICS_ENDPOINT }}
-          ORBIS_ANALYTICS_WEBSITE_ID: ${{ secrets.ORBIS_ANALYTICS_WEBSITE_ID }}
+          PADU_SIGNING_IDENTITY: ${{ secrets.PADU_SIGNING_IDENTITY }}
+          PADU_ANALYTICS_ENDPOINT: ${{ secrets.PADU_ANALYTICS_ENDPOINT }}
+          PADU_ANALYTICS_WEBSITE_ID: ${{ secrets.PADU_ANALYTICS_WEBSITE_ID }}
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: bun run release --local
 
@@ -355,9 +355,9 @@ jobs:
         with:
           name: macos
           path: |
-            dist/Orbis-${{ needs.version.outputs.version }}.dmg
-            dist/Orbis-${{ needs.version.outputs.version }}.md
-            dist/Orbis-${{ needs.version.outputs.version }}.zip
+            dist/Padu-${{ needs.version.outputs.version }}.dmg
+            dist/Padu-${{ needs.version.outputs.version }}.md
+            dist/Padu-${{ needs.version.outputs.version }}.zip
             dist/appcast.xml
           if-no-files-found: error
 
@@ -408,7 +408,7 @@ jobs:
           for platform in linux windows; do
             for arch in x86_64 aarch64; do
               curl -fsSL --max-time 30 \
-                "https://releases.orbis.sh/appcast-$platform-$arch.xml" \
+                "https://releases.padu.dev/appcast-$platform-$arch.xml" \
                 -o "artifacts/appcast-$platform-$arch.xml" || true
             done
           done

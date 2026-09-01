@@ -8,7 +8,7 @@ use gpui::{KeyBinding, actions};
 
 use super::*;
 
-actions!(orbis_image_preview, [DismissImagePreview]);
+actions!(padu_image_preview, [DismissImagePreview]);
 
 const IMAGE_PREVIEW_CONTEXT: &str = "ImagePreview";
 const IMAGE_PREVIEW_ANIMATION_DURATION: Duration = Duration::from_millis(140);
@@ -40,7 +40,7 @@ pub(super) fn attachment_menu_items(path: PathBuf, can_reveal: bool) -> Vec<Menu
     ]
 }
 
-impl Orbis {
+impl Padu {
     /// Resolve one daemon-owned image for a visible row. Frames consult only
     /// in-memory state; the first miss starts a deduplicated background RPC and
     /// a later notification lets GPUI render the returned bytes from memory.
@@ -52,8 +52,8 @@ impl Orbis {
         cx: &mut Context<Self>,
     ) -> Option<Arc<gpui::Image>> {
         let attachment_reference =
-            reference.starts_with(orbis_protocol::attachments::ATTACHMENT_SCHEME);
-        if !orbis_protocol::blob::is_reference(reference) && !attachment_reference {
+            reference.starts_with(padu_protocol::attachments::ATTACHMENT_SCHEME);
+        if !padu_protocol::blob::is_reference(reference) && !attachment_reference {
             return None;
         }
         if let Some(state) = self.remote_images.borrow().get(reference) {
@@ -80,11 +80,11 @@ impl Orbis {
         let fetch_reference = cache_key.clone();
         let daemon_path = daemon_path.map(Path::to_path_buf);
         let daemon = self.daemon.clone();
-        cx.spawn(async move |orbis, cx| {
+        cx.spawn(async move |padu, cx| {
             let image = cx
                 .background_executor()
                 .spawn(async move {
-                    orbis_client::persistence::read_remote_reference(
+                    padu_client::persistence::read_remote_reference(
                         &fetch_reference,
                         daemon_path.as_deref(),
                         &daemon,
@@ -92,8 +92,8 @@ impl Orbis {
                     .map(|bytes| Arc::new(gpui::Image::from_bytes(format, bytes)))
                 })
                 .await;
-            let _ = orbis.update(cx, |orbis, cx| {
-                orbis.remote_images.borrow_mut().insert(
+            let _ = padu.update(cx, |padu, cx| {
+                padu.remote_images.borrow_mut().insert(
                     cache_key,
                     image.map_or(RemoteImageState::Unavailable, RemoteImageState::Ready),
                 );

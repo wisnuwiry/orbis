@@ -16,7 +16,7 @@ import {
 export { APP_LANGUAGES }
 export type { AppLanguage, AppLocale }
 
-const LANGUAGE_STORAGE_KEY = 'orbis.language'
+const LANGUAGE_STORAGE_KEY = 'padu.language'
 const catalogs: Record<AppLocale, Record<string, string>> = {
   en: parseRustI18nCatalog(englishSource, 'en'),
   'zh-CN': parseRustI18nCatalog(simplifiedChineseSource, 'zh-CN'),

@@ -8,7 +8,7 @@ import { createInterface } from "node:readline/promises";
 const projectRoot = resolve(import.meta.dir, "..");
 const userHome = homedir();
 const library = join(userHome, "Library");
-const debugBundleIdentifiers = ["sh.orbis.dev", "codes.orbis.dev"];
+const debugBundleIdentifiers = ["dev.padu.dev", "codes.padu.dev"];
 
 type Target = {
   path: string;
@@ -22,7 +22,7 @@ function addCandidate(path: string): void {
 }
 
 function isDebugDiagnostic(name: string): boolean {
-  return /^Orbis Debug(?: Computer Use)?[-_.]/.test(name);
+  return /^Padu Debug(?: Computer Use)?[-_.]/.test(name);
 }
 
 async function addMatchingChildren(
@@ -64,38 +64,38 @@ async function existingTargets(): Promise<Target[]> {
 
 // Checkout-local state and build artifacts. Keep the release cache intact.
 addCandidate(join(projectRoot, "temp"));
-addCandidate(join(projectRoot, ".orbis-cache", "computer-use", "debug"));
-addCandidate(join(projectRoot, "target", "debug", "Orbis Debug.app"));
+addCandidate(join(projectRoot, ".padu-cache", "computer-use", "debug"));
+addCandidate(join(projectRoot, "target", "debug", "Padu Debug.app"));
 
 if (process.env.CARGO_TARGET_DIR) {
   addCandidate(
     join(
       resolve(projectRoot, process.env.CARGO_TARGET_DIR),
       "debug",
-      "Orbis Debug.app",
+      "Padu Debug.app",
     ),
   );
 }
 
 // Debug app bundles that may have been copied outside the checkout.
-addCandidate(join(userHome, "Applications", "Orbis Debug.app"));
-addCandidate("/Applications/Orbis Debug.app");
+addCandidate(join(userHome, "Applications", "Padu Debug.app"));
+addCandidate("/Applications/Padu Debug.app");
 
-// Debug-only app data. The release app uses Orbis/sh.orbis and is not included.
-addCandidate(join(library, "Application Support", "Orbis Debug"));
+// Debug-only app data. The release app uses Padu/dev.padu and is not included.
+addCandidate(join(library, "Application Support", "Padu Debug"));
 addCandidate(
   join(
     library,
     "Application Support",
-    "Orbis",
+    "Padu",
     "Computer Use",
-    "Orbis Debug Computer Use.app",
+    "Padu Debug Computer Use.app",
   ),
 );
-addCandidate(join(library, "Caches", "Orbis Debug"));
-addCandidate(join(library, "Logs", "Orbis Debug"));
+addCandidate(join(library, "Caches", "Padu Debug"));
+addCandidate(join(library, "Logs", "Padu Debug"));
 
-// codes.orbis.dev was Orbis Debug's bundle ID before sh.orbis.dev.
+// codes.padu.dev was Padu Debug's bundle ID before dev.padu.dev.
 for (const bundleIdentifier of debugBundleIdentifiers) {
   for (const path of [
     join(library, "Application Support", bundleIdentifier),
@@ -137,18 +137,18 @@ await addMatchingChildren(
 
 const targets = await existingTargets();
 if (targets.length === 0) {
-  console.log("No Orbis Debug files or directories found.");
+  console.log("No Padu Debug files or directories found.");
   process.exit(0);
 }
 
 console.log(
-  "The following Orbis Debug paths, including directory contents, will be permanently deleted:\n",
+  "The following Padu Debug paths, including directory contents, will be permanently deleted:\n",
 );
 for (const target of targets) {
   console.log(`  [${target.kind}] ${target.path}`);
 }
 
-const runningProcesses = ["Orbis Debug", "Orbis Debug Computer Use"].filter(
+const runningProcesses = ["Padu Debug", "Padu Debug Computer Use"].filter(
   (name) =>
     Bun.spawnSync(["/usr/bin/pgrep", "-x", name], {
       stdout: "ignore",

@@ -270,7 +270,7 @@ const CODE_SAMPLES: { language: string; lines: string[] }[] = [
     language: "bash",
     lines: [
       "cargo build --profile dev 2>&1 | tail -20",
-      "hyperfine --warmup 3 'target/debug/orbis --bench transcript'",
+      "hyperfine --warmup 3 'target/debug/padu --bench transcript'",
       "rg -n 'fn render' src/app | wc -l",
       "sqlite3 temp/app.db 'EXPLAIN QUERY PLAN SELECT * FROM sessions ORDER BY updated_at'",
     ],
@@ -429,7 +429,7 @@ function buildLog(random: Random, lines: number): string {
       out.push("   |         ^^^^ help: if this is intentional, prefix it with an underscore");
     } else if (roll < 0.2) {
       out.push(
-        `   Compiling ${pick(random, ["gpui", "orbis", "rusqlite", "pulldown-cmark", "smol"])} v${int(random, 0, 3)}.${int(random, 0, 40)}.${int(random, 0, 9)}`,
+        `   Compiling ${pick(random, ["gpui", "padu", "rusqlite", "pulldown-cmark", "smol"])} v${int(random, 0, 3)}.${int(random, 0, 40)}.${int(random, 0, 9)}`,
       );
     } else {
       out.push(
@@ -618,7 +618,7 @@ function blobReferences(databasePath: string): string[] {
       continue;
     }
     for (const file of files) {
-      if (/\.(png|jpe?g|gif|webp)$/i.test(file)) references.push(`orbis-blob:${file}`);
+      if (/\.(png|jpe?g|gif|webp)$/i.test(file)) references.push(`padu-blob:${file}`);
     }
   }
   return references;
@@ -834,7 +834,7 @@ function buildSession(
             turn_count: turnIndex + 1,
             // No such ref exists, so the rewind affordance stays hidden —
             // `prefetch_checkpoint_refs` only offers it for refs git resolves.
-            git_ref: `refs/orbis/session-${sessionId}-turn-${turnIndex + 1}`,
+            git_ref: `refs/padu/session-${sessionId}-turn-${turnIndex + 1}`,
             status: "ready",
             files: Array.from({ length: int(random, 0, 5) }, () => ({
               path: pick(random, FILES),

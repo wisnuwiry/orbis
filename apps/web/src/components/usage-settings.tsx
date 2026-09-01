@@ -8,12 +8,12 @@ import type {
   ProviderSlice,
   UsageHistory,
   UsageWindow,
-} from '@orbis/client'
+} from '@padu/client'
 import { useState, type ReactNode } from 'react'
 import { Virtuoso } from 'react-virtuoso'
 import { ControlMenu } from '@/components/control-menu'
 import { UsageTrendChart, type UsageMetric } from '@/components/usage-chart'
-import { ProviderIcon, OrbisIcon } from '@/components/orbis-icon'
+import { ProviderIcon, PaduIcon } from '@/components/padu-icon'
 import { useUsageHistory } from '@/hooks/use-daemon-data'
 import { useI18n, type AppLocale } from '@/lib/i18n'
 import type { Translator } from '@/lib/transcript-presentation'
@@ -76,7 +76,7 @@ export function UsageSettings({ projects }: { projects: Project[] }) {
           type="button"
           onClick={() => void usage.refetch()}
         >
-          <OrbisIcon className={cn('size-3', usage.isFetching && 'motion-safe:animate-spin')} name={usage.isFetching ? 'loaderCircle' : 'rotateCw'} />
+          <PaduIcon className={cn('size-3', usage.isFetching && 'motion-safe:animate-spin')} name={usage.isFetching ? 'loaderCircle' : 'rotateCw'} />
         </button>
       </div>
 
@@ -434,7 +434,7 @@ function ProjectsUsage({
       total={byCost ? formatMoney(history.costUsd, locale) : formatNumber(history.totalTokens, locale)}
       action={(
         <label className="flex h-7 w-[240px] shrink-0 items-center gap-2 rounded-md border bg-background px-2.5 focus-within:border-ring">
-          <OrbisIcon className="size-3 text-[var(--text-tertiary)]" name="search" />
+          <PaduIcon className="size-3 text-[var(--text-tertiary)]" name="search" />
           <input
             aria-label={t('usage.filter_projects')}
             className="min-w-0 flex-1 bg-transparent text-[11px] outline-none placeholder:text-[var(--text-ghost)]"

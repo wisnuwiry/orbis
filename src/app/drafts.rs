@@ -56,7 +56,7 @@ impl From<MessageAttachment> for ComposerAttachment {
     }
 }
 
-impl Orbis {
+impl Padu {
     pub(super) fn selected_composer_draft_key(
         &self,
     ) -> Option<crate::persistence::ComposerDraftKey> {
@@ -181,19 +181,19 @@ impl Orbis {
     pub(super) fn schedule_composer_draft_save(&mut self, cx: &mut Context<Self>) {
         self.composer_draft_save_generation = self.composer_draft_save_generation.saturating_add(1);
         let generation = self.composer_draft_save_generation;
-        cx.spawn(async move |orbis, cx| {
+        cx.spawn(async move |padu, cx| {
             cx.background_executor()
                 .timer(COMPOSER_DRAFT_SAVE_DELAY)
                 .await;
-            let Some((store, drafts)) = orbis
-                .update(cx, |orbis, cx| {
-                    if orbis.composer_draft_save_generation != generation {
+            let Some((store, drafts)) = padu
+                .update(cx, |padu, cx| {
+                    if padu.composer_draft_save_generation != generation {
                         return None;
                     }
-                    orbis.capture_current_composer_draft(cx);
+                    padu.capture_current_composer_draft(cx);
                     Some((
-                        orbis.composer_draft_store.clone(),
-                        orbis.composer_drafts.clone(),
+                        padu.composer_draft_store.clone(),
+                        padu.composer_drafts.clone(),
                     ))
                 })
                 .ok()
@@ -206,8 +206,8 @@ impl Orbis {
                 .spawn(async move { store.save(drafts, generation) })
                 .await;
             if let Err(error) = result {
-                let _ = orbis.update(cx, |orbis, cx| {
-                    orbis.show_toast(tr!("errors.save_local_state", error = error));
+                let _ = padu.update(cx, |padu, cx| {
+                    padu.show_toast(tr!("errors.save_local_state", error = error));
                     cx.notify();
                 });
             }

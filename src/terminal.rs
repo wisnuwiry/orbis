@@ -1813,12 +1813,12 @@ mod tests {
             None
         );
 
-        let term = parse_terminal(b"x\x1b]8;;https://orbis.gg\x1b\\Orbis\x1b]8;;\x1b\\ y");
+        let term = parse_terminal(b"x\x1b]8;;https://padu.gg\x1b\\Padu\x1b]8;;\x1b\\ y");
         let (value, bounds) = hyperlink_at(&term, TerminalPoint::new(Line(0), Column(2))).unwrap();
-        assert_eq!(value, "https://orbis.gg");
+        assert_eq!(value, "https://padu.gg");
         assert_eq!(
             bounds,
-            TerminalPoint::new(Line(0), Column(1))..=TerminalPoint::new(Line(0), Column(5))
+            TerminalPoint::new(Line(0), Column(1))..=TerminalPoint::new(Line(0), Column(4))
         );
     }
 

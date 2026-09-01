@@ -57,7 +57,7 @@ quoted: "值：%{count}"
     expect(normalizeLanguage('invalid')).toBe('system')
     expect(interpolateTranslation('%{count} files in %{project}', {
       count: 2,
-      project: 'orbis',
-    })).toBe('2 files in orbis')
+      project: 'padu',
+    })).toBe('2 files in padu')
   })
 })

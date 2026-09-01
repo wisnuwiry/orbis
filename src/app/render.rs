@@ -12,7 +12,7 @@ fn should_render_empty_state(session: Option<&AgentSession>) -> bool {
         .unwrap_or(true)
 }
 
-impl Orbis {
+impl Padu {
     pub(super) fn render_panel_resize_handle(
         &self,
         id: &'static str,
@@ -99,10 +99,10 @@ fn slide_width(slide: &mut Option<motion::WidthTween>, target: f32) -> f32 {
     }
 }
 
-impl Orbis {
+impl Padu {
     /// An edge is currently animating. While this holds, the pane islands'
     /// root observer stops fanning root notifies out to every island (see
-    /// [`OrbisPane::bind`]) and lets the cached-view geometry checks decide
+    /// [`PaduPane::bind`]) and lets the cached-view geometry checks decide
     /// which islands a slide tick actually rebuilds.
     pub(super) fn panels_sliding(&self) -> bool {
         self.sidebar_slide.is_some() || self.right_panel_slide.is_some()
@@ -167,7 +167,7 @@ impl Orbis {
             - self.right_panel_rendered_width
     }
 
-    /// [`OrbisPane`] delegate for the sidebar island.
+    /// [`PaduPane`] delegate for the sidebar island.
     pub(super) fn sidebar_pane_content(
         &mut self,
         window: &mut Window,
@@ -178,7 +178,7 @@ impl Orbis {
             .into_any_element()
     }
 
-    /// [`OrbisPane`] delegate for the transcript island.
+    /// [`PaduPane`] delegate for the transcript island.
     pub(super) fn transcript_pane_content(
         &mut self,
         window: &mut Window,
@@ -198,7 +198,7 @@ impl Orbis {
             .into_any_element()
     }
 
-    /// [`OrbisPane`] delegate for the right-panel island.
+    /// [`PaduPane`] delegate for the right-panel island.
     pub(super) fn right_panel_pane_content(
         &mut self,
         window: &mut Window,
@@ -223,7 +223,7 @@ impl Orbis {
     }
 }
 
-impl Render for Orbis {
+impl Render for Padu {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         // Panel geometry first: the browser sync right below reads whether a
         // panel is mid-slide, and settling here rather than at the point of
@@ -285,7 +285,7 @@ impl Render for Orbis {
         let goal_dialog = self.render_goal_dialog(window, cx);
         let toast = self.render_active_toast(cx);
         let content = div()
-            .key_context("Orbis")
+            .key_context("Padu")
             .on_action(cx.listener(Self::close_window_or_right_panel_tab_action))
             .on_action(cx.listener(Self::new_session_action))
             .on_action(cx.listener(Self::new_project_action))
@@ -441,7 +441,7 @@ mod tests {
     }
 }
 
-impl Orbis {
+impl Padu {
     /// Arm the dismiss timer and build the floating toast layer, if a toast
     /// is active. Every full-window surface (workspace and settings alike)
     /// must include this, or a toast raised there stays invisible until the
@@ -550,7 +550,7 @@ impl Orbis {
                     .child(dismiss)
                     .child(self.toast_selection_input()),
             )
-            // Keep the toast top-centered just beneath Orbis's 48px header.
+            // Keep the toast top-centered just beneath Padu's 48px header.
             // GPUI's animation path honors the system reduce-motion preference
             // and resolves immediately.
             .with_animation(

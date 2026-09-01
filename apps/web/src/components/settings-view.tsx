@@ -3,7 +3,7 @@ import type {
   DaemonSettings,
   Project,
   ProviderKind,
-} from '@orbis/client'
+} from '@padu/client'
 import { useEffect, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import { ControlMenu } from '@/components/control-menu'
@@ -12,7 +12,7 @@ import { SkillsSettings } from '@/components/skills-settings'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { UsageSettings } from '@/components/usage-settings'
-import { ProviderIcon, PROVIDERS, OrbisIcon, type OrbisIconName } from '@/components/orbis-icon'
+import { ProviderIcon, PROVIDERS, PaduIcon, type PaduIconName } from '@/components/padu-icon'
 import {
   useDaemonSettings,
   useProviderProbes,
@@ -48,7 +48,7 @@ export const SETTINGS_PAGES: Array<{
   id: SettingsPageId
   label: string
   labelKey: string
-  icon: OrbisIconName
+  icon: PaduIconName
   keywords: string
   keywordsKey: string
 }> = [
@@ -105,13 +105,13 @@ export function SettingsView({
             type="button"
             onClick={onBack}
           >
-            <OrbisIcon className="size-[15px] text-[var(--text-tertiary)]" name="arrowLeft" />
+            <PaduIcon className="size-[15px] text-[var(--text-tertiary)]" name="arrowLeft" />
             {t('settings.back')}
           </button>
         </div>
         <div className="px-3 pt-2">
           <label className="flex h-8 items-center gap-2 rounded-lg border bg-[var(--inset)] px-2.5 focus-within:border-ring">
-            <OrbisIcon className="size-[13px] text-[var(--text-tertiary)]" name="search" />
+            <PaduIcon className="size-[13px] text-[var(--text-tertiary)]" name="search" />
             <input
               aria-label={t('settings.search')}
               className="min-w-0 flex-1 bg-transparent text-[12px] outline-none placeholder:text-[var(--text-ghost)]"
@@ -140,7 +140,7 @@ export function SettingsView({
               type="button"
               onClick={() => onPageChange(candidate.id)}
             >
-              <OrbisIcon className="size-[15px] text-[var(--text-tertiary)]" name={candidate.icon} />
+              <PaduIcon className="size-[15px] text-[var(--text-tertiary)]" name={candidate.icon} />
               {candidate.localizedLabel}
             </button>
           ))}
@@ -170,7 +170,7 @@ export function SettingsView({
 
 function GeneralSettings() {
   const { t } = useI18n()
-  const [analytics, setAnalytics] = useStoredBoolean('orbis.analytics-enabled', true)
+  const [analytics, setAnalytics] = useStoredBoolean('padu.analytics-enabled', true)
   return (
     <div>
       <SettingsCard>
@@ -199,7 +199,7 @@ function AppearanceSettings() {
     const systemAppearance = window.matchMedia('(prefers-color-scheme: dark)')
     const apply = () => applyThemeChoice(document.documentElement, theme, systemAppearance.matches)
     apply()
-    window.localStorage.setItem('orbis.theme', theme)
+    window.localStorage.setItem('padu.theme', theme)
     systemAppearance.addEventListener('change', apply)
     return () => systemAppearance.removeEventListener('change', apply)
   }, [theme])
@@ -313,7 +313,7 @@ function ProvidersSettings() {
               void queryClient.invalidateQueries({ queryKey: daemonKeys.providers(config.address) })
             }}
           >
-            <OrbisIcon className={cn('size-[11px] text-[var(--text-tertiary)]', probes.isFetching && 'motion-safe:animate-spin')} name="rotateCw" />
+            <PaduIcon className={cn('size-[11px] text-[var(--text-tertiary)]', probes.isFetching && 'motion-safe:animate-spin')} name="rotateCw" />
             {probes.isFetching ? t('common.checking') : t('common.refresh')}
           </button>
           {!probes.isFetching && checkedAt > 0 && (
@@ -359,7 +359,7 @@ function ProvidersSettings() {
                   type="button"
                   onClick={() => toggleExpandedProvider(provider.id)}
                 >
-                  <OrbisIcon className="size-2.5" name={open ? 'chevronDown' : 'chevronRight'} />
+                  <PaduIcon className="size-2.5" name={open ? 'chevronDown' : 'chevronRight'} />
                 </button>
                 {installed && (
                   <Toggle
@@ -574,12 +574,12 @@ function DetailRow({
           variant="outline"
           onClick={() => setRevealed((current) => !current)}
         >
-          <OrbisIcon name={revealed ? 'eyeOff' : 'eye'} />
+          <PaduIcon name={revealed ? 'eyeOff' : 'eye'} />
         </Button>
       )}
       {copy && (
         <Button size="sm" variant="outline" onClick={() => void copyFeedback.copyText(value)}>
-          <OrbisIcon name={copyFeedback.copied ? 'check' : 'copy'} />
+          <PaduIcon name={copyFeedback.copied ? 'check' : 'copy'} />
           {t(copyFeedback.copied ? 'common.copied' : 'common.copy')}
         </Button>
       )}

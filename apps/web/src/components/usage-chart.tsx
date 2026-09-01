@@ -3,7 +3,7 @@ import { decorative } from '@tanstack/charts/mark/decorative'
 import { Chart } from '@tanstack/charts/react'
 import { scaleLinear } from '@tanstack/charts/scales/linear'
 import { tooltip } from '@tanstack/charts/tooltip'
-import type { UsageHistory } from '@orbis/client'
+import type { UsageHistory } from '@padu/client'
 import { scaleUtc } from 'd3-scale'
 import { useI18n, type AppLocale } from '@/lib/i18n'
 
@@ -120,7 +120,7 @@ export function UsageTrendChart({
         metric: t(metric === 'cost' ? 'usage.cost' : 'usage.processed_tokens'),
       })}
       ariaLabel={t(metric === 'cost' ? 'usage.daily_cost' : 'usage.daily_processed_tokens')}
-      className="orbis-usage-chart"
+      className="padu-usage-chart"
       definition={definition}
       height={188}
       initialWidth={640}

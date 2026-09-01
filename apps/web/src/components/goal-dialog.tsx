@@ -1,8 +1,8 @@
-import type { AgentSession, ThreadGoal, ThreadGoalStatus } from '@orbis/client'
+import type { AgentSession, ThreadGoal, ThreadGoalStatus } from '@padu/client'
 import { useEffect, useState, type RefObject } from 'react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
-import { OrbisIcon, type OrbisIconName } from '@/components/orbis-icon'
+import { PaduIcon, type PaduIconName } from '@/components/padu-icon'
 import { useI18n } from '@/lib/i18n'
 import { usePrimaryShortcut } from '@/lib/platform'
 import { cn } from '@/lib/utils'
@@ -113,9 +113,9 @@ export function GoalDialog({
     : t('goal.set')
   const statusAction = goal && !replace
     ? goal.status === 'active'
-      ? { status: 'paused' as const, label: t('goal.pause'), icon: 'stop' as OrbisIconName }
+      ? { status: 'paused' as const, label: t('goal.pause'), icon: 'stop' as PaduIconName }
       : goal.status === 'paused' || goal.status === 'blocked' || goal.status === 'usageLimited'
-        ? { status: 'active' as const, label: t('goal.resume'), icon: 'arrowUp' as OrbisIconName }
+        ? { status: 'active' as const, label: t('goal.resume'), icon: 'arrowUp' as PaduIconName }
         : null
     : null
   const usage = goal ? goalUsageReadout(goal) : null
@@ -134,7 +134,7 @@ export function GoalDialog({
         finalFocus={returnFocus}
       >
         <DialogTitle className="flex h-12 items-center gap-2.5 px-4 text-sm font-normal">
-          <OrbisIcon className="size-[15px]" name="target" />
+          <PaduIcon className="size-[15px]" name="target" />
           <span>{t('goal.title')}</span>
           {goal && (
             <span className={cn(
@@ -216,7 +216,7 @@ function GoalActionRow({
   destructive,
   onClick,
 }: {
-  icon: OrbisIconName
+  icon: PaduIconName
   label: string
   shortcut?: string
   enabled: boolean
@@ -233,7 +233,7 @@ function GoalActionRow({
       type="button"
       onClick={onClick}
     >
-      <OrbisIcon
+      <PaduIcon
         className={cn('size-3.5', destructive ? 'text-destructive' : 'text-[var(--text-secondary)]')}
         name={icon}
       />

@@ -6,15 +6,15 @@ import { join, resolve } from "node:path";
 
 const root = resolve(import.meta.dir, "..");
 const isMacOS = process.platform === "darwin";
-const appName = "Orbis Debug";
+const appName = "Padu Debug";
 const targetDir = resolve(root, process.env.CARGO_TARGET_DIR || "target");
 const executableSuffix = process.platform === "win32" ? ".exe" : "";
 const appPath = isMacOS
-  ? join(targetDir, "debug/Orbis Debug.app")
-  : join(targetDir, `debug/orbis${executableSuffix}`);
+  ? join(targetDir, "debug/Padu Debug.app")
+  : join(targetDir, `debug/padu${executableSuffix}`);
 const daemonPath = join(
   targetDir,
-  `debug/orbis-debug-daemon${executableSuffix}`,
+  `debug/padu-debug-daemon${executableSuffix}`,
 );
 const watchedDirectories = ["src", "crates", "assets", "resources", "locales"];
 const watchedFiles = ["Cargo.toml", "Cargo.lock", "build.rs"];
@@ -42,12 +42,12 @@ let daemonChangeRevision = 0;
 let rebuildTimer: ReturnType<typeof setTimeout> | undefined;
 const watchers: FSWatcher[] = [];
 const hyprlandRuleKeys = [
-  "orbis_dev_workspace_rule",
-  "orbis_dev_background_rule",
+  "padu_dev_workspace_rule",
+  "padu_dev_background_rule",
 ] as const;
-const hyprlandSubscriptionKey = "orbis_dev_window_open_subscription";
-const hyprlandLaunchArmedKey = "orbis_dev_launch_armed";
-const hyprlandOwnerKey = "orbis_dev_owner";
+const hyprlandSubscriptionKey = "padu_dev_window_open_subscription";
+const hyprlandLaunchArmedKey = "padu_dev_launch_armed";
+const hyprlandOwnerKey = "padu_dev_owner";
 let hyprlandRulesInstalled = false;
 let hyprlandWarningShown = false;
 
@@ -162,15 +162,15 @@ async function prepareHyprlandLaunch(): Promise<void> {
 
     if _G[workspace_key] == nil then
       _G[workspace_key] = hl.window_rule({
-        name = "orbis-dev-workspace",
-        match = { initial_class = "sh[.]orbis[.]dev" },
+        name = "padu-dev-workspace",
+        match = { initial_class = "sh[.]padu[.]dev" },
         workspace = ${luaString(`${hyprlandWorkspace.selector} silent`)},
       })
     end
     if _G[background_key] == nil then
       _G[background_key] = hl.window_rule({
-        name = "orbis-dev-background",
-        match = { initial_class = "sh[.]orbis[.]dev" },
+        name = "padu-dev-background",
+        match = { initial_class = "sh[.]padu[.]dev" },
         no_initial_focus = true,
         suppress_event = "activate activatefocus",
       })
@@ -182,7 +182,7 @@ async function prepareHyprlandLaunch(): Promise<void> {
     if _G[subscription_key] == nil then
       local anchor_selector = ${luaString(anchorSelector)}
       _G[subscription_key] = hl.on("window.open", function(window)
-        if not _G[armed_key] or window.initial_class ~= "sh.orbis.dev" then
+        if not _G[armed_key] or window.initial_class ~= "dev.padu.dev" then
           return
         end
         _G[armed_key] = false
@@ -206,7 +206,7 @@ async function prepareHyprlandLaunch(): Promise<void> {
           return
         end
 
-        -- Swapping with each preceding singleton column rotates Orbis into the
+        -- Swapping with each preceding singleton column rotates Padu into the
         -- desired slot while preserving the order of all intervening columns.
         -- A stacked or custom-width column cannot be rotated through this API
         -- without changing its membership or sizing, so leave it untouched.
@@ -257,7 +257,7 @@ async function prepareHyprlandLaunch(): Promise<void> {
       const detail =
         result.stderr.toString().trim() || result.stdout.toString().trim();
       console.warn(
-        `[orbis-dev] Could not pin Orbis to its Hyprland workspace${detail ? `: ${detail}` : "."}`,
+        `[padu-dev] Could not pin Padu to its Hyprland workspace${detail ? `: ${detail}` : "."}`,
       );
       hyprlandWarningShown = true;
     }
@@ -266,7 +266,7 @@ async function prepareHyprlandLaunch(): Promise<void> {
 
   if (!hyprlandRulesInstalled) {
     console.log(
-      `[orbis-dev] Keeping Orbis beside the watcher on Hyprland workspace ${hyprlandWorkspace.name}.`,
+      `[padu-dev] Keeping Padu beside the watcher on Hyprland workspace ${hyprlandWorkspace.name}.`,
     );
   }
   hyprlandRulesInstalled = true;
@@ -301,30 +301,30 @@ async function build(target: BuildTarget): Promise<boolean> {
     return buildDaemon();
   }
 
-  console.log(`[orbis-dev] Building ${isMacOS ? "app bundle" : "app"}...`);
+  console.log(`[padu-dev] Building ${isMacOS ? "app bundle" : "app"}...`);
   if (!(await buildDaemon())) {
     console.error(
-      "[orbis-dev] Daemon build failed; keeping the current app open.",
+      "[padu-dev] Daemon build failed; keeping the current app open.",
     );
     return false;
   }
   const result = isMacOS
     ? await $`${join(root, "scripts/bundle.sh")} debug`.nothrow()
-    : await $`cargo build --package orbis --bin orbis --bin orbis_js_repl`.nothrow();
+    : await $`cargo build --package padu --bin padu --bin padu_js_repl`.nothrow();
   if (result.exitCode !== 0) {
-    console.error("[orbis-dev] Build failed; keeping the current app open.");
+    console.error("[padu-dev] Build failed; keeping the current app open.");
     return false;
   }
   return true;
 }
 
 async function buildDaemon(): Promise<boolean> {
-  console.log("[orbis-dev] Building daemon...");
+  console.log("[padu-dev] Building daemon...");
   const result =
-    await $`cargo build --package orbis-daemon --features dev-binary --bin orbis-debug-daemon`.nothrow();
+    await $`cargo build --package padu-daemon --features dev-binary --bin padu-debug-daemon`.nothrow();
   if (result.exitCode !== 0) {
     console.error(
-      "[orbis-dev] Daemon build failed; keeping the current daemon running.",
+      "[padu-dev] Daemon build failed; keeping the current daemon running.",
     );
     return false;
   }
@@ -345,11 +345,11 @@ async function stopApp(): Promise<void> {
 }
 
 function launchApp(): ReturnType<typeof Bun.spawn> {
-  console.log(`[orbis-dev] Launching ${appPath}`);
+  console.log(`[padu-dev] Launching ${appPath}`);
   const command = isMacOS ? ["open", "-n", "-W", appPath] : [appPath];
   const launchedApp = Bun.spawn(command, {
     cwd: root,
-    env: { ...process.env, ORBIS_DAEMON_PATH: daemonPath },
+    env: { ...process.env, PADU_DAEMON_PATH: daemonPath },
     stdout: "inherit",
     stderr: "inherit",
   });
@@ -360,7 +360,7 @@ function launchApp(): ReturnType<typeof Bun.spawn> {
     closeWatchers();
     clearRebuildTimer();
     await releaseHyprlandRules();
-    console.log("[orbis-dev] App exited; stopping the watcher.");
+    console.log("[padu-dev] App exited; stopping the watcher.");
     process.exitCode = exitCode;
   });
   return launchedApp;
@@ -377,7 +377,7 @@ function closeWatchers(): void {
 }
 
 function reportWatcherError(error: Error): void {
-  console.error("[orbis-dev] File watcher failed:", error);
+  console.error("[padu-dev] File watcher failed:", error);
   process.exitCode = 1;
   void cleanup();
 }
@@ -396,8 +396,8 @@ function targetForChange(
   if (directory !== "crates" || filename === null) return "app";
   const relativePath = filename.toString().replaceAll("\\", "/");
   if (
-    relativePath.startsWith("orbis-daemon/") ||
-    relativePath.startsWith("orbis-core/")
+    relativePath.startsWith("padu-daemon/") ||
+    relativePath.startsWith("padu-core/")
   ) {
     return "daemon";
   }
@@ -454,7 +454,7 @@ async function drainBuildQueue(): Promise<void> {
       if (target === "daemon") {
         if (daemonChangeRevision === buildDaemonRevision) {
           console.log(
-            "[orbis-dev] Daemon rebuilt; Orbis will swap the process without relaunching.",
+            "[padu-dev] Daemon rebuilt; Padu will swap the process without relaunching.",
           );
         }
         continue;
@@ -465,7 +465,7 @@ async function drainBuildQueue(): Promise<void> {
       // up the independently rebuilt daemon.
       if (appChangeRevision !== buildAppRevision) {
         console.log(
-          "[orbis-dev] More changes arrived during the build; waiting to rebuild.",
+          "[padu-dev] More changes arrived during the build; waiting to rebuild.",
         );
         continue;
       }
@@ -483,7 +483,7 @@ async function drainBuildQueue(): Promise<void> {
 async function cleanup(): Promise<void> {
   if (stopping) return;
   stopping = true;
-  console.log("[orbis-dev] Stopping watcher and app...");
+  console.log("[padu-dev] Stopping watcher and app...");
   closeWatchers();
   clearRebuildTimer();
   await stopApp();
@@ -509,11 +509,11 @@ if (appChangeRevision === initialAppRevision) {
   if (!stopping) app = launchApp();
 } else {
   console.log(
-    "[orbis-dev] Changes arrived during the initial build; waiting to rebuild.",
+    "[padu-dev] Changes arrived during the initial build; waiting to rebuild.",
   );
   if (queuedBuild !== undefined) void drainBuildQueue();
 }
 
 console.log(
-  "[orbis-dev] Watching for source changes. Daemon-only edits hot-reload without relaunching Orbis.",
+  "[padu-dev] Watching for source changes. Daemon-only edits hot-reload without relaunching Padu.",
 );

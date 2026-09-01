@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import type { AgentSession, SequencedEvent } from '@orbis/client'
+import type { AgentSession, SequencedEvent } from '@padu/client'
 import { reduceRuntimeEvent } from './event-reducer'
 
 const clock = {

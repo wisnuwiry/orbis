@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { OrbisClient } from '@orbis/client'
+import { PaduClient } from '@padu/client'
 import {
   createContext,
   useCallback,
@@ -26,7 +26,7 @@ export type ConnectionPhase =
   | 'error'
 
 interface DaemonContextValue {
-  client: OrbisClient | null
+  client: PaduClient | null
   config: ConnectionConfig | null
   phase: ConnectionPhase
   error: string | null
@@ -41,7 +41,7 @@ const DaemonContext = createContext<DaemonContextValue | null>(null)
 export function DaemonProvider({ children }: { children: ReactNode }) {
   const { locale } = useI18n()
   const queryClient = useQueryClient()
-  const [client, setClient] = useState<OrbisClient | null>(null)
+  const [client, setClient] = useState<PaduClient | null>(null)
   const [config, setConfig] = useState<ConnectionConfig | null>(null)
   const [phase, setPhase] = useState<ConnectionPhase>('booting')
   const [error, setError] = useState<string | null>(null)
@@ -61,7 +61,7 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
       setError(null)
       setConfig(normalized)
 
-      const next = new OrbisClient({
+      const next = new PaduClient({
         address: normalized.address,
         token: normalized.token,
       })

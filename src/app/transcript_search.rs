@@ -57,7 +57,7 @@ impl TranscriptSearch {
     }
 }
 
-impl Orbis {
+impl Padu {
     pub(super) fn refresh_transcript_search_localized_text(&mut self, cx: &mut Context<Self>) {
         let Some(search) = &self.transcript_search else {
             return;
@@ -512,16 +512,16 @@ mod tests {
 
     #[test]
     fn literal_find_is_case_insensitive_and_unicode_safe() {
-        let regex = literal_find_regex("orbis");
+        let regex = literal_find_regex("padu");
         let (matches, limited) =
-            md::render::markdown_search_matches("Orbis **orbis** ORBIS", &regex, 20);
+            md::render::markdown_search_matches("Padu **padu** PADU", &regex, 20);
         assert!(!limited);
         assert_eq!(
             matches
                 .iter()
                 .map(|found| found.range.clone())
                 .collect::<Vec<_>>(),
-            vec![0..5, 6..11, 12..17]
+            vec![0..4, 5..9, 10..14]
         );
 
         let regex = literal_find_regex("界");

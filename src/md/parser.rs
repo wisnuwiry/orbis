@@ -971,14 +971,14 @@ mod tests {
     #[test]
     fn explicit_links_and_inline_code_are_not_relinkified() {
         let tree =
-            parse("[docs at https://example.com](https://orbis.gg) and `https://example.com/code`");
+            parse("[docs at https://example.com](https://padu.gg) and `https://example.com/code`");
         let Block::Paragraph { runs } = &tree.blocks[0].block else {
             panic!("expected a paragraph");
         };
 
         assert!(runs.iter().any(|run| {
             run.text == "docs at https://example.com"
-                && run.style.link.as_deref() == Some("https://orbis.gg")
+                && run.style.link.as_deref() == Some("https://padu.gg")
         }));
         assert!(runs.iter().any(|run| {
             run.text == "https://example.com/code" && run.style.code && run.style.link.is_none()

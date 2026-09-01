@@ -1,7 +1,7 @@
-import type { AgentSession, ProviderKind, ProviderSessionSummary, SessionMessageMatch } from '@orbis/client'
+import type { AgentSession, ProviderKind, ProviderSessionSummary, SessionMessageMatch } from '@padu/client'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { ProviderIcon, PROVIDERS, providerMeta, OrbisIcon, type OrbisIconName } from '@/components/orbis-icon'
+import { ProviderIcon, PROVIDERS, providerMeta, PaduIcon, type PaduIconName } from '@/components/padu-icon'
 import type { SettingsPageId } from '@/components/settings-view'
 import { SETTINGS_PAGES } from '@/components/settings-view'
 import {
@@ -31,7 +31,7 @@ interface PaletteItem {
   label: string
   detail?: string
   content?: { source: string; snippet: string }
-  icon?: OrbisIconName
+  icon?: PaduIconName
   provider?: AgentSession['provider']
   shortcut?: string
   pending?: boolean
@@ -349,7 +349,7 @@ export function CommandPalette({
     >
       <div className="flex max-h-[min(480px,calc(100dvh-108px))] w-full max-w-[680px] flex-col overflow-hidden rounded-[15px] bg-[var(--raised)] shadow-[0_24px_80px_rgba(0,0,0,0.26)]">
         <div className="flex h-[60px] shrink-0 items-center gap-3 border-b px-[19px]">
-          <OrbisIcon className="size-4 shrink-0 text-[var(--text-tertiary)]" name="search" />
+          <PaduIcon className="size-4 shrink-0 text-[var(--text-tertiary)]" name="search" />
           <input
             aria-activedescendant={items[selected] ? `palette-${items[selected]!.id}` : undefined}
             aria-controls="command-palette-results"
@@ -430,7 +430,7 @@ export function CommandPalette({
             >
               <ProviderIcon className="size-3.5" provider={resumeProvider} />
               <span>{providerMeta(resumeProvider).shortName}</span>
-              <OrbisIcon className="size-3 text-[var(--text-tertiary)]" name="chevronDown" />
+              <PaduIcon className="size-3 text-[var(--text-tertiary)]" name="chevronDown" />
             </button>
           ))}
         </div>
@@ -438,7 +438,7 @@ export function CommandPalette({
           {!items.length ? (
             <div className="grid h-[180px] place-items-center text-center">
               <div>
-                <OrbisIcon
+                <PaduIcon
                   className={cn(
                     'mx-auto size-[18px] text-[var(--text-ghost)]',
                     view === 'resume' && resultsPending && 'animate-spin motion-reduce:animate-none',
@@ -521,10 +521,10 @@ function PaletteRows({
         >
           <span className="grid size-5 shrink-0 place-items-center text-[var(--text-secondary)]">
             {item.pending
-              ? <OrbisIcon className="size-4 animate-spin motion-reduce:animate-none" name="loaderCircle" />
+              ? <PaduIcon className="size-4 animate-spin motion-reduce:animate-none" name="loaderCircle" />
               : item.provider
               ? <ProviderIcon className="size-4" provider={item.provider} />
-              : item.icon && <OrbisIcon className="size-4" name={item.icon} />}
+              : item.icon && <PaduIcon className="size-4" name={item.icon} />}
           </span>
           <span className="min-w-0 flex-1">
             <span className="flex min-w-0 items-baseline gap-[7px]">
@@ -781,7 +781,7 @@ function command(
   id: string,
   section: PaletteSection,
   label: string,
-  icon: OrbisIconName,
+  icon: PaduIconName,
   shortcut: string | undefined,
   keywords: string,
   run: () => void,

@@ -1,6 +1,6 @@
 use super::*;
 
-impl Orbis {
+impl Padu {
     /// One list row per message plus each ordered non-message turn block.
     pub(super) fn transcript_row_count(&self) -> usize {
         self.refresh_transcript_row_kinds()

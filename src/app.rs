@@ -132,7 +132,7 @@ const STREAM_SAVE_INTERVAL: Duration = Duration::from_secs(1);
 const DEFAULT_TOAST_DURATION: Duration = Duration::from_secs(5);
 const MINIMUM_TOAST_RESUME_DURATION: Duration = Duration::from_millis(800);
 const TOAST_ANIMATION_DURATION: Duration = Duration::from_millis(150);
-const TASK_NOTIFICATION_TAG_PREFIX: &str = "orbis-task:";
+const TASK_NOTIFICATION_TAG_PREFIX: &str = "padu-task:";
 
 pub(crate) fn task_notification_tag(session_id: Uuid) -> String {
     format!("{TASK_NOTIFICATION_TAG_PREFIX}{session_id}")
@@ -561,11 +561,11 @@ struct DriverStartRequest {
     provider: ProviderKind,
     options: DriverStartOptions,
     event_wake: smol::channel::Sender<()>,
-    daemon: orbis_client::DaemonSupervisor,
+    daemon: padu_client::DaemonSupervisor,
 }
 
 /// A provider process that has started off-thread but is not installed into
-/// Orbis's runtime map yet. Its event receiver safely buffers early events.
+/// Padu's runtime map yet. Its event receiver safely buffers early events.
 struct PreparedDriver {
     handle: DriverHandle,
     events: Receiver<DriverEvent>,
@@ -652,7 +652,7 @@ enum EventPumpSchedule {
 }
 
 /// One cached island of the root view: a region rendered by delegating back
-/// into [`Orbis`] under its own view identity.
+/// into [`Padu`] under its own view identity.
 ///
 /// All state stays on the root entity; what the island buys is scope for
 /// gpui's cached-view machinery. The pulse clock and the streaming veil lease
@@ -662,25 +662,25 @@ enum EventPumpSchedule {
 /// invalidation semantics exactly — any root notify still re-renders every
 /// island — so caching cannot show state the single-view architecture would
 /// have repainted.
-struct OrbisPane {
-    orbis: Option<WeakEntity<Orbis>>,
-    content: fn(&mut Orbis, &mut Window, &mut Context<Orbis>) -> AnyElement,
+struct PaduPane {
+    padu: Option<WeakEntity<Padu>>,
+    content: fn(&mut Padu, &mut Window, &mut Context<Padu>) -> AnyElement,
 }
 
-impl OrbisPane {
+impl PaduPane {
     fn new(
-        content: fn(&mut Orbis, &mut Window, &mut Context<Orbis>) -> AnyElement,
+        content: fn(&mut Padu, &mut Window, &mut Context<Padu>) -> AnyElement,
         cx: &mut App,
     ) -> Entity<Self> {
         cx.new(|_| Self {
-            orbis: None,
+            padu: None,
             content,
         })
     }
 
-    fn bind(&mut self, orbis: &Entity<Orbis>, cx: &mut Context<Self>) {
-        self.orbis = Some(orbis.downgrade());
-        cx.observe(orbis, |_, orbis, cx| {
+    fn bind(&mut self, padu: &Entity<Padu>, cx: &mut Context<Self>) {
+        self.padu = Some(padu.downgrade());
+        cx.observe(padu, |_, padu, cx| {
             // A panel slide notifies the root at display rate for its 200ms,
             // and this fan-out would price every one of those ticks at a
             // three-island rebuild. Skipping it hands the decision to the
@@ -692,7 +692,7 @@ impl OrbisPane {
             // (terminal output, pulse leases) dirty their ancestor pane
             // without this observer, and the slide's retirement notify
             // below re-runs the fan-out, so nothing outlasts the 200ms.
-            if !orbis.read(cx).panels_sliding() {
+            if !padu.read(cx).panels_sliding() {
                 cx.notify();
             }
         })
@@ -700,13 +700,13 @@ impl OrbisPane {
     }
 }
 
-impl Render for OrbisPane {
+impl Render for PaduPane {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        let Some(orbis) = self.orbis.as_ref().and_then(WeakEntity::upgrade) else {
+        let Some(padu) = self.padu.as_ref().and_then(WeakEntity::upgrade) else {
             return gpui::div().into_any_element();
         };
         let content = self.content;
-        orbis.update(cx, |orbis, cx| content(orbis, window, cx))
+        padu.update(cx, |padu, cx| content(padu, window, cx))
     }
 }
 
@@ -1032,11 +1032,11 @@ impl Default for ActivityScrollViewport {
     }
 }
 
-pub struct Orbis {
+pub struct Padu {
     /// Owns the headless provider process for exactly as long as the desktop
     /// app entity. Debug builds can replace it independently after a rebuild;
     /// all live driver handles below are lightweight RPC proxies.
-    daemon: orbis_client::DaemonSupervisor,
+    daemon: padu_client::DaemonSupervisor,
     /// Cached once at construction for the Daemon settings connection URL;
     /// rendering must not query account or network configuration.
     daemon_hostname: String,
@@ -1581,10 +1581,10 @@ pub struct Orbis {
     menus: RefCell<HashMap<SharedString, ContextMenuHandle>>,
     navigation_rail: Entity<ConversationNavigationRail>,
     navigation_rail_reset_generation: Cell<u64>,
-    /// Cached islands of the root view; see [`OrbisPane`].
-    sidebar_pane: Entity<OrbisPane>,
-    transcript_pane: Entity<OrbisPane>,
-    right_panel_pane: Entity<OrbisPane>,
+    /// Cached islands of the root view; see [`PaduPane`].
+    sidebar_pane: Entity<PaduPane>,
+    transcript_pane: Entity<PaduPane>,
+    right_panel_pane: Entity<PaduPane>,
     /// The unix second the pending time-label wake-up targets, or `None` when
     /// none is armed. See `schedule_time_label_wake`.
     time_label_wake: Cell<Option<u64>>,
@@ -1681,7 +1681,7 @@ pub(super) fn next_time_label_change(sessions: &[AgentSession], now: u64) -> Opt
 
 fn migrate_legacy_projectless_projects(
     state: &mut PersistedState,
-    workspace: &orbis_client::WorkspaceClient,
+    workspace: &padu_client::WorkspaceClient,
 ) -> (bool, Option<anyhow::Error>) {
     let legacy_indices = state
         .projects
@@ -1699,9 +1699,9 @@ fn migrate_legacy_projectless_projects(
     for index in legacy_indices {
         let path = state.projects[index].path.clone();
         let response = workspace
-            .request(orbis_client::WorkspaceOperation::MigrateProjectlessWorkspace { path });
+            .request(padu_client::WorkspaceOperation::MigrateProjectlessWorkspace { path });
         let cwd = match response {
-            Ok(orbis_client::WorkspaceResult::ProjectlessWorkspace { cwd }) => cwd,
+            Ok(padu_client::WorkspaceResult::ProjectlessWorkspace { cwd }) => cwd,
             Ok(_) => {
                 return (
                     changed,
@@ -1719,7 +1719,7 @@ fn migrate_legacy_projectless_projects(
     (changed, None)
 }
 
-impl Orbis {
+impl Padu {
     fn updater_button_expanded(&self) -> bool {
         self.updater_button_hovered || self.updater_button_focused
     }
@@ -1929,7 +1929,7 @@ impl Orbis {
     pub fn new(
         window: &mut Window,
         cx: &mut App,
-        daemon: orbis_client::DaemonSupervisor,
+        daemon: padu_client::DaemonSupervisor,
     ) -> Entity<Self> {
         let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
         let store = StateStore::remote(daemon.clone());
@@ -1945,7 +1945,7 @@ impl Orbis {
         crate::i18n::set_language(state.language);
         // Chrome text is authored in `sp` rems against the default UI font
         // size, so the window's rem size *is* the UI font size setting.
-        window.set_rem_size(px(orbis_client::persistence::sanitized_ui_font_size(
+        window.set_rem_size(px(padu_client::persistence::sanitized_ui_font_size(
             state.ui_font_size,
         )));
         let analytics = crate::analytics::Analytics::new(
@@ -2037,10 +2037,10 @@ impl Orbis {
                 .placeholder(tr!("diff.filter_files"))
         });
         let navigation_rail = cx.new(|_| ConversationNavigationRail::new());
-        let sidebar_pane = OrbisPane::new(Orbis::sidebar_pane_content, cx);
-        let transcript_pane = OrbisPane::new(Orbis::transcript_pane_content, cx);
-        let right_panel_pane = OrbisPane::new(Orbis::right_panel_pane_content, cx);
-        let workspace_client = orbis_client::WorkspaceClient::new(daemon.client());
+        let sidebar_pane = PaduPane::new(Padu::sidebar_pane_content, cx);
+        let transcript_pane = PaduPane::new(Padu::transcript_pane_content, cx);
+        let right_panel_pane = PaduPane::new(Padu::right_panel_pane_content, cx);
+        let workspace_client = padu_client::WorkspaceClient::new(daemon.client());
         let (projectless_migrated, projectless_migration_error) =
             migrate_legacy_projectless_projects(&mut state, &workspace_client);
         let projectless_save_error = projectless_migrated
@@ -2205,14 +2205,14 @@ impl Orbis {
             let event_wake = event_wake_tx.clone();
             let daemon = daemon.client();
             std::thread::Builder::new()
-                .name("orbis-computer-permission-probe".into())
+                .name("padu-computer-permission-probe".into())
                 .spawn(move || {
                     let result = match daemon.request(
                         Uuid::nil(),
                         Uuid::nil(),
-                        orbis_client::Command::ProbeComputerPermissions { prompt: false },
+                        padu_client::Command::ProbeComputerPermissions { prompt: false },
                     ) {
-                        Ok(orbis_client::ResponsePayload::ComputerPermissions { permissions }) => {
+                        Ok(padu_client::ResponsePayload::ComputerPermissions { permissions }) => {
                             Ok(permissions)
                         }
                         Ok(_) => Err("the daemon returned an invalid permission response".into()),
@@ -2457,7 +2457,7 @@ impl Orbis {
             .detach();
 
             // Clipboard images and Finder file copies are attachment payloads,
-            // not text paths. The input owns representation priority; Orbis
+            // not text paths. The input owns representation priority; Padu
             // owns durable staging and composer/session state.
             cx.subscribe(
                 &composer,
@@ -2720,10 +2720,10 @@ impl Orbis {
             .detach();
 
             let markdown_link_handler: md::render::LinkHandler = {
-                let orbis = cx.entity().downgrade();
+                let padu = cx.entity().downgrade();
                 Rc::new(move |target, _, cx| {
-                    let handled = orbis
-                        .update(cx, |orbis, cx| orbis.open_transcript_link(target, cx))
+                    let handled = padu
+                        .update(cx, |padu, cx| padu.open_transcript_link(target, cx))
                         .unwrap_or(false);
                     if !handled {
                         cx.open_url(target);
@@ -3029,7 +3029,7 @@ impl Orbis {
                 fps_value: 0,
             }
         });
-        navigation_rail.update(cx, |rail, _| rail.set_orbis(entity.downgrade()));
+        navigation_rail.update(cx, |rail, _| rail.set_padu(entity.downgrade()));
         for pane in [&sidebar_pane, &transcript_pane, &right_panel_pane] {
             pane.update(cx, |pane, cx| pane.bind(&entity, cx));
         }

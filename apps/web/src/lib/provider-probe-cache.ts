@@ -1,6 +1,6 @@
-import type { ProviderKind, ProviderProbe } from '@orbis/client'
+import type { ProviderKind, ProviderProbe } from '@padu/client'
 
-const CACHE_KEY = 'orbis.provider-probes.v1'
+const CACHE_KEY = 'padu.provider-probes.v1'
 const CACHE_VERSION = 1
 const CACHE_MAX_AGE = 30 * 24 * 60 * 60 * 1_000
 const CACHE_MAX_ENTRIES = 32

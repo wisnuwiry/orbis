@@ -499,7 +499,7 @@ fn work_elapsed(item: &BackgroundWorkItem) -> String {
     }
 }
 
-impl Orbis {
+impl Padu {
     pub(super) fn background_output_refresh_delay(&self) -> Option<Duration> {
         self.background_work
             .values()
@@ -1397,7 +1397,7 @@ fn render_background_summary_card(
     identifiers: Option<TaskIdentifierSection>,
     environment: Option<EnvironmentSummary>,
     entries: Rc<Vec<BackgroundSummaryEntry>>,
-    weak: WeakEntity<Orbis>,
+    weak: WeakEntity<Padu>,
     cx: &mut App,
 ) -> AnyElement {
     let theme = Theme::current(cx);
@@ -1475,7 +1475,7 @@ fn render_background_summary_card(
 
 fn render_task_identifiers_section(
     section: TaskIdentifierSection,
-    weak: WeakEntity<Orbis>,
+    weak: WeakEntity<Padu>,
     theme: &Theme,
 ) -> Div {
     let mut rows = vec![render_task_identifier_row(
@@ -1516,7 +1516,7 @@ fn render_task_identifier_row(
     control_id: &'static str,
     focus: &FocusHandle,
     copied: bool,
-    weak: WeakEntity<Orbis>,
+    weak: WeakEntity<Padu>,
     theme: &Theme,
 ) -> Div {
     let tooltip = Tooltip::text(if copied {
@@ -1614,7 +1614,7 @@ fn render_task_identifier_row(
 fn render_environment_summary_section(
     environment: EnvironmentSummary,
     handle: ContextMenuHandle,
-    weak: WeakEntity<Orbis>,
+    weak: WeakEntity<Padu>,
     theme: &Theme,
 ) -> Div {
     let commit_handle = handle.clone();
@@ -1753,7 +1753,7 @@ fn render_background_summary_section(
     entries: Vec<BackgroundSummaryEntry>,
     session_id: Uuid,
     handle: ContextMenuHandle,
-    weak: WeakEntity<Orbis>,
+    weak: WeakEntity<Padu>,
     theme: &Theme,
 ) -> Div {
     let mut rows = div().w_full().flex().flex_col().gap(px(2.0));
@@ -1785,7 +1785,7 @@ fn render_background_summary_row(
     entry: BackgroundSummaryEntry,
     session_id: Uuid,
     handle: ContextMenuHandle,
-    weak: WeakEntity<Orbis>,
+    weak: WeakEntity<Padu>,
     theme: &Theme,
 ) -> Stateful<Div> {
     let item = entry.item;
@@ -1995,7 +1995,7 @@ mod tests {
     }
 
     #[test]
-    fn info_popover_uses_orbis_task_and_native_agent_ids() {
+    fn info_popover_uses_padu_task_and_native_agent_ids() {
         let task_id = Uuid::parse_str("ed28ee51-43cf-4a83-a52f-04c509ca2c09").unwrap();
         let mut session = AgentSession::new(Uuid::nil(), ProviderKind::Codex);
         session.id = task_id;

@@ -8,7 +8,7 @@ use gpui::{KeyBinding, actions};
 use super::*;
 
 actions!(
-    orbis_commit_dialog,
+    padu_commit_dialog,
     [ConfirmCommitDialog, DismissCommitDialog]
 );
 
@@ -100,7 +100,7 @@ impl CommitDialogState {
     }
 }
 
-impl Orbis {
+impl Padu {
     pub(super) fn commit_operation_status_label(&self) -> Option<String> {
         self.commit_operation
             .as_ref()
@@ -170,7 +170,7 @@ impl Orbis {
             commit_push_focus: cx.focus_handle(),
             push_focus: cx.focus_handle(),
         });
-        // Like Orbis's other deferred surfaces, the modal joins the dispatch
+        // Like Padu's other deferred surfaces, the modal joins the dispatch
         // tree only after it has drawn. Focus it two frames later so typing
         // cannot fall through to the composer beneath it.
         window.on_next_frame(move |window, _| {
@@ -178,15 +178,15 @@ impl Orbis {
         });
         cx.notify();
 
-        let workspace_client = orbis_client::WorkspaceClient::new(self.daemon.client());
-        cx.spawn(async move |orbis, cx| {
+        let workspace_client = padu_client::WorkspaceClient::new(self.daemon.client());
+        cx.spawn(async move |padu, cx| {
             let result = cx
                 .background_executor()
                 .spawn(async move {
-                    match workspace_client.request(orbis_client::WorkspaceOperation::InspectCommit {
+                    match workspace_client.request(padu_client::WorkspaceOperation::InspectCommit {
                         cwd: workspace.clone(),
                     }) {
-                        Ok(orbis_client::WorkspaceResult::CommitSnapshot { snapshot }) => {
+                        Ok(padu_client::WorkspaceResult::CommitSnapshot { snapshot }) => {
                             Ok(snapshot)
                         }
                         Ok(_) => Err("the daemon returned an invalid Git response".to_owned()),
@@ -194,8 +194,8 @@ impl Orbis {
                     }
                 })
                 .await;
-            let _ = orbis.update(cx, |orbis, cx| {
-                let Some(dialog) = orbis.commit_dialog.as_mut().filter(|dialog| dialog.id == id)
+            let _ = padu.update(cx, |padu, cx| {
+                let Some(dialog) = padu.commit_dialog.as_mut().filter(|dialog| dialog.id == id)
                 else {
                     return;
                 };
@@ -323,20 +323,20 @@ impl Orbis {
         window_handle: gpui::AnyWindowHandle,
         cx: &mut Context<Self>,
     ) {
-        let workspace_client = orbis_client::WorkspaceClient::new(self.daemon.client());
-        cx.spawn(async move |orbis, cx| {
+        let workspace_client = padu_client::WorkspaceClient::new(self.daemon.client());
+        cx.spawn(async move |padu, cx| {
             let generation_workspace = workspace.clone();
             let result = cx
                 .background_executor()
                 .spawn(async move {
                     match workspace_client.request(
-                        orbis_client::WorkspaceOperation::GenerateCommitMessage {
+                        padu_client::WorkspaceOperation::GenerateCommitMessage {
                             cwd: generation_workspace,
                             include_unstaged,
                             invocation,
                         },
                     ) {
-                        Ok(orbis_client::WorkspaceResult::CommitMessage { message }) => Ok(message),
+                        Ok(padu_client::WorkspaceResult::CommitMessage { message }) => Ok(message),
                         Ok(_) => {
                             Err("the daemon returned an invalid commit message response".into())
                         }
@@ -344,8 +344,8 @@ impl Orbis {
                     }
                 })
                 .await;
-            let _ = orbis.update(cx, |orbis, cx| {
-                let current = orbis.commit_operation.as_ref().is_some_and(|operation| {
+            let _ = padu.update(cx, |padu, cx| {
+                let current = padu.commit_operation.as_ref().is_some_and(|operation| {
                     operation.id == id
                         && operation.workspace == workspace
                         && operation.pending == CommitPending::Generating(action)
@@ -355,17 +355,17 @@ impl Orbis {
                 }
                 match result {
                     Ok(message) => {
-                        if let Some(operation) = orbis.commit_operation.as_mut() {
+                        if let Some(operation) = padu.commit_operation.as_mut() {
                             operation.pending = CommitPending::Git(action);
                         }
                         if let Some(dialog) =
-                            orbis.commit_dialog.as_mut().filter(|dialog| dialog.id == id)
+                            padu.commit_dialog.as_mut().filter(|dialog| dialog.id == id)
                         {
                             dialog
                                 .message
                                 .update(cx, |input, cx| input.set_content(message.clone(), cx));
                         }
-                        orbis.spawn_git_action(
+                        padu.spawn_git_action(
                             id,
                             action,
                             workspace,
@@ -376,16 +376,16 @@ impl Orbis {
                         );
                     }
                     Err(error) => {
-                        orbis.commit_operation = None;
+                        padu.commit_operation = None;
                         if let Some(dialog) =
-                            orbis.commit_dialog.as_mut().filter(|dialog| dialog.id == id)
+                            padu.commit_dialog.as_mut().filter(|dialog| dialog.id == id)
                         {
                             dialog.error = Some(error);
                             dialog
                                 .message
                                 .update(cx, |message, _| message.set_read_only(false));
                         } else {
-                            orbis.show_toast(error);
+                            padu.show_toast(error);
                         }
                     }
                 }
@@ -405,31 +405,31 @@ impl Orbis {
         window_handle: gpui::AnyWindowHandle,
         cx: &mut Context<Self>,
     ) {
-        let workspace_client = orbis_client::WorkspaceClient::new(self.daemon.client());
-        cx.spawn(async move |orbis, cx| {
+        let workspace_client = padu_client::WorkspaceClient::new(self.daemon.client());
+        cx.spawn(async move |padu, cx| {
             let operation_workspace = workspace.clone();
             let result = cx
                 .background_executor()
                 .spawn(async move {
                     let operation = match action {
-                        CommitAction::Commit => orbis_client::WorkspaceOperation::Commit {
+                        CommitAction::Commit => padu_client::WorkspaceOperation::Commit {
                             cwd: operation_workspace.clone(),
                             message,
                             include_unstaged,
                             push: false,
                         },
-                        CommitAction::CommitAndPush => orbis_client::WorkspaceOperation::Commit {
+                        CommitAction::CommitAndPush => padu_client::WorkspaceOperation::Commit {
                             cwd: operation_workspace.clone(),
                             message,
                             include_unstaged,
                             push: true,
                         },
-                        CommitAction::Push => orbis_client::WorkspaceOperation::Push {
+                        CommitAction::Push => padu_client::WorkspaceOperation::Push {
                             cwd: operation_workspace.clone(),
                         },
                     };
                     let result = match workspace_client.request(operation) {
-                        Ok(orbis_client::WorkspaceResult::Ack) => Ok(()),
+                        Ok(padu_client::WorkspaceResult::Ack) => Ok(()),
                         Ok(_) => Err(anyhow::anyhow!(
                             "the daemon returned an invalid Git response"
                         )),
@@ -437,11 +437,11 @@ impl Orbis {
                     };
                     let snapshot = result.as_ref().err().and_then(|_| {
                         match workspace_client.request(
-                            orbis_client::WorkspaceOperation::InspectCommit {
+                            padu_client::WorkspaceOperation::InspectCommit {
                                 cwd: operation_workspace.clone(),
                             },
                         ) {
-                            Ok(orbis_client::WorkspaceResult::CommitSnapshot { snapshot }) => {
+                            Ok(padu_client::WorkspaceResult::CommitSnapshot { snapshot }) => {
                                 Some(snapshot)
                             }
                             _ => None,
@@ -450,8 +450,8 @@ impl Orbis {
                     (result.map_err(|error| error.to_string()), snapshot)
                 })
                 .await;
-            let focus = orbis.update(cx, |orbis, cx| {
-                let current = orbis.commit_operation.as_ref().is_some_and(|operation| {
+            let focus = padu.update(cx, |padu, cx| {
+                let current = padu.commit_operation.as_ref().is_some_and(|operation| {
                     operation.id == id
                         && operation.workspace == workspace
                         && operation.pending == CommitPending::Git(action)
@@ -460,34 +460,34 @@ impl Orbis {
                     return None;
                 }
                 let (result, refreshed_snapshot) = result;
-                orbis.commit_operation = None;
-                if orbis
+                padu.commit_operation = None;
+                if padu
                     .selected_workspace_path()
                     .is_some_and(|path| path == workspace)
                 {
-                    orbis.invalidate_workspace_queries(cx);
+                    padu.invalidate_workspace_queries(cx);
                 } else {
-                    orbis.branch_snapshots.invalidate(&workspace);
+                    padu.branch_snapshots.invalidate(&workspace);
                 }
                 let focus = match result {
                     Ok(()) => {
-                        let dialog_was_open = orbis
+                        let dialog_was_open = padu
                             .commit_dialog
                             .as_ref()
                             .is_some_and(|dialog| dialog.id == id);
                         if dialog_was_open {
-                            orbis.commit_dialog = None;
+                            padu.commit_dialog = None;
                         }
-                        orbis.show_success_toast(match action {
+                        padu.show_success_toast(match action {
                             CommitAction::Commit => tr!("commit.committed"),
                             CommitAction::CommitAndPush => tr!("commit.committed_and_pushed"),
                             CommitAction::Push => tr!("commit.pushed"),
                         });
-                        dialog_was_open.then(|| orbis.composer_focus(cx))
+                        dialog_was_open.then(|| padu.composer_focus(cx))
                     }
                     Err(error) => {
                         if let Some(dialog) =
-                            orbis.commit_dialog.as_mut().filter(|dialog| dialog.id == id)
+                            padu.commit_dialog.as_mut().filter(|dialog| dialog.id == id)
                         {
                             dialog.error = Some(error);
                             if let Some(snapshot) = refreshed_snapshot {
@@ -498,7 +498,7 @@ impl Orbis {
                                 .message
                                 .update(cx, |message, _| message.set_read_only(false));
                         } else {
-                            orbis.show_toast(error);
+                            padu.show_toast(error);
                         }
                         None
                     }
@@ -606,14 +606,14 @@ impl Orbis {
                 )
                 .when(include_enabled, |row| {
                     row.on_click(move |_, _, cx| {
-                        let _ = click_weak.update(cx, |orbis, cx| orbis.toggle_include_unstaged(cx));
+                        let _ = click_weak.update(cx, |padu, cx| padu.toggle_include_unstaged(cx));
                     })
                     .on_key_down(move |event: &KeyDownEvent, _, cx| {
                         if !event.keystroke.modifiers.modified()
                             && matches!(event.keystroke.key.as_str(), "enter" | "space")
                         {
                             let _ =
-                                key_weak.update(cx, |orbis, cx| orbis.toggle_include_unstaged(cx));
+                                key_weak.update(cx, |padu, cx| padu.toggle_include_unstaged(cx));
                             cx.stop_propagation();
                         }
                     })
@@ -687,11 +687,11 @@ impl Orbis {
         let card = div()
             .id("commit-dialog-card")
             .key_context(DIALOG_CONTEXT)
-            .on_action(cx.listener(|orbis, _: &ConfirmCommitDialog, window, cx| {
-                orbis.request_commit_action(CommitAction::Commit, window, cx)
+            .on_action(cx.listener(|padu, _: &ConfirmCommitDialog, window, cx| {
+                padu.request_commit_action(CommitAction::Commit, window, cx)
             }))
-            .on_action(cx.listener(|orbis, _: &DismissCommitDialog, window, cx| {
-                orbis.close_commit_dialog(window, cx)
+            .on_action(cx.listener(|padu, _: &DismissCommitDialog, window, cx| {
+                padu.close_commit_dialog(window, cx)
             }))
             .tab_group()
             .tab_stop(false)
@@ -768,7 +768,7 @@ impl Orbis {
             .justify_center()
             .on_mouse_down(
                 MouseButton::Left,
-                cx.listener(|orbis, _, window, cx| orbis.close_commit_dialog(window, cx)),
+                cx.listener(|padu, _, window, cx| padu.close_commit_dialog(window, cx)),
             )
             .child(card);
         Some(gpui::deferred(layer).with_priority(4).into_any_element())
@@ -785,7 +785,7 @@ fn render_commit_action_row(
     active: bool,
     shortcut: Option<&'static str>,
     action: CommitAction,
-    weak: WeakEntity<Orbis>,
+    weak: WeakEntity<Padu>,
     theme: &Theme,
 ) -> Stateful<Div> {
     let foreground = if enabled {
@@ -845,16 +845,16 @@ fn render_commit_action_row(
         })
         .when(enabled, |row| {
             row.on_click(move |_, window, cx| {
-                let _ = click_weak.update(cx, |orbis, cx| {
-                    orbis.request_commit_action(action, window, cx)
+                let _ = click_weak.update(cx, |padu, cx| {
+                    padu.request_commit_action(action, window, cx)
                 });
             })
             .on_key_down(move |event: &KeyDownEvent, window, cx| {
                 if !event.keystroke.modifiers.modified()
                     && matches!(event.keystroke.key.as_str(), "enter" | "space")
                 {
-                    let _ = key_weak.update(cx, |orbis, cx| {
-                        orbis.request_commit_action(action, window, cx)
+                    let _ = key_weak.update(cx, |padu, cx| {
+                        padu.request_commit_action(action, window, cx)
                     });
                     cx.stop_propagation();
                 }

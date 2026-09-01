@@ -14,16 +14,16 @@ import { parseArgs } from "node:util";
 import { defaultDownloadUrlPrefix, generateAppcast } from "./appcast";
 import { extractReleaseNotes } from "./changelog";
 
-const appName = "Orbis";
-const executableName = "Orbis";
-const jsReplExecutableName = "orbis_js_repl";
-const daemonExecutableName = "orbis-daemon";
-const computerUseHelperName = "Orbis Computer Use";
-const packageName = "orbis";
+const appName = "Padu";
+const executableName = "Padu";
+const jsReplExecutableName = "padu_js_repl";
+const daemonExecutableName = "padu-daemon";
+const computerUseHelperName = "Padu Computer Use";
+const packageName = "padu";
 const defaultNotaryProfile = "NOTARY";
 const projectRoot = resolve(import.meta.dir, "..");
 
-const help = `Build, notarize, and publish a production release of Orbis.
+const help = `Build, notarize, and publish a production release of Padu.
 
 Usage:
   bun run release [options]
@@ -31,39 +31,39 @@ Usage:
 The default run builds a signed, notarized DMG, packages the Sparkle update
 archive, regenerates the signed appcast (with binary deltas against recent
 releases), and uploads everything to Cloudflare R2 — the bucket behind
-https://releases.orbis.sh. One-time setup lives in RELEASING.md.
+https://releases.padu.dev. One-time setup lives in RELEASING.md.
 
 Options:
   --local                       Build, notarize, and write the DMG + zip
                                 without publishing to R2
   --force                       Publish even if this version is already in R2
-  --output <path>               DMG output path (default: dist/Orbis-<version>.dmg)
+  --output <path>               DMG output path (default: dist/Padu-<version>.dmg)
   --signing-identity <name>     Developer ID Application identity selector
-                                (or ORBIS_SIGNING_IDENTITY; required unless --adhoc)
+                                (or PADU_SIGNING_IDENTITY; required unless --adhoc)
   --notary-profile <name>       notarytool keychain profile
-                                (default: NOTARY; or ORBIS_NOTARY_PROFILE)
-  --build-number <number>       CFBundleVersion override (or ORBIS_BUILD_NUMBER;
+                                (default: NOTARY; or PADU_NOTARY_PROFILE)
+  --build-number <number>       CFBundleVersion override (or PADU_BUILD_NUMBER;
                                 default derives a monotonic number from the
                                 Cargo version)
-  --volume-name <name>          Mounted DMG name (default: Orbis)
-  --skip-build                  Reuse target/release/orbis, orbis_js_repl, and
-                                orbis-daemon
+  --volume-name <name>          Mounted DMG name (default: Padu)
+  --skip-build                  Reuse target/release/padu, padu_js_repl, and
+                                padu-daemon
   --skip-notarize               Unnotarized signed DMG (implies --local)
   --adhoc                       Ad-hoc sign, no notarization (implies --local)
   --help                        Show this help
 
 Environment:
-  ORBIS_SIGNING_IDENTITY         Developer ID Application identity selector
-  ORBIS_ANALYTICS_ENDPOINT       analytics endpoint embedded at build time
-  ORBIS_ANALYTICS_WEBSITE_ID     analytics website ID embedded at build time
-  ORBIS_R2_REMOTE                rclone remote name (default: r2)
-  ORBIS_R2_BUCKET                R2 bucket name (default: orbis-releases)
-  ORBIS_DOWNLOAD_URL_PREFIX      base URL served by the bucket
+  PADU_SIGNING_IDENTITY         Developer ID Application identity selector
+  PADU_ANALYTICS_ENDPOINT       analytics endpoint embedded at build time
+  PADU_ANALYTICS_WEBSITE_ID     analytics website ID embedded at build time
+  PADU_R2_REMOTE                rclone remote name (default: r2)
+  PADU_R2_BUCKET                R2 bucket name (default: padu-releases)
+  PADU_DOWNLOAD_URL_PREFIX      base URL served by the bucket
                                 (default: ${defaultDownloadUrlPrefix})
-  ORBIS_HISTORY_COUNT            prior archives pulled for deltas (default: 15)
-  ORBIS_NO_HISTORY=1             skip pulling prior archives (no deltas)
+  PADU_HISTORY_COUNT            prior archives pulled for deltas (default: 15)
+  PADU_NO_HISTORY=1             skip pulling prior archives (no deltas)
   SPARKLE_BIN                   Sparkle tools dir (default: the bundle.sh cache
-                                under .orbis-cache/sparkle)
+                                under .padu-cache/sparkle)
   SPARKLE_PRIVATE_KEY           Sparkle EdDSA private key (otherwise keychain)
 
 Before the first production release:
@@ -137,38 +137,38 @@ function derivedBuildNumber(version: string): string {
 const adhoc = values.adhoc ?? false;
 const skipNotarize = values["skip-notarize"] ?? false;
 const configuredSigningIdentity =
-  values["signing-identity"] ?? process.env.ORBIS_SIGNING_IDENTITY;
+  values["signing-identity"] ?? process.env.PADU_SIGNING_IDENTITY;
 const notaryProfile =
   values["notary-profile"] ??
-  process.env.ORBIS_NOTARY_PROFILE ??
+  process.env.PADU_NOTARY_PROFILE ??
   defaultNotaryProfile;
 const explicitBuildNumber =
-  values["build-number"] ?? process.env.ORBIS_BUILD_NUMBER;
-const analyticsEndpoint = process.env.ORBIS_ANALYTICS_ENDPOINT?.trim();
-const analyticsWebsiteId = process.env.ORBIS_ANALYTICS_WEBSITE_ID?.trim();
+  values["build-number"] ?? process.env.PADU_BUILD_NUMBER;
+const analyticsEndpoint = process.env.PADU_ANALYTICS_ENDPOINT?.trim();
+const analyticsWebsiteId = process.env.PADU_ANALYTICS_WEBSITE_ID?.trim();
 const localOnly = values.local ?? false;
 const force = values.force ?? false;
 // Publishing requires a Developer ID-signed, notarized DMG, so the flags that
 // weaken signing imply --local.
 const publishing = !localOnly && !adhoc && !skipNotarize;
 
-const r2Remote = process.env.ORBIS_R2_REMOTE ?? "r2";
-const r2Bucket = process.env.ORBIS_R2_BUCKET ?? "orbis-releases";
+const r2Remote = process.env.PADU_R2_REMOTE ?? "r2";
+const r2Bucket = process.env.PADU_R2_BUCKET ?? "padu-releases";
 const r2Destination = `${r2Remote}:${r2Bucket}`;
 // A bucket-scoped R2 API token cannot create buckets, and rclone otherwise
 // checks/creates one before writing. The bucket must already exist.
 const rcloneFlags = ["--s3-no-check-bucket"];
 const downloadUrlPrefix =
-  process.env.ORBIS_DOWNLOAD_URL_PREFIX ?? defaultDownloadUrlPrefix;
-const historyCount = Number(process.env.ORBIS_HISTORY_COUNT ?? "15");
-const skipHistory = process.env.ORBIS_NO_HISTORY === "1";
+  process.env.PADU_DOWNLOAD_URL_PREFIX ?? defaultDownloadUrlPrefix;
+const historyCount = Number(process.env.PADU_HISTORY_COUNT ?? "15");
+const skipHistory = process.env.PADU_NO_HISTORY === "1";
 
 if (adhoc && values["signing-identity"]) {
   throw new Error("Use either --adhoc or --signing-identity, not both.");
 }
 if (!adhoc && !configuredSigningIdentity) {
   throw new Error(
-    "Set ORBIS_SIGNING_IDENTITY or pass --signing-identity (or use --adhoc).",
+    "Set PADU_SIGNING_IDENTITY or pass --signing-identity (or use --adhoc).",
   );
 }
 if (explicitBuildNumber && !/^\d+(?:\.\d+){0,2}$/.test(explicitBuildNumber)) {
@@ -177,11 +177,11 @@ if (explicitBuildNumber && !/^\d+(?:\.\d+){0,2}$/.test(explicitBuildNumber)) {
   );
 }
 if (!Number.isSafeInteger(historyCount) || historyCount < 0) {
-  throw new Error("ORBIS_HISTORY_COUNT must be a non-negative integer.");
+  throw new Error("PADU_HISTORY_COUNT must be a non-negative integer.");
 }
 if (!values["skip-build"] && (!analyticsEndpoint || !analyticsWebsiteId)) {
   throw new Error(
-    "Set ORBIS_ANALYTICS_ENDPOINT and ORBIS_ANALYTICS_WEBSITE_ID before building a release.",
+    "Set PADU_ANALYTICS_ENDPOINT and PADU_ANALYTICS_WEBSITE_ID before building a release.",
   );
 }
 
@@ -245,7 +245,7 @@ if (publishing) {
       throw new Error(
         `R2 bucket "${r2Bucket}" does not exist on remote "${r2Remote}". ` +
           "Create it in the Cloudflare dashboard and attach the " +
-          "releases.orbis.sh custom domain (see RELEASING.md), then re-run.",
+          "releases.padu.dev custom domain (see RELEASING.md), then re-run.",
       );
     }
     throw new Error(`Cannot reach ${r2Destination}: ${detail}`);
@@ -291,7 +291,7 @@ const bundledComputerUseSkill = join(
   contentsDirectory,
   "Resources",
   "skills",
-  "orbis-computer-use",
+  "padu-computer-use",
   "SKILL.md",
 );
 const bundledPiComputerUseExtension = join(
@@ -325,7 +325,7 @@ async function verifyJavaScriptRepl(executable: string): Promise<void> {
       params: {
         protocolVersion: "2025-06-18",
         capabilities: {},
-        clientInfo: { name: "orbis-release", version: "1" },
+        clientInfo: { name: "padu-release", version: "1" },
       },
     },
     { jsonrpc: "2.0", id: 2, method: "tools/list", params: {} },
@@ -411,7 +411,7 @@ try {
       ? "Assembling the app bundle"
       : "Building and assembling the app bundle",
   );
-  await $`env ORBIS_CODESIGN_IDENTITY=${identity} ORBIS_ANALYTICS_ENDPOINT=${analyticsEndpoint ?? ""} ORBIS_ANALYTICS_WEBSITE_ID=${analyticsWebsiteId ?? ""} ORBIS_SKIP_CARGO_BUILD=${values["skip-build"] ? "1" : "0"} ${join(projectRoot, "scripts", "bundle.sh")} release`;
+  await $`env PADU_CODESIGN_IDENTITY=${identity} PADU_ANALYTICS_ENDPOINT=${analyticsEndpoint ?? ""} PADU_ANALYTICS_WEBSITE_ID=${analyticsWebsiteId ?? ""} PADU_SKIP_CARGO_BUILD=${values["skip-build"] ? "1" : "0"} ${join(projectRoot, "scripts", "bundle.sh")} release`;
   for (const artifact of [
     join(contentsDirectory, "MacOS", executableName),
     bundledDaemonExecutable,
@@ -446,7 +446,7 @@ try {
   }
   await $`codesign --verify --deep --strict --verbose=2 ${appBundle}`;
 
-  temporaryDirectory = await mkdtemp(join(tmpdir(), "orbis-dmg-"));
+  temporaryDirectory = await mkdtemp(join(tmpdir(), "padu-dmg-"));
   const stagingDirectory = join(temporaryDirectory, "root");
   mountDirectory = join(temporaryDirectory, "mount");
   await mkdir(stagingDirectory);
@@ -502,7 +502,7 @@ try {
       mountedContents,
       "Resources",
       "skills",
-      "orbis-computer-use",
+      "padu-computer-use",
       "SKILL.md",
     ),
     join(
@@ -630,7 +630,7 @@ try {
   await $`ditto ${zipPath} ${join(updatesDirectory, zipName)}`;
 
   // Release notes: this version's CHANGELOG.md section ships next to the
-  // archive as Orbis-<version>.md; generate_appcast links it as the update's
+  // archive as Padu-<version>.md; generate_appcast links it as the update's
   // release notes, which Sparkle renders in the prompt.
   const changelogFile = Bun.file(join(projectRoot, "CHANGELOG.md"));
   const notes = (await changelogFile.exists())
@@ -666,7 +666,7 @@ try {
     logStep("Uploading appcast.xml");
     await $`rclone copyto ${join(updatesDirectory, "appcast.xml")} ${`${r2Destination}/appcast.xml`} ${rcloneFlags} --header-upload ${"Cache-Control: public, max-age=300, must-revalidate"}`;
 
-    console.log(`\nOrbis ${version} (build ${buildNumber}) is live:`);
+    console.log(`\nPadu ${version} (build ${buildNumber}) is live:`);
     console.log(`  download : ${downloadUrlPrefix}${dmgName}`);
     console.log(`  update   : ${downloadUrlPrefix}${zipName}`);
     console.log(`  feed     : ${downloadUrlPrefix}appcast.xml`);

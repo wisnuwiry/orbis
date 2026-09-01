@@ -72,5 +72,5 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           bun run protocol:check
-          bun run --filter @orbis/client check
-          bun run --filter @orbis/client test
+          bun run --filter @padu/client check
+          bun run --filter @padu/client test

@@ -4,7 +4,7 @@ import type {
   ProviderModelOption,
   ReportedCommand,
   SlashCommand,
-} from '@orbis/client'
+} from '@padu/client'
 import { fuzzyScore } from './palette-search'
 
 export const COMPOSER_AUTOCOMPLETE_CAP = 64
@@ -76,7 +76,7 @@ export function isFastModeToggleSubmission(
       && command.template === null)
 }
 
-/** Orbis's provider-neutral terminal-session picker. */
+/** Padu's provider-neutral terminal-session picker. */
 export function isResumeSubmission(prompt: string): boolean {
   return prompt.trim() === '/resume'
 }
@@ -90,7 +90,7 @@ export type GoalCommand =
   | { kind: 'set'; objective: string }
 
 /**
- * Parse the submitted text as Codex's native `/goal` command, which Orbis
+ * Parse the submitted text as Codex's native `/goal` command, which Padu
  * bridges to `thread/goal/*`. `null` when it is not one — wrong provider,
  * other text, or a project/user command that deliberately owns `/goal`
  * (resolution precedence stands).

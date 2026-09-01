@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import type { FileEntry, ReportedCommand, SlashCommand } from '@orbis/client'
+import type { FileEntry, ReportedCommand, SlashCommand } from '@padu/client'
 import {
   composerAutocompleteRows,
   detectComposerTrigger,

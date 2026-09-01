@@ -17,26 +17,26 @@
     }
   };
 
-  const nativeSkyCall = globalThis.__orbisSkyCall;
-  const nativeWrite = globalThis.__orbisWrite;
-  const nativeEmitImage = globalThis.__orbisEmitImage;
-  const nativeSetResponseMeta = globalThis.__orbisSetResponseMeta;
-  const nativeScheduleTimer = globalThis.__orbisScheduleTimer;
-  const nativeClearTimer = globalThis.__orbisClearTimer;
-  const nativeRefreshTimer = globalThis.__orbisRefreshTimer;
-  const cwd = globalThis.__orbisCwd;
-  const homeDir = globalThis.__orbisHomeDir;
-  const tmpDir = globalThis.__orbisTmpDir;
-  delete globalThis.__orbisSkyCall;
-  delete globalThis.__orbisWrite;
-  delete globalThis.__orbisEmitImage;
-  delete globalThis.__orbisSetResponseMeta;
-  delete globalThis.__orbisScheduleTimer;
-  delete globalThis.__orbisClearTimer;
-  delete globalThis.__orbisRefreshTimer;
-  delete globalThis.__orbisCwd;
-  delete globalThis.__orbisHomeDir;
-  delete globalThis.__orbisTmpDir;
+  const nativeSkyCall = globalThis.__paduSkyCall;
+  const nativeWrite = globalThis.__paduWrite;
+  const nativeEmitImage = globalThis.__paduEmitImage;
+  const nativeSetResponseMeta = globalThis.__paduSetResponseMeta;
+  const nativeScheduleTimer = globalThis.__paduScheduleTimer;
+  const nativeClearTimer = globalThis.__paduClearTimer;
+  const nativeRefreshTimer = globalThis.__paduRefreshTimer;
+  const cwd = globalThis.__paduCwd;
+  const homeDir = globalThis.__paduHomeDir;
+  const tmpDir = globalThis.__paduTmpDir;
+  delete globalThis.__paduSkyCall;
+  delete globalThis.__paduWrite;
+  delete globalThis.__paduEmitImage;
+  delete globalThis.__paduSetResponseMeta;
+  delete globalThis.__paduScheduleTimer;
+  delete globalThis.__paduClearTimer;
+  delete globalThis.__paduRefreshTimer;
+  delete globalThis.__paduCwd;
+  delete globalThis.__paduHomeDir;
+  delete globalThis.__paduTmpDir;
 
   const write = (value, newline = false) => nativeWrite(format(value), newline);
   globalThis.console = Object.freeze({
@@ -46,8 +46,8 @@
     error: (...values) => nativeWrite(values.map((value) => format(value)).join(" "), true),
   });
 
-  const timerId = Symbol("orbis.timerId");
-  const timerRefed = Symbol("orbis.timerRefed");
+  const timerId = Symbol("padu.timerId");
+  const timerRefed = Symbol("padu.timerRefed");
   const timers = new Map();
   class Timeout {
     constructor(id) {
@@ -88,7 +88,7 @@
     timers.delete(id);
     nativeClearTimer(id);
   };
-  globalThis.__orbisRunTimer = (id) => {
+  globalThis.__paduRunTimer = (id) => {
     const timer = timers.get(id);
     if (!timer) return;
     if (!timer.repeat) timers.delete(id);
@@ -384,7 +384,7 @@
   };
 
   let requestMeta = Object.freeze({});
-  globalThis.__orbisSetRequestMeta = (meta) => {
+  globalThis.__paduSetRequestMeta = (meta) => {
     requestMeta = Object.freeze(meta ?? {});
   };
   globalThis.nodeRepl = Object.freeze({

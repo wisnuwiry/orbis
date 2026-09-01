@@ -433,7 +433,7 @@ menus hosted by another process.
 
 ## Exact background-focus architecture
 
-This is the critical path for Orbis parity.
+This is the critical path for Padu parity.
 
 Sky does not activate the target application through
 `NSRunningApplication.activate`. It maintains two parallel truths:
@@ -544,7 +544,7 @@ enforcer; those temporary instances are deactivated after the click. Normal
 controller actions reuse the retained instance and deactivate it when the
 controller/session ends.
 
-## Why Orbis's previous approximation failed
+## Why Padu's previous approximation failed
 
 The prior implementation diverged in four material ways:
 
@@ -562,7 +562,7 @@ These differences explain the observed combination: either Kero receives too
 little logical activation and opens the wrong menu, or it receives an
 activation-shaped event without Sky's guard and comes to the front.
 
-## Compatibility requirements for Orbis
+## Compatibility requirements for Padu
 
 A parity implementation must satisfy all of the following as one unit:
 
@@ -584,7 +584,7 @@ A parity implementation must satisfy all of the following as one unit:
 The acceptance test for the reported bug is stricter than “the foreground app
 is restored afterward”:
 
-1. Codex/Orbis remains the actual frontmost application throughout.
+1. Codex/Padu remains the actual frontmost application throughout.
 2. The Kero terminal cursor changes from outline to solid.
 3. A right-click on the intended project row opens that row's context menu.
 4. The menu contains Kero's project actions (`Rename…`,

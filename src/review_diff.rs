@@ -1,4 +1,4 @@
-//! Immutable, render-ready Git diffs for Orbis's Review surface.
+//! Immutable, render-ready Git diffs for Padu's Review surface.
 //!
 //! The daemon captures Git output. This desktop module only parses and expands
 //! that returned data off the UI thread; a frame only indexes stored rows.
@@ -307,22 +307,22 @@ pub fn from_file_changes(changes: &[crate::model::ActivityFileChange]) -> Snapsh
     parse(Source::default(), &numstat, &patch, false)
 }
 
-pub fn wire_source(source: Source) -> orbis_client::workspace::ReviewDiffSource {
+pub fn wire_source(source: Source) -> padu_client::workspace::ReviewDiffSource {
     match source {
         Source::LastTurn {
             session_id,
             turn_id,
             turn_count,
-        } => orbis_client::workspace::ReviewDiffSource::LastTurn {
+        } => padu_client::workspace::ReviewDiffSource::LastTurn {
             session_id,
             turn_id,
             turn_count,
         },
-        Source::Uncommitted => orbis_client::workspace::ReviewDiffSource::Uncommitted,
-        Source::Unstaged => orbis_client::workspace::ReviewDiffSource::Unstaged,
-        Source::Staged => orbis_client::workspace::ReviewDiffSource::Staged,
-        Source::Committed => orbis_client::workspace::ReviewDiffSource::Committed,
-        Source::Branch => orbis_client::workspace::ReviewDiffSource::Branch,
+        Source::Uncommitted => padu_client::workspace::ReviewDiffSource::Uncommitted,
+        Source::Unstaged => padu_client::workspace::ReviewDiffSource::Unstaged,
+        Source::Staged => padu_client::workspace::ReviewDiffSource::Staged,
+        Source::Committed => padu_client::workspace::ReviewDiffSource::Committed,
+        Source::Branch => padu_client::workspace::ReviewDiffSource::Branch,
     }
 }
 

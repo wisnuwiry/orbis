@@ -5,8 +5,8 @@ import type {
   Project,
   ProviderSessionHistory,
   ProviderSessionSummary,
-  OrbisClient,
-} from '@orbis/client'
+  PaduClient,
+} from '@padu/client'
 import {
   applyComposerDraftChanges,
   beginTurn,
@@ -36,7 +36,7 @@ describe('applyComposerDraftChanges', () => {
         command = next
         return { type: 'ack' }
       },
-    } as unknown as OrbisClient
+    } as unknown as PaduClient
     const changes: ComposerDraftChange[] = [{
       target: { type: 'session', sessionId: 'session' },
       draft: { text: 'keep this', attachments: [] },
@@ -80,7 +80,7 @@ describe('browseDaemonDirectory', () => {
         command = next
         return { type: 'workspace', result }
       },
-    } as unknown as OrbisClient
+    } as unknown as PaduClient
 
     await expect(browseDaemonDirectory(client, '/Users/me')).resolves.toEqual(result)
     expect(command).toEqual({
@@ -104,7 +104,7 @@ describe('browseDaemonDirectory', () => {
         command = next
         return { type: 'workspace', result }
       },
-    } as unknown as OrbisClient
+    } as unknown as PaduClient
 
     await expect(browseDaemonDirectory(client, null)).resolves.toEqual(result)
     expect(command).toEqual({
@@ -122,14 +122,14 @@ describe('turn checkpoints', () => {
         command = next
         return { type: 'workspace', result: { type: 'ack' } }
       },
-    } as unknown as OrbisClient
+    } as unknown as PaduClient
 
-    await expect(captureTurnStart(client, '/srv/orbis', 'session', 2)).resolves.toBeUndefined()
+    await expect(captureTurnStart(client, '/srv/padu', 'session', 2)).resolves.toBeUndefined()
     expect(command).toEqual({
       type: 'workspace',
       operation: {
         type: 'captureTurnStart',
-        cwd: '/srv/orbis',
+        cwd: '/srv/padu',
         session_id: 'session',
         turn_count: 2,
       },
@@ -140,7 +140,7 @@ describe('turn checkpoints', () => {
     let command: unknown
     const checkpoint = {
       turn_count: 2,
-      git_ref: 'refs/orbis/session-session-turn-2',
+      git_ref: 'refs/padu/session-session-turn-2',
       status: 'ready' as const,
       files: [],
       additions: 0,
@@ -152,15 +152,15 @@ describe('turn checkpoints', () => {
         command = next
         return { type: 'workspace', result: { type: 'checkpoint', checkpoint } }
       },
-    } as unknown as OrbisClient
+    } as unknown as PaduClient
 
-    await expect(captureTurnCheckpoint(client, '/srv/orbis', 'session', 2))
+    await expect(captureTurnCheckpoint(client, '/srv/padu', 'session', 2))
       .resolves.toEqual(checkpoint)
     expect(command).toEqual({
       type: 'workspace',
       operation: {
         type: 'captureTurn',
-        cwd: '/srv/orbis',
+        cwd: '/srv/padu',
         session_id: 'session',
         turn_count: 2,
       },
@@ -179,14 +179,14 @@ describe('probeProvider', () => {
           probe: {
             provider: 'codex',
             installed: true,
-            path: '/opt/orbis/codex',
+            path: '/opt/padu/codex',
             models: [],
             agent_presets: [],
           },
           version: null,
         }
       },
-    } as unknown as OrbisClient
+    } as unknown as PaduClient
     // Empty override maps are omitted by serde even though the generated
     // TypeScript type currently marks the field as required.
     const settings = {} as DaemonSettings
@@ -194,7 +194,7 @@ describe('probeProvider', () => {
     await expect(probeProvider(client, 'codex', settings, {
       discoverModels: false,
       probeVersion: false,
-    })).resolves.toMatchObject({ installed: true, path: '/opt/orbis/codex' })
+    })).resolves.toMatchObject({ installed: true, path: '/opt/padu/codex' })
     expect(command).toEqual({
       type: 'probeProvider',
       provider: 'codex',
@@ -213,16 +213,16 @@ describe('writeWorkspaceTextFile', () => {
         command = next
         return { type: 'workspace', result: { type: 'ack' } }
       },
-    } as unknown as OrbisClient
+    } as unknown as PaduClient
 
     await expect(
-      writeWorkspaceTextFile(client, '/srv/orbis', 'src/app.ts', 'export const ready = true\n'),
+      writeWorkspaceTextFile(client, '/srv/padu', 'src/app.ts', 'export const ready = true\n'),
     ).resolves.toBeUndefined()
     expect(command).toEqual({
       type: 'workspace',
       operation: {
         type: 'writeTextFile',
-        root: '/srv/orbis',
+        root: '/srv/padu',
         relative_path: 'src/app.ts',
         content: 'export const ready = true\n',
       },
@@ -233,8 +233,8 @@ describe('writeWorkspaceTextFile', () => {
 describe('createProject', () => {
   test('normalizes a remote absolute path without collapsing the root', () => {
     expect(createProject('/').path).toBe('/')
-    expect(createProject('/srv/orbis/').path).toBe('/srv/orbis')
-    expect(createProject('/srv/orbis/').name).toBe('orbis')
+    expect(createProject('/srv/padu/').path).toBe('/srv/padu')
+    expect(createProject('/srv/padu/').name).toBe('padu')
   })
 
   test('rejects paths that depend on the browser process cwd', () => {
@@ -245,7 +245,7 @@ describe('createProject', () => {
 describe('persistProject', () => {
   test('adds a daemon-host project without creating a session', async () => {
     const existing = project('existing', 'existing', '/srv/existing')
-    const candidate = project('new', 'orbis', '/srv/orbis')
+    const candidate = project('new', 'padu', '/srv/padu')
     const commands: unknown[] = []
     const client = {
       request: async (command: unknown) => {
@@ -256,12 +256,12 @@ describe('persistProject', () => {
             projects: [existing],
             sessions: [{ id: 'session' }],
             defaultCwd: '/srv',
-            projectlessRoot: '/srv/.orbis/projects',
+            projectlessRoot: '/srv/.padu/projects',
           }
         }
         return { type: 'taskStateSaved', sessions: [] }
       },
-    } as unknown as OrbisClient
+    } as unknown as PaduClient
 
     const result = await persistProject(client, candidate)
 
@@ -279,7 +279,7 @@ describe('persistProject', () => {
   })
 
   test('reuses a project already persisted for the same daemon path', async () => {
-    const existing = project('existing', 'orbis', '/srv/orbis')
+    const existing = project('existing', 'padu', '/srv/padu')
     const commands: unknown[] = []
     const client = {
       request: async (command: unknown) => {
@@ -289,12 +289,12 @@ describe('persistProject', () => {
           projects: [existing],
           sessions: [],
           defaultCwd: '/srv',
-          projectlessRoot: '/srv/.orbis/projects',
+          projectlessRoot: '/srv/.padu/projects',
         }
       },
-    } as unknown as OrbisClient
+    } as unknown as PaduClient
 
-    const result = await persistProject(client, project('duplicate', 'orbis', '/srv/orbis'))
+    const result = await persistProject(client, project('duplicate', 'padu', '/srv/padu'))
 
     expect(result.project).toEqual(existing)
     expect(commands).toEqual([{ type: 'loadTaskState' }])
@@ -310,7 +310,7 @@ describe('persistSession', () => {
         commands.push(command)
         return { type: 'taskStateSaved', sessions: [saved] }
       },
-    } as unknown as OrbisClient
+    } as unknown as PaduClient
 
     await expect(persistSession(client, saved)).resolves.toEqual(saved)
     expect(commands).toEqual([{
@@ -326,7 +326,7 @@ describe('provider session resume', () => {
   const summary: ProviderSessionSummary = {
     cursor: { provider: 'claude', sessionId: 'native-session' },
     title: 'Imported terminal task',
-    cwd: '/srv/orbis',
+    cwd: '/srv/padu',
     created_at: 100,
     updated_at: 200,
   }
@@ -341,13 +341,13 @@ describe('provider session resume', () => {
           ? { type: 'providerSessions', sessions: [summary] }
           : { type: 'providerSessionHistory', history }
       },
-    } as unknown as OrbisClient
+    } as unknown as PaduClient
 
     await expect(listProviderSessions(client, 'claude')).resolves.toEqual([summary])
     await expect(loadProviderSessionHistory(client, summary)).resolves.toEqual(history)
     expect(commands).toEqual([
       { type: 'listProviderSessions', provider: 'claude', limit: 250 },
-      { type: 'loadProviderSession', cursor: summary.cursor, cwd: '/srv/orbis' },
+      { type: 'loadProviderSession', cursor: summary.cursor, cwd: '/srv/padu' },
     ])
   })
 
@@ -386,9 +386,9 @@ describe('provider session resume', () => {
 
 describe('selectableProjects', () => {
   test('represents projectless tasks as one choice while preserving the selected workspace', () => {
-    const ordinary = project('repo', 'orbis', '/srv/orbis')
-    const first = project('one', 'No project', '/home/me/.orbis/projects/one')
-    const selected = project('two', 'No project', '/home/me/.orbis/projects/two')
+    const ordinary = project('repo', 'padu', '/srv/padu')
+    const first = project('one', 'No project', '/home/me/.padu/projects/one')
+    const selected = project('two', 'No project', '/home/me/.padu/projects/two')
 
     expect(selectableProjects([ordinary, first, selected], selected)).toEqual([
       selected,
@@ -412,12 +412,12 @@ describe('removeSession', () => {
             projects: [],
             sessions: [{ id: 'keep' }],
             defaultCwd: '/srv',
-            projectlessRoot: '/srv/.orbis/projects',
+            projectlessRoot: '/srv/.padu/projects',
           }
         }
         throw new Error('unexpected command')
       },
-    } as unknown as OrbisClient
+    } as unknown as PaduClient
 
     const next = await removeSession(client, 'remove')
 

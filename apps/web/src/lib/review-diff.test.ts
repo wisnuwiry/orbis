@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { hydratePartialDiff, parsePatchFiles } from '@pierre/diffs'
-import type { AgentSession, ReviewDiffSource } from '@orbis/client'
+import type { AgentSession, ReviewDiffSource } from '@padu/client'
 import {
   compactReviewPatch,
   createReviewDiffLoader,

@@ -13,7 +13,7 @@ use nucleo_matcher::{Matcher, Utf32Str};
 use super::*;
 
 actions!(
-    orbis_command_palette,
+    padu_command_palette,
     [
         SelectNext,
         SelectPrevious,
@@ -404,7 +404,7 @@ impl CommandPaletteUi {
     }
 }
 
-impl Orbis {
+impl Padu {
     pub(super) fn open_resume_picker_action(
         &mut self,
         _: &OpenResumePicker,
@@ -1360,29 +1360,29 @@ impl Orbis {
         let fetch = self
             .store
             .provider_sessions(provider, PROVIDER_SESSION_CATALOG_LIMIT);
-        cx.spawn(async move |orbis, cx| {
+        cx.spawn(async move |padu, cx| {
             let result = cx.background_executor().spawn(async move { fetch() }).await;
-            let _ = orbis.update(cx, |orbis, cx| {
-                if !orbis.command_palette.open
-                    || orbis.command_palette.provider_session_generation != generation
-                    || orbis.command_palette.resume_provider != provider
+            let _ = padu.update(cx, |padu, cx| {
+                if !padu.command_palette.open
+                    || padu.command_palette.provider_session_generation != generation
+                    || padu.command_palette.resume_provider != provider
                 {
                     return;
                 }
-                orbis.command_palette.provider_sessions_pending = false;
+                padu.command_palette.provider_sessions_pending = false;
                 match result {
                     Ok(sessions) => {
-                        orbis.command_palette.provider_sessions = sessions;
-                        orbis.command_palette.provider_session_error = None;
+                        padu.command_palette.provider_sessions = sessions;
+                        padu.command_palette.provider_session_error = None;
                     }
                     Err(error) => {
-                        orbis.command_palette.provider_sessions.clear();
-                        orbis.command_palette.provider_session_error = Some(error.to_string());
+                        padu.command_palette.provider_sessions.clear();
+                        padu.command_palette.provider_session_error = Some(error.to_string());
                     }
                 }
-                if orbis.command_palette.view == CommandPaletteView::Resume {
-                    let query = orbis.command_palette.search.read(cx).content().to_owned();
-                    orbis.refresh_command_palette_results(&query, false, cx);
+                if padu.command_palette.view == CommandPaletteView::Resume {
+                    let query = padu.command_palette.search.read(cx).content().to_owned();
+                    padu.refresh_command_palette_results(&query, false, cx);
                 }
                 cx.notify();
             });
@@ -1506,13 +1506,13 @@ impl Orbis {
         let window_handle = window.window_handle();
         cx.notify();
 
-        cx.spawn(async move |orbis, cx| {
+        cx.spawn(async move |padu, cx| {
             let result = cx.background_executor().spawn(async move { fetch() }).await;
-            let update = orbis.update(cx, |orbis, cx| {
-                if !orbis.command_palette.open
-                    || orbis.command_palette.view != CommandPaletteView::Resume
-                    || orbis.command_palette.provider_session_generation != generation
-                    || orbis
+            let update = padu.update(cx, |padu, cx| {
+                if !padu.command_palette.open
+                    || padu.command_palette.view != CommandPaletteView::Resume
+                    || padu.command_palette.provider_session_generation != generation
+                    || padu
                         .command_palette
                         .provider_session_import
                         .as_ref()
@@ -1524,9 +1524,9 @@ impl Orbis {
                     Ok(history) => Some((summary, history)),
                     Err(error) => {
                         let error = error.to_string();
-                        orbis.command_palette.provider_session_import = None;
-                        orbis.command_palette.provider_session_error = Some(error.clone());
-                        orbis.show_toast(tr!("command_palette.resume_failed", error = error));
+                        padu.command_palette.provider_session_import = None;
+                        padu.command_palette.provider_session_error = Some(error.clone());
+                        padu.show_toast(tr!("command_palette.resume_failed", error = error));
                         cx.notify();
                         None
                     }
@@ -1536,12 +1536,12 @@ impl Orbis {
                 return;
             };
             let _ = window_handle.update(cx, |_, window, cx| {
-                let _ = orbis.update(cx, |orbis, cx| {
-                    if orbis.command_palette.open
-                        && orbis.command_palette.view == CommandPaletteView::Resume
-                        && orbis.command_palette.provider_session_generation == generation
+                let _ = padu.update(cx, |padu, cx| {
+                    if padu.command_palette.open
+                        && padu.command_palette.view == CommandPaletteView::Resume
+                        && padu.command_palette.provider_session_generation == generation
                     {
-                        orbis.import_provider_session(summary, history, window, cx);
+                        padu.import_provider_session(summary, history, window, cx);
                     }
                 });
             });

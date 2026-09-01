@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import type { OrbisClient } from '@orbis/client'
+import type { PaduClient } from '@padu/client'
 import { importDaemonPathAttachment } from './attachments'
 
 describe('importDaemonPathAttachment', () => {
@@ -11,14 +11,14 @@ describe('importDaemonPathAttachment', () => {
         return {
           type: 'attachmentStored',
           attachment: {
-            reference: 'orbis-attachment:one',
-            path: '/home/me/.orbis/attachments/one/logo.png',
+            reference: 'padu-attachment:one',
+            path: '/home/me/.padu/attachments/one/logo.png',
             name: 'logo.png',
             isDir: false,
           },
         }
       },
-    } as unknown as OrbisClient
+    } as unknown as PaduClient
 
     const attachment = await importDaemonPathAttachment(client, '/Users/me/Pictures/logo.png')
 
@@ -27,12 +27,12 @@ describe('importDaemonPathAttachment', () => {
       path: '/Users/me/Pictures/logo.png',
     })
     expect(attachment).toEqual({
-      path: '/home/me/.orbis/attachments/one/logo.png',
+      path: '/home/me/.padu/attachments/one/logo.png',
       mention: '/Users/me/Pictures/logo.png',
       name: 'logo.png',
       is_dir: false,
       is_image: true,
-      blob_reference: 'orbis-attachment:one',
+      blob_reference: 'padu-attachment:one',
     })
   })
 })

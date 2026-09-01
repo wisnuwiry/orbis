@@ -3,7 +3,7 @@ import type {
   ComposerDraftChange,
   ComposerDrafts,
   ComposerDraftTarget,
-} from '@orbis/client'
+} from '@padu/client'
 
 export function composerDraftId(target: ComposerDraftTarget): string {
   return target.type === 'newSession'

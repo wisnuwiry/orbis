@@ -1,4 +1,4 @@
-//! Desktop proxy for the provider runtime owned by `orbis-daemon`.
+//! Desktop proxy for the provider runtime owned by `padu-daemon`.
 
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -10,13 +10,13 @@ use crate::model::{
 use crossbeam_channel::{Sender, bounded, select};
 use parking_lot::Mutex;
 
-pub use orbis_client::driver::{
+pub use padu_client::driver::{
     DriverControl, DriverEventSender, DriverHandle, DriverStartOptions, SessionOptions,
     event_channel,
 };
 
 pub(crate) fn start_remote(
-    daemon: orbis_client::DaemonSupervisor,
+    daemon: padu_client::DaemonSupervisor,
     session_id: uuid::Uuid,
     provider: ProviderKind,
     options: DriverStartOptions,
@@ -24,13 +24,13 @@ pub(crate) fn start_remote(
 ) -> anyhow::Result<DriverHandle> {
     let client = daemon.client();
     let runtime_id = uuid::Uuid::new_v4();
-    let command = orbis_client::Command::Start {
-        options: orbis_client::WireDriverStartOptions {
-            provider: orbis_client::encode_enum(provider)?,
+    let command = padu_client::Command::Start {
+        options: padu_client::WireDriverStartOptions {
+            provider: padu_client::encode_enum(provider)?,
             binary: options.binary,
             cwd: options.cwd,
-            mode: orbis_client::encode_enum(options.mode)?,
-            interaction_mode: orbis_client::encode_enum(options.interaction_mode)?,
+            mode: padu_client::encode_enum(options.mode)?,
+            interaction_mode: padu_client::encode_enum(options.interaction_mode)?,
             model: options.model,
             reasoning_effort: options.reasoning_effort,
             service_tier: options.service_tier,
@@ -44,8 +44,8 @@ pub(crate) fn start_remote(
         },
     };
     let supports_steer = match client.request(session_id, runtime_id, command) {
-        Ok(orbis_client::ResponsePayload::Started { supports_steer }) => supports_steer,
-        Ok(_) => anyhow::bail!("Orbis daemon returned an invalid start response"),
+        Ok(padu_client::ResponsePayload::Started { supports_steer }) => supports_steer,
+        Ok(_) => anyhow::bail!("Padu daemon returned an invalid start response"),
         Err(error) => return Err(error),
     };
     connect_remote(
@@ -60,8 +60,8 @@ pub(crate) fn start_remote(
 }
 
 pub(crate) fn attach_remote(
-    daemon: orbis_client::DaemonSupervisor,
-    client: orbis_client::DaemonClient,
+    daemon: padu_client::DaemonSupervisor,
+    client: padu_client::DaemonClient,
     session_id: uuid::Uuid,
     runtime_id: uuid::Uuid,
     supports_steer: bool,
@@ -80,8 +80,8 @@ pub(crate) fn attach_remote(
 }
 
 fn connect_remote(
-    daemon: orbis_client::DaemonSupervisor,
-    initial_client: orbis_client::DaemonClient,
+    daemon: padu_client::DaemonSupervisor,
+    initial_client: padu_client::DaemonClient,
     session_id: uuid::Uuid,
     runtime_id: uuid::Uuid,
     supports_steer: bool,
@@ -97,7 +97,7 @@ fn connect_remote(
     let forwarding_events = events.clone();
     let thread_initial_client = initial_client.clone();
     let spawn = std::thread::Builder::new()
-        .name(format!("orbis-daemon-session-{session_id}"))
+        .name(format!("padu-daemon-session-{session_id}"))
         .spawn(move || {
             let mut client = thread_initial_client;
             let mut remote_events = client.subscribe(session_id, runtime_id);
@@ -121,10 +121,10 @@ fn connect_remote(
                                 epoch: sequenced.epoch,
                                 sequence: sequenced.sequence,
                             };
-                            let event = match orbis_client::event_from_wire(sequenced.event) {
+                            let event = match padu_client::event_from_wire(sequenced.event) {
                                 Ok(event) => event,
                                 Err(error) => DriverEvent::Error(format!(
-                                    "Orbis daemon sent an invalid event: {error}"
+                                    "Padu daemon sent an invalid event: {error}"
                                 )),
                             };
                             let process_exited = matches!(&event, DriverEvent::ProcessExited);
@@ -166,10 +166,10 @@ fn connect_remote(
                 let attached = replacement.request(
                     session_id,
                     uuid::Uuid::nil(),
-                    orbis_client::Command::AttachSession,
+                    padu_client::Command::AttachSession,
                 );
                 match attached {
-                    Ok(orbis_client::ResponsePayload::SessionRuntime {
+                    Ok(padu_client::ResponsePayload::SessionRuntime {
                         runtime_id: Some(attached_runtime_id),
                         ..
                     }) if attached_runtime_id == runtime_id => {
@@ -177,13 +177,13 @@ fn connect_remote(
                         client = replacement;
                         remote_events = client.subscribe(session_id, runtime_id);
                     }
-                    Ok(orbis_client::ResponsePayload::SessionRuntime { .. }) => {
+                    Ok(padu_client::ResponsePayload::SessionRuntime { .. }) => {
                         let _ = forwarding_events.send(DriverEvent::ProcessExited);
                         break;
                     }
                     Ok(_) => {
                         let _ = forwarding_events.send(DriverEvent::Error(
-                            "Orbis daemon returned an invalid runtime attachment response".into(),
+                            "Padu daemon returned an invalid runtime attachment response".into(),
                         ));
                         break;
                     }
@@ -213,7 +213,7 @@ fn connect_remote(
 }
 
 struct RemoteDriverControl {
-    client: Arc<Mutex<orbis_client::DaemonClient>>,
+    client: Arc<Mutex<padu_client::DaemonClient>>,
     session_id: uuid::Uuid,
     runtime_id: uuid::Uuid,
     supports_steer: bool,
@@ -223,11 +223,11 @@ struct RemoteDriverControl {
 }
 
 impl RemoteDriverControl {
-    fn notify(&self, command: orbis_client::Command) {
+    fn notify(&self, command: padu_client::Command) {
         let client = self.client.lock().clone();
         if let Err(error) = client.notify(self.session_id, self.runtime_id, command) {
             let _ = self.events.send(DriverEvent::Error(format!(
-                "Orbis daemon command failed: {error}"
+                "Padu daemon command failed: {error}"
             )));
         }
     }
@@ -235,7 +235,7 @@ impl RemoteDriverControl {
 
 impl DriverControl for RemoteDriverControl {
     fn prompt(&self, prompt: String) {
-        self.notify(orbis_client::Command::Prompt { prompt });
+        self.notify(padu_client::Command::Prompt { prompt });
     }
 
     fn supports_steer(&self) -> bool {
@@ -243,24 +243,24 @@ impl DriverControl for RemoteDriverControl {
     }
 
     fn steer(&self, prompt: String) {
-        self.notify(orbis_client::Command::Steer { prompt });
+        self.notify(padu_client::Command::Steer { prompt });
     }
 
     fn cancel(&self) {
-        self.notify(orbis_client::Command::Cancel);
+        self.notify(padu_client::Command::Cancel);
     }
 
     fn cancel_computer_use(&self) {
-        self.notify(orbis_client::Command::CancelComputerUse);
+        self.notify(padu_client::Command::CancelComputerUse);
     }
 
     fn refresh_background_work(&self) {
-        self.notify(orbis_client::Command::RefreshBackgroundWork);
+        self.notify(padu_client::Command::RefreshBackgroundWork);
     }
 
     fn stop_background_work(&self, key: BackgroundWorkKey, control_id: String) {
         match serde_json::to_value(key) {
-            Ok(key) => self.notify(orbis_client::Command::StopBackgroundWork { key, control_id }),
+            Ok(key) => self.notify(padu_client::Command::StopBackgroundWork { key, control_id }),
             Err(error) => {
                 let _ = self.events.send(DriverEvent::Error(format!(
                     "could not encode background-work command: {error}"
@@ -270,7 +270,7 @@ impl DriverControl for RemoteDriverControl {
     }
 
     fn respond(&self, request_id: String, option_id: String) {
-        self.notify(orbis_client::Command::Respond {
+        self.notify(padu_client::Command::Respond {
             request_id,
             option_id,
         });
@@ -279,21 +279,21 @@ impl DriverControl for RemoteDriverControl {
     fn respond_user_input(
         &self,
         request_id: String,
-        answers: Vec<orbis_protocol::model::UserInputAnswer>,
+        answers: Vec<padu_protocol::model::UserInputAnswer>,
     ) {
-        self.notify(orbis_client::Command::RespondUserInput {
+        self.notify(padu_client::Command::RespondUserInput {
             request_id,
             answers,
         });
     }
 
-    fn goal(&self, operation: orbis_protocol::model::GoalOperation) {
-        self.notify(orbis_client::Command::Goal { operation });
+    fn goal(&self, operation: padu_protocol::model::GoalOperation) {
+        self.notify(padu_client::Command::Goal { operation });
     }
 
     fn run_computer_tool(&self, request: ComputerToolRequest) {
-        self.notify(orbis_client::Command::RunComputerTool {
-            request: orbis_client::WireComputerToolRequest {
+        self.notify(padu_client::Command::RunComputerTool {
+            request: padu_client::WireComputerToolRequest {
                 call_id: request.call_id,
                 tool: request.tool,
                 arguments: request.arguments,
@@ -302,8 +302,8 @@ impl DriverControl for RemoteDriverControl {
     }
 
     fn reject_computer_tool(&self, request: ComputerToolRequest, reason: String) {
-        self.notify(orbis_client::Command::RejectComputerTool {
-            request: orbis_client::WireComputerToolRequest {
+        self.notify(padu_client::Command::RejectComputerTool {
+            request: padu_client::WireComputerToolRequest {
                 call_id: request.call_id,
                 tool: request.tool,
                 arguments: request.arguments,
@@ -314,9 +314,9 @@ impl DriverControl for RemoteDriverControl {
 
     fn apply_options(&self, options: SessionOptions) -> bool {
         let options = (|| {
-            Ok::<_, anyhow::Error>(orbis_client::WireSessionOptions {
-                mode: orbis_client::encode_enum(options.mode)?,
-                interaction_mode: orbis_client::encode_enum(options.interaction_mode)?,
+            Ok::<_, anyhow::Error>(padu_client::WireSessionOptions {
+                mode: padu_client::encode_enum(options.mode)?,
+                interaction_mode: padu_client::encode_enum(options.interaction_mode)?,
                 model: options.model,
                 reasoning_effort: options.reasoning_effort,
                 service_tier: options.service_tier,
@@ -331,9 +331,9 @@ impl DriverControl for RemoteDriverControl {
             client.request(
                 self.session_id,
                 self.runtime_id,
-                orbis_client::Command::ApplyOptions { options }
+                padu_client::Command::ApplyOptions { options }
             ),
-            Ok(orbis_client::ResponsePayload::OptionsApplied { applied: true })
+            Ok(padu_client::ResponsePayload::OptionsApplied { applied: true })
         )
     }
 
@@ -342,13 +342,13 @@ impl DriverControl for RemoteDriverControl {
         match client.request(
             self.session_id,
             self.runtime_id,
-            orbis_client::Command::Rollback { turns },
+            padu_client::Command::Rollback { turns },
         )? {
-            orbis_client::ResponsePayload::Cursor { cursor } => cursor
+            padu_client::ResponsePayload::Cursor { cursor } => cursor
                 .map(serde_json::from_value)
                 .transpose()
                 .map_err(Into::into),
-            _ => anyhow::bail!("Orbis daemon returned an invalid rollback response"),
+            _ => anyhow::bail!("Padu daemon returned an invalid rollback response"),
         }
     }
 
@@ -357,17 +357,17 @@ impl DriverControl for RemoteDriverControl {
         match client.request(
             self.session_id,
             self.runtime_id,
-            orbis_client::Command::Fork { turns_to_remove },
+            padu_client::Command::Fork { turns_to_remove },
         )? {
-            orbis_client::ResponsePayload::Cursor {
+            padu_client::ResponsePayload::Cursor {
                 cursor: Some(cursor),
             } => serde_json::from_value(cursor).map_err(Into::into),
-            _ => anyhow::bail!("Orbis daemon returned an invalid fork response"),
+            _ => anyhow::bail!("Padu daemon returned an invalid fork response"),
         }
     }
 
     fn close(&self) {
-        self.notify(orbis_client::Command::CloseSession);
+        self.notify(padu_client::Command::CloseSession);
     }
 }
 

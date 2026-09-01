@@ -5,7 +5,7 @@
 // Usage:
 //   bun scripts/appcast-windows.ts <assets-dir> <version>
 //
-// <assets-dir> holds this release's `Orbis-<version>-<arch>-Setup.exe` files.
+// <assets-dir> holds this release's `Padu-<version>-<arch>-Setup.exe` files.
 // One feed is written per architecture, because a Sparkle appcast has no way
 // to say which binary an item is for. Existing feeds in the directory are
 // merged, so older releases keep their entries.
@@ -17,7 +17,7 @@
 //
 // Env:
 //   SPARKLE_PRIVATE_KEY        EdDSA private key, base64 (required)
-//   ORBIS_DOWNLOAD_URL_PREFIX   base URL for enclosure links
+//   PADU_DOWNLOAD_URL_PREFIX   base URL for enclosure links
 import { createPrivateKey, sign } from "node:crypto";
 import { readdirSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -158,7 +158,7 @@ export function renderAppcast(arch: Architecture, items: AppcastItem[]): string 
   return `<?xml version="1.0" encoding="utf-8"?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
   <channel>
-    <title>Orbis (Windows ${arch})</title>
+    <title>Padu (Windows ${arch})</title>
 ${entries}
   </channel>
 </rss>
@@ -188,7 +188,7 @@ export async function generateWindowsAppcasts(
   const present = new Set(readdirSync(assetsDir));
   const written: string[] = [];
   for (const arch of architectures) {
-    const installer = `Orbis-${version}-${arch}-Setup.exe`;
+    const installer = `Padu-${version}-${arch}-Setup.exe`;
     if (!present.has(installer)) {
       console.warn(`No ${installer} in ${assetsDir}; leaving that feed alone.`);
       continue;
@@ -212,7 +212,7 @@ export async function generateWindowsAppcasts(
     console.log(`Wrote ${feedPath} (${item.length} bytes signed)`);
   }
   if (written.length === 0) {
-    throw new Error(`No Orbis-${version}-<arch>-Setup.exe found in ${assetsDir}`);
+    throw new Error(`No Padu-${version}-<arch>-Setup.exe found in ${assetsDir}`);
   }
   return written;
 }
@@ -226,7 +226,7 @@ if (import.meta.main) {
   await generateWindowsAppcasts(
     assetsDir,
     version,
-    process.env.ORBIS_DOWNLOAD_URL_PREFIX ?? defaultDownloadUrlPrefix,
+    process.env.PADU_DOWNLOAD_URL_PREFIX ?? defaultDownloadUrlPrefix,
     new Date().toUTCString(),
   );
 }

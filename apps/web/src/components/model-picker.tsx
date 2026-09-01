@@ -1,7 +1,7 @@
-import type { AgentSession, ProviderKind, ProviderModel, ProviderProbe } from '@orbis/client'
+import type { AgentSession, ProviderKind, ProviderModel, ProviderProbe } from '@padu/client'
 import { Popover } from '@base-ui/react/popover'
 import { useEffect, useRef, useState, type RefObject } from 'react'
-import { ProviderIcon, PROVIDERS, providerMeta, OrbisIcon } from '@/components/orbis-icon'
+import { ProviderIcon, PROVIDERS, providerMeta, PaduIcon } from '@/components/padu-icon'
 import { useDaemonSettings, useProviderProbes } from '@/hooks/use-daemon-data'
 import { useI18n } from '@/lib/i18n'
 import {
@@ -34,7 +34,7 @@ export function ModelPicker({
   const [highlight, setHighlight] = useState<number | null>(null)
   const [favorites, setFavorites] = useState<string[]>(() => {
     if (typeof window === 'undefined') return []
-    try { return JSON.parse(window.localStorage.getItem('orbis.favorite-models') ?? '[]') as string[] }
+    try { return JSON.parse(window.localStorage.getItem('padu.favorite-models') ?? '[]') as string[] }
     catch { return [] }
   })
   const search = useRef<HTMLInputElement>(null)
@@ -119,7 +119,7 @@ export function ModelPicker({
     const key = `${provider}:${model}`
     setFavorites((current) => {
       const next = current.includes(key) ? current.filter((item) => item !== key) : [...current, key]
-      window.localStorage.setItem('orbis.favorite-models', JSON.stringify(next))
+      window.localStorage.setItem('padu.favorite-models', JSON.stringify(next))
       return next
     })
   }
@@ -147,7 +147,7 @@ export function ModelPicker({
         >
           <Popover.Popup
             aria-label={t('models.choose')}
-            className="orbis-popover-surface flex h-[390px] w-[460px] max-w-[calc(100vw-32px)] overflow-hidden rounded-[12px] outline-none"
+            className="padu-popover-surface flex h-[390px] w-[460px] max-w-[calc(100vw-32px)] overflow-hidden rounded-[12px] outline-none"
             finalFocus={returnFocus
               ? (closeType) => closeType === 'keyboard' ? true : returnFocus.current
               : undefined}
@@ -156,7 +156,7 @@ export function ModelPicker({
           >
           <div className="flex h-full w-[50px] shrink-0 flex-col items-center gap-1 overflow-y-auto border-r bg-background p-[5px]">
             <ModelTab active={tab === 'favorites' && !query} label={t('models.favorites')} onClick={() => { setTab('favorites'); setQuery(''); setHighlight(null) }}>
-              <OrbisIcon className="size-[17px]" name="star" />
+              <PaduIcon className="size-[17px]" name="star" />
             </ModelTab>
             <div className="my-[3px] h-px w-[34px] shrink-0 bg-border" />
             {PROVIDERS.map((provider) => {
@@ -177,7 +177,7 @@ export function ModelPicker({
           <div className="flex min-w-0 flex-1 flex-col bg-card">
             <div className="h-[52px] shrink-0 px-3 pb-2 pt-2.5">
               <label className="flex h-[34px] items-center gap-2 rounded-[9px] bg-[var(--raised)] px-2.5">
-                <OrbisIcon className="size-[15px] text-[var(--text-secondary)]" name="search" />
+                <PaduIcon className="size-[15px] text-[var(--text-secondary)]" name="search" />
                 <input
                   aria-activedescendant={highlight !== null && rows[highlight]
                     ? `model-${rows[highlight]!.provider}-${rows[highlight]!.model.id}`
@@ -271,7 +271,7 @@ export function ModelPicker({
                         }
                       }}
                     >
-                      <OrbisIcon className={cn('size-3.5 text-[var(--text-ghost)]', favorite && 'text-amber-500')} name={favorite ? 'starFilled' : 'star'} />
+                      <PaduIcon className={cn('size-3.5 text-[var(--text-ghost)]', favorite && 'text-amber-500')} name={favorite ? 'starFilled' : 'star'} />
                     </span>
                   </div>
                 )

@@ -1,5 +1,5 @@
 /**
- * Orbis local state schema.
+ * Padu local state schema.
  *
  * Drizzle is a build-time tool here: `bun run db:generate` diffs this file and
  * writes plain SQL into `db/migrations`, which the Rust app applies at startup

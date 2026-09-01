@@ -45,7 +45,7 @@ mod theme;
 mod ui;
 mod updater;
 
-pub use orbis_client::{
+pub use padu_client::{
     checkpoint, command_env, composer_complete, git_branch, git_commit, i18n, identity, model,
     model_catalog, persistence, projectless, skills, usage, usage_history, worktree,
 };
@@ -55,10 +55,10 @@ use gpui::{
     WindowBackgroundAppearance, WindowBounds, WindowOptions, actions, point, px, size,
 };
 
-use crate::app::Orbis;
+use crate::app::Padu;
 use crate::identity::{APP_ID, APP_NAME};
 actions!(
-    orbis,
+    padu,
     [
         Quit,
         About,
@@ -173,11 +173,11 @@ fn restored_window_placement(cx: &App) -> (WindowBounds, Option<gpui::DisplayId>
     (window_bounds, display_id)
 }
 
-trait OrbisApplicationExt {
+trait PaduApplicationExt {
     fn with_main_window_reopen(self) -> Self;
 }
 
-impl OrbisApplicationExt for Application {
+impl PaduApplicationExt for Application {
     fn with_main_window_reopen(self) -> Self {
         self.on_reopen(|cx| {
             if let Some(window) = cx.windows().into_iter().next() {
@@ -193,7 +193,7 @@ impl OrbisApplicationExt for Application {
 
 pub fn run() {
     let daemon = crate::daemon::start_process()
-        .unwrap_or_else(|error| panic!("failed to start Orbis daemon: {error:#}"));
+        .unwrap_or_else(|error| panic!("failed to start Padu daemon: {error:#}"));
     gpui_platform::application()
         .with_assets(crate::assets::Assets)
         .with_main_window_reopen()
@@ -241,12 +241,12 @@ pub fn run() {
                 KeyBinding::new("secondary-shift-b", ToggleRightPanel, None),
                 KeyBinding::new("secondary-k", ToggleCommandPalette, None),
                 KeyBinding::new("secondary-alt-shift-f", ToggleFpsCounter, None),
-                KeyBinding::new("secondary-[", NavigateBack, Some("Orbis")),
-                KeyBinding::new("secondary-]", NavigateForward, Some("Orbis")),
-                KeyBinding::new("ctrl-tab", SwitchTaskForward, Some("Orbis")),
-                KeyBinding::new("ctrl-shift-tab", SwitchTaskBackward, Some("Orbis")),
-                KeyBinding::new("ctrl-escape", CancelTaskSwitch, Some("Orbis")),
-                KeyBinding::new("ctrl-shift-escape", CancelTaskSwitch, Some("Orbis")),
+                KeyBinding::new("secondary-[", NavigateBack, Some("Padu")),
+                KeyBinding::new("secondary-]", NavigateForward, Some("Padu")),
+                KeyBinding::new("ctrl-tab", SwitchTaskForward, Some("Padu")),
+                KeyBinding::new("ctrl-shift-tab", SwitchTaskBackward, Some("Padu")),
+                KeyBinding::new("ctrl-escape", CancelTaskSwitch, Some("Padu")),
+                KeyBinding::new("ctrl-shift-escape", CancelTaskSwitch, Some("Padu")),
                 KeyBinding::new("down", SwitchTaskForward, Some("TaskSwitcher")),
                 KeyBinding::new("right", SwitchTaskForward, Some("TaskSwitcher")),
                 KeyBinding::new("up", SwitchTaskBackward, Some("TaskSwitcher")),
@@ -259,21 +259,21 @@ pub fn run() {
                 KeyBinding::new("secondary-/", ToggleModelPicker, None),
                 KeyBinding::new("secondary-u", ToggleUsagePanel, None),
                 KeyBinding::new("secondary-s", SaveFile, None),
-                KeyBinding::new("escape", CancelTurn, Some("Orbis")),
-                KeyBinding::new("secondary-c", CopySelection, Some("Orbis")),
+                KeyBinding::new("escape", CancelTurn, Some("Padu")),
+                KeyBinding::new("secondary-c", CopySelection, Some("Padu")),
                 // Find and replace in the right panel's file editor, on the
                 // conventional VS Code bindings. The primary shortcut + G cycles matches from
                 // the editor without moving focus to the bar.
-                KeyBinding::new("secondary-f", OpenFind, Some("Orbis")),
+                KeyBinding::new("secondary-f", OpenFind, Some("Padu")),
                 // The text input's macOS-style Ctrl-F caret binding is more
-                // specific than Orbis's root context. Reassert the platform
+                // specific than Padu's root context. Reassert the platform
                 // primary shortcut for inputs inside this window so Ctrl-F
                 // remains find-in-page on Linux/Windows while Cmd-F keeps the
                 // native behavior on macOS.
-                KeyBinding::new("secondary-f", OpenFind, Some("Orbis > TextInput")),
-                KeyBinding::new("secondary-alt-f", OpenFindReplace, Some("Orbis")),
-                KeyBinding::new("secondary-g", FindNext, Some("Orbis")),
-                KeyBinding::new("secondary-shift-g", FindPrevious, Some("Orbis")),
+                KeyBinding::new("secondary-f", OpenFind, Some("Padu > TextInput")),
+                KeyBinding::new("secondary-alt-f", OpenFindReplace, Some("Padu")),
+                KeyBinding::new("secondary-g", FindNext, Some("Padu")),
+                KeyBinding::new("secondary-shift-g", FindPrevious, Some("Padu")),
                 // Scoped to the editor pane: escape closes the bar there and
                 // falls through to CancelTurn anywhere else.
                 KeyBinding::new("escape", CloseFind, Some("FileEditorPane")),
@@ -291,7 +291,7 @@ pub fn run() {
                 KeyBinding::new("secondary-alt-r", ToggleFindRegex, Some("FileEditorPane")),
                 KeyBinding::new("shift-enter", FindPrevious, Some("FindBar")),
                 KeyBinding::new("secondary-alt-enter", ReplaceAllMatches, Some("FindBar")),
-                // Browser surface. Deeper than "Orbis", so while focus is on the
+                // Browser surface. Deeper than "Padu", so while focus is on the
                 // page or its address bar the browser reads the platform's
                 // conventional navigation shortcuts; the same keys elsewhere
                 // keep their app meanings. The clipboard trio is rebound
@@ -333,7 +333,7 @@ pub fn run() {
                             // Windows creates the window without `WS_CAPTION`
                             // either way; asking for the transparent titlebar
                             // is what extends the client area over the frame
-                            // so Orbis's own header can host the caption
+                            // so Padu's own header can host the caption
                             // buttons and drag region.
                             appears_transparent: cfg!(any(
                                 target_os = "macos",
@@ -342,7 +342,7 @@ pub fn run() {
                             traffic_light_position: cfg!(target_os = "macos")
                                 .then(|| point(px(16.0), px(17.0))),
                         }),
-                        // Orbis moves its custom macOS titlebar explicitly. Keep
+                        // Padu moves its custom macOS titlebar explicitly. Keep
                         // the NSWindow movable so native controls and Window-menu
                         // tiling remain enabled.
                         is_movable: true,
@@ -355,7 +355,7 @@ pub fn run() {
                         app_id: Some(APP_ID.to_owned()),
                         // GPUI defaults to compositor/server decorations. If a
                         // Wayland compositor declines them, it reports the
-                        // client fallback and Orbis renders that frame itself.
+                        // client fallback and Padu renders that frame itself.
                         #[cfg(target_os = "linux")]
                         icon: crate::platform::linux_app_icon(),
                         window_bounds: Some(window_bounds),
@@ -365,13 +365,13 @@ pub fn run() {
                     },
                     move |window, cx| {
                         crate::platform::configure_main_window_close_behavior(window, cx);
-                        let orbis = Orbis::new(window, cx, daemon);
-                        let composer_focus = orbis.read(cx).composer_focus(cx);
+                        let padu = Padu::new(window, cx, daemon);
+                        let composer_focus = padu.read(cx).composer_focus(cx);
                         window.focus(&composer_focus, cx);
-                        orbis
+                        padu
                     },
                 )
-                .expect("failed to open Orbis window");
+                .expect("failed to open Padu window");
 
             cx.on_system_notification_response({
                 let window = window;
@@ -381,8 +381,8 @@ pub fn run() {
                         return;
                     };
                     window
-                        .update(cx, |orbis, window, cx| {
-                            orbis.open_task_from_notification(session_id, cx);
+                        .update(cx, |padu, window, cx| {
+                            padu.open_task_from_notification(session_id, cx);
                             window.activate_window();
                             cx.activate(true);
                         })
