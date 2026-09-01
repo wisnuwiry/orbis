@@ -100,7 +100,7 @@ function parseHeadings(content: string): DocHeading[] {
   return headings;
 }
 
-const docModules = import.meta.glob("../../public-docs/**/*.md", {
+const docModules = import.meta.glob("../../../public-docs/**/*.md", {
   eager: true,
   query: "?raw",
   import: "default",

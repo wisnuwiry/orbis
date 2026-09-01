@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="website/public/padu.svg">
-    <img alt="Padu" src="website/public/padu.svg" width="240">
+    <source media="(prefers-color-scheme: dark)" srcset="apps/landing/public/padu.svg">
+    <img alt="Padu" src="apps/landing/public/padu.svg" width="240">
   </picture>
 </p>
 
@@ -36,8 +36,8 @@ in Rust with [GPUI](https://github.com/zed-industries/zed/tree/main/crates/gpui)
 it keeps projects, sessions, and transcripts entirely on your machine.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="website/public/app-screenshot-dark.png">
-  <img alt="Padu app preview" src="website/public/app-screenshot-light.png" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="apps/landing/public/app-screenshot-dark.png">
+  <img alt="Padu app preview" src="apps/landing/public/app-screenshot-light.png" width="100%">
 </picture>
 
 ## Install

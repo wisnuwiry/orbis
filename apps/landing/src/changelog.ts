@@ -1,4 +1,4 @@
-import changelogMarkdown from "../../CHANGELOG.md?raw";
+import changelogMarkdown from "../../../CHANGELOG.md?raw";
 
 export interface ChangelogRelease {
   version: string;

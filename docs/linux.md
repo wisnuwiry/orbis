@@ -109,7 +109,7 @@ To exercise the install script against that local build:
 
 ```sh
 PADU_BUNDLE_PATH=target/release/padu-<version>-<target>.tar.gz \
-  sh website/public/install.sh
+  sh apps/landing/public/install.sh
 ```
 
 ## Running in a virtual machine

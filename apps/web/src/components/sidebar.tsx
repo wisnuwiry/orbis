@@ -24,7 +24,7 @@ import {
   type SidebarOrdering,
 } from '@/lib/sidebar-presentation'
 import { cn } from '@/lib/utils'
-import paduAppIconUrl from '../../../../website/public/app-icon.png'
+import paduAppIconUrl from '../../../landing/public/app-icon.png'
 
 interface SidebarProps {
   taskState: TaskState

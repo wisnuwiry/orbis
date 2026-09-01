@@ -13,10 +13,14 @@
     "web:preview": "bun run --filter @padu/web preview",
     "web:typecheck": "bun run --filter @padu/web typecheck",
     "web:test": "bun run --filter @padu/web test",
-    "website:dev": "bun run --filter website dev",
-    "website:build": "bun run --filter website build",
-    "website:preview": "bun run --filter website preview",
-    "website:typecheck": "bun run --filter website typecheck",
+    "landing:dev": "bun run --filter @padu/landing dev",
+    "landing:build": "bun run --filter @padu/landing build",
+    "landing:preview": "bun run --filter @padu/landing preview",
+    "landing:typecheck": "bun run --filter @padu/landing typecheck",
+    "website:dev": "bun run --filter @padu/landing dev",
+    "website:build": "bun run --filter @padu/landing build",
+    "website:preview": "bun run --filter @padu/landing preview",
+    "website:typecheck": "bun run --filter @padu/landing typecheck",
     "mobile:start": "bun run --filter @padu/mobile start",
     "mobile:ios": "bun run --filter @padu/mobile ios",
     "mobile:android": "bun run --filter @padu/mobile android",
@@ -32,5 +36,5 @@
     "drizzle-orm": "^0.45.2",
     "typescript": "^7.0.2"
   },
-  "workspaces": ["website", "apps/*", "packages/*"]
+  "workspaces": ["apps/*", "packages/*"]
 }

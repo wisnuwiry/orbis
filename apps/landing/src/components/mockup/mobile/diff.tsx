@@ -135,7 +135,7 @@ function FileHeader() {
       <ReactFileIcon size={15} />
       <span className="shrink-0 text-[16px] text-mock-fg">atoms.tsx</span>
       <span className="min-w-0 flex-1 truncate text-[14px] text-mock-fg-muted">
-        packages/website/src/componen…
+        apps/landing/src/componen…
       </span>
       <span className="flex shrink-0 items-center gap-[3px] text-[14px] tabular-nums">
         <span className="text-mock-success">+56</span>
