@@ -1,14 +1,11 @@
 import * as React from "react";
 import {
   ArrowRight,
-  Bot,
-  Braces,
   ExternalLink,
   GitFork,
   Laptop,
   Monitor,
   Smartphone,
-  Terminal,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -37,9 +34,6 @@ const EASE_OUT_015: Transition = { duration: 0.15, ease: "easeOut" };
 const DURATION_05: Transition = { duration: 0.5 };
 
 const VIEWPORT_60 = { once: true, margin: "-60px" };
-const AGENT_LIST_GRID_STYLE = {
-  gridTemplateColumns: "auto auto auto minmax(0, 1fr)",
-};
 
 // A ~240px-wide phone rotated 15° only foreshortens a couple percent at
 // perspective 1200 — it reads as a flat, skewed card. The side phones already
@@ -109,7 +103,6 @@ export function LandingPage({ title, subtitle }: LandingPageProps) {
           <div className="space-y-24">
             <MultiProviderSection />
             <TurnkeySection />
-            <AutomationSection />
             <FAQ />
           </div>
         </main>
@@ -360,241 +353,6 @@ function TurnkeyExtensionCard({
         </a>
       </div>
     </div>
-  );
-}
-
-type AutomationKind = "mcp" | "cli" | "sdk";
-
-const AUTOMATION_OPTIONS: Array<{
-  kind: AutomationKind;
-  label: string;
-  caption: string;
-  icon: LucideIcon;
-}> = [
-  {
-    kind: "mcp",
-    label: "MCP",
-    caption: "From another agent",
-    icon: Bot,
-  },
-  {
-    kind: "cli",
-    label: "CLI",
-    caption: "From the terminal",
-    icon: Terminal,
-  },
-  {
-    kind: "sdk",
-    label: "SDK",
-    caption: "From code",
-    icon: Braces,
-  },
-];
-
-const AUTOMATION_LINKS = [
-  { href: "/docs/mcp", label: "MCP docs" },
-  { href: "/docs/cli", label: "CLI docs" },
-  { href: "/docs/connectivity", label: "Connectivity docs" },
-] as const;
-
-function AutomationSection() {
-  const [activeKind, setActiveKind] = React.useState<AutomationKind>("mcp");
-
-  return (
-    <FeatureSection
-      title="Built for automation"
-      description="Use MCP, the CLI, or the TypeScript SDK to automate Padu"
-      links={AUTOMATION_LINKS}
-    >
-      <div className="grid gap-4 md:grid-cols-[14rem_minmax(0,1fr)]">
-        <div className="grid self-start gap-2" role="tablist">
-          {AUTOMATION_OPTIONS.map((option) => (
-            <AutomationSelector
-              key={option.kind}
-              option={option}
-              active={option.kind === activeKind}
-              onSelect={setActiveKind}
-            />
-          ))}
-        </div>
-        <AutomationDetail kind={activeKind} />
-      </div>
-    </FeatureSection>
-  );
-}
-
-function AutomationSelector({
-  option,
-  active,
-  onSelect,
-}: {
-  option: (typeof AUTOMATION_OPTIONS)[number];
-  active: boolean;
-  onSelect: (kind: AutomationKind) => void;
-}) {
-  const Icon = option.icon;
-  const handleClick = React.useCallback(() => onSelect(option.kind), [onSelect, option.kind]);
-
-  return (
-    <button
-      type="button"
-      role="tab"
-      aria-selected={active}
-      onClick={handleClick}
-      className={`flex items-center gap-3 rounded-xl border p-3 text-left transition-colors md:block md:p-4 ${
-        active
-          ? "border-white/20 bg-white/[0.07]"
-          : "border-white/10 bg-white/[0.025] hover:border-white/15 hover:bg-white/[0.04]"
-      }`}
-    >
-      <div className="flex shrink-0 items-center gap-2 text-muted-foreground md:mb-1">
-        <Icon className="h-3 w-3" strokeWidth={1.5} />
-        <span className="text-[10px]">{option.label}</span>
-      </div>
-      <p className="text-xs leading-snug text-white/85 md:text-sm">{option.caption}</p>
-    </button>
-  );
-}
-
-function AutomationDetail({ kind }: { kind: AutomationKind }) {
-  return (
-    <div
-      role="tabpanel"
-      className="min-h-80 min-w-0 overflow-hidden rounded-xl border border-white/10 bg-black/20 p-5 md:h-[26rem] md:p-6"
-    >
-      {kind === "mcp" ? <McpAutomationTranscript /> : null}
-      {kind === "cli" ? <CliAutomationExample /> : null}
-      {kind === "sdk" ? <SdkAutomationExample /> : null}
-    </div>
-  );
-}
-
-function McpAutomationTranscript() {
-  return (
-    <div className="space-y-5">
-      <div className="ml-auto w-fit max-w-xl rounded-xl rounded-tr-none bg-white/[0.07] px-4 py-3">
-        <p className="text-sm leading-relaxed text-white/75">
-          Take the open GitHub issues labeled ready and fan them out to separate worktree agents.
-        </p>
-      </div>
-      <div className="flex items-start gap-3">
-        <Bot className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" strokeWidth={1.5} />
-        <div className="min-w-0 flex-1 space-y-4">
-          <p className="text-sm leading-relaxed text-white/55">
-            I found two ready issues. I will run each in its own worktree.
-          </p>
-          <div className="space-y-2 font-mono text-[11px]">
-            <McpAgentCall issue="#412" provider="claude/opus-4.6" />
-            <McpAgentCall issue="#417" provider="codex/gpt-5.6-sol" />
-          </div>
-          <p className="text-sm leading-relaxed text-white/55">
-            Done, two agents are running. I will let you know when they finish.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function McpAgentCall({ issue, provider }: { issue: string; provider: string }) {
-  return (
-    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-md border border-white/[0.07] bg-white/[0.025] px-3 py-2">
-      <span className="text-sky-300/80">create_agent</span>
-      <span className="text-white/25">{issue}</span>
-      <span className="text-white/35">{provider}</span>
-      <span className="text-white/25">worktree</span>
-    </div>
-  );
-}
-
-function CliAutomationExample() {
-  return (
-    <div className="font-mono text-[11px] leading-5 text-white/60">
-      <div className="space-y-6">
-        <div>
-          <ShellPrompt>
-            <span className="text-white">padu run</span> <span className="text-white/35">\</span>
-          </ShellPrompt>
-          <div className="pl-5">
-            <span className="text-sky-300/75">--provider</span>{" "}
-            <span className="text-white/75">codex/gpt-5.6-sol</span>{" "}
-            <span className="text-white/35">\</span>
-          </div>
-          <div className="pl-5 text-purple-300/80">{'"Fix issue #412 and add tests."'}</div>
-          <div className="mt-1 text-purple-300/65">✓ Started agent a7f3c2</div>
-        </div>
-
-        <div className="space-y-1">
-          <ShellPrompt>
-            <span className="text-white">padu ls</span>
-          </ShellPrompt>
-          <AgentListOutput />
-        </div>
-
-        <div>
-          <div className="text-white/30"># Target another host</div>
-          <ShellPrompt>
-            <span className="text-white">padu ls</span>{" "}
-            <span className="text-sky-300/75">--host</span>{" "}
-            <span className="text-white/75">devbox:6767</span>
-          </ShellPrompt>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ShellPrompt({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="whitespace-nowrap">
-      <span className="select-none text-white/25">$ </span>
-      {children}
-    </div>
-  );
-}
-
-function AgentListOutput() {
-  return (
-    <div className="grid gap-x-5" style={AGENT_LIST_GRID_STYLE}>
-      <span className="text-white/30">AGENT</span>
-      <span className="text-white/30">STATUS</span>
-      <span className="text-white/30">PROVIDER/MODEL</span>
-      <span className="text-white/30">TITLE</span>
-      <span className="text-white/55">a7f3c2</span>
-      <span className="text-purple-300/70">running</span>
-      <span className="text-white/55">codex/gpt-5.6-sol</span>
-      <span className="text-white/55">Fix issue #412 and add tests.</span>
-    </div>
-  );
-}
-
-function SdkAutomationExample() {
-  return (
-    <pre className="overflow-x-auto font-mono text-[11px] leading-5 text-white/60">
-      <span className="text-purple-300">import</span> {"{"} createPaduClient {"}"}{" "}
-      <span className="text-purple-300">from</span>{" "}
-      <span className="text-purple-300/80">{'"@padu/client"'}</span>;{"\n\n"}
-      <span className="text-purple-300">const</span> client ={" "}
-      <span className="text-sky-300">createPaduClient</span>({"{"}
-      {"\n"} url: <span className="text-purple-300/80">{'"ws://127.0.0.1:6767/ws"'}</span>,{"\n"}
-      {"}"});
-      {"\n"}
-      <span className="text-purple-300">await</span> client.
-      <span className="text-sky-300">connect</span>();
-      {"\n\n"}
-      <span className="text-purple-300">const</span> agent ={" "}
-      <span className="text-purple-300">await</span> client.agents.
-      <span className="text-sky-300">create</span>({"{"}
-      {"\n"} config: {"{"} provider:{" "}
-      <span className="text-purple-300/80">{'"codex/gpt-5.6-sol"'}</span> {"}"},{"\n"} cwd:{" "}
-      <span className="text-purple-300/80">{'"/Users/me/dev/padu"'}</span>,{"\n"} prompt:{" "}
-      <span className="text-purple-300/80">{'"Fix issue #412 and add tests."'}</span>,{"\n"}
-      {"}"});
-      {"\n\n"}
-      <span className="text-purple-300">const</span> result ={" "}
-      <span className="text-purple-300">await</span> agent.
-      <span className="text-sky-300">waitForFinish</span>();
-    </pre>
   );
 }
 
