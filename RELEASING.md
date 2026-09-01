@@ -232,7 +232,7 @@ assets — including every signed update feed — to R2.
 `latest-linux.txt`, and `latest-windows.txt` are the bucket's mutable pointers
 and upload with a short cache lifetime; everything else is versioned and
 cached forever. Linux users install from that bucket via
-[`website/public/install.sh`](website/public/install.sh), served at
+[`apps/landing/public/install.sh`](apps/landing/public/install.sh), served at
 `https://padu.dev/install.sh` — see [docs/linux.md](docs/linux.md).
 
 Publishing that GitHub release (or running **Sync release** from Actions)

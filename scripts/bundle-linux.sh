@@ -25,7 +25,7 @@ install -Dm644 resources/linux/dev.padu.desktop \
   "$package_dir/share/applications/dev.padu.desktop"
 install -Dm644 resources/linux/self-update-v1 \
   "$package_dir/share/padu/self-update-v1"
-install -Dm644 website/public/app-icon.png \
+install -Dm644 apps/landing/public/app-icon.png \
   "$package_dir/share/icons/hicolor/256x256/apps/dev.padu.png"
 install -Dm644 LICENSE "$package_dir/share/licenses/padu/LICENSE"
 

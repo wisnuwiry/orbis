@@ -1,5 +1,5 @@
 // Small shared bits for the mobile mockups. The Padu butterfly mark is the
-// app icon (packages/website/public/favicon.svg) with the black plate dropped,
+// app icon (apps/landing/public/favicon.svg) with the black plate dropped,
 // so it can be tinted and placed on any tile. Tile fills are the app's identity
 // palette — packages/app/src/styles/identity-colors.ts — surfaced as
 // `--color-mock-tile-*` tokens in styles.css.

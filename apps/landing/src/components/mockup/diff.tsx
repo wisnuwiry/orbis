@@ -290,7 +290,7 @@ type ChangesTreeDepth = 0 | 1 | 2 | 3 | 4;
 type ChangeStatus = "added" | "modified" | "deleted";
 
 const CHANGES_TREE: ChangesTreeEntry[] = [
-  { kind: "folder", name: "packages/website/src", depth: 0, add: "1.9k", remove: "684" },
+  { kind: "folder", name: "apps/landing/src", depth: 0, add: "1.9k", remove: "684" },
   { kind: "folder", name: "components", depth: 1, add: "1.5k", remove: "512" },
   { kind: "folder", name: "mockup", depth: 2, add: "1.3k", remove: "389" },
   { kind: "folder", name: "mobile", depth: 3, add: "480", remove: "231" },
@@ -321,12 +321,11 @@ export const REVIEW_DIFF_ROWS: DiffRow[] = [
   {
     kind: "file",
     name: "chat.tsx",
-    path: "packages/website/src/components/mockup/mobile",
+    path: "apps/landing/src/components/mockup/mobile",
     add: "155",
     remove: "74",
   },
   { kind: "hunk", label: "@@ -22,5 +23,11 @@" },
-  { kind: "line", n: "22", text: "const TOOL_ROWS = [", mark: "remove" },
   {
     kind: "line",
     n: "23",
@@ -359,7 +358,7 @@ export const REVIEW_DIFF_ROWS: DiffRow[] = [
   {
     kind: "file",
     name: "titlebar.tsx",
-    path: "packages/website/src/components/mockup/desktop",
+    path: "apps/landing/src/components/mockup/desktop",
     add: "117",
     remove: "61",
   },
@@ -393,7 +392,7 @@ export const REVIEW_DIFF_ROWS: DiffRow[] = [
   {
     kind: "file",
     name: "window.tsx",
-    path: "packages/website/src/components/mockup/desktop",
+    path: "apps/landing/src/components/mockup/desktop",
     add: "167",
     remove: "42",
   },
@@ -406,7 +405,7 @@ export const REVIEW_DIFF_ROWS: DiffRow[] = [
   {
     kind: "file",
     name: "mockup.css",
-    path: "packages/website/src/styles",
+    path: "apps/landing/src/styles",
     add: "68",
     remove: "47",
   },
