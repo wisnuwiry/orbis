@@ -51,7 +51,6 @@ jobs:
 
   test:
     name: Rust (${{ matrix.os }})
-    needs: fmt
     strategy:
       fail-fast: false
       matrix:

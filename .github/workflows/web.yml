@@ -39,12 +39,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check:
-    name: Protocol, client packages & apps
+  protocol-and-themes:
+    name: Protocol & Themes
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v6
+      - name: Check out repository
+        uses: actions/checkout@v6
 
       - name: Install Rust
         run: |
@@ -61,36 +62,101 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: web-checks-rust-1.96.0-cargo-${{ hashFiles('Cargo.lock') }}
+          key: protocol-rust-1.96.0-cargo-${{ hashFiles('Cargo.lock') }}
           restore-keys: |
-            web-checks-rust-1.96.0-cargo-
+            protocol-rust-1.96.0-cargo-
 
       - name: Install JavaScript dependencies
         run: bun install --frozen-lockfile
 
-      - name: Check generated protocol & theme synchronization
-        run: |
-          bun run protocol:check
-          bun run theme:check
+      - name: Check wire protocol synchronization
+        run: bun run protocol:check
 
-      - name: Check client package (@padu/client)
-        run: |
-          bun run --filter @padu/client check
-          bun run --filter @padu/client test
+      - name: Check theme synchronization
+        run: bun run theme:check
 
-      - name: Check web app (@padu/web)
-        run: |
-          bun run web:typecheck
-          bun run web:test
-          bun run web:build
+  client-package:
+    name: Client Package (@padu/client)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
 
-      - name: Check landing app (@padu/landing)
-        run: |
-          bun run landing:typecheck
-          bun run landing:test
-          bun run landing:build
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
 
-      - name: Check mobile app (@padu/mobile)
-        run: |
-          bun run mobile:typecheck
-          bun run mobile:test
+      - name: Install JavaScript dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck @padu/client
+        run: bun run --filter @padu/client check
+
+      - name: Test @padu/client
+        run: bun run --filter @padu/client test
+
+  web-app:
+    name: Web App (@padu/web)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install JavaScript dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck web app
+        run: bun run web:typecheck
+
+      - name: Test web app
+        run: bun run web:test
+
+      - name: Build web app
+        run: bun run web:build
+
+  landing-app:
+    name: Website (@padu/landing)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install JavaScript dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck landing app
+        run: bun run landing:typecheck
+
+      - name: Test landing app
+        run: bun run landing:test
+
+      - name: Build landing app
+        run: bun run landing:build
+
+  mobile-app:
+    name: Mobile App (@padu/mobile)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install JavaScript dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck mobile app
+        run: bun run mobile:typecheck
+
+      - name: Test mobile app
+        run: bun run mobile:test
