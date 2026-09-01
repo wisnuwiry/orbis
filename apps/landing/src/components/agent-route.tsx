@@ -7,13 +7,7 @@ export function agentRouteOptions(slug: string) {
   return {
     head: () => pageMeta(page.metaTitle, page.metaDescription, `/${slug}`),
     component: function AgentLandingPage() {
-      return (
-        <LandingPage
-          eyebrow={`Open Source · ${page.name} GUI`}
-          title={page.title}
-          subtitle={page.subtitle}
-        />
-      );
+      return <LandingPage title={page.title} subtitle={page.subtitle} />;
     },
   };
 }

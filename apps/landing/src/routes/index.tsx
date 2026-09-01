@@ -15,7 +15,6 @@ export const Route = createFileRoute("/")({
 function Home() {
   return (
     <LandingPage
-      eyebrow="Open Source · 100% Local-First"
       title={
         <>
           The native workspace

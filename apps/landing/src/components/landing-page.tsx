@@ -115,15 +115,17 @@ function Hero({
   subtitle: React.ReactNode;
 }) {
   return (
-    <div className="space-y-6 text-center max-w-3xl mx-auto">
-      <p className="font-mono text-xs font-medium tracking-wider uppercase text-zinc-400">
-        {eyebrow ?? "Open Source · 100% Local-First"}
-      </p>
+    <div className="space-y-4 text-center max-w-2xl mx-auto">
+      {eyebrow && (
+        <p className="font-mono text-xs font-medium tracking-wider uppercase text-zinc-400">
+          {eyebrow}
+        </p>
+      )}
 
-      <h1 className="text-4xl sm:text-6xl md:text-7xl font-semibold tracking-tight leading-[1.05] text-white">
+      <h1 className="text-3xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.08] text-white">
         {title}
       </h1>
-      <p className="text-base sm:text-lg md:text-xl leading-relaxed text-zinc-400 max-w-2xl mx-auto font-normal">
+      <p className="text-sm sm:text-base md:text-lg leading-relaxed text-zinc-400 max-w-xl mx-auto font-normal">
         {subtitle}
       </p>
     </div>
