@@ -13,7 +13,7 @@ export function SiteShell({ children, width }: SiteShellProps) {
   return (
     <div className="min-h-screen bg-background">
       <main className={mainClasses}>
-        <div className="mb-12">
+        <div className="mb-16 md:mb-20">
           <SiteHeader />
         </div>
         {children}

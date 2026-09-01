@@ -121,7 +121,7 @@ export function LandingPage({ title, subtitle }: LandingPageProps) {
 
 function Nav() {
   return (
-    <nav className="mb-20 md:mb-24">
+    <nav className="mb-16 md:mb-20">
       <SiteHeader />
     </nav>
   );
