@@ -42,10 +42,46 @@ it keeps projects, sessions, and transcripts entirely on your machine.
 
 ## Install
 
-> **Coming soon** — Padu is not yet ready for general use. Pre-built binaries
-> will be available at [padu.dev](https://padu.dev) once the first stable
-> release ships. In the meantime, see [Development](#development) to build from
-> source.
+Padu is available for **Linux**, **macOS** (ad-hoc), and **Windows**.
+
+### Linux
+
+```sh
+curl -fsSL https://padu.dev/install.sh | sh
+```
+
+Installs to `~/.local/padu.app` — no root, no package manager.
+
+### macOS (ad-hoc)
+
+```sh
+# Download the latest DMG from GitHub Releases:
+# https://github.com/wisnuwiry/padu/releases/latest
+#
+# Or via terminal:
+curl -LO https://github.com/wisnuwiry/padu/releases/latest/download/Padu-0.1.0.dmg
+open Padu-0.1.0.dmg
+```
+
+> ⚠️ **Ad-hoc signed** — no Apple Developer account needed. The first time you
+> open it, macOS will show a Gatekeeper warning. **Right-click → Open** the
+> app (or go to System Settings → Privacy & Security → Open Anyway) to bypass
+> it. This is only needed once.
+
+### Windows
+
+```sh
+# Download the latest installer from GitHub Releases:
+# https://github.com/wisnuwiry/padu/releases/latest
+#
+# Or via PowerShell:
+irm https://github.com/wisnuwiry/padu/releases/latest/download/Padu-0.1.0-x86_64-Setup.exe -OutFile $env:TEMP\Padu-Setup.exe
+Start-Process $env:TEMP\Padu-Setup.exe
+```
+
+> ℹ️ The installer is **per-user** (\`%LOCALAPPDATA%\Programs\Padu\`) — no
+> admin rights needed. SmartScreen may show a warning; click **Run anyway**
+> to proceed.
 
 ## Supported agents
 

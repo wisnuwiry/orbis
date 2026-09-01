@@ -288,7 +288,7 @@ jobs:
           if-no-files-found: error
 
   macos:
-    name: macOS
+    name: macOS (ad-hoc)
     needs: version
     if: needs.version.outputs.published != 'true'
     runs-on: macos-latest
@@ -316,40 +316,16 @@ jobs:
           restore-keys: |
             macos-latest-rust-1.96.0-release-
 
-      - name: Import Apple Developer Certificate
+      # Ad-hoc signed — no Apple Developer account needed. macOS will show a
+      # Gatekeeper warning; users right-click → Open to bypass it. In-app
+      # updates via Sparkle still work because the appcast is signed with the
+      # EdDSA key.
+      - name: Release (ad-hoc)
         env:
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-        run: |
-          KEYCHAIN_PASSWORD=$(openssl rand -base64 24)
-          echo $APPLE_CERTIFICATE | base64 --decode > certificate.p12
-          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security set-keychain-settings -t 3600 -u build.keychain
-          security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
-          security find-identity -v -p codesigning build.keychain
-          rm certificate.p12
-
-      - name: Store notary credentials
-        env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: |
-          xcrun notarytool store-credentials NOTARY \
-            --apple-id "$APPLE_ID" \
-            --password "$APPLE_APP_SPECIFIC_PASSWORD" \
-            --team-id "$APPLE_TEAM_ID"
-
-      - name: Release
-        env:
-          PADU_SIGNING_IDENTITY: ${{ secrets.PADU_SIGNING_IDENTITY }}
           PADU_ANALYTICS_ENDPOINT: ${{ secrets.PADU_ANALYTICS_ENDPOINT }}
           PADU_ANALYTICS_WEBSITE_ID: ${{ secrets.PADU_ANALYTICS_WEBSITE_ID }}
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
-        run: bun run release --local
+        run: bun run release --adhoc
 
       - uses: actions/upload-artifact@v7
         with:

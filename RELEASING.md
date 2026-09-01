@@ -71,12 +71,15 @@ new public key in Info.plist, and pass `--account padu` through to
 old key, so do this on a release that still signs with the old key… in other
 words, don't do it casually.
 
-### 2. Developer ID signing + notarization
+### 2. Developer ID signing + notarization (optional)
 
-Copy `.env.example` to `.env` and replace the signing and analytics
-placeholders. Bun loads these values before Cargo compiles the release, so the
-analytics endpoint and website ID are embedded in the executable. The script
-notarizes with the `NOTARY` keychain profile by default. On a fresh machine:
+macOS CI builds are **ad-hoc signed** by default — no Apple Developer account
+needed. Users will see a Gatekeeper warning the first time and must
+right-click → Open to launch. In-app updates still work because the appcast is
+signed with the EdDSA key.
+
+For fully signed + notarized builds (no Gatekeeper warning), copy `.env.example`
+to `.env` and replace the signing and analytics placeholders:
 
 ```sh
 cp .env.example .env
@@ -84,8 +87,16 @@ xcrun notarytool store-credentials NOTARY \
   --apple-id you@example.com --team-id YOUR_APPLE_TEAM_ID
 ```
 
+Then run:
+
+```sh
+bun run release --signing-identity "Developer ID Application: Your Name"
+```
+
 Override the environment with `--signing-identity`, or change the notary
-profile with `--notary-profile` / `PADU_NOTARY_PROFILE`.
+profile with `--notary-profile` / `PADU_NOTARY_PROFILE`. The CI workflow
+accepts `PADU_SIGNING_IDENTITY`, `APPLE_CERTIFICATE`, `APPLE_ID`,
+`APPLE_APP_SPECIFIC_PASSWORD`, and `APPLE_TEAM_ID` secrets for signed builds.
 
 ### 3. Cloudflare R2 bucket + domain  ← **still to do once**
 
@@ -115,19 +126,20 @@ Cloudflare, `no_check_bucket = true`) is shared with kero and needs no change.
    appcast serves one stable channel.
 2. **Write the release notes** — add a `## [<version>]` section at the top of
    [`CHANGELOG.md`](CHANGELOG.md).
-3. **Run it:**
+3. **Run it — two options:**
    ```sh
-   bun run release
+   bun run release --adhoc          # ad-hoc signed (no dev account needed)
+   bun run release                  # Developer ID signed + notarized
    ```
 
 The script checks R2 up front (bucket reachable, version not already
 published), builds and signs the app via `scripts/bundle.sh release`, verifies
-the bundled JS REPL and computer-use helper, builds the styled DMG, notarizes
-and staples DMG + app, zips the app for Sparkle, pulls the recent archives
-from R2 so `generate_appcast` can build binary deltas, attaches the changelog
-section as release notes, regenerates the signed `appcast.xml`, and uploads
-everything with immutable cache headers (the appcast itself stays
-`max-age=300`). When it finishes:
+the bundled JS REPL and computer-use helper, builds the styled DMG, signs it
+(ad-hoc with `--adhoc`, or Developer ID + notarize otherwise), zips the app
+for Sparkle, pulls the recent archives from R2 so `generate_appcast` can build
+binary deltas, attaches the changelog section as release notes, regenerates the
+signed `appcast.xml`, and uploads everything with immutable cache headers (the
+appcast itself stays `max-age=300`). When it finishes:
 
 - **Download link**: `https://releases.padu.dev/Padu-<version>.dmg`
 - **In-app updates**: served from the same origin via the appcast.
@@ -145,8 +157,9 @@ The Release workflow runs two ways:
   whatever `Cargo.toml` says and drafts it as `v<version>`; that tag is created
   at the built commit when you publish the draft.
 
-macOS CI runs `bun run release --local`, which signs, notarizes, and writes the
-same artifacts as a local release:
+macOS CI runs `bun run release --adhoc`, which builds an ad-hoc signed DMG and
+zip. No Apple Developer account required — users bypass Gatekeeper by
+right-clicking → Open. The same artifacts are produced:
 
 - `Padu-<version>.dmg`
 - `Padu-<version>.zip`
