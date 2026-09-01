@@ -1,4 +1,4 @@
-import type { ActivityItem, AgentSession } from '@orbis/client'
+import type { ActivityItem, AgentSession } from '@padu/client'
 
 export type AssistantResponseFooter = {
   content: string

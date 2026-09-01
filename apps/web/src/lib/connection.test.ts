@@ -6,27 +6,27 @@ describe('normalizeDaemonAddress', () => {
     expect(normalizeDaemonAddress('host.example:34123')).toBe(
       'ws://host.example:34123',
     )
-    expect(normalizeDaemonAddress('https://orbis.example/v1?token=nope')).toBe(
-      'wss://orbis.example',
+    expect(normalizeDaemonAddress('https://padu.example/v1?token=nope')).toBe(
+      'wss://padu.example',
     )
-    expect(normalizeDaemonAddress('HTTP://ORBIS.EXAMPLE/v1')).toBe(
-      'ws://orbis.example',
+    expect(normalizeDaemonAddress('HTTP://PADU.EXAMPLE/v1')).toBe(
+      'ws://padu.example',
     )
   })
 
   test('rejects unsupported schemes and credentials', () => {
-    expect(() => normalizeDaemonAddress('ftp://orbis.example')).toThrow()
-    expect(() => normalizeDaemonAddress('ws://token@orbis.example')).toThrow()
+    expect(() => normalizeDaemonAddress('ftp://padu.example')).toThrow()
+    expect(() => normalizeDaemonAddress('ws://token@padu.example')).toThrow()
   })
 
   test('requires a token without putting it in the address', () => {
     expect(() =>
-      validateConnectionConfig({ address: 'orbis.example', token: '  ' }),
+      validateConnectionConfig({ address: 'padu.example', token: '  ' }),
     ).toThrow('token')
     expect(
-      validateConnectionConfig({ address: 'orbis.example', token: 'secret' }),
+      validateConnectionConfig({ address: 'padu.example', token: 'secret' }),
     ).toEqual({
-      address: 'ws://orbis.example',
+      address: 'ws://padu.example',
       token: 'secret',
       remember: false,
     })

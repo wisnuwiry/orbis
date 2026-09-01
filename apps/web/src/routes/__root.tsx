@@ -12,9 +12,9 @@ import { DaemonProvider } from '@/lib/daemon-context'
 import { RuntimeProvider } from '@/lib/runtime-context'
 import appCss from '@/styles.css?url'
 
-const TITLE = 'Orbis Web'
+const TITLE = 'Padu Web'
 const DESCRIPTION =
-  'Connect securely to a Orbis daemon and continue your coding-agent tasks from the browser.'
+  'Connect securely to a Padu daemon and continue your coding-agent tasks from the browser.'
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
@@ -43,7 +43,7 @@ export const Route = createRootRouteWithContext<{
     links: [{ rel: 'stylesheet', href: appCss }],
     scripts: [
       {
-        children: `try{var d=document.documentElement,p=localStorage.getItem('orbis.theme'),s=matchMedia('(prefers-color-scheme: dark)').matches,x=p==='dark'||p!=='light'&&s,l=localStorage.getItem('orbis.language'),n=(navigator.languages&&navigator.languages[0]||navigator.language||'en').replaceAll('_','-').toLowerCase(),r=l==='zh-CN'||l==='ja'||l==='en'?l:n==='zh-cn'||n==='zh-sg'||n.startsWith('zh-hans')?'zh-CN':n==='ja'||n.startsWith('ja-')?'ja':'en';d.classList.toggle('dark',x);d.classList.toggle('light',!x);d.lang=r}catch(e){}`,
+        children: `try{var d=document.documentElement,p=localStorage.getItem('padu.theme'),s=matchMedia('(prefers-color-scheme: dark)').matches,x=p==='dark'||p!=='light'&&s,l=localStorage.getItem('padu.language'),n=(navigator.languages&&navigator.languages[0]||navigator.language||'en').replaceAll('_','-').toLowerCase(),r=l==='zh-CN'||l==='ja'||l==='en'?l:n==='zh-cn'||n==='zh-sg'||n.startsWith('zh-hans')?'zh-CN':n==='ja'||n.startsWith('ja-')?'ja':'en';d.classList.toggle('dark',x);d.classList.toggle('light',!x);d.lang=r}catch(e){}`,
       },
     ],
   }),

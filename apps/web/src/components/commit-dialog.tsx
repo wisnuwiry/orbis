@@ -1,9 +1,9 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import type { AgentSession, Project } from '@orbis/client'
+import type { AgentSession, Project } from '@padu/client'
 import { useEffect, useState, type RefObject } from 'react'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
-import { OrbisIcon, type OrbisIconName } from '@/components/orbis-icon'
+import { PaduIcon, type PaduIconName } from '@/components/padu-icon'
 import {
   commitWorkspace,
   daemonKeys,
@@ -124,7 +124,7 @@ export function CommitDialog({
       <DialogContent className="max-w-[420px] overflow-hidden rounded-[18px] bg-[var(--raised)] p-0" finalFocus={returnFocus}>
         <DialogTitle className="sr-only">{t('environment.commit_or_push')}</DialogTitle>
         <div className="flex h-12 items-center gap-2.5 px-4 text-[14px]">
-          <OrbisIcon className="size-[15px]" name="gitBranch" />
+          <PaduIcon className="size-[15px]" name="gitBranch" />
           <span className="min-w-0 flex-1 truncate">{snapshot.data?.branch ?? 'HEAD'}</span>
         </div>
         <textarea
@@ -155,7 +155,7 @@ export function CommitDialog({
               'grid size-[15px] place-items-center rounded border',
               includeUnstaged ? 'border-input bg-background' : 'border-[var(--text-ghost)]',
             )}>
-              {includeUnstaged && <OrbisIcon className="size-3" name="check" />}
+              {includeUnstaged && <PaduIcon className="size-3" name="check" />}
             </span>
             <span className="min-w-0 flex-1 text-left">{t('commit.include_unstaged')}</span>
             <span className="flex items-center gap-1.5 text-[13.5px] font-medium">
@@ -211,7 +211,7 @@ function CommitActionRow({
   pending,
   onClick,
 }: {
-  icon: OrbisIconName
+  icon: PaduIconName
   label: string
   shortcut?: string
   enabled: boolean
@@ -225,7 +225,7 @@ function CommitActionRow({
       type="button"
       onClick={onClick}
     >
-      <OrbisIcon className={cn('size-3.5 text-[var(--text-secondary)]', pending && 'motion-safe:animate-spin')} name={pending ? 'loaderCircle' : icon} />
+      <PaduIcon className={cn('size-3.5 text-[var(--text-secondary)]', pending && 'motion-safe:animate-spin')} name={pending ? 'loaderCircle' : icon} />
       <span className="min-w-0 flex-1 truncate text-left">{label}</span>
       {shortcut && <span className="text-[11px] text-[var(--text-ghost)]">{shortcut}</span>}
     </button>
@@ -233,7 +233,7 @@ function CommitActionRow({
 }
 
 function requireClient<T>(client: T | null): T {
-  if (!client) throw new Error('Orbis daemon is disconnected')
+  if (!client) throw new Error('Padu daemon is disconnected')
   return client
 }
 

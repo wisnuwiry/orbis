@@ -8,7 +8,7 @@ import type {
   ThreadGoal,
   TranscriptBlock,
   TurnStatus,
-} from '@orbis/client'
+} from '@padu/client'
 
 export interface PendingPermission {
   requestId: string

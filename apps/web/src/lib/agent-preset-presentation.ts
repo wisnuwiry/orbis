@@ -1,4 +1,4 @@
-import type { ProviderAgentPreset } from '@orbis/client'
+import type { ProviderAgentPreset } from '@padu/client'
 
 type Translator = (key: string) => string
 

@@ -1,9 +1,9 @@
-import { MAX_WIRE_MESSAGE_BYTES, type MessageAttachment, type OrbisClient } from '@orbis/client'
+import { MAX_WIRE_MESSAGE_BYTES, type MessageAttachment, type PaduClient } from '@padu/client'
 
 const MAX_UPLOAD_BYTES = Math.floor((MAX_WIRE_MESSAGE_BYTES * 3) / 4) - 1024 * 1024
 
 export async function importFiles(
-  client: OrbisClient,
+  client: PaduClient,
   files: File[],
 ): Promise<MessageAttachment[]> {
   const attachments: MessageAttachment[] = []
@@ -35,7 +35,7 @@ export async function importFiles(
 }
 
 export async function importDaemonPathAttachment(
-  client: OrbisClient,
+  client: PaduClient,
   path: string,
 ): Promise<MessageAttachment> {
   const response = await client.request({
@@ -57,12 +57,12 @@ export async function importDaemonPathAttachment(
 }
 
 export async function readAttachmentImage(
-  client: OrbisClient,
+  client: PaduClient,
   attachment: MessageAttachment,
 ): Promise<string> {
   const reference = attachment.blob_reference
   if (!reference) throw new Error('This attachment has no daemon reference')
-  const command = reference.startsWith('orbis-blob:')
+  const command = reference.startsWith('padu-blob:')
     ? ({ type: 'readBlob', reference } as const)
     : ({ type: 'readAttachment', reference, path: attachment.path } as const)
   const response = await client.request(command)

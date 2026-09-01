@@ -186,7 +186,7 @@
   }
 }
 
-.orbis-terminal.wterm {
+.padu-terminal.wterm {
   --term-fg: var(--foreground);
   --term-bg: var(--background);
   --term-cursor: var(--foreground);
@@ -206,18 +206,18 @@
   box-shadow: none;
 }
 
-.orbis-code-surface {
+.padu-code-surface {
   --diffs-font-family: var(--font-mono);
   --diffs-font-size: 11px;
   --diffs-line-height: 18px;
   --diffs-tab-size: 4;
 }
 
-.orbis-code-editor {
+.padu-code-editor {
   --diffs-gap-block: 0px;
 }
 
-.orbis-usage-chart {
+.padu-usage-chart {
   color: var(--text-tertiary);
   --ts-chart-tooltip-background: var(--popover);
   --ts-chart-tooltip-color: var(--foreground);
@@ -228,12 +228,12 @@
   --ts-chart-tooltip-font: 10.5px/1.45 var(--font-sans);
 }
 
-.orbis-usage-chart svg text {
+.padu-usage-chart svg text {
   font-family: var(--font-sans);
 }
 
 @layer components {
-  .orbis-popover-surface {
+  .padu-popover-surface {
     border: 1px solid var(--input);
     background: var(--raised);
     box-shadow:
@@ -241,7 +241,7 @@
       0 4px 6px -4px rgb(0 0 0 / 10%);
   }
 
-  .orbis-menu-surface {
+  .padu-menu-surface {
     min-width: 176px;
     max-width: min(320px, calc(100vw - 16px));
     overflow: hidden;
@@ -256,7 +256,7 @@
     outline: none;
   }
 
-  .orbis-menu-item {
+  .padu-menu-item {
     display: flex;
     min-height: 26px;
     margin-inline: 4px;
@@ -273,20 +273,20 @@
     outline: none;
   }
 
-  .orbis-menu-item[data-highlighted] {
+  .padu-menu-item[data-highlighted] {
     background: var(--accent);
   }
 
-  .orbis-menu-item:not([data-disabled]):hover {
+  .padu-menu-item:not([data-disabled]):hover {
     background: var(--accent);
   }
 
-  .orbis-menu-item[data-disabled] {
+  .padu-menu-item[data-disabled] {
     color: var(--text-ghost);
     cursor: not-allowed;
   }
 
-  .orbis-menu-separator {
+  .padu-menu-separator {
     height: 1px;
     margin: 4px 6px;
     background: var(--border);

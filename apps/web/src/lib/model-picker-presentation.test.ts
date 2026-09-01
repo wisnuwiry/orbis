@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import type { ProviderModel } from '@orbis/client'
+import type { ProviderModel } from '@padu/client'
 import {
   nextModelPickerHighlight,
   selectedModelPickerIndex,

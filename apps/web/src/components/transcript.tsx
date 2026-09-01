@@ -3,14 +3,14 @@ import type {
   AgentSession,
   MessageAttachment,
   ReviewDiffSource,
-} from '@orbis/client'
+} from '@padu/client'
 import { ContextMenu } from '@base-ui/react/context-menu'
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { Virtuoso, type ListItem, type VirtuosoHandle } from 'react-virtuoso'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { PreviewableImage } from '@/components/image-preview'
-import { FileTypeIcon, OrbisIcon, type OrbisIconName } from '@/components/orbis-icon'
+import { FileTypeIcon, PaduIcon, type PaduIconName } from '@/components/padu-icon'
 import { readAttachmentImage } from '@/lib/attachments'
 import { useDaemon } from '@/lib/daemon-context'
 import { activitiesForBlock } from '@/lib/event-reducer'
@@ -212,7 +212,7 @@ export function Transcript({
       {empty ? (
         <div className="absolute inset-0 grid place-items-center pb-8">
           <div className="text-center">
-            <OrbisIcon className="mx-auto size-5 text-ring" name="sparkle" />
+            <PaduIcon className="mx-auto size-5 text-ring" name="sparkle" />
             <h2 className="mt-3 text-xl font-medium tracking-tight">
               {t('onboarding.what_should_we_build')}
             </h2>
@@ -328,7 +328,7 @@ export function Transcript({
             behavior: 'auto',
           })}
         >
-          <OrbisIcon className="size-4" name="arrowDown" />
+          <PaduIcon className="size-4" name="arrowDown" />
         </button>
       )}
       </div>
@@ -512,7 +512,7 @@ function ConversationNavigationRail({
       />
       {emphasizedIndex !== null && (
         <div
-          className="orbis-popover-surface pointer-events-none absolute left-[60px] z-20 flex max-h-[126px] w-80 flex-col gap-1.5 overflow-hidden rounded-[14px] px-[15px] py-3 text-popover-foreground"
+          className="padu-popover-surface pointer-events-none absolute left-[60px] z-20 flex max-h-[126px] w-80 flex-col gap-1.5 overflow-hidden rounded-[14px] px-[15px] py-3 text-popover-foreground"
           style={{ top: previewTop }}
         >
           <div className="truncate text-sm font-semibold leading-5">
@@ -951,7 +951,7 @@ function TurnFold({
         onClick={onToggle}
       >
         {label}
-        <OrbisIcon className="size-2.5" name={expanded ? 'chevronDown' : 'chevronRight'} />
+        <PaduIcon className="size-2.5" name={expanded ? 'chevronDown' : 'chevronRight'} />
       </button>
       <div className="h-px flex-1 bg-border" />
     </div>
@@ -1185,7 +1185,7 @@ function MessageEditBubble({
           disabled={!canSubmit || pending}
           type="submit"
         >
-          {pending && <OrbisIcon className="size-3 motion-safe:animate-spin" name="loaderCircle" />}
+          {pending && <PaduIcon className="size-3 motion-safe:animate-spin" name="loaderCircle" />}
           {t('common.send')}
         </button>
       </div>
@@ -1237,7 +1237,7 @@ function MessageFooter({
           }, 2_000)
         }}
       >
-        <OrbisIcon className="size-3.5" name={copied ? 'check' : 'copy'} />
+        <PaduIcon className="size-3.5" name={copied ? 'check' : 'copy'} />
       </button>
       {alignRight && rewindAction && (
         <button
@@ -1248,7 +1248,7 @@ function MessageFooter({
           type="button"
           onClick={rewindAction.onBegin}
         >
-          <OrbisIcon
+          <PaduIcon
             className={cn('size-3.5', rewindAction.pending && 'motion-safe:animate-spin')}
             name={rewindAction.pending ? 'loaderCircle' : 'rewind'}
           />
@@ -1263,7 +1263,7 @@ function MessageFooter({
           type="button"
           onClick={() => forkAction.onFork(forkAction.turnCount)}
         >
-          <OrbisIcon
+          <PaduIcon
             className={cn('size-3.5', forkAction.pending && 'motion-safe:animate-spin')}
             name={forkAction.pending ? 'loaderCircle' : 'fork'}
           />
@@ -1301,48 +1301,48 @@ function MessageContextMenu({
       <ContextMenu.Portal>
         <ContextMenu.Positioner className="z-[100] outline-none">
           <ContextMenu.Popup
-            className="orbis-menu-surface"
+            className="padu-menu-surface"
             finalFocus={false}
           >
             {selectedText && (
               <ContextMenu.Item
-                className="orbis-menu-item"
+                className="padu-menu-item"
                 onClick={() => void navigator.clipboard.writeText(selectedText)}
               >
-                <OrbisIcon className="size-3" name="copy" /> {t('common.copy_selection')}
+                <PaduIcon className="size-3" name="copy" /> {t('common.copy_selection')}
               </ContextMenu.Item>
             )}
             <ContextMenu.Item
-              className="orbis-menu-item"
+              className="padu-menu-item"
               onClick={() => void navigator.clipboard.writeText(content)}
             >
-              <OrbisIcon className="size-3" name="copy" /> {t('common.copy_message_title')}
+              <PaduIcon className="size-3" name="copy" /> {t('common.copy_message_title')}
             </ContextMenu.Item>
             {copyToComposer && (
               <ContextMenu.Item
-                className="orbis-menu-item"
+                className="padu-menu-item"
                 onClick={copyToComposer}
               >
-                <OrbisIcon className="size-3" name="compose" /> {t('common.copy_to_composer')}
+                <PaduIcon className="size-3" name="compose" /> {t('common.copy_to_composer')}
               </ContextMenu.Item>
             )}
             {code && (
               <ContextMenu.Item
-                className="orbis-menu-item"
+                className="padu-menu-item"
                 onClick={() => void navigator.clipboard.writeText(code)}
               >
-                <OrbisIcon className="size-3" name="copy" /> {t('common.copy_code')}
+                <PaduIcon className="size-3" name="copy" /> {t('common.copy_code')}
               </ContextMenu.Item>
             )}
             {rewindAction && (
               <>
-                <ContextMenu.Separator className="orbis-menu-separator" />
+                <ContextMenu.Separator className="padu-menu-separator" />
                 <ContextMenu.Item
-                  className="orbis-menu-item"
+                  className="padu-menu-item"
                   disabled={rewindAction.pending}
                   onClick={rewindAction.onBegin}
                 >
-                  <OrbisIcon
+                  <PaduIcon
                     className={cn('size-3', rewindAction.pending && 'motion-safe:animate-spin')}
                     name={rewindAction.pending ? 'loaderCircle' : 'rewind'}
                   />
@@ -1352,13 +1352,13 @@ function MessageContextMenu({
             )}
             {forkAction && (
               <>
-                <ContextMenu.Separator className="orbis-menu-separator" />
+                <ContextMenu.Separator className="padu-menu-separator" />
                 <ContextMenu.Item
-                  className="orbis-menu-item"
+                  className="padu-menu-item"
                   disabled={forkAction.pending}
                   onClick={() => forkAction.onFork(forkAction.turnCount)}
                 >
-                  <OrbisIcon
+                  <PaduIcon
                     className={cn('size-3', forkAction.pending && 'motion-safe:animate-spin')}
                     name={forkAction.pending ? 'loaderCircle' : 'fork'}
                   />
@@ -1450,7 +1450,7 @@ function ActivityGroup({
         onClick={() => setExpanded((value) => !value)}
       >
         <span className="min-w-0 truncate text-left text-[12.5px] font-medium text-[var(--text-secondary)]">{activityHeaderTitle(activities, liveGroup, t)}</span>
-        <OrbisIcon className="size-2.5 shrink-0" name={expanded ? 'chevronDown' : 'chevronRight'} />
+        <PaduIcon className="size-2.5 shrink-0" name={expanded ? 'chevronDown' : 'chevronRight'} />
       </button>
       {expanded && (
         <div className="ml-1.5 flex min-w-0 flex-col gap-2 border-l pb-0.5 pl-3">
@@ -1530,7 +1530,7 @@ function ActivityRow({
           type="button"
           onClick={() => setExpanded((value) => !value)}
         >
-          <OrbisIcon className="size-3 shrink-0 text-[var(--text-tertiary)]" name={iconName} />
+          <PaduIcon className="size-3 shrink-0 text-[var(--text-tertiary)]" name={iconName} />
           <span className="shrink-0 font-semibold text-[var(--text-secondary)]">{actionLabel}</span>
           {rowDetail && (
             <span className="min-w-0 flex-1 truncate text-[var(--text-secondary)]">
@@ -1692,7 +1692,7 @@ function ActivitySection({
                 }, 2_000)
               }}
             >
-              <OrbisIcon className="size-[11px]" name={copied ? 'check' : 'copy'} />
+              <PaduIcon className="size-[11px]" name={copied ? 'check' : 'copy'} />
             </button>
           )}
         </div>
@@ -1765,9 +1765,9 @@ function ActivityState({
   hasDetail: boolean
   t: Translator
 }) {
-  if (hasDetail) return <OrbisIcon className="size-2.5 text-[var(--text-tertiary)]" name={expanded ? 'chevronDown' : 'chevronRight'} />
+  if (hasDetail) return <PaduIcon className="size-2.5 text-[var(--text-tertiary)]" name={expanded ? 'chevronDown' : 'chevronRight'} />
   if (activity.reasoning) return null
-  if (activity.failed) return <OrbisIcon label={t('background.status.failed')} className="size-3 text-destructive" name="alert" />
+  if (activity.failed) return <PaduIcon label={t('background.status.failed')} className="size-3 text-destructive" name="alert" />
   if (activity.complete) return null
   return <span aria-label={t('background.status.running')} className="size-1.5 rounded-full bg-ring motion-safe:animate-pulse" role="img" />
 }
@@ -1792,7 +1792,7 @@ function ChangedFilesCard({
     <div className="overflow-hidden rounded-xl border bg-accent">
       <div className="flex min-h-[58px] items-center gap-2.5 px-3 py-[9px]">
         <span className="grid size-9 shrink-0 place-items-center rounded-[9px] bg-[var(--raised)]">
-          <OrbisIcon className="size-4 text-[var(--text-tertiary)]" name="fileDiff" />
+          <PaduIcon className="size-4 text-[var(--text-tertiary)]" name="fileDiff" />
         </span>
         <div className="min-w-0 flex-1">
           <div className="truncate text-[12.5px] font-medium">
@@ -1811,7 +1811,7 @@ function ChangedFilesCard({
             type="button"
             onClick={onReview}
           >
-            <OrbisIcon className="size-3 text-[var(--text-tertiary)]" name="fileDiff" />
+            <PaduIcon className="size-3 text-[var(--text-tertiary)]" name="fileDiff" />
             {t('transcript.review_changes')}
           </button>
         )}
@@ -1839,7 +1839,7 @@ function ChangedFilesCard({
               </span>
             )}
             <span className="flex-1" />
-            <OrbisIcon className="size-[11px] text-[var(--text-tertiary)]" name={expanded ? 'chevronDown' : 'chevronRight'} />
+            <PaduIcon className="size-[11px] text-[var(--text-tertiary)]" name={expanded ? 'chevronDown' : 'chevronRight'} />
           </button>
         )}
       </div>
@@ -1855,7 +1855,7 @@ function Attachment({ attachment }: { attachment: MessageAttachment }) {
       title={attachment.name}
     >
       {attachment.is_dir
-        ? <OrbisIcon className="size-[18px] text-[var(--text-tertiary)]" name="folder" />
+        ? <PaduIcon className="size-[18px] text-[var(--text-tertiary)]" name="folder" />
         : <FileTypeIcon className="size-[18px]" path={attachment.mention || attachment.name} />}
       <span className="w-full truncate text-center text-[9.5px] text-[var(--text-secondary)]">
         {attachment.name}
@@ -1937,7 +1937,7 @@ function ActivityImage({ reference, t }: { reference: string; t: Translator }) {
   )
 }
 
-function activityIcon(activity: ActivityItem): OrbisIconName {
+function activityIcon(activity: ActivityItem): PaduIconName {
   if (activity.reasoning || activity.kind === 'reasoning') return 'sparkle'
   if (activity.kind === 'command') return 'terminal'
   if (activity.kind === 'search' || activity.kind === 'fileSearch') return 'search'

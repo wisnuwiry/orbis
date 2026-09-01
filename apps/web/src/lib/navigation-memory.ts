@@ -1,4 +1,4 @@
-import type { AgentSession, Project } from '@orbis/client'
+import type { AgentSession, Project } from '@padu/client'
 import { isProjectlessProject } from './project-presentation'
 
 export type RememberedNavigation =
@@ -18,7 +18,7 @@ interface NavigationStorage {
   setItem(key: string, value: string): void
 }
 
-const STORAGE_KEY = 'orbis.navigation'
+const STORAGE_KEY = 'padu.navigation'
 
 export function routeDestinationTransition(
   previousSessionId: string | undefined,

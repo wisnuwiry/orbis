@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import type { Project, ProviderKind, SkillEntry, SkillSource } from '@orbis/client'
+import type { Project, ProviderKind, SkillEntry, SkillSource } from '@padu/client'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Virtuoso } from 'react-virtuoso'
@@ -7,7 +7,7 @@ import remarkGfm from 'remark-gfm'
 import { toast } from 'sonner'
 import { ControlMenu } from '@/components/control-menu'
 import { Button } from '@/components/ui/button'
-import { ProviderIcon, providerMeta, OrbisIcon } from '@/components/orbis-icon'
+import { ProviderIcon, providerMeta, PaduIcon } from '@/components/padu-icon'
 import { useSkills } from '@/hooks/use-daemon-data'
 import { useCopyFeedback } from '@/hooks/use-copy-feedback'
 import { daemonKeys, setSkillsEnabled, trashSkills } from '@/lib/daemon-api'
@@ -65,7 +65,7 @@ export function SkillsSettings({ projects }: { projects: Project[] }) {
       <div className="grid h-full place-items-center px-10 py-10 text-center">
         <div>
           <div className="mx-auto grid size-11 place-items-center rounded-xl bg-[var(--inset)]">
-            <OrbisIcon className="size-5 text-[var(--text-tertiary)]" name="package" />
+            <PaduIcon className="size-5 text-[var(--text-tertiary)]" name="package" />
           </div>
           <div className="mt-3 text-[13px] font-medium">{t('skills.empty_title')}</div>
           <p className="mx-auto mt-2 max-w-[420px] text-[11.5px] leading-[17px] text-[var(--text-secondary)]">
@@ -81,7 +81,7 @@ export function SkillsSettings({ projects }: { projects: Project[] }) {
       <section className="flex w-[264px] shrink-0 flex-col border-r" aria-label={t('skills.library')}>
         <div className="flex shrink-0 flex-col gap-[7px] px-2.5 pb-2 pt-[22px]">
           <label className="flex h-7 items-center gap-2 rounded-md border bg-[var(--inset)] px-2.5 focus-within:border-ring">
-            <OrbisIcon className="size-3 text-[var(--text-tertiary)]" name="search" />
+            <PaduIcon className="size-3 text-[var(--text-tertiary)]" name="search" />
             <input
               aria-label={t('skills.search')}
               className="min-w-0 flex-1 bg-transparent text-[11.5px] outline-none placeholder:text-[var(--text-ghost)]"
@@ -187,7 +187,7 @@ export function SkillsSettings({ projects }: { projects: Project[] }) {
         ) : (
           <div className="grid h-full place-items-center text-[11px] text-[var(--text-ghost)]">
             <div className="flex flex-col items-center gap-2">
-              <OrbisIcon className="size-5" name="package" />
+              <PaduIcon className="size-5" name="package" />
               {t('skills.select_placeholder')}
             </div>
           </div>
@@ -256,7 +256,7 @@ function SkillDetail({
 
         {skill.duplicates > 0 && (
           <div className="mt-3 flex items-center gap-1.5 text-[10px] text-[var(--warning)]">
-            <OrbisIcon className="size-[11px]" name="alert" />
+            <PaduIcon className="size-[11px]" name="alert" />
             {t(skill.duplicates === 1 ? 'skills.duplicate_one' : 'skills.duplicate_many', { count: skill.duplicates })}
           </div>
         )}
@@ -268,7 +268,7 @@ function SkillDetail({
             variant="outline"
             onClick={() => void copyFeedback.copyText(location)}
           >
-            <OrbisIcon className="size-[11px]" name={copyFeedback.copied ? 'check' : 'copy'} />
+            <PaduIcon className="size-[11px]" name={copyFeedback.copied ? 'check' : 'copy'} />
             {t(copyFeedback.copied ? 'common.copied' : 'skills.copy_path')}
           </Button>
           <span className="flex-1" />
@@ -282,7 +282,7 @@ function SkillDetail({
               else setDeleteArmed(true)
             }}
           >
-            <OrbisIcon className="size-[11px]" name="trash" /> {t(deleteArmed ? 'skills.confirm_delete' : 'skills.delete')}
+            <PaduIcon className="size-[11px]" name="trash" /> {t(deleteArmed ? 'skills.confirm_delete' : 'skills.delete')}
           </Button>
         </div>
 
@@ -312,7 +312,7 @@ function SkillGlyph({ skill, enabled, large = false }: { skill: SkillEntry; enab
   const source = skill.installs.length === 1 ? skill.installs[0]?.source : 'shared'
   const className = cn(large ? 'size-[18px]' : 'size-[13px]', !enabled && 'opacity-45')
   if (source && source !== 'shared') return <ProviderIcon className={className} provider={source.provider} />
-  return <OrbisIcon className={cn(className, 'text-[var(--text-secondary)]')} name="package" />
+  return <PaduIcon className={cn(className, 'text-[var(--text-secondary)]')} name="package" />
 }
 
 function Toggle({ checked, label, onChange }: { checked: boolean; label: string; onChange: (checked: boolean) => void }) {

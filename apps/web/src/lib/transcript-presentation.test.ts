@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import type { ActivityItem, AgentSession } from '@orbis/client'
+import type { ActivityItem, AgentSession } from '@padu/client'
 import {
   activityActionLabel,
   activityDisclosureSections,

@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { OrbisShell } from '@/components/orbis-shell'
+import { PaduShell } from '@/components/padu-shell'
 
 export const Route = createFileRoute('/')({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -9,5 +9,5 @@ export const Route = createFileRoute('/')({
 })
 
 function IndexRoute() {
-  return <OrbisShell />
+  return <PaduShell />
 }

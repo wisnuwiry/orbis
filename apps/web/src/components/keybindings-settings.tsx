@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { OrbisIcon } from '@/components/orbis-icon'
+import { PaduIcon } from '@/components/padu-icon'
 import { useI18n } from '@/lib/i18n'
 import { useMacLikePlatform } from '@/lib/platform'
 
@@ -245,7 +245,7 @@ export function KeybindingsSettings() {
   return (
     <div>
       <div className="mt-[15px] flex h-8 items-center gap-2 rounded-lg border bg-[var(--inset)] px-2.5 focus-within:border-ring">
-        <OrbisIcon className="size-[13px] text-[var(--text-tertiary)]" name="search" />
+        <PaduIcon className="size-[13px] text-[var(--text-tertiary)]" name="search" />
         <input
           aria-label={t('keybindings.search')}
           className="min-w-0 flex-1 bg-transparent text-[12px] outline-none placeholder:text-[var(--text-ghost)]"
@@ -266,7 +266,7 @@ export function KeybindingsSettings() {
             type="button"
             onClick={() => setQuery('')}
           >
-            <OrbisIcon className="size-3" name="x" />
+            <PaduIcon className="size-3" name="x" />
           </button>
         )}
       </div>

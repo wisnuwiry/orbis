@@ -1,4 +1,4 @@
-import type { Project } from '@orbis/client'
+import type { Project } from '@padu/client'
 
 export const PROJECTLESS_NAME = 'No project'
 

@@ -1,11 +1,11 @@
-# Orbis Web
+# Padu Web
 
-Browser client for an existing Orbis daemon. The Cloudflare Worker serves the
+Browser client for an existing Padu daemon. The Cloudflare Worker serves the
 TanStack Start application only; it does not start, proxy, or store credentials
 for a daemon.
 
 ```sh
-bun --filter @orbis/web dev
+bun --filter @padu/web dev
 ```
 
 Then add a daemon WebSocket URL and token in the connection screen. The daemon
@@ -14,12 +14,12 @@ exact browser origin in its `--allow-origin` list. For local development the
 origin is `http://localhost:3001`.
 
 ```sh
-ORBIS_DAEMON_TOKEN=replace-me cargo run -p orbis-daemon --bin orbis-daemon -- \
+PADU_DAEMON_TOKEN=replace-me cargo run -p padu-daemon --bin padu-daemon -- \
   --bind 127.0.0.1:34123 \
   --allow-origin http://localhost:3001
 ```
 
-Orbis Desktop can expose the daemon it manages from Settings → Daemon, where you
+Padu Desktop can expose the daemon it manages from Settings → Daemon, where you
 choose the port and exact browser origins and copy the URL/token. A standalone
 daemon requires the explicit `--allow-non-loopback` flag for a non-loopback
 bind. For access outside a private network, put a trusted TLS reverse proxy or
@@ -28,8 +28,8 @@ tunnel in front of the listener, forward WebSockets, and use `wss://`.
 ## Production
 
 ```sh
-bun --filter @orbis/web build
-bun --filter @orbis/web deploy
+bun --filter @padu/web build
+bun --filter @padu/web deploy
 ```
 
 The token is a full-control daemon capability. It is sent directly from the

@@ -11,7 +11,7 @@ import type {
   ProviderModel,
   ProviderProbe,
   ThreadGoalStatus,
-} from '@orbis/client'
+} from '@padu/client'
 import {
   useEffect,
   useRef,
@@ -29,7 +29,7 @@ import { PreviewableImage } from '@/components/image-preview'
 import { ModelPicker } from '@/components/model-picker'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { FileTypeIcon, OrbisIcon } from '@/components/orbis-icon'
+import { FileTypeIcon, PaduIcon } from '@/components/padu-icon'
 import {
   useComposerCommands,
   useComposerFiles,
@@ -655,7 +655,7 @@ export function Composer({
                     )
                   }}
                 >
-                  {option.allow && <OrbisIcon name="check" />}
+                  {option.allow && <PaduIcon name="check" />}
                   {option.label}
                 </Button>
               ))}
@@ -827,7 +827,7 @@ export function Composer({
                 >
                   {escapeStopArmed
                     ? <span className="text-[10px] font-semibold">Esc</span>
-                    : <OrbisIcon className="size-[18px]" name="stopFilled" />}
+                    : <PaduIcon className="size-[18px]" name="stopFilled" />}
                 </Button>
               )}
               <Button
@@ -842,7 +842,7 @@ export function Composer({
                 variant="ghost"
                 onClick={() => setFilePickerOpen(true)}
               >
-                <OrbisIcon className="size-[14px]" name="paperclip" />
+                <PaduIcon className="size-[14px]" name="paperclip" />
               </Button>
               {busy ? (
                 hasDraft && (
@@ -853,7 +853,7 @@ export function Composer({
                     size="icon-sm"
                     onClick={() => void submit()}
                   >
-                    <OrbisIcon name="arrowUp" />
+                    <PaduIcon name="arrowUp" />
                   </Button>
                 )
               ) : (
@@ -864,7 +864,7 @@ export function Composer({
                   size="icon-sm"
                   onClick={() => void submit()}
                 >
-                  <OrbisIcon name="arrowUp" />
+                  <PaduIcon name="arrowUp" />
                 </Button>
               )}
             </div>
@@ -1092,7 +1092,7 @@ function UserInputPanel({
                     </span>
                   )}
                 </span>
-                {checked && <OrbisIcon className="size-3 shrink-0 text-primary" name="check" />}
+                {checked && <PaduIcon className="size-3 shrink-0 text-primary" name="check" />}
               </button>
             )
           })}
@@ -1104,7 +1104,7 @@ function UserInputPanel({
           custom.trim() && 'border-primary/35 bg-primary/[0.06]',
         )}
       >
-        <OrbisIcon
+        <PaduIcon
           className={cn('size-3 shrink-0 text-[var(--text-ghost)]', custom.trim() && 'text-primary')}
           name="pencil"
         />
@@ -1167,7 +1167,7 @@ function ComposerAutocomplete({
     <div
       aria-label={t('composer.suggestions')}
       aria-live={loading ? 'polite' : undefined}
-      className="orbis-popover-surface absolute bottom-[calc(100%+6px)] left-0 z-[70] w-full overflow-hidden rounded-[11px] p-1"
+      className="padu-popover-surface absolute bottom-[calc(100%+6px)] left-0 z-[70] w-full overflow-hidden rounded-[11px] p-1"
       id="composer-autocomplete"
       role={loading ? 'status' : 'listbox'}
       style={{ height: loading ? 38 : Math.min(302, rows.length * 30 + 8) }}
@@ -1175,7 +1175,7 @@ function ComposerAutocomplete({
       {loading
         ? (
             <div className="flex h-[30px] items-center gap-2 px-2 text-[12px] text-[var(--text-tertiary)]">
-              <OrbisIcon className="size-3 motion-safe:animate-spin" name="loaderCircle" />
+              <PaduIcon className="size-3 motion-safe:animate-spin" name="loaderCircle" />
               {t('composer.loading_suggestions')}
             </div>
           )
@@ -1221,8 +1221,8 @@ function AutocompleteRowContents({ row }: { row: ComposerAutocompleteRow }) {
     return (
       <>
         {command.scope === 'Skill'
-          ? <OrbisIcon className="size-3 text-[var(--text-tertiary)]" name="sparkle" />
-          : <OrbisIcon className="size-3 text-[var(--text-tertiary)]" name="command" />}
+          ? <PaduIcon className="size-3 text-[var(--text-tertiary)]" name="sparkle" />
+          : <PaduIcon className="size-3 text-[var(--text-tertiary)]" name="command" />}
         <span className="max-w-[260px] shrink-0 truncate text-[12px] font-medium">
           /{command.name}
         </span>
@@ -1248,7 +1248,7 @@ function AutocompleteRowContents({ row }: { row: ComposerAutocompleteRow }) {
   return (
     <>
       {row.file.is_dir
-        ? <OrbisIcon className="size-[13px] text-[var(--text-tertiary)]" name="folder" />
+        ? <PaduIcon className="size-[13px] text-[var(--text-tertiary)]" name="folder" />
         : <FileTypeIcon className="size-[13px]" path={row.file.path} />}
       <span className="max-w-[300px] shrink-0 truncate text-[12px]">{name}</span>
       {parent && (
@@ -1294,7 +1294,7 @@ function ComposerAttachmentTile({
   ) : (
     <div className="flex size-full flex-col items-center justify-center gap-[5px] px-[5px]">
       {attachment.is_dir
-        ? <OrbisIcon className="size-4 text-[var(--text-tertiary)]" name="folder" />
+        ? <PaduIcon className="size-4 text-[var(--text-tertiary)]" name="folder" />
         : <FileTypeIcon className="size-4" path={attachment.mention || attachment.name} />}
       {!attachment.is_image && (
         <span className="w-full truncate text-center text-[8.5px] text-[var(--text-tertiary)]">
@@ -1317,7 +1317,7 @@ function ComposerAttachmentTile({
         onClick={onRemove}
         onMouseDown={(event) => event.preventDefault()}
       >
-        <OrbisIcon className="size-[9px]" name="x" />
+        <PaduIcon className="size-[9px]" name="x" />
       </button>
     </div>
   )
@@ -1379,7 +1379,7 @@ function GoalControl({
       type="button"
       onClick={onOpen}
     >
-      <OrbisIcon className="size-[11px]" name="target" />
+      <PaduIcon className="size-[11px]" name="target" />
       <span className="max-w-[220px] truncate">
         {usage ? `${phrase} (${usage})` : phrase}
       </span>
@@ -1590,7 +1590,7 @@ function InteractionModeControl({
       type="button"
       onClick={() => onPatch({ interaction_mode: plan ? 'build' : 'plan' })}
     >
-      <OrbisIcon className={cn('size-[10.5px] text-[var(--text-tertiary)]', plan && 'text-ring')} name={plan ? 'list' : 'wrench'} />
+      <PaduIcon className={cn('size-[10.5px] text-[var(--text-tertiary)]', plan && 'text-ring')} name={plan ? 'list' : 'wrench'} />
       {t(plan ? 'mode.plan' : 'mode.build')}
     </button>
   )
@@ -1629,7 +1629,7 @@ function QueuedMessages({
               type="button"
               onClick={() => onEdit(message)}
             >
-              <OrbisIcon className="size-3 shrink-0 text-[var(--text-tertiary)]" name="queue" />
+              <PaduIcon className="size-3 shrink-0 text-[var(--text-tertiary)]" name="queue" />
               <span className="min-w-0 flex-1 truncate">
                 {message.display_content || message.content || message.attachments?.map((item) => item.name).join(', ')}
               </span>
@@ -1642,7 +1642,7 @@ function QueuedMessages({
                   type="button"
                   onClick={() => onSteer(message)}
                 >
-                  <OrbisIcon className="size-[11px]" name="cornerDownRight" />
+                  <PaduIcon className="size-[11px]" name="cornerDownRight" />
                   {t('composer.steer')}
                 </button>
               )}
@@ -1652,7 +1652,7 @@ function QueuedMessages({
                 type="button"
                 onClick={() => onRemove(message.id)}
               >
-                <OrbisIcon className="size-3" name="trash" />
+                <PaduIcon className="size-3" name="trash" />
               </button>
               <ControlMenu
                 caret={false}
@@ -1676,7 +1676,7 @@ function QueuedMessages({
                 selectionMode="status"
                 triggerClassName="grid size-6 place-items-center px-0 rounded-md"
               >
-                <OrbisIcon className="size-3" name="ellipsis" />
+                <PaduIcon className="size-3" name="ellipsis" />
               </ControlMenu>
             </div>
           </div>
@@ -1771,7 +1771,7 @@ function BranchPicker({
           }
         }}
       >
-        <OrbisIcon className="size-[11px] text-[var(--text-tertiary)]" name="gitBranch" />
+        <PaduIcon className="size-[11px] text-[var(--text-tertiary)]" name="gitBranch" />
         <span className="truncate">{pending ? t('branches.switching') : selected ?? t('branches.detached_head')}</span>
       </Popover.Trigger>
       <Popover.Portal>
@@ -1784,7 +1784,7 @@ function BranchPicker({
         >
           <Popover.Popup
             aria-label={t('branches.choose')}
-            className="orbis-popover-surface flex max-h-[390px] w-[360px] flex-col overflow-hidden rounded-[13px] outline-none"
+            className="padu-popover-surface flex max-h-[390px] w-[360px] flex-col overflow-hidden rounded-[13px] outline-none"
             finalFocus={(closeType) => closeType === 'keyboard' ? true : returnFocus.current}
             initialFocus={input}
             role="dialog"
@@ -1824,7 +1824,7 @@ function BranchPicker({
             {mode === 'create' ? (
               <div className="p-3.5">
                 <div className="flex items-center gap-2 text-[13px] font-medium">
-                  <OrbisIcon className="size-3.5 text-[var(--text-secondary)]" name="plus" />
+                  <PaduIcon className="size-3.5 text-[var(--text-secondary)]" name="plus" />
                   {t('branches.create_and_checkout')}
                 </div>
                 <input
@@ -1841,7 +1841,7 @@ function BranchPicker({
               <>
                 <div className="h-[52px] shrink-0 px-3 pb-2 pt-2.5">
                   <label className="flex h-[34px] items-center gap-2 rounded-[9px] bg-background px-2.5 focus-within:ring-1 focus-within:ring-ring">
-                    <OrbisIcon className="size-[15px] text-[var(--text-secondary)]" name="search" />
+                    <PaduIcon className="size-[15px] text-[var(--text-secondary)]" name="search" />
                     <input
                       className="min-w-0 flex-1 bg-transparent text-[12px] outline-none"
                       placeholder={t('input.search_branches')}
@@ -1876,9 +1876,9 @@ function BranchPicker({
                         onMouseEnter={() => actionIndex >= 0 && setActive(actionIndex)}
                         onClick={() => choose(branch.name)}
                       >
-                        <OrbisIcon className="size-3 text-[var(--text-tertiary)]" name="gitBranch" />
+                        <PaduIcon className="size-3 text-[var(--text-tertiary)]" name="gitBranch" />
                         <span className="min-w-0 flex-1 truncate">{branch.name}</span>
-                        {branch.name === selected && <OrbisIcon className="size-[11px] text-[var(--text-tertiary)]" name="check" />}
+                        {branch.name === selected && <PaduIcon className="size-[11px] text-[var(--text-tertiary)]" name="check" />}
                       </button>
                     )
                   })}
@@ -1898,7 +1898,7 @@ function BranchPicker({
                         requestAnimationFrame(() => input.current?.focus())
                       }}
                     >
-                      <OrbisIcon className="size-3 text-[var(--text-secondary)]" name="plus" />
+                      <PaduIcon className="size-3 text-[var(--text-secondary)]" name="plus" />
                       {t('branches.create_and_checkout_ellipsis')}
                     </button>
                   </>
@@ -1984,7 +1984,7 @@ function UsageMeter({
         >
           <Popover.Popup
             aria-label={t('settings.usage')}
-            className="orbis-popover-surface flex w-80 flex-col gap-3 rounded-[10px] p-3.5 text-xs text-popover-foreground outline-none"
+            className="padu-popover-surface flex w-80 flex-col gap-3 rounded-[10px] p-3.5 text-xs text-popover-foreground outline-none"
             finalFocus={(closeType) => closeType === 'keyboard' ? true : returnFocus.current}
             initialFocus={false}
             role="dialog"
@@ -2078,7 +2078,7 @@ function PlanUsageLanes({
           target="_blank"
         >
           <span className="min-w-0 flex-1 truncate">{header}</span>
-          <OrbisIcon className="size-2.5" name="arrowRight" />
+          <PaduIcon className="size-2.5" name="arrowRight" />
         </a>
       ) : (
         <div className="truncate text-[11px] text-[var(--text-tertiary)]">{header}</div>

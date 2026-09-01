@@ -1,13 +1,13 @@
 import { Menu } from '@base-ui/react/menu'
 import { type ReactNode, type RefObject, useState } from 'react'
-import { OrbisIcon, type OrbisIconName } from '@/components/orbis-icon'
+import { PaduIcon, type PaduIconName } from '@/components/padu-icon'
 import { cn } from '@/lib/utils'
 
 export interface ControlMenuItem {
   id: string
   label: string
   description?: string
-  icon?: OrbisIconName
+  icon?: PaduIconName
   selected?: boolean
   disabled?: boolean
   suffix?: string
@@ -33,7 +33,7 @@ export function ControlMenu({
   returnFocus,
 }: {
   label: string
-  icon?: OrbisIconName
+  icon?: PaduIconName
   children?: ReactNode
   items: ControlMenuItem[]
   align?: 'left' | 'right'
@@ -68,9 +68,9 @@ export function ControlMenu({
           triggerClassName,
         )}
       >
-        {icon && <OrbisIcon className="size-[11px] text-[var(--text-tertiary)]" name={icon} />}
+        {icon && <PaduIcon className="size-[11px] text-[var(--text-tertiary)]" name={icon} />}
         {children ?? <span className="truncate">{label}</span>}
-        {caret && <OrbisIcon className="size-2.5 text-[var(--text-ghost)]" name="chevronDown" />}
+        {caret && <PaduIcon className="size-2.5 text-[var(--text-ghost)]" name="chevronDown" />}
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner
@@ -82,7 +82,7 @@ export function ControlMenu({
         >
           <Menu.Popup
             aria-label={label}
-            className={cn('orbis-menu-surface', menuClassName)}
+            className={cn('padu-menu-surface', menuClassName)}
             finalFocus={returnFocus
               ? (closeType) => closeType === 'keyboard' ? true : returnFocus.current
               : undefined}
@@ -90,7 +90,7 @@ export function ControlMenu({
             {items.map((item, index) => (
               <div key={item.id}>
                 {item.separatorBefore && index > 0 && (
-                  <div className="orbis-menu-separator" role="separator" />
+                  <div className="padu-menu-separator" role="separator" />
                 )}
                 {item.section && (index === 0 || items[index - 1]?.section !== item.section) && (
                   <div className="px-2.5 pb-0.5 pt-1.5 text-[10px] font-medium leading-[14px] text-[var(--text-tertiary)]">
@@ -101,7 +101,7 @@ export function ControlMenu({
                   aria-checked={selectionMode === 'choice' ? item.selected : undefined}
                   aria-current={selectionMode === 'status' && item.selected ? 'true' : undefined}
                   className={cn(
-                    'orbis-menu-item',
+                    'padu-menu-item',
                     item.description && 'py-[5px] text-foreground',
                     item.selected && 'text-foreground',
                   )}
@@ -112,7 +112,7 @@ export function ControlMenu({
                     item.onSelect()
                   }}
                 >
-                  {item.icon && <OrbisIcon className="size-3 text-current" name={item.icon} />}
+                  {item.icon && <PaduIcon className="size-3 text-current" name={item.icon} />}
                   <span className="min-w-0 flex-1">
                     <span className={cn(
                       'flex items-baseline gap-1 truncate',
@@ -129,7 +129,7 @@ export function ControlMenu({
                       </span>
                     )}
                   </span>
-                  {item.selected && <OrbisIcon className="size-[11px] text-[var(--text-tertiary)]" name="check" />}
+                  {item.selected && <PaduIcon className="size-[11px] text-[var(--text-tertiary)]" name="check" />}
                 </Menu.Item>
               </div>
             ))}

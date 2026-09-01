@@ -4,8 +4,8 @@ export interface ConnectionConfig {
   remember: boolean
 }
 
-const SESSION_KEY = 'orbis.remote.session.v1'
-const PERSISTENT_KEY = 'orbis.remote.persistent.v1'
+const SESSION_KEY = 'padu.remote.session.v1'
+const PERSISTENT_KEY = 'padu.remote.persistent.v1'
 
 type ConnectionTranslator = (key: string) => string
 
@@ -37,7 +37,7 @@ export function normalizeDaemonAddress(
     window.location.protocol === 'https:' &&
     url.protocol !== 'wss:'
   ) {
-    throw new Error(t?.('web.error_secure_websocket_required') ?? 'A secure Orbis Web page can only connect through wss://')
+    throw new Error(t?.('web.error_secure_websocket_required') ?? 'A secure Padu Web page can only connect through wss://')
   }
 
   url.pathname = ''

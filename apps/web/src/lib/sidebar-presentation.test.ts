@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import type { AgentSession, Project } from '@orbis/client'
+import type { AgentSession, Project } from '@padu/client'
 import {
   dateGroup,
   formatTimeAgo,
@@ -72,7 +72,7 @@ describe('desktop sidebar presentation', () => {
     const project: Project = {
       id: 'project',
       name: 'No project',
-      path: '/home/me/.orbis/projects/session',
+      path: '/home/me/.padu/projects/session',
       created_at: 1,
     }
     const groups = groupSessions(

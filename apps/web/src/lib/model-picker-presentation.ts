@@ -1,4 +1,4 @@
-import type { ProviderKind, ProviderModel } from '@orbis/client'
+import type { ProviderKind, ProviderModel } from '@padu/client'
 
 export interface ModelPickerRow {
   provider: ProviderKind

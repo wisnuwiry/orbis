@@ -1,4 +1,4 @@
-import type { AgentSession, Project } from '@orbis/client'
+import type { AgentSession, Project } from '@padu/client'
 import { ContextMenu } from '@base-ui/react/context-menu'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Virtuoso } from 'react-virtuoso'
@@ -7,7 +7,7 @@ import { ControlMenu } from '@/components/control-menu'
 import { Input } from '@/components/ui/input'
 import { Tooltip } from '@/components/ui/tooltip'
 import { PanelResizeHandle } from '@/components/panel-resize-handle'
-import { OrbisIcon } from '@/components/orbis-icon'
+import { PaduIcon } from '@/components/padu-icon'
 import { displayTitle, type TaskState } from '@/lib/daemon-api'
 import { useDaemon } from '@/lib/daemon-context'
 import { useI18n } from '@/lib/i18n'
@@ -24,7 +24,7 @@ import {
   type SidebarOrdering,
 } from '@/lib/sidebar-presentation'
 import { cn } from '@/lib/utils'
-import orbisAppIconUrl from '../../../../website/public/app-icon.png'
+import paduAppIconUrl from '../../../../website/public/app-icon.png'
 
 interface SidebarProps {
   taskState: TaskState
@@ -75,14 +75,14 @@ export function Sidebar({
   const { t } = useI18n()
   const [grouping, setGrouping] = useState<SidebarGrouping>(() => {
     if (typeof window !== 'undefined') {
-      const saved = window.localStorage.getItem('orbis:sidebar_grouping')
+      const saved = window.localStorage.getItem('padu:sidebar_grouping')
       if (saved === 'project' || saved === 'updated') return saved
     }
     return 'updated'
   })
   const [ordering, setOrdering] = useState<SidebarOrdering>(() => {
     if (typeof window !== 'undefined') {
-      const saved = window.localStorage.getItem('orbis:sidebar_ordering')
+      const saved = window.localStorage.getItem('padu:sidebar_ordering')
       if (saved === 'newest' || saved === 'oldest') return saved
     }
     return 'newest'
@@ -90,7 +90,7 @@ export function Sidebar({
   const [collapsed, setCollapsed] = useState<Set<string>>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = window.localStorage.getItem('orbis:sidebar_collapsed_groups')
+        const saved = window.localStorage.getItem('padu:sidebar_collapsed_groups')
         if (saved) return new Set(JSON.parse(saved))
       } catch {}
     }
@@ -109,19 +109,19 @@ export function Sidebar({
 
   useEffect(() => {
     try {
-      window.localStorage.setItem('orbis:sidebar_grouping', grouping)
+      window.localStorage.setItem('padu:sidebar_grouping', grouping)
     } catch {}
   }, [grouping])
 
   useEffect(() => {
     try {
-      window.localStorage.setItem('orbis:sidebar_ordering', ordering)
+      window.localStorage.setItem('padu:sidebar_ordering', ordering)
     } catch {}
   }, [ordering])
 
   useEffect(() => {
     try {
-      window.localStorage.setItem('orbis:sidebar_collapsed_groups', JSON.stringify(Array.from(collapsed)))
+      window.localStorage.setItem('padu:sidebar_collapsed_groups', JSON.stringify(Array.from(collapsed)))
     } catch {}
   }, [collapsed])
 
@@ -169,10 +169,10 @@ export function Sidebar({
       >
         <header className="flex h-12 shrink-0 items-center px-2.5">
           <img
-            alt="Orbis"
+            alt="Padu"
             className="size-6 rounded-md"
             draggable={false}
-            src={orbisAppIconUrl}
+            src={paduAppIconUrl}
           />
           <div className="flex-1" />
           <Tooltip content={t('sidebar.toggle')} shortcut={sidebarShortcut}>
@@ -182,13 +182,13 @@ export function Sidebar({
               variant="ghost"
               onClick={onToggleSidebar}
             >
-              <OrbisIcon name="panelLeft" />
+              <PaduIcon name="panelLeft" />
             </Button>
           </Tooltip>
         </header>
         <div className="px-2.5">
           <SidebarAction
-            icon={<OrbisIcon name="pencil" />}
+            icon={<PaduIcon name="pencil" />}
             label={t('menu.new_task')}
             shortcut={newTaskShortcut}
             onClick={() => {
@@ -210,7 +210,7 @@ export function Sidebar({
                 return (
                   <div className="h-[42px] px-2.5">
                     <SidebarAction
-                      icon={<OrbisIcon name="search" />}
+                      icon={<PaduIcon name="search" />}
                       label={t('sidebar.search')}
                       shortcut={searchShortcut}
                       onClick={onSearch}
@@ -279,14 +279,14 @@ export function Sidebar({
                         }}
                       >
                         {isProjectGroup && (
-                          <OrbisIcon
+                          <PaduIcon
                             className="size-3.5 shrink-0 text-[var(--text-secondary)]"
                             name={row.collapsed ? 'folder' : 'folderOpen'}
                           />
                         )}
                         <span className="truncate">{label}</span>
                         {!isProjectGroup && (
-                          <OrbisIcon
+                          <PaduIcon
                             className="size-3 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"
                             name={row.collapsed ? 'chevronRight' : 'chevronDown'}
                           />
@@ -336,7 +336,7 @@ export function Sidebar({
                             >
                               <Tooltip content={t('sidebar.options')}>
                                 <span className="grid size-8 place-items-center">
-                                  <OrbisIcon className="size-3.5 text-[var(--text-tertiary)]" name="listFilter" />
+                                  <PaduIcon className="size-3.5 text-[var(--text-tertiary)]" name="listFilter" />
                                 </span>
                               </Tooltip>
                             </ControlMenu>
@@ -348,7 +348,7 @@ export function Sidebar({
                                 variant="ghost"
                                 onClick={onAddProject}
                               >
-                                <OrbisIcon name="folderNew" />
+                                <PaduIcon name="folderNew" />
                               </Button>
                             </Tooltip>
                           </>
@@ -391,7 +391,7 @@ export function Sidebar({
               variant="ghost"
               onClick={onSettings}
             >
-              <OrbisIcon name="settings" />
+              <PaduIcon name="settings" />
             </Button>
           </Tooltip>
           <div className="flex-1" />
@@ -404,7 +404,7 @@ export function Sidebar({
                 variant="ghost"
                 onClick={onUsage}
               >
-                <OrbisIcon name="chartColumn" />
+                <PaduIcon name="chartColumn" />
               </Button>
             </Tooltip>
           )}
@@ -620,11 +620,11 @@ function SessionRow({
       <ContextMenu.Portal>
         <ContextMenu.Positioner className="z-[100] outline-none">
           <ContextMenu.Popup
-            className="orbis-menu-surface"
+            className="padu-menu-surface"
             finalFocus={false}
           >
             <ContextMenu.Item
-              className="orbis-menu-item"
+              className="padu-menu-item"
               onClick={() => {
                 restoreMenuFocus.current = false
                 setMenuOpen(false)
@@ -633,18 +633,18 @@ function SessionRow({
                 setRenaming(true)
               }}
             >
-              <OrbisIcon className="size-3" name="pencil" /> {t('common.rename')}
+              <PaduIcon className="size-3" name="pencil" /> {t('common.rename')}
             </ContextMenu.Item>
-            <ContextMenu.Separator className="orbis-menu-separator" />
+            <ContextMenu.Separator className="padu-menu-separator" />
             <ContextMenu.Item
-              className="orbis-menu-item text-destructive data-[highlighted]:bg-[var(--danger-soft)]"
+              className="padu-menu-item text-destructive data-[highlighted]:bg-[var(--danger-soft)]"
               onClick={() => {
                 restoreMenuFocus.current = false
                 setMenuOpen(false)
                 void onRemove(item.session.id).catch(() => {})
               }}
             >
-              <OrbisIcon className="size-3" name="trash" /> {t('common.remove')}
+              <PaduIcon className="size-3" name="trash" /> {t('common.remove')}
             </ContextMenu.Item>
           </ContextMenu.Popup>
         </ContextMenu.Positioner>
@@ -665,7 +665,7 @@ function SessionMetadata({
   const timeLabel = sessionTimeLabel(item.session, nowSeconds, t)
   return (
     <span className="flex w-full min-w-0 items-center gap-1.5 text-[11.5px] leading-[15px] text-[var(--text-tertiary)]">
-      <OrbisIcon className="size-[11px] shrink-0" name="folder" />
+      <PaduIcon className="size-[11px] shrink-0" name="folder" />
       <span className="min-w-0 flex-1 truncate">{item.projectName}</span>
       {timeLabel && (
         <span
@@ -684,12 +684,12 @@ function SessionMetadata({
 function SessionStatus({ status, t }: { status: AgentSession['status']; t: Translator }) {
   if (status === 'idle') return null
   if (status === 'working' || status === 'connecting') {
-    return <OrbisIcon label={t('sidebar.status_working')} className="size-3 text-[var(--success)] motion-safe:animate-spin" name="loaderCircle" />
+    return <PaduIcon label={t('sidebar.status_working')} className="size-3 text-[var(--success)] motion-safe:animate-spin" name="loaderCircle" />
   }
   if (status === 'waiting') {
-    return <OrbisIcon label={t('sidebar.status_waiting')} className="size-3 text-[var(--warning)]" name="alert" />
+    return <PaduIcon label={t('sidebar.status_waiting')} className="size-3 text-[var(--warning)]" name="alert" />
   }
-  return <OrbisIcon label={t('sidebar.status_failed')} className="size-3 text-destructive" name="x" />
+  return <PaduIcon label={t('sidebar.status_failed')} className="size-3 text-destructive" name="x" />
 }
 
 function ConnectionDot() {

@@ -1,6 +1,6 @@
 import { useQueries, useQuery } from '@tanstack/react-query'
-import type { ProviderKind } from '@orbis/client'
-import { PROVIDERS } from '@/components/orbis-icon'
+import type { ProviderKind } from '@padu/client'
+import { PROVIDERS } from '@/components/padu-icon'
 import { useDaemon } from '@/lib/daemon-context'
 import {
   daemonKeys,
@@ -237,7 +237,7 @@ export function useUsageHistory(
 }
 
 function requireClient<T>(client: T | null): T {
-  if (!client) throw new Error('Orbis daemon is disconnected')
+  if (!client) throw new Error('Padu daemon is disconnected')
   return client
 }
 

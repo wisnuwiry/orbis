@@ -18,7 +18,7 @@ const icons = Object.fromEntries(
 function readIcon(file: string) {
   const source = readFileSync(`${iconDirectory}/${file}`, 'utf8')
   const svg = source.match(/<svg\b([^>]*)>([\s\S]*)<\/svg>/i)
-  if (!svg) throw new Error(`Invalid Orbis icon: ${file}`)
+  if (!svg) throw new Error(`Invalid Padu icon: ${file}`)
 
   const viewBox = svg[1]!.match(/viewBox="([^"]+)"/i)?.[1]
     ?.trim()
@@ -44,8 +44,8 @@ export default {
   plugins: [
     iconsPlugin({
       collections: {
-        orbis: {
-          prefix: 'orbis',
+        padu: {
+          prefix: 'padu',
           icons,
         },
       },

@@ -1,7 +1,7 @@
 export type ThemeChoice = 'system' | 'light' | 'dark'
 
 export function readThemeChoice(storage: Pick<Storage, 'getItem'> | null): ThemeChoice {
-  const stored = storage?.getItem('orbis.theme')
+  const stored = storage?.getItem('padu.theme')
   return stored === 'light' || stored === 'dark' ? stored : 'system'
 }
 
