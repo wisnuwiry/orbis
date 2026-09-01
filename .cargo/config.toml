@@ -8,7 +8,7 @@ TS_RS_LARGE_INT = "number"
 
 # Link the C runtime statically on Windows, as Zed does for GPUI. The
 # alternative is shipping (or installing) the Visual C++ redistributable, and
-# neither works here: Orbis installs per-user with no elevation precisely so it
+# neither works here: Padu installs per-user with no elevation precisely so it
 # can update itself silently, and the portable zip has to run from wherever it
 # is unpacked. Windows on Arm makes the failure routine rather than rare — an
 # arm64 machine almost never has the arm64 redistributable already, so a
