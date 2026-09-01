@@ -1,37 +1,37 @@
 #!/usr/bin/env sh
 set -eu
 
-# Installs Orbis for Linux into ~/.local — no root, no package manager.
-# Downloads the release tarball from https://releases.orbis.sh, unpacks it as
-# ~/.local/orbis.app, links the binary onto PATH, and registers the desktop
+# Installs Padu for Linux into ~/.local — no root, no package manager.
+# Downloads the release tarball from https://releases.padu.dev, unpacks it as
+# ~/.local/padu.app, links the binary onto PATH, and registers the desktop
 # entry. docs/linux.md documents the equivalent manual steps.
 #
-#   curl -fsSL https://orbis.sh/install.sh | sh
+#   curl -fsSL https://padu.dev/install.sh | sh
 #
 # Environment:
-#   ORBIS_VERSION        install this version instead of the latest
-#   ORBIS_BUNDLE_PATH    install a local tarball instead of downloading
-#   ORBIS_RELEASES_URL   base URL to download from
+#   PADU_VERSION        install this version instead of the latest
+#   PADU_BUNDLE_PATH    install a local tarball instead of downloading
+#   PADU_RELEASES_URL   base URL to download from
 
 usage() {
     cat <<'USAGE'
-Install Orbis for Linux into ~/.local.
+Install Padu for Linux into ~/.local.
 
 Usage:
-  curl -fsSL https://orbis.sh/install.sh | sh
-  curl -fsSL https://orbis.sh/install.sh | sh -s -- --uninstall
+  curl -fsSL https://padu.dev/install.sh | sh
+  curl -fsSL https://padu.dev/install.sh | sh -s -- --uninstall
 
 Options:
-  --uninstall   Remove Orbis, leaving ~/.orbis (projects and settings) alone
+  --uninstall   Remove Padu, leaving ~/.padu (projects and settings) alone
   --help        Show this help
 USAGE
 }
 
 main() {
-    app_dir="$HOME/.local/orbis.app"
-    bin_link="$HOME/.local/bin/orbis"
-    desktop_file="$HOME/.local/share/applications/sh.orbis.desktop"
-    releases="${ORBIS_RELEASES_URL:-https://releases.orbis.sh}"
+    app_dir="$HOME/.local/padu.app"
+    bin_link="$HOME/.local/bin/padu"
+    desktop_file="$HOME/.local/share/applications/dev.padu.desktop"
+    releases="${PADU_RELEASES_URL:-https://releases.padu.dev}"
 
     case "${1:-}" in
         --uninstall) uninstall; return ;;
@@ -46,8 +46,8 @@ main() {
 
     platform="$(uname -s)"
     if [ "$platform" = "Darwin" ]; then
-        echo "Orbis for macOS ships as a signed .dmg that updates itself." >&2
-        echo "Download it from https://orbis.sh" >&2
+        echo "Padu for macOS ships as a signed .dmg that updates itself." >&2
+        echo "Download it from https://padu.dev" >&2
         exit 1
     fi
     if [ "$platform" != "Linux" ]; then
@@ -61,7 +61,7 @@ main() {
         aarch64 | arm64) target="aarch64-unknown-linux-gnu" ;;
         *)
             echo "Unsupported architecture: $machine" >&2
-            echo "Build from source: https://github.com/wisnuwiry/orbis" >&2
+            echo "Build from source: https://github.com/wisnuwiry/padu" >&2
             exit 1
             ;;
     esac
@@ -75,30 +75,30 @@ main() {
         exit 1
     fi
 
-    temp="$(mktemp -d "${TMPDIR:-/tmp}/orbis-XXXXXX")"
+    temp="$(mktemp -d "${TMPDIR:-/tmp}/padu-XXXXXX")"
     staging="$app_dir.new"
     trap 'rm -rf -- "$temp" "$staging"' EXIT INT TERM
 
-    archive="$temp/orbis.tar.gz"
-    if [ -n "${ORBIS_BUNDLE_PATH:-}" ]; then
-        cp "$ORBIS_BUNDLE_PATH" "$archive"
+    archive="$temp/padu.tar.gz"
+    if [ -n "${PADU_BUNDLE_PATH:-}" ]; then
+        cp "$PADU_BUNDLE_PATH" "$archive"
     else
-        version="${ORBIS_VERSION:-}"
+        version="${PADU_VERSION:-}"
         if [ -z "$version" ]; then
             if ! version="$(fetch "$releases/latest-linux.txt")"; then
                 echo "Could not reach $releases/latest-linux.txt." >&2
-                echo "Pass ORBIS_VERSION to install a specific version." >&2
+                echo "Pass PADU_VERSION to install a specific version." >&2
                 exit 1
             fi
             version="$(printf '%s' "$version" | tr -d '[:space:]')"
         fi
         if [ -z "$version" ]; then
-            echo "No Orbis version published for Linux yet." >&2
+            echo "No Padu version published for Linux yet." >&2
             exit 1
         fi
-        echo "Downloading Orbis $version for $machine"
-        if ! fetch "$releases/orbis-$version-$target.tar.gz" >"$archive"; then
-            echo "Download failed: $releases/orbis-$version-$target.tar.gz" >&2
+        echo "Downloading Padu $version for $machine"
+        if ! fetch "$releases/padu-$version-$target.tar.gz" >"$archive"; then
+            echo "Download failed: $releases/padu-$version-$target.tar.gz" >&2
             exit 1
         fi
     fi
@@ -116,18 +116,18 @@ main() {
     mkdir -p "$staging" "$(dirname "$bin_link")" "$(dirname "$desktop_file")"
     tar -xzf "$archive" --strip-components=1 -C "$staging"
 
-    # Orbis resolves its daemon and self-update helper next to its own
+    # Padu resolves its daemon and self-update helper next to its own
     # executable, so all three must stay together in bin/. Linking only the
     # main binary onto PATH is safe — current_exe() resolves the symlink back
-    # into orbis.app.
-    for binary in orbis orbis-daemon orbis-updater; do
+    # into padu.app.
+    for binary in padu padu-daemon padu-updater; do
         if [ ! -x "$staging/bin/$binary" ]; then
             echo "Archive is missing bin/$binary." >&2
             exit 1
         fi
     done
-    if [ "$(cat "$staging/share/orbis/self-update-v1" 2>/dev/null || true)" != \
-        "orbis-self-update-v1" ]; then
+    if [ "$(cat "$staging/share/padu/self-update-v1" 2>/dev/null || true)" != \
+        "padu-self-update-v1" ]; then
         echo "Archive is missing its managed-install marker." >&2
         exit 1
     fi
@@ -135,29 +135,29 @@ main() {
     # survive the upgrade.
     rm -rf "$app_dir"
     mv "$staging" "$app_dir"
-    ln -sf "$app_dir/bin/orbis" "$bin_link"
+    ln -sf "$app_dir/bin/padu" "$bin_link"
 
-    entry="$app_dir/share/applications/sh.orbis.desktop"
+    entry="$app_dir/share/applications/dev.padu.desktop"
     if [ -f "$entry" ]; then
         # The packaged entry is relocatable (bare Exec/Icon names). Pin both to
         # this install so the launcher works without PATH or icon-theme setup.
-        sed -e "s|^Exec=orbis$|Exec=$app_dir/bin/orbis|" \
-            -e "s|^Icon=sh.orbis$|Icon=$app_dir/share/icons/hicolor/256x256/apps/sh.orbis.png|" \
+        sed -e "s|^Exec=padu$|Exec=$app_dir/bin/padu|" \
+            -e "s|^Icon=dev.padu$|Icon=$app_dir/share/icons/hicolor/256x256/apps/dev.padu.png|" \
             "$entry" >"$desktop_file"
         if command -v update-desktop-database >/dev/null 2>&1; then
             update-desktop-database "$(dirname "$desktop_file")" 2>/dev/null || true
         fi
     fi
 
-    # Orbis is a desktop app and takes no arguments, so the launcher entry is
+    # Padu is a desktop app and takes no arguments, so the launcher entry is
     # the way in. The PATH link is a convenience for starting it from a
     # terminal to watch its output.
-    echo "Orbis is installed."
+    echo "Padu is installed."
     if [ -f "$desktop_file" ]; then
         echo "Open it from your applications menu."
     fi
-    if [ "$(command -v orbis || true)" = "$bin_link" ]; then
-        echo "From a terminal: orbis"
+    if [ "$(command -v padu || true)" = "$bin_link" ]; then
+        echo "From a terminal: padu"
     else
         echo "From a terminal: $bin_link"
     fi
@@ -165,19 +165,19 @@ main() {
 
 uninstall() {
     if [ ! -d "$app_dir" ] && [ ! -L "$bin_link" ]; then
-        echo "Orbis is not installed at $app_dir." >&2
+        echo "Padu is not installed at $app_dir." >&2
         exit 1
     fi
     # Only reclaim the symlink and desktop entry this script created; a
     # distro package's copies of both belong to the package manager.
-    if [ "$(readlink "$bin_link" 2>/dev/null || true)" = "$app_dir/bin/orbis" ]; then
+    if [ "$(readlink "$bin_link" 2>/dev/null || true)" = "$app_dir/bin/padu" ]; then
         rm -f "$bin_link"
     fi
-    if [ -f "$desktop_file" ] && grep -qF "$app_dir/bin/orbis" "$desktop_file"; then
+    if [ -f "$desktop_file" ] && grep -qF "$app_dir/bin/padu" "$desktop_file"; then
         rm -f "$desktop_file"
     fi
     rm -rf "$app_dir"
-    echo "Orbis is uninstalled. Projects and settings remain in ~/.orbis."
+    echo "Padu is uninstalled. Projects and settings remain in ~/.padu."
 }
 
 main "$@"

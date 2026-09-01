@@ -1,6 +1,6 @@
-# Contributing to Orbis
+# Contributing to Padu
 
-Thanks for helping improve Orbis. Bug reports, focused fixes, tests, and
+Thanks for helping improve Padu. Bug reports, focused fixes, tests, and
 well-scoped features are welcome.
 
 ## Development setup
@@ -32,9 +32,9 @@ bun install
 bun run dev
 ```
 
-On macOS the watcher builds and signs `target/debug/Orbis Debug.app`; on Linux
-and Windows it builds `target/debug/orbis`. In both cases the provider daemon remains an
-external `target/debug/orbis-debug-daemon`: provider-only edits rebuild and
+On macOS the watcher builds and signs `target/debug/Padu Debug.app`; on Linux
+and Windows it builds `target/debug/padu`. In both cases the provider daemon remains an
+external `target/debug/padu-debug-daemon`: provider-only edits rebuild and
 hot-swap that process without relaunching the app, while desktop edits rebuild
 and relaunch the app normally. Keep that watcher running while you work. Do
 not start a second watcher or manually relaunch the debug app. Press `Ctrl-C`,
@@ -62,12 +62,12 @@ The archive is written under `target/release` with an install-prefix layout
 not bundle system graphics libraries; distribution packages should declare
 those runtime dependencies normally.
 
-`website/public/install.sh` (served at `https://orbis.sh/install.sh`) is what
+`website/public/install.sh` (served at `https://padu.dev/install.sh`) is what
 users run to install that archive. Point it at a local build to exercise it
 without publishing:
 
 ```sh
-ORBIS_BUNDLE_PATH=target/release/orbis-<version>-<target>.tar.gz \
+PADU_BUNDLE_PATH=target/release/padu-<version>-<target>.tar.gz \
   sh website/public/install.sh
 ```
 
@@ -82,9 +82,9 @@ bun scripts/bundle-windows.ts
 ```
 
 Both land under `target/release`. The zip holds the two executables side by
-side beneath one versioned directory — the layout Orbis needs to find its
+side beneath one versioned directory — the layout Padu needs to find its
 daemon — and the installer is built from
-[`resources/windows/orbis.iss`](resources/windows/orbis.iss), so Inno Setup 6.3
+[`resources/windows/padu.iss`](resources/windows/padu.iss), so Inno Setup 6.3
 or newer must be installed (`choco install innosetup`) — the architecture
 gate uses identifiers added in 6.3. Set `WINDOWS_CERTIFICATE`
 (base64 `.pfx`) and `WINDOWS_CERTIFICATE_PASSWORD` to Authenticode-sign them;
@@ -113,16 +113,16 @@ Run the focused checks relevant to your change, then run the full baseline
 before opening a pull request:
 
 ```sh
-cargo fmt --package orbis --package orbis-protocol --package orbis-client --package orbis-core --package orbis-daemon -- --check
+cargo fmt --package padu --package padu-protocol --package padu-client --package padu-core --package padu-daemon -- --check
 cargo check
 cargo test
 bun run protocol:check
-bun run --filter @orbis/client check
-bun run --filter @orbis/client test
+bun run --filter @padu/client check
+bun run --filter @padu/client test
 ```
 
 When a Rust wire type changes, run `bun run protocol:generate` and commit the
-updated files under `packages/orbis-client/src/generated`.
+updated files under `packages/padu-client/src/generated`.
 
 For user-visible changes, wait for the watcher to report a successful rebuild
 and validate the freshly relaunched app. Include screenshots or a short

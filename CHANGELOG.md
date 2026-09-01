@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Orbis. This file is the **source of truth for the release
+All notable changes to Padu. This file is the **source of truth for the release
 notes shown in the in-app updater**: [`scripts/release.ts`](scripts/release.ts)
 extracts the section whose heading matches the version being released
 (`MARKETING_VERSION`) and publishes it next to the update, so Sparkle shows it in
@@ -18,7 +18,7 @@ the original feature bullet instead of adding separate entries for them.
 
 ## 0.1.0
 
-- Initial release of Orbis: a fast, native control plane for local coding agents
+- Initial release of Padu: a fast, native control plane for local coding agents
 - Support for multiple local agent CLIs (Claude Code, Codex CLI, Cursor CLI, Amp, OpenCode, Grok Build, Pi, Kimi Code, Fx)
 - GPU-accelerated desktop interface built with GPUI
 - Standalone headless daemon and web client

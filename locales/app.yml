@@ -60,7 +60,7 @@ updater.update:
 updater.updating:
   en: Updating…
 updater.up_to_date:
-  en: Orbis is up to date
+  en: Padu is up to date
 updater.failed:
   en: "Update failed: %{error}"
 
@@ -129,7 +129,7 @@ command_palette.loading_sessions:
 command_palette.no_resume_sessions:
   en: No resumable terminal sessions
 command_palette.no_resume_sessions_hint:
-  en: Sessions already in Orbis are hidden. Start one in an agent CLI and try again.
+  en: Sessions already in Padu are hidden. Start one in an agent CLI and try again.
 command_palette.could_not_load_sessions:
   en: Couldn’t load terminal sessions
 command_palette.loading_selected_session:
@@ -142,7 +142,7 @@ language.title:
 language.system:
   en: System
 language.description:
-  en: Choose the language used throughout Orbis
+  en: Choose the language used throughout Padu
 
 settings.general:
   en: General
@@ -205,11 +205,11 @@ keybindings.open_settings_desc:
 keybindings.close_window:
   en: Close Window
 keybindings.close_window_desc:
-  en: Close the current Orbis window
+  en: Close the current Padu window
 keybindings.quit:
   en: Quit
 keybindings.quit_desc:
-  en: Quit Orbis application
+  en: Quit Padu application
 keybindings.toggle_sidebar:
   en: Toggle Sidebar
 keybindings.toggle_sidebar_desc:
@@ -309,7 +309,7 @@ settings.search:
 daemon.expose_title:
   en: Expose managed daemon
 daemon.expose_description:
-  en: Listen beyond this machine so another Orbis client can connect. Changing this restarts only the daemon.
+  en: Listen beyond this machine so another Padu client can connect. Changing this restarts only the daemon.
 daemon.status_local:
   en: Local only
 daemon.status_exposed:
@@ -323,7 +323,7 @@ daemon.connection_description:
 daemon.port:
   en: Port
 daemon.port_description:
-  en: Orbis listens on all network interfaces at this port while exposure is enabled.
+  en: Padu listens on all network interfaces at this port while exposure is enabled.
 daemon.port_placeholder:
   en: "34123"
 daemon.allowed_origins:
@@ -331,7 +331,7 @@ daemon.allowed_origins:
 daemon.allowed_origins_description:
   en: Exact http:// or https:// origins allowed to open the WebSocket.
 daemon.allowed_origins_placeholder:
-  en: https://orbis.example.com, http://localhost:3001
+  en: https://padu.example.com, http://localhost:3001
 daemon.apply:
   en: Apply
 daemon.restarting:
@@ -339,7 +339,7 @@ daemon.restarting:
 daemon.credentials_title:
   en: Connection details
 daemon.credentials_description:
-  en: Enter these in Orbis Web. The URL uses this machine’s local network hostname.
+  en: Enter these in Padu Web. The URL uses this machine’s local network hostname.
 daemon.websocket_url:
   en: WebSocket URL
 daemon.token:
@@ -355,9 +355,9 @@ daemon.security_warning:
 daemon.external_title:
   en: External daemon
 daemon.external_description:
-  en: This desktop is connected to a daemon managed outside Orbis. Configure its listener, browser origins, and token on that host.
+  en: This desktop is connected to a daemon managed outside Padu. Configure its listener, browser origins, and token on that host.
 daemon.web_external_description:
-  en: Orbis Web connects to a daemon managed outside this browser. Configure its listener, browser origins, and token on that host.
+  en: Padu Web connects to a daemon managed outside this browser. Configure its listener, browser origins, and token on that host.
 daemon.web_connection_description:
   en: This browser never starts or stops the daemon.
 daemon.not_configured:
@@ -395,7 +395,7 @@ daemon.url_copied:
 daemon.token_copied:
   en: Daemon token copied
 web.connect_title:
-  en: Connect to Orbis daemon
+  en: Connect to Padu daemon
 web.connect_description:
   en: Enter the remote listener URL and token from Desktop Settings → Daemon.
 web.token_placeholder:
@@ -411,13 +411,13 @@ web.connecting:
 web.security_warning:
   en: The browser sends the token only to this WebSocket. Use WSS through a trusted TLS proxy outside a private network.
 web.starting:
-  en: Starting Orbis…
+  en: Starting Padu…
 web.starting_label:
-  en: Starting Orbis
+  en: Starting Padu
 web.start_failed_label:
-  en: Orbis could not start
+  en: Padu could not start
 web.load_failed:
-  en: Couldn’t load Orbis
+  en: Couldn’t load Padu
 web.try_again:
   en: Try again
 web.daemon_connection_closed:
@@ -433,7 +433,7 @@ web.error_daemon_url_scheme:
 web.error_daemon_url_host:
   en: The daemon URL must contain a host and no credentials
 web.error_secure_websocket_required:
-  en: A secure Orbis Web page can only connect through wss://
+  en: A secure Padu Web page can only connect through wss://
 web.error_daemon_token_required:
   en: Enter the daemon token
 settings.theme:
@@ -494,7 +494,7 @@ settings.local_by_default:
 settings.local_by_default_description:
   en: Projects, conversations, and settings are stored on this computer
 settings.local_by_default_web_description:
-  en: Projects, conversations, and attachments stay on the connected daemon host. Orbis Web preferences stay in this browser.
+  en: Projects, conversations, and attachments stay on the connected daemon host. Padu Web preferences stay in this browser.
 settings.automatic_updates:
   en: Automatic updates
 settings.automatic_updates_description:
@@ -502,14 +502,14 @@ settings.automatic_updates_description:
 settings.share_anonymous_usage_data:
   en: Share anonymous usage data
 settings.share_anonymous_usage_data_description:
-  en: Help improve Orbis by sharing feature usage and reliability data. Prompts, responses, project names, file paths, and other personal data are never included
+  en: Help improve Padu by sharing feature usage and reliability data. Prompts, responses, project names, file paths, and other personal data are never included
 
 providers.coding_agents:
   en: Coding agents
 providers.description:
-  en: Orbis drives agent CLIs installed on this computer. Install or sign in with each agent's own CLI, then refresh
+  en: Padu drives agent CLIs installed on this computer. Install or sign in with each agent's own CLI, then refresh
 providers.web_description:
-  en: Orbis drives agent CLIs installed on the daemon host. Install or sign in with each agent's own CLI, then refresh
+  en: Padu drives agent CLIs installed on the daemon host. Install or sign in with each agent's own CLI, then refresh
 providers.check_failed:
   en: "Could not check %{command}: %{error}"
 providers.show_settings:
@@ -537,11 +537,11 @@ providers.detected_at:
 providers.detected_as:
   en: Detected as %{command}
 providers.searches_path:
-  en: Orbis did not detect %{command} in PATH
+  en: Padu did not detect %{command} in PATH
 providers.binary_path:
   en: Binary path
 providers.binary_path_description:
-  en: The executable Orbis launches for %{provider}. Press Return to apply; leave empty to detect from PATH
+  en: The executable Padu launches for %{provider}. Press Return to apply; leave empty to detect from PATH
 providers.checked_just_now:
   en: Checked just now
 providers.checked_minutes_ago:
@@ -550,13 +550,13 @@ providers.checked_hours_ago:
   en: Checked %{count}h ago
 
 computer_use.allow_apps:
-  en: Let Orbis use apps
+  en: Let Padu use apps
 computer_use.availability:
   en: Computer Use is available with Codex, OpenCode, Grok, and Pi
 computer_use.macos_access:
   en: macOS access
 computer_use.helper_access:
-  en: Grant access to %{helper}, Orbis's isolated control helper
+  en: Grant access to %{helper}, Padu's isolated control helper
 computer_use.screen_recording:
   en: Screen Recording
 computer_use.screen_recording_description:
@@ -568,7 +568,7 @@ computer_use.accessibility_description:
 computer_use.always_allowed_apps:
   en: Always allowed apps
 computer_use.always_allowed_apps_description:
-  en: Orbis pins these grants to the app's bundle ID and signing team
+  en: Padu pins these grants to the app's bundle ID and signing team
 computer_use.no_always_allowed_apps:
   en: No apps are always allowed. Task-scoped grants stay in memory only
 computer_use.access_granted:
@@ -677,7 +677,7 @@ project.your_project:
 onboarding.open_project_to_begin:
   en: Open a project to begin
 onboarding.description:
-  en: Orbis runs coding agents in folders you choose. Your code, sessions, and history stay on this computer
+  en: Padu runs coding agents in folders you choose. Your code, sessions, and history stay on this computer
 onboarding.web_description:
   en: Choose a path on the daemon host, or start without a project.
 onboarding.open_project_folder:
@@ -1010,7 +1010,7 @@ computer_use.allow_for_task:
 computer_use.always_allow_app:
   en: Always allow app
 computer_use.allow_control:
-  en: Allow Orbis to control %{app}?
+  en: Allow Padu to control %{app}?
 computer_use.screenshot_shared:
   en: A screenshot of this window will be shared with the active Codex model
 computer_use.sensitive_action:
@@ -1314,7 +1314,7 @@ composer.message:
 composer.queue_placeholder:
   en: Queue a follow-up…
 composer.prompt_placeholder:
-  en: Ask Orbis to build something…
+  en: Ask Padu to build something…
 composer.attach_daemon:
   en: Attach a file or folder from the daemon host
 composer.attach_daemon_title:
@@ -1396,11 +1396,11 @@ session.agent_stopped_reason:
 errors.open_session:
   en: "Could not open that session: %{error}"
 errors.create_projectless_task:
-  en: "Could not create a task beneath ~/.orbis/projects: %{error}"
+  en: "Could not create a task beneath ~/.padu/projects: %{error}"
 errors.save_projectless_migration:
   en: "Could not save the projectless task migration: %{error}"
 errors.move_projectless_task:
-  en: "Could not move the old projectless task beneath ~/.orbis/projects: %{error}"
+  en: "Could not move the old projectless task beneath ~/.padu/projects: %{error}"
 errors.remote_host_path:
   en: This path belongs to the daemon host and cannot be opened by the desktop
 errors.change_branch:
@@ -1421,8 +1421,8 @@ errors.provider_native_cursor_unavailable:
   en: "%{provider}'s native session cursor is unavailable"
 errors.provider_native_thread_cursor_unavailable:
   en: "%{provider}'s native thread cursor is unavailable"
-errors.provider_orbis_task_unavailable:
-  en: "%{provider}'s Orbis task is unavailable"
+errors.provider_padu_task_unavailable:
+  en: "%{provider}'s Padu task is unavailable"
 errors.provider_not_installed:
   en: "%{provider} is not installed"
 errors.provider_not_found:
@@ -1464,7 +1464,7 @@ errors.no_live_runtime:
 errors.unexpected_daemon_response:
   en: "Expected %{expected}, received %{actual} from the daemon"
 errors.daemon_disconnected:
-  en: Orbis daemon is disconnected
+  en: Padu daemon is disconnected
 errors.path_outside_workspace:
   en: This path is outside the active workspace on the daemon host
 errors.rename_task:
@@ -1528,7 +1528,7 @@ errors.answer_provider_question:
 errors.initialize_codex_app_server:
   en: Failed to initialize Codex app-server
 errors.register_computer_use_skill:
-  en: Failed to register Orbis Computer Use skill with Codex
+  en: Failed to register Padu Computer Use skill with Codex
 errors.codex_thread_open_incomplete:
   en: Codex did not finish opening its thread
 errors.codex_goals_unsupported:
@@ -2299,7 +2299,7 @@ usage_error.curl_no_status:
   en: curl returned no HTTP status line
 
 onboarding.welcome_title:
-  en: Welcome to Orbis
+  en: Welcome to Padu
 onboarding.welcome_subtitle:
   en: A fast, native control plane for local coding agents
 onboarding.step_indicator:
@@ -2322,7 +2322,7 @@ onboarding.slide1_badge:
 onboarding.slide1_title:
   en: Native Multi-Agent Control Plane
 onboarding.slide1_desc:
-  en: Orbis connects directly to your favorite local agent CLIs with structured protocol streaming and zero cloud middleman.
+  en: Padu connects directly to your favorite local agent CLIs with structured protocol streaming and zero cloud middleman.
 onboarding.slide1_item1_title:
   en: Broad CLI Support
 onboarding.slide1_item1_desc:
@@ -2372,14 +2372,14 @@ onboarding.slide3_item2_desc:
 onboarding.slide3_item3_title:
   en: Built-in Terminal & Preview
 onboarding.slide3_item3_desc:
-  en: Render markdown previews and access integrated terminal sessions without leaving Orbis.
+  en: Render markdown previews and access integrated terminal sessions without leaving Padu.
 
 onboarding.slide4_badge:
   en: Productivity & Privacy
 onboarding.slide4_title:
   en: Speed at Your Fingertips, 100% Local
 onboarding.slide4_desc:
-  en: Orbis is built keyboard-first with absolute privacy for your proprietary codebase.
+  en: Padu is built keyboard-first with absolute privacy for your proprietary codebase.
 onboarding.slide4_item1_title:
   en: Command Palette (Cmd/Ctrl + K)
 onboarding.slide4_item1_desc:
@@ -2391,5 +2391,5 @@ onboarding.slide4_item2_desc:
 onboarding.slide4_item3_title:
   en: 100% Local-First Storage
 onboarding.slide4_item3_desc:
-  en: All projects, transcripts, and settings reside locally in ~/.orbis with no external accounts needed.
+  en: All projects, transcripts, and settings reside locally in ~/.padu with no external accounts needed.
 

@@ -29,7 +29,7 @@ window.maximize: 最大化
 window.restore: 还原
 updater.update: 更新
 updater.updating: 正在更新…
-updater.up_to_date: Orbis 已是最新版本
+updater.up_to_date: Padu 已是最新版本
 updater.failed: "更新失败：%{error}"
 command_palette.placeholder: 搜索任务或运行命令…
 command_palette.resume_placeholder: 搜索终端会话…
@@ -63,13 +63,13 @@ command_palette.no_results_hint: 可尝试搜索任务标题、消息、项目�
 command_palette.no_matching_providers: 未找到匹配的服务商
 command_palette.loading_sessions: 正在加载终端会话…
 command_palette.no_resume_sessions: 没有可恢复的终端会话
-command_palette.no_resume_sessions_hint: 已在 Orbis 中的会话不会显示。请在智能体 CLI 中开始会话后重试。
+command_palette.no_resume_sessions_hint: 已在 Padu 中的会话不会显示。请在智能体 CLI 中开始会话后重试。
 command_palette.could_not_load_sessions: 无法加载终端会话
 command_palette.loading_selected_session: 正在加载对话…
 command_palette.resume_failed: "无法恢复会话：%{error}"
 language.title: 语言
 language.system: 跟随系统
-language.description: 选择 Orbis 的界面语言
+language.description: 选择 Padu 的界面语言
 settings.general: 通用
 settings.appearance: 外观
 settings.keybindings: 快捷键
@@ -102,7 +102,7 @@ keybindings.open_settings_desc: 打开应用偏好设置
 keybindings.close_window: 关闭窗口
 keybindings.close_window_desc: 关闭当前窗口
 keybindings.quit: 退出
-keybindings.quit_desc: 退出 Orbis 应用程序
+keybindings.quit_desc: 退出 Padu 应用程序
 keybindings.toggle_sidebar: 切换侧边栏
 keybindings.toggle_sidebar_desc: 显示或隐藏左侧项目与任务列表
 keybindings.toggle_right_panel: 切换右侧面板
@@ -151,23 +151,23 @@ keybindings.search: 搜索快捷键...
 keybindings.no_results: 未找到快捷键
 settings.back: 返回
 settings.search: 搜索设置
-daemon.expose_title: 暴露由 Orbis 管理的守护进程
-daemon.expose_description: 允许本机之外的 Orbis 客户端连接。更改此项只会重启守护进程。
+daemon.expose_title: 暴露由 Padu 管理的守护进程
+daemon.expose_description: 允许本机之外的 Padu 客户端连接。更改此项只会重启守护进程。
 daemon.status_local: 仅本机
 daemon.status_exposed: 已暴露
 daemon.status_restarting: 正在重启
 daemon.connection_title: 监听访问
 daemon.connection_description: 浏览器来源必须完全匹配。多个来源请用逗号分隔。
 daemon.port: 端口
-daemon.port_description: 启用暴露后，Orbis 会在所有网络接口的此端口上监听。
+daemon.port_description: 启用暴露后，Padu 会在所有网络接口的此端口上监听。
 daemon.port_placeholder: "34123"
 daemon.allowed_origins: 允许的浏览器来源
 daemon.allowed_origins_description: 可打开 WebSocket 的确切 http:// 或 https:// 来源。
-daemon.allowed_origins_placeholder: https://orbis.example.com, http://localhost:3001
+daemon.allowed_origins_placeholder: https://padu.example.com, http://localhost:3001
 daemon.apply: 应用
 daemon.restarting: 正在重启…
 daemon.credentials_title: 连接信息
-daemon.credentials_description: 在 Orbis Web 中输入这些信息。此地址使用本机的局域网主机名。
+daemon.credentials_description: 在 Padu Web 中输入这些信息。此地址使用本机的局域网主机名。
 daemon.websocket_url: WebSocket 地址
 daemon.token: 令牌
 daemon.reveal_token: 显示令牌
@@ -175,8 +175,8 @@ daemon.hide_token: 隐藏令牌
 daemon.regenerate_token: 重新生成
 daemon.security_warning: 此令牌可完全访问本机上的任务、文件、Git、附件和编程智能体。在私有网络之外请通过受信任的 TLS 代理使用 WSS。
 daemon.external_title: 外部守护进程
-daemon.external_description: 此桌面应用连接到由 Orbis 之外管理的守护进程。请在对应主机上配置监听地址、浏览器来源和令牌。
-daemon.web_external_description: Orbis Web 连接到由浏览器之外管理的守护进程。请在对应主机上配置监听地址、浏览器来源和令牌。
+daemon.external_description: 此桌面应用连接到由 Padu 之外管理的守护进程。请在对应主机上配置监听地址、浏览器来源和令牌。
+daemon.web_external_description: Padu Web 连接到由浏览器之外管理的守护进程。请在对应主机上配置监听地址、浏览器来源和令牌。
 daemon.web_connection_description: 此浏览器不会启动或停止守护进程。
 daemon.not_configured: 未配置
 daemon.status: 状态
@@ -195,7 +195,7 @@ daemon.settings_applied: 守护进程访问设置已更新
 daemon.restart_failed: 无法重启守护进程：%{error}
 daemon.url_copied: 已复制 WebSocket 地址
 daemon.token_copied: 已复制守护进程令牌
-web.connect_title: 连接 Orbis 守护进程
+web.connect_title: 连接 Padu 守护进程
 web.connect_description: 输入桌面应用“设置 → 守护进程”中显示的远程监听地址和令牌。
 web.token_placeholder: 守护进程访问令牌
 web.remember_device: 在此设备上记住
@@ -203,10 +203,10 @@ web.remember_device_description: 否则，浏览器会话结束时将清除凭�
 web.connect: 连接
 web.connecting: 正在连接…
 web.security_warning: 浏览器只会将令牌发送到此 WebSocket。在私有网络之外请通过受信任的 TLS 代理使用 WSS。
-web.starting: Orbis 正在启动…
-web.starting_label: Orbis 正在启动
-web.start_failed_label: Orbis 无法启动
-web.load_failed: 无法加载 Orbis
+web.starting: Padu 正在启动…
+web.starting_label: Padu 正在启动
+web.start_failed_label: Padu 无法启动
+web.load_failed: 无法加载 Padu
 web.try_again: 重试
 web.daemon_connection_closed: 与守护进程的连接已关闭
 web.daemon_not_configured: 尚未配置守护进程
@@ -214,7 +214,7 @@ web.error_daemon_url_required: 请输入守护进程 URL
 web.error_daemon_url_invalid: 请输入有效的 ws:// 或 wss:// 守护进程 URL
 web.error_daemon_url_scheme: 守护进程 URL 必须使用 ws:// 或 wss://
 web.error_daemon_url_host: 守护进程 URL 必须包含主机，且不能包含凭据
-web.error_secure_websocket_required: 安全的 Orbis Web 页面只能通过 wss:// 连接
+web.error_secure_websocket_required: 安全的 Padu Web 页面只能通过 wss:// 连接
 web.error_daemon_token_required: 请输入守护进程令牌
 settings.theme: 主题
 settings.theme_description: 选择跟随系统、浅色或深色主题
@@ -243,14 +243,14 @@ common.retry: 重试
 common.creating: 正在创建…
 settings.local_by_default: 默认存储在本地
 settings.local_by_default_description: 项目、对话和设置均存储在这台电脑上
-settings.local_by_default_web_description: 项目、对话和附件保留在所连接的守护进程主机上。Orbis Web 的偏好设置保留在此浏览器中。
+settings.local_by_default_web_description: 项目、对话和附件保留在所连接的守护进程主机上。Padu Web 的偏好设置保留在此浏览器中。
 settings.automatic_updates: 自动更新
 settings.automatic_updates_description: 在后台检查新版本，并在发现更新时提示安装
 settings.share_anonymous_usage_data: 分享匿名使用数据
-settings.share_anonymous_usage_data_description: 分享功能使用情况和可靠性数据，帮助改进 Orbis。不会包含提示词、回复、项目名称、文件路径等个人信息
+settings.share_anonymous_usage_data_description: 分享功能使用情况和可靠性数据，帮助改进 Padu。不会包含提示词、回复、项目名称、文件路径等个人信息
 providers.coding_agents: 编程智能体
-providers.description: Orbis 调用安装在这台电脑上的智能体命令行工具。请先安装相应工具或完成登录，然后刷新
-providers.web_description: Orbis 调用安装在守护进程主机上的智能体命令行工具。请先安装相应工具或完成登录，然后刷新
+providers.description: Padu 调用安装在这台电脑上的智能体命令行工具。请先安装相应工具或完成登录，然后刷新
+providers.web_description: Padu 调用安装在守护进程主机上的智能体命令行工具。请先安装相应工具或完成登录，然后刷新
 providers.check_failed: "无法检查 %{command}：%{error}"
 providers.show_settings: 显示 %{provider} 设置
 providers.hide_settings: 隐藏 %{provider} 设置
@@ -264,22 +264,22 @@ providers.using_override: 正在使用 %{path}，不再从 PATH 自动检测
 providers.invalid_override: 此路径下没有可执行文件。清空后可恢复从 PATH 自动检测
 providers.detected_at: 已在 %{path} 检测到
 providers.detected_as: 已检测到 %{command}
-providers.searches_path: Orbis 未在 PATH 中找到 %{command}
+providers.searches_path: Padu 未在 PATH 中找到 %{command}
 providers.binary_path: 可执行文件路径
-providers.binary_path_description: Orbis 用于启动 %{provider} 的可执行文件。按 Return 应用；留空则从 PATH 自动检测
+providers.binary_path_description: Padu 用于启动 %{provider} 的可执行文件。按 Return 应用；留空则从 PATH 自动检测
 providers.checked_just_now: 刚刚检查过
 providers.checked_minutes_ago: "%{count} 分钟前检查过"
 providers.checked_hours_ago: "%{count} 小时前检查过"
-computer_use.allow_apps: 允许 Orbis 操作其他应用
+computer_use.allow_apps: 允许 Padu 操作其他应用
 computer_use.availability: Codex、OpenCode、Grok 和 Pi 支持电脑操作功能
 computer_use.macos_access: macOS 权限
-computer_use.helper_access: 请向 Orbis 的独立控制助手 %{helper} 授予权限
+computer_use.helper_access: 请向 Padu 的独立控制助手 %{helper} 授予权限
 computer_use.screen_recording: 屏幕录制
 computer_use.screen_recording_description: 仅截取已允许应用的窗口
 computer_use.accessibility: 辅助功能
 computer_use.accessibility_description: 获得批准后发送鼠标与键盘操作
 computer_use.always_allowed_apps: 始终允许的应用
-computer_use.always_allowed_apps_description: Orbis 会将授权绑定到应用的 Bundle ID 和签名团队
+computer_use.always_allowed_apps_description: Padu 会将授权绑定到应用的 Bundle ID 和签名团队
 computer_use.no_always_allowed_apps: 尚未始终允许任何应用。仅限当前任务的授权只会保存在内存中
 computer_use.access_granted: 已授权
 computer_use.grant_access: 授予权限
@@ -331,7 +331,7 @@ project.project_lower: 项目
 project.without_a_project: 不使用项目
 project.your_project: 你的项目
 onboarding.open_project_to_begin: 打开一个项目即可开始
-onboarding.description: Orbis 会在你选择的文件夹中运行编程智能体。代码、任务和历史记录都保留在这台电脑上
+onboarding.description: Padu 会在你选择的文件夹中运行编程智能体。代码、任务和历史记录都保留在这台电脑上
 onboarding.web_description: 请选择守护进程主机上的路径，或在不使用项目的情况下开始。
 onboarding.open_project_folder: 打开项目文件夹…
 onboarding.what_should_we_build: 想构建什么？
@@ -494,7 +494,7 @@ agent_preset.no_description: 暂无描述。
 agent_preset.minimal_no_plan: 极简模式不包含计划功能
 computer_use.allow_for_task: 本次任务允许
 computer_use.always_allow_app: 始终允许此应用
-computer_use.allow_control: 允许 Orbis 控制“%{app}”吗？
+computer_use.allow_control: 允许 Padu 控制“%{app}”吗？
 computer_use.screenshot_shared: 此窗口的截图将发送给当前使用的 Codex 模型
 computer_use.sensitive_action: 此操作可以输入文字或按下按键
 computer_use.bundle_id: "Bundle ID：%{id}"
@@ -641,7 +641,7 @@ composer.preparing_task: 正在准备任务…
 composer.queue_followup: 排队为后续消息（⏎）
 composer.message: 消息
 composer.queue_placeholder: 添加后续消息…
-composer.prompt_placeholder: 让 Orbis 构建些什么…
+composer.prompt_placeholder: 让 Padu 构建些什么…
 composer.attach_daemon: 从守护进程主机附加文件或文件夹
 composer.attach_daemon_title: 从守护进程主机附加
 composer.stop: 停止
@@ -680,9 +680,9 @@ session.agent_ran_out_of_context: 智能体在本轮任务中耗尽了上下文�
 session.agent_declined_turn: 智能体拒绝执行本轮任务
 session.agent_stopped_reason: "智能体已停止：%{reason}"
 errors.open_session: "无法打开该任务：%{error}"
-errors.create_projectless_task: "无法在 ~/.orbis/projects 下创建任务：%{error}"
+errors.create_projectless_task: "无法在 ~/.padu/projects 下创建任务：%{error}"
 errors.save_projectless_migration: "无法保存无项目任务的迁移结果：%{error}"
-errors.move_projectless_task: "无法将旧的根目录无项目任务移至 ~/.orbis/projects：%{error}"
+errors.move_projectless_task: "无法将旧的根目录无项目任务移至 ~/.padu/projects：%{error}"
 errors.remote_host_path: 此路径属于守护进程主机，无法在桌面应用中打开
 errors.change_branch: "无法切换分支：%{error}"
 errors.capture_pre_turn_checkpoint: "无法创建任务开始前的检查点：%{error}"
@@ -693,7 +693,7 @@ errors.provider_native_session_unavailable: "%{provider} 的原生会话不可�
 errors.provider_native_thread_unavailable: "%{provider} 的原生线程不可用"
 errors.provider_native_cursor_unavailable: "%{provider} 的原生会话位置不可用"
 errors.provider_native_thread_cursor_unavailable: "%{provider} 的原生线程位置不可用"
-errors.provider_orbis_task_unavailable: "%{provider} 对应的 Orbis 任务不可用"
+errors.provider_padu_task_unavailable: "%{provider} 对应的 Padu 任务不可用"
 errors.provider_not_installed: "尚未安装 %{provider}"
 errors.provider_not_found: "尚未安装 %{provider}，或无法找到该程序"
 errors.claude_fork_checkpoint_missing: Claude 未返回派生任务所需的检查点
@@ -714,7 +714,7 @@ errors.task_already_forking: 此任务正在派生
 errors.task_already_rewinding: 此任务正在回退
 errors.no_live_runtime: 此任务没有正在运行的智能体
 errors.unexpected_daemon_response: "预期守护进程返回 %{expected}，实际收到 %{actual}"
-errors.daemon_disconnected: Orbis 守护进程未连接
+errors.daemon_disconnected: Padu 守护进程未连接
 errors.path_outside_workspace: 此路径位于守护进程主机上的当前工作区之外
 errors.rename_task: "无法重命名任务：%{error}"
 errors.remove_task: "无法移除任务：%{error}"
@@ -746,7 +746,7 @@ errors.read_provider_event_stream: "无法读取 %{provider} 事件流：%{error
 errors.answer_provider_permission: "无法响应 %{provider} 的权限请求：%{error}"
 errors.answer_provider_question: "无法回答 %{provider} 的问题：%{error}"
 errors.initialize_codex_app_server: 无法初始化 Codex app-server
-errors.register_computer_use_skill: 无法向 Codex 注册 Orbis 电脑操作技能
+errors.register_computer_use_skill: 无法向 Codex 注册 Padu 电脑操作技能
 errors.codex_thread_open_incomplete: Codex 未能完成线程打开操作
 errors.codex_goals_unsupported: 此版本的 Codex 不支持线程目标
 errors.provider_receive_prompt: "%{provider} 未能接收消息"
@@ -1121,7 +1121,7 @@ usage_error.curl_failed: "curl 失败：%{error}"
 usage_error.unknown_error: 未知错误
 usage_error.curl_no_status: curl 未返回 HTTP 状态行
 
-onboarding.welcome_title: 欢迎使用 Orbis
+onboarding.welcome_title: 欢迎使用 Padu
 onboarding.welcome_subtitle: 本地 AI 编程智能体的极速原生控制台
 onboarding.step_indicator: "%{current} / %{total}"
 onboarding.skip: 跳过
@@ -1133,7 +1133,7 @@ onboarding.replay_button: 重新播放导览
 
 onboarding.slide1_badge: 多智能体中心
 onboarding.slide1_title: 原生多智能体控制台
-onboarding.slide1_desc: Orbis 通过结构化协议流直接连接您常用的本地智能体 CLI，无需任何云端中转。
+onboarding.slide1_desc: Padu 通过结构化协议流直接连接您常用的本地智能体 CLI，无需任何云端中转。
 onboarding.slide1_item1_title: 广泛的 CLI 支持
 onboarding.slide1_item1_desc: 无缝运行 Claude Code、Codex CLI、Cursor CLI、Amp、OpenCode、Grok、Kimi、Pi 与 Fx。
 onboarding.slide1_item2_title: 自动发现
@@ -1159,15 +1159,15 @@ onboarding.slide3_item1_desc: 在智能体编辑文件时，实时以并排或�
 onboarding.slide3_item2_title: 对话感知检查点
 onboarding.slide3_item2_desc: 随时将工作目录回退到之前的任意消息节点，或派生出新会话分支。
 onboarding.slide3_item3_title: 内置终端与文件预览
-onboarding.slide3_item3_desc: 无需离开 Orbis 即可实时渲染 Markdown 预览并使用集成终端。
+onboarding.slide3_item3_desc: 无需离开 Padu 即可实时渲染 Markdown 预览并使用集成终端。
 
 onboarding.slide4_badge: 生产力与隐私
 onboarding.slide4_title: 键盘极速操作，100% 本地存储
-onboarding.slide4_desc: Orbis 采用键盘优先设计，并对您的专有代码提供完全的本地隐私保护。
+onboarding.slide4_desc: Padu 采用键盘优先设计，并对您的专有代码提供完全的本地隐私保护。
 onboarding.slide4_item1_title: 命令面板 (Cmd/Ctrl + K)
 onboarding.slide4_item1_desc: 通过模糊搜索快速跳转会话、执行命令或配置设置。
 onboarding.slide4_item2_title: 快速任务切换 (Cmd/Ctrl + T / Ctrl + Tab)
 onboarding.slide4_item2_desc: 在活跃的智能体对话与后台任务之间瞬间切换。
 onboarding.slide4_item3_title: 100% 本地优先
-onboarding.slide4_item3_desc: 所有项目、转录记录与配置均保存在本地 ~/.orbis，无需任何外部账户。
+onboarding.slide4_item3_desc: 所有项目、转录记录与配置均保存在本地 ~/.padu，无需任何外部账户。
 

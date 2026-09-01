@@ -1,13 +1,13 @@
-# Orbis development guidance
+# Padu development guidance
 
 ## Development runtime
 
 - Assume `bun ./scripts/dev.ts` is already running and owns the current
-  `Orbis Debug.app` process. Source changes are rebuilt, signed, and relaunched
+  `Padu Debug.app` process. Source changes are rebuilt, signed, and relaunched
   automatically. Only run it yourself if not already launched.
 - During normal development and UI validation, do not run
   `scripts/bundle.sh debug`, start a second watcher, or manually quit/relaunch
-  `Orbis Debug.app`. Quitting the app also stops the watcher.
+  `Padu Debug.app`. Quitting the app also stops the watcher.
 - After an edit, wait for the watcher to finish its successful rebuild and
   validate the freshly relaunched debug app. Only start or recover the watcher
   manually when it is confirmed unavailable.
@@ -15,7 +15,7 @@
 
 ## Performance
 
-- Treat performance as a product requirement, not a follow-up. Orbis is a native
+- Treat performance as a product requirement, not a follow-up. Padu is a native
   app competing with web clients, and staying smooth under a long transcript on
   a high-refresh display is the point of being native. Prefer the faster design
   when it costs nothing in clarity, and measure before assuming a cost is fine.
@@ -74,8 +74,8 @@
   explicitly platform-exclusive by design (e.g. native macOS window chrome or
   local OS integrations).
 - When a feature or UI change touches the wire protocol
-  (`crates/orbis-protocol`), immediately run `bun run protocol:generate` and
-  `bun run protocol:check` to ensure `packages/orbis-client` and `apps/web/`
+  (`crates/padu-protocol`), immediately run `bun run protocol:generate` and
+  `bun run protocol:check` to ensure `packages/padu-client` and `apps/web/`
   remain strictly type-safe and synchronized with the daemon backend.
 - Ensure visual hierarchy, state representation, controls, and interaction
   models remain consistent across both surfaces, while respecting native GPUI
@@ -98,13 +98,13 @@
   behavior — or when an in-house `src/ui` primitive needs a proven native
   precedent. Zed is the canonical GPUI codebase; read its crates rather than
   `gpui-component`, and read the gpui revision pinned in `Cargo.toml` so the
-  APIs match what Orbis builds against.
+  APIs match what Padu builds against.
 - Split the two references by concern: T3 Code answers what a coding-agent
   client should do, Zed answers how a polished GPUI app implements it. The
   same restraint applies to both — no reference spelunking for localized
   fixes or changes the user has already specified.
 - Use the reference as behavioral and design evidence, not as an instruction to
-  reproduce web-specific interaction patterns or known bugs. Orbis should keep
+  reproduce web-specific interaction patterns or known bugs. Padu should keep
   native macOS conventions.
 - Explicit user screenshots and feedback override a previous or merely
   "consistent" treatment.
