@@ -1,11 +1,34 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
+import { LandingPage } from "~/components/landing-page";
+import { pageMeta } from "~/meta";
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
+  head: () =>
+    pageMeta(
+      "Padu – Run Claude Code, Codex, Copilot, OpenCode from anywhere",
+      "Self-hosted daemon for Claude Code, Codex, Copilot, OpenCode, and Pi. Agents run on your machine with your full dev environment. Connect from phone, desktop, or web.",
+      "/",
+    ),
   component: Home,
-})
+});
 
 function Home() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background" />
-  )
+    <LandingPage
+      title={
+        <>
+          The control plane
+          <br />
+          for coding agents
+        </>
+      }
+      subtitle={
+        <>
+          Run any coding agent from anywhere.
+          <br />
+          Self-hosted, multi-provider, open source
+        </>
+      }
+    />
+  );
 }

@@ -1,5 +1,5 @@
 {
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["**/*.ts", "**/*.tsx", "vite.config.ts"],
   "compilerOptions": {
     "strict": true,
     "esModuleInterop": true,
@@ -14,7 +14,9 @@
     "allowJs": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
+    "types": ["@cloudflare/workers-types"],
     "paths": {
+      "~/*": ["./src/*"],
       "@/*": ["./src/*"]
     }
   }
