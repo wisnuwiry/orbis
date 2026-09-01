@@ -375,7 +375,23 @@ html.dark[data-color-scheme="${id}"] {
   return css;
 }
 
+function generateLandingThemesCss(config: ThemesConfig): string {
+  const defaultSchemeKey = config.defaultScheme;
+  const defaultScheme = config.schemes[defaultSchemeKey] ?? Object.values(config.schemes)[0];
+
+  return `/* Generated from themes.json by scripts/generate-themes.ts. Do not edit directly. */
+
+@theme {
+  --color-primary: ${defaultScheme.dark.accent};
+  --color-primary-foreground: #ffffff;
+  --color-mock-accent: ${defaultScheme.dark.accent};
+  --color-mock-accent-bright: #a78bfa;
+}
+`;
+}
+
 function generateRustPalette(config: ThemesConfig): string {
+
   const schemeEntries = Object.entries(config.schemes);
   const enumVariants = schemeEntries
     .map(([id]) => {
@@ -483,6 +499,11 @@ function main() {
       path: join(root, "apps/web/src/themes.css"),
       content: generateWebThemesCss(config),
       name: "Web CSS Themes (apps/web/src/themes.css)",
+    },
+    {
+      path: join(root, "apps/landing/src/themes.css"),
+      content: generateLandingThemesCss(config),
+      name: "Landing CSS Themes (apps/landing/src/themes.css)",
     },
     {
       path: join(root, "src/theme_palette.rs"),
