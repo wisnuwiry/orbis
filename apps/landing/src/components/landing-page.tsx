@@ -156,6 +156,39 @@ function SectionHeader({
 }
 
 /* -------------------------------------------------------------------------- */
+/* Clean Gray Placeholder Component                                          */
+/* -------------------------------------------------------------------------- */
+
+function GrayPlaceholder({
+  label,
+  aspect = "aspect-[16/10]",
+}: {
+  label: string;
+  aspect?: string;
+}) {
+  return (
+    <div
+      className={`w-full ${aspect} rounded-xl border border-white/10 bg-white/[0.02] flex flex-col items-center justify-center gap-2.5 p-6 text-center select-none`}
+    >
+      <div className="w-9 h-9 rounded-lg border border-white/[0.08] bg-white/[0.03] flex items-center justify-center text-zinc-500">
+        <svg
+          className="w-4.5 h-4.5 text-zinc-600"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        >
+          <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+          <circle cx="9" cy="9" r="2" />
+          <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+        </svg>
+      </div>
+      <span className="font-mono text-xs text-zinc-500">{label}</span>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /* Architecture Tab Carousel (Apple Style)                                    */
 /* -------------------------------------------------------------------------- */
 
@@ -175,7 +208,7 @@ const ARCHITECTURE_TABS = [
     ],
     docHref: "/docs",
     docLabel: "Read architecture docs",
-    preview: <GpuiPreview />,
+    preview: <GrayPlaceholder label="GPUI Rendering Architecture" />,
   },
   {
     id: "worktrees",
@@ -192,7 +225,7 @@ const ARCHITECTURE_TABS = [
     ],
     docHref: "/docs/worktrees",
     docLabel: "Read worktrees docs",
-    preview: <WorktreePreview />,
+    preview: <GrayPlaceholder label="Git Worktree Isolation Diagram" />,
   },
   {
     id: "checkpoints",
@@ -207,7 +240,7 @@ const ARCHITECTURE_TABS = [
       "Unified diff review with side-by-side hunk inspection",
       "1-click rollback of code and conversation context",
     ],
-    preview: <CheckpointPreview />,
+    preview: <GrayPlaceholder label="Turn Checkpoints & Rewind Timeline" />,
   },
   {
     id: "daemon",
@@ -224,201 +257,9 @@ const ARCHITECTURE_TABS = [
     ],
     docHref: "/docs/cli",
     docLabel: "Read CLI docs",
-    preview: <DaemonPreview />,
+    preview: <GrayPlaceholder label="Local Daemon Supervision Architecture" />,
   },
 ];
-
-function GpuiPreview() {
-  return (
-    <div className="rounded-xl border border-white/10 bg-black/60 p-4 font-mono text-[11px] text-zinc-400 space-y-3 select-none">
-      <div className="flex items-center justify-between border-b border-white/[0.06] pb-2 text-[10px]">
-        <div className="flex items-center gap-1.5 text-zinc-300">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-          <span>GPUI Native Render Pipeline</span>
-        </div>
-        <span className="text-zinc-500">120 Hz Target</span>
-      </div>
-
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-[10px] text-zinc-500">
-          <span>Frame Time</span>
-          <span className="text-emerald-400 font-semibold">2.1ms / 8.3ms budget</span>
-        </div>
-        {/* Frame bar */}
-        <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden flex">
-          <div className="h-full bg-emerald-400 w-[25%]" />
-          <div className="h-full bg-purple-400 w-[10%]" />
-          <div className="h-full bg-white/20 w-[65%]" />
-        </div>
-        <div className="flex items-center justify-between text-[9px] text-zinc-500">
-          <span>Render: 1.4ms</span>
-          <span>Layout: 0.7ms</span>
-          <span>Idle: 6.2ms</span>
-        </div>
-      </div>
-
-      <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-2.5 space-y-1.5 text-[10px]">
-        <div className="flex items-center justify-between text-zinc-300">
-          <span>Backend Target</span>
-          <span className="text-white">macOS Metal / Linux Vulkan / Win DirectX</span>
-        </div>
-        <div className="flex items-center justify-between text-zinc-300">
-          <span>DOM / Webview Layer</span>
-          <span className="text-emerald-400 font-semibold">None (0ms Reflow)</span>
-        </div>
-        <div className="flex items-center justify-between text-zinc-300">
-          <span>Transcript Buffer</span>
-          <span className="text-white">Virtualized GPUI List (100k+ tokens)</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function WorktreePreview() {
-  return (
-    <div className="rounded-xl border border-white/10 bg-black/60 p-4 font-mono text-[11px] text-zinc-400 space-y-3 select-none">
-      <div className="flex items-center justify-between border-b border-white/[0.06] pb-2 text-[10px]">
-        <div className="flex items-center gap-1.5 text-zinc-300">
-          <GitFork className="h-3.5 w-3.5 text-sky-400" />
-          <span>Git Worktree Manager</span>
-        </div>
-        <span className="text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-1.5 py-0.5 rounded text-[9px]">
-          2 Active Worktrees
-        </span>
-      </div>
-
-      <div className="space-y-2 text-[10px]">
-        {/* Main working directory */}
-        <div className="rounded border border-white/[0.06] bg-white/[0.01] p-2 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-zinc-300">
-            <span className="text-zinc-500">ROOT</span>
-            <span className="text-white">~/project (main)</span>
-          </div>
-          <span className="text-zinc-500 text-[9px]">Active Working Tree · Pristine</span>
-        </div>
-
-        {/* Worktree 1 */}
-        <div className="rounded border border-sky-500/20 bg-sky-500/[0.03] p-2 space-y-1">
-          <div className="flex items-center justify-between text-sky-300">
-            <div className="flex items-center gap-2">
-              <span className="text-sky-400 font-semibold">TASK #1</span>
-              <span>.padu/worktrees/task-81f (feat/auth-refresh)</span>
-            </div>
-            <span className="text-emerald-400 text-[9px]">Claude Code</span>
-          </div>
-          <div className="text-zinc-400 text-[9px] pl-2 border-l border-sky-500/30">
-            Running tests in isolated branch · 4 files modified
-          </div>
-        </div>
-
-        {/* Worktree 2 */}
-        <div className="rounded border border-purple-500/20 bg-purple-500/[0.03] p-2 space-y-1">
-          <div className="flex items-center justify-between text-purple-300">
-            <div className="flex items-center gap-2">
-              <span className="text-purple-400 font-semibold">TASK #2</span>
-              <span>.padu/worktrees/task-49a (fix/rate-limits)</span>
-            </div>
-            <span className="text-purple-400 text-[9px]">Codex CLI</span>
-          </div>
-          <div className="text-zinc-400 text-[9px] pl-2 border-l border-purple-500/30">
-            Refactoring Redis token bucket · 2 files modified
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CheckpointPreview() {
-  return (
-    <div className="rounded-xl border border-white/10 bg-black/60 p-4 font-mono text-[11px] text-zinc-400 space-y-3 select-none">
-      <div className="flex items-center justify-between border-b border-white/[0.06] pb-2 text-[10px]">
-        <div className="flex items-center gap-1.5 text-zinc-300">
-          <RotateCcw className="h-3.5 w-3.5 text-purple-400" />
-          <span>Turn-by-Turn Checkpoint Timeline</span>
-        </div>
-        <span className="text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-1.5 py-0.5 rounded text-[9px]">
-          Time Travel Ready
-        </span>
-      </div>
-
-      <div className="space-y-2 text-[10px]">
-        {/* Turn 1 */}
-        <div className="rounded border border-white/[0.06] bg-white/[0.01] p-2 flex items-center justify-between opacity-60">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-zinc-500" />
-            <span className="text-zinc-400">Turn 1: Initialized database schema</span>
-          </div>
-          <span className="text-zinc-500 text-[9px]">+84 -0</span>
-        </div>
-
-        {/* Turn 2 */}
-        <div className="rounded border border-white/[0.06] bg-white/[0.01] p-2 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
-            <span className="text-zinc-300">Turn 2: Added token refresh handler</span>
-          </div>
-          <span className="text-emerald-400 text-[9px]">+28 -6</span>
-        </div>
-
-        {/* Turn 3 (Active) */}
-        <div className="rounded border border-purple-500/30 bg-purple-500/[0.04] p-2.5 space-y-1.5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-white font-medium">
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
-              <span>Turn 3: Unit test validation</span>
-            </div>
-            <span className="text-zinc-400 text-[9px]">Latest Snapshot</span>
-          </div>
-          <div className="flex items-center gap-2 pt-1">
-            <span className="px-2 py-0.5 rounded bg-white/10 text-[9px] text-white">Review Diff</span>
-            <span className="px-2 py-0.5 rounded bg-white/[0.06] text-[9px] text-zinc-300 border border-white/10">
-              1-Click Rewind
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function DaemonPreview() {
-  return (
-    <div className="rounded-xl border border-white/10 bg-black/60 p-4 font-mono text-[11px] text-zinc-400 space-y-3 select-none">
-      <div className="flex items-center justify-between border-b border-white/[0.06] pb-2 text-[10px]">
-        <div className="flex items-center gap-1.5 text-zinc-300">
-          <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-          <span>Supervised Daemon RPC</span>
-        </div>
-        <span className="text-zinc-500">127.0.0.1:4789</span>
-      </div>
-
-      <div className="space-y-2 text-[10px]">
-        <div className="grid grid-cols-2 gap-2">
-          <div className="rounded border border-white/[0.06] bg-white/[0.02] p-2 space-y-1">
-            <span className="text-zinc-500 text-[9px] uppercase">Process Supervision</span>
-            <div className="text-white font-medium">PTY / Unix Sockets</div>
-            <div className="text-zinc-400 text-[9px]">Zero cloud proxying</div>
-          </div>
-          <div className="rounded border border-white/[0.06] bg-white/[0.02] p-2 space-y-1">
-            <span className="text-zinc-500 text-[9px] uppercase">Key Storage</span>
-            <div className="text-white font-medium">OS Native Keychain</div>
-            <div className="text-zinc-400 text-[9px]">AES-256 encrypted</div>
-          </div>
-        </div>
-
-        <div className="rounded border border-white/10 bg-white/[0.02] p-2.5 flex items-center justify-between">
-          <div className="space-y-0.5">
-            <div className="text-white font-medium text-[10px]">Zero Cloud Telemetry</div>
-            <div className="text-zinc-400 text-[9px]">Code, prompts, and credentials stay on your hardware.</div>
-          </div>
-          <span className="text-zinc-300 font-mono text-xs">100% Local</span>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function ArchitectureCarousel() {
   const [activeTab, setActiveTab] = React.useState(0);
@@ -521,7 +362,7 @@ function ArchitectureCarousel() {
               )}
             </div>
 
-            {/* Right schematic preview */}
+            {/* Right placeholder preview */}
             <div className="md:col-span-6 w-full">
               {current.preview}
             </div>
@@ -574,176 +415,8 @@ function ArchitectureCarousel() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Device Schematic Placeholders for Ecosystem Bento                          */
+/* Ecosystem Bento Section with Gray Image Placeholders                       */
 /* -------------------------------------------------------------------------- */
-
-function TabletPlaceholder() {
-  return (
-    <div className="w-full rounded-xl border border-white/10 bg-black/60 p-2.5 flex flex-col gap-2 font-mono text-[10px] text-zinc-400 select-none">
-      {/* Header bar */}
-      <div className="flex items-center justify-between border-b border-white/[0.06] pb-1.5 px-1">
-        <div className="flex items-center gap-1.5">
-          <div className="w-2 h-2 rounded-full bg-white/20" />
-          <div className="w-2 h-2 rounded-full bg-white/20" />
-          <div className="w-2 h-2 rounded-full bg-white/20" />
-          <span className="text-zinc-500 ml-1 text-[9px]">Padu iPadOS</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/[0.04] text-zinc-300 border border-white/[0.08]">
-            Connected · Local Daemon
-          </span>
-        </div>
-      </div>
-      {/* Two-column layout */}
-      <div className="grid grid-cols-12 gap-2 h-36">
-        {/* Left column: Transcript & Chat */}
-        <div className="col-span-6 rounded border border-white/[0.06] bg-white/[0.01] p-2 flex flex-col justify-between">
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-1.5 text-zinc-300">
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
-              <span className="font-semibold text-white">Claude Code</span>
-              <span className="text-zinc-500">turn #2</span>
-            </div>
-            <div className="text-[9px] text-zinc-400 bg-white/[0.02] p-1.5 rounded border border-white/[0.04]">
-              &gt; Refactored auth middleware with token refresh.
-            </div>
-            <div className="h-1.5 w-3/4 rounded bg-white/10" />
-            <div className="h-1.5 w-1/2 rounded bg-white/10" />
-          </div>
-          <div className="rounded border border-white/10 bg-white/[0.03] px-2 py-1 text-zinc-500 text-[9px] flex items-center justify-between">
-            <span>Send instruction...</span>
-            <span className="text-zinc-400">⏎</span>
-          </div>
-        </div>
-        {/* Right column: Split Diff */}
-        <div className="col-span-6 rounded border border-white/[0.06] bg-white/[0.01] p-2 flex flex-col justify-between">
-          <div className="space-y-1 text-[9px]">
-            <div className="flex items-center justify-between text-zinc-400 pb-1 border-b border-white/[0.04]">
-              <span>src/auth.ts</span>
-              <span className="text-emerald-400">+12 -3</span>
-            </div>
-            <div className="space-y-0.5 font-mono text-[8.5px]">
-              <div className="text-zinc-500">@@ -14,6 +14,8 @@</div>
-              <div className="bg-red-500/10 text-red-300 px-1 rounded">- const token = req.cookies.token;</div>
-              <div className="bg-emerald-500/10 text-emerald-300 px-1 rounded">+ const token = await extractBearerToken(req);</div>
-              <div className="bg-emerald-500/10 text-emerald-300 px-1 rounded">+ if (!token) throw new AuthError();</div>
-            </div>
-          </div>
-          <div className="text-right text-[8.5px] text-zinc-500">
-            <span>Diff Review · 1-click apply</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function IPhonePlaceholder() {
-  return (
-    <div className="w-full max-w-[200px] mx-auto rounded-2xl border border-white/10 bg-black/60 p-2.5 flex flex-col justify-between h-44 font-mono text-[9px] text-zinc-400 select-none">
-      {/* Notch & status */}
-      <div className="flex items-center justify-between px-1">
-        <span className="text-[8px] text-zinc-500">9:41</span>
-        <div className="w-10 h-2.5 rounded-full bg-white/15" />
-        <span className="text-[8px] text-zinc-500">5G</span>
-      </div>
-      {/* Mini chat bubble */}
-      <div className="space-y-1.5 my-auto">
-        <div className="bg-white/10 text-white px-2 py-1 rounded-lg rounded-br-none text-[8.5px] max-w-[85%] ml-auto">
-          Add login rate limiting
-        </div>
-        <div className="bg-white/[0.04] border border-white/[0.08] text-zinc-300 px-2 py-1.5 rounded-lg rounded-bl-none text-[8px] max-w-[90%] space-y-1">
-          <div className="flex items-center gap-1 text-zinc-300">
-            <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
-            <span>Codex CLI: editing...</span>
-          </div>
-          <div className="text-[7.5px] text-zinc-400">Added 5 req/min Redis rate limiter</div>
-        </div>
-      </div>
-      {/* Composer input */}
-      <div className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[8px] text-zinc-500 flex items-center justify-between">
-        <span>Steer agent...</span>
-        <span className="text-zinc-400">↑</span>
-      </div>
-    </div>
-  );
-}
-
-function AndroidPlaceholder() {
-  return (
-    <div className="w-full max-w-[200px] mx-auto rounded-xl border border-white/10 bg-black/60 p-2.5 flex flex-col justify-between h-44 font-mono text-[9px] text-zinc-400 select-none">
-      {/* Top bar */}
-      <div className="flex items-center justify-between px-1 border-b border-white/[0.06] pb-1">
-        <span className="text-[8.5px] text-zinc-300 font-semibold">Padu Android</span>
-        <span className="text-[7.5px] text-zinc-400 bg-white/[0.04] border border-white/[0.08] px-1 rounded">Live</span>
-      </div>
-      {/* Session Card */}
-      <div className="space-y-1.5 my-auto">
-        <div className="rounded border border-white/[0.08] bg-white/[0.03] p-1.5 space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-[8px] text-white font-medium">Session #49a</span>
-            <span className="text-[7px] text-zinc-500">Worktree: feat/ui</span>
-          </div>
-          <div className="text-[7.5px] text-zinc-400">Agent: OpenCode (8 turns)</div>
-          <div className="flex items-center gap-1 pt-0.5">
-            <span className="px-1 py-0.2 rounded bg-white/5 text-[7px] text-zinc-400 border border-white/10">3 files changed</span>
-            <span className="px-1 py-0.2 rounded bg-white/[0.06] text-[7px] text-zinc-300">Ready</span>
-          </div>
-        </div>
-      </div>
-      {/* Bottom Action Bar */}
-      <div className="flex items-center justify-around text-[7.5px] text-zinc-500 pt-1 border-t border-white/[0.06]">
-        <span className="text-white">Sessions</span>
-        <span>Diffs</span>
-        <span>Settings</span>
-      </div>
-    </div>
-  );
-}
-
-function PwaPlaceholder() {
-  return (
-    <div className="w-full rounded-xl border border-white/10 bg-black/60 p-2.5 flex flex-col gap-2 font-mono text-[10px] text-zinc-400 select-none">
-      {/* Browser address bar */}
-      <div className="flex items-center gap-2 border-b border-white/[0.06] pb-1.5 px-1">
-        <div className="flex items-center gap-1">
-          <div className="w-2 h-2 rounded-full bg-white/20" />
-          <div className="w-2 h-2 rounded-full bg-white/20" />
-          <div className="w-2 h-2 rounded-full bg-white/20" />
-        </div>
-        <div className="flex-1 rounded bg-white/[0.04] border border-white/[0.06] px-2 py-0.5 text-center text-[9px] text-zinc-400">
-          https://app.padu.dev
-        </div>
-        <span className="text-[8px] text-zinc-500 font-sans">PWA</span>
-      </div>
-      {/* Browser content preview */}
-      <div className="grid grid-cols-12 gap-2 h-36">
-        <div className="col-span-4 rounded border border-white/[0.06] bg-white/[0.01] p-1.5 space-y-1 text-[8.5px]">
-          <div className="text-zinc-500 font-semibold uppercase text-[7.5px]">Connected Daemons</div>
-          <div className="bg-white/[0.04] p-1 rounded border border-white/[0.06] text-white">● local-devbox:4789</div>
-          <div className="p-1 text-zinc-500">○ vps-europe:4789</div>
-          <div className="p-1 text-zinc-500">○ homelab-server</div>
-        </div>
-        <div className="col-span-8 rounded border border-white/[0.06] bg-white/[0.01] p-2 flex flex-col justify-between">
-          <div className="space-y-1">
-            <div className="flex items-center justify-between text-[9px]">
-              <span className="text-white font-medium">Terminal &amp; Transcript Stream</span>
-              <span className="text-emerald-400 text-[8px]">WebSocket Active</span>
-            </div>
-            <div className="font-mono text-[8px] text-zinc-400 bg-black/50 p-1.5 rounded border border-white/[0.04] space-y-0.5">
-              <div>$ git diff --stat</div>
-              <div className="text-zinc-500"> 2 files changed, 24 insertions(+), 6 deletions(-)</div>
-              <div className="text-purple-300">&gt; Claude Code completed turn in 1.4s</div>
-            </div>
-          </div>
-          <div className="text-[8px] text-zinc-500">
-            Works in Safari, Chrome, Firefox, Edge, and Arc without plugins
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function EcosystemBentoSection() {
   return (
@@ -777,7 +450,7 @@ function EcosystemBentoSection() {
               touch-optimized side-by-side diff inspection.
             </p>
           </div>
-          <TabletPlaceholder />
+          <GrayPlaceholder label="iPad & Tablet Split-screen Preview" aspect="aspect-[16/9]" />
         </div>
 
         {/* iPhone (iOS) - 1 column */}
@@ -796,7 +469,7 @@ function EcosystemBentoSection() {
               Steer running agents, queue follow-ups, and review changes on the go.
             </p>
           </div>
-          <IPhonePlaceholder />
+          <GrayPlaceholder label="iPhone Companion App Preview" aspect="aspect-[16/10] sm:aspect-[9/12]" />
         </div>
 
         {/* Android - 1 column */}
@@ -815,7 +488,7 @@ function EcosystemBentoSection() {
               Direct daemon connectivity over local Wi-Fi, VPN, or private tailnets.
             </p>
           </div>
-          <AndroidPlaceholder />
+          <GrayPlaceholder label="Android Companion App Preview" aspect="aspect-[16/10] sm:aspect-[9/12]" />
         </div>
 
         {/* PWA & Web - 2 columns */}
@@ -835,7 +508,7 @@ function EcosystemBentoSection() {
               with full real-time WebSocket communication.
             </p>
           </div>
-          <PwaPlaceholder />
+          <GrayPlaceholder label="Web App & PWA Interface Preview" aspect="aspect-[16/9]" />
         </div>
       </div>
     </motion.section>
