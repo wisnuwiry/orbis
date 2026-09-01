@@ -1,5 +1,6 @@
 use gpui::{App, Global, Hsla, Rems, Window, WindowAppearance, hsla, rems, rgb, transparent_black};
 
+pub use crate::theme_palette::ColorScheme;
 pub use padu_client::theme::ThemePreference;
 
 /// Scaled pixels: a dimension authored at the default 14px UI font size,
@@ -64,7 +65,7 @@ pub struct Theme {
     pub text_tertiary: Hsla,
     pub text_ghost: Hsla,
 
-    /// Brand coral. Logo, caret, live-activity pulses — nothing structural.
+    /// Brand accent. Logo, caret, live-activity pulses — nothing structural.
     pub accent: Hsla,
     pub resize_handle: Hsla,
     /// Meter fills in the usage panel. Quota-meter blue by convention;
@@ -100,6 +101,15 @@ impl Theme {
     }
 
     pub fn dark() -> Self {
+        Self::dark_with_scheme(ColorScheme::default())
+    }
+
+    pub fn light() -> Self {
+        Self::light_with_scheme(ColorScheme::default())
+    }
+
+    pub fn dark_with_scheme(scheme: ColorScheme) -> Self {
+        let (accent, code_text) = scheme.dark_tokens();
         Self {
             is_dark: true,
             canvas: rgb(0x1A1A1A).into(),
@@ -127,12 +137,12 @@ impl Theme {
             text_tertiary: rgb(0x7D7D7D).into(),
             text_ghost: rgb(0x575757).into(),
 
-            accent: rgb(0xE2795B).into(),
+            accent,
             resize_handle: rgb(0x3B82F6).into(),
             gauge: rgb(0x3B82F6).into(),
 
             selection: hsla(211.0 / 360.0, 1.0, 0.50, 0.55),
-            code_text: rgb(0xE0A882).into(),
+            code_text,
             code_wash: hsla(220.0 / 360.0, 0.10, 0.90, 0.08),
 
             inverse: rgb(0xE7E9EC).into(),
@@ -146,7 +156,8 @@ impl Theme {
         }
     }
 
-    pub fn light() -> Self {
+    pub fn light_with_scheme(scheme: ColorScheme) -> Self {
+        let (accent, code_text) = scheme.light_tokens();
         Self {
             is_dark: false,
             canvas: rgb(0xF6F5F6).into(),
@@ -174,12 +185,12 @@ impl Theme {
             text_tertiary: rgb(0x858585).into(),
             text_ghost: rgb(0xA4A4A4).into(),
 
-            accent: rgb(0xC85F44).into(),
+            accent,
             resize_handle: rgb(0x2563EB).into(),
             gauge: rgb(0x2563EB).into(),
 
             selection: hsla(211.0 / 360.0, 1.0, 0.50, 0.35),
-            code_text: rgb(0x9A5528).into(),
+            code_text,
             code_wash: hsla(220.0 / 360.0, 0.10, 0.12, 0.07),
 
             inverse: rgb(0x202227).into(),

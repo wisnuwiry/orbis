@@ -1,0 +1,51 @@
+/* Generated from themes.json by scripts/generate-themes.ts. Do not edit directly. */
+
+:root {
+  --color-scheme-id: "purple";
+  --ring: #7c3aed;
+  --code-text: #6d28d9;
+}
+
+.dark {
+  --color-scheme-id: "purple";
+  --ring: #8b5cf6;
+  --code-text: #c4b5fd;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --color-scheme-id: "purple";
+    --ring: #8b5cf6;
+    --code-text: #c4b5fd;
+  }
+}
+
+/* Color Scheme: Purple */
+[data-color-scheme="purple"] {
+  --color-scheme-id: "purple";
+  --ring: #7c3aed;
+  --code-text: #6d28d9;
+}
+
+.dark [data-color-scheme="purple"],
+[data-color-scheme="purple"].dark,
+html.dark[data-color-scheme="purple"] {
+  --color-scheme-id: "purple";
+  --ring: #8b5cf6;
+  --code-text: #c4b5fd;
+}
+
+/* Color Scheme: Coral */
+[data-color-scheme="coral"] {
+  --color-scheme-id: "coral";
+  --ring: #c85f44;
+  --code-text: #9a5528;
+}
+
+.dark [data-color-scheme="coral"],
+[data-color-scheme="coral"].dark,
+html.dark[data-color-scheme="coral"] {
+  --color-scheme-id: "coral";
+  --ring: #e2795b;
+  --code-text: #e0a882;
+}

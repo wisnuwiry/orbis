@@ -2,6 +2,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
+@import './themes.css';
 @config '../tailwind.config.ts';
 
 @custom-variant dark (&:is(.dark *));
@@ -63,7 +64,7 @@
   --destructive: #c64a42;
   --border: rgb(28 31 37 / 8%);
   --input: rgb(28 31 37 / 15%);
-  --ring: #c85f44;
+  --ring: #7c3aed;
   --radius: 0.625rem;
   --sidebar: #f3f3f3;
   --sidebar-foreground: #242424;
@@ -85,7 +86,7 @@
   --warning: #a66b20;
   --provider-codex: #34363b;
   --danger-soft: rgb(198 74 66 / 10%);
-  --code-text: #9a5528;
+  --code-text: #6d28d9;
   --code-wash: rgb(28 31 37 / 7%);
 }
 
@@ -108,7 +109,7 @@
   --destructive: #e2726a;
   --border: rgb(230 230 230 / 7%);
   --input: rgb(230 230 230 / 14%);
-  --ring: #e2795b;
+  --ring: #8b5cf6;
   --sidebar: #181818;
   --sidebar-foreground: #e2e2e2;
   --sidebar-primary: var(--primary);
@@ -129,7 +130,7 @@
   --warning: #e0b36a;
   --provider-codex: #f3f3f3;
   --danger-soft: rgb(226 114 106 / 10%);
-  --code-text: #e0a882;
+  --code-text: #c4b5fd;
   --code-wash: rgb(230 230 230 / 8%);
 }
 
@@ -374,7 +375,7 @@
     --destructive: #e2726a;
     --border: rgb(230 230 230 / 7%);
     --input: rgb(230 230 230 / 14%);
-    --ring: #e2795b;
+    --ring: #8b5cf6;
     --sidebar: #181818;
     --sidebar-foreground: #e2e2e2;
     --sidebar-primary: var(--primary);
@@ -391,7 +392,7 @@
     --success: #62c987;
     --warning: #e0b36a;
     --danger-soft: rgb(226 114 106 / 10%);
-    --code-text: #e0a882;
+    --code-text: #c4b5fd;
     --code-wash: rgb(230 230 230 / 8%);
   }
 }

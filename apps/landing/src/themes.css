@@ -1,0 +1,8 @@
+/* Generated from themes.json by scripts/generate-themes.ts. Do not edit directly. */
+
+@theme {
+  --color-primary: #8b5cf6;
+  --color-primary-foreground: #ffffff;
+  --color-mock-accent: #8b5cf6;
+  --color-mock-accent-bright: #a78bfa;
+}
