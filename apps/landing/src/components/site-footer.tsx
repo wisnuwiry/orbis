@@ -16,12 +16,6 @@ export function SiteFooter({ width = "default" }: SiteFooterProps) {
           <p className="text-white/60 font-medium">Product</p>
           <div className="space-y-2">
             <a
-              href="/blog"
-              className="block text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Blog
-            </a>
-            <a
               href="/docs"
               className="block text-muted-foreground hover:text-foreground transition-colors"
             >
@@ -32,12 +26,6 @@ export function SiteFooter({ width = "default" }: SiteFooterProps) {
               className="block text-muted-foreground hover:text-foreground transition-colors"
             >
               Changelog
-            </a>
-            <a
-              href="/hub"
-              className="block text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Hub
             </a>
             <a
               href="/docs/cli"
@@ -56,12 +44,6 @@ export function SiteFooter({ width = "default" }: SiteFooterProps) {
               className="block text-muted-foreground hover:text-foreground transition-colors"
             >
               Terms
-            </a>
-            <a
-              href="/sponsor"
-              className="block text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Sponsor
             </a>
           </div>
         </div>

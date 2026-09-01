@@ -15,7 +15,6 @@ import { Route as AgoragenticRouteImport } from "./routes/agoragentic";
 import { Route as AmpRouteImport } from "./routes/amp";
 import { Route as AuggieRouteImport } from "./routes/auggie";
 import { Route as AutohandRouteImport } from "./routes/autohand";
-import { Route as BlogRouteImport } from "./routes/blog";
 import { Route as ChangelogRouteImport } from "./routes/changelog";
 import { Route as ClaudeCodeRouteImport } from "./routes/claude-code";
 import { Route as ClineRouteImport } from "./routes/cline";
@@ -39,7 +38,6 @@ import { Route as GlmRouteImport } from "./routes/glm";
 import { Route as GooseRouteImport } from "./routes/goose";
 import { Route as GrokRouteImport } from "./routes/grok";
 import { Route as HermesRouteImport } from "./routes/hermes";
-import { Route as HubRouteImport } from "./routes/hub";
 import { Route as JunieRouteImport } from "./routes/junie";
 import { Route as KiloRouteImport } from "./routes/kilo";
 import { Route as KimiRouteImport } from "./routes/kimi";
@@ -54,7 +52,6 @@ import { Route as PrivacyRouteImport } from "./routes/privacy";
 import { Route as QoderRouteImport } from "./routes/qoder";
 import { Route as QwenCodeRouteImport } from "./routes/qwen-code";
 import { Route as SigitRouteImport } from "./routes/sigit";
-import { Route as SponsorRouteImport } from "./routes/sponsor";
 import { Route as StakpakRouteImport } from "./routes/stakpak";
 import { Route as TermsRouteImport } from "./routes/terms";
 import { Route as VtcodeRouteImport } from "./routes/vtcode";
@@ -65,8 +62,6 @@ import { Route as AlternativesHappyCoderRouteImport } from "./routes/alternative
 import { Route as AlternativesOpenchamberRouteImport } from "./routes/alternatives/openchamber";
 import { Route as AlternativesOpencodeDesktopRouteImport } from "./routes/alternatives/opencode-desktop";
 import { Route as AlternativesSupersetRouteImport } from "./routes/alternatives/superset";
-import { Route as BlogIndexRouteImport } from "./routes/blog/index";
-import { Route as BlogSplatRouteImport } from "./routes/blog/$";
 import { Route as DocsIndexRouteImport } from "./routes/docs/index";
 import { Route as DocsSplatRouteImport } from "./routes/docs/$";
 
@@ -98,11 +93,6 @@ const AuggieRoute = AuggieRouteImport.update({
 const AutohandRoute = AutohandRouteImport.update({
   id: "/autohand",
   path: "/autohand",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const BlogRoute = BlogRouteImport.update({
-  id: "/blog",
-  path: "/blog",
   getParentRoute: () => rootRouteImport,
 } as any);
 const ChangelogRoute = ChangelogRouteImport.update({
@@ -220,11 +210,6 @@ const HermesRoute = HermesRouteImport.update({
   path: "/hermes",
   getParentRoute: () => rootRouteImport,
 } as any);
-const HubRoute = HubRouteImport.update({
-  id: "/hub",
-  path: "/hub",
-  getParentRoute: () => rootRouteImport,
-} as any);
 const JunieRoute = JunieRouteImport.update({
   id: "/junie",
   path: "/junie",
@@ -295,11 +280,6 @@ const SigitRoute = SigitRouteImport.update({
   path: "/sigit",
   getParentRoute: () => rootRouteImport,
 } as any);
-const SponsorRoute = SponsorRouteImport.update({
-  id: "/sponsor",
-  path: "/sponsor",
-  getParentRoute: () => rootRouteImport,
-} as any);
 const StakpakRoute = StakpakRouteImport.update({
   id: "/stakpak",
   path: "/stakpak",
@@ -352,16 +332,6 @@ const AlternativesSupersetRoute = AlternativesSupersetRouteImport.update({
   path: "/alternatives/superset",
   getParentRoute: () => rootRouteImport,
 } as any);
-const BlogIndexRoute = BlogIndexRouteImport.update({
-  id: "/",
-  path: "/",
-  getParentRoute: () => BlogRoute,
-} as any);
-const BlogSplatRoute = BlogSplatRouteImport.update({
-  id: "/$",
-  path: "/$",
-  getParentRoute: () => BlogRoute,
-} as any);
 const DocsIndexRoute = DocsIndexRouteImport.update({
   id: "/",
   path: "/",
@@ -380,7 +350,6 @@ export interface FileRoutesByFullPath {
   "/amp": typeof AmpRoute;
   "/auggie": typeof AuggieRoute;
   "/autohand": typeof AutohandRoute;
-  "/blog": typeof BlogRouteWithChildren;
   "/changelog": typeof ChangelogRoute;
   "/claude-code": typeof ClaudeCodeRoute;
   "/cline": typeof ClineRoute;
@@ -404,7 +373,6 @@ export interface FileRoutesByFullPath {
   "/goose": typeof GooseRoute;
   "/grok": typeof GrokRoute;
   "/hermes": typeof HermesRoute;
-  "/hub": typeof HubRoute;
   "/junie": typeof JunieRoute;
   "/kilo": typeof KiloRoute;
   "/kimi": typeof KimiRoute;
@@ -419,7 +387,6 @@ export interface FileRoutesByFullPath {
   "/qoder": typeof QoderRoute;
   "/qwen-code": typeof QwenCodeRoute;
   "/sigit": typeof SigitRoute;
-  "/sponsor": typeof SponsorRoute;
   "/stakpak": typeof StakpakRoute;
   "/terms": typeof TermsRoute;
   "/vtcode": typeof VtcodeRoute;
@@ -430,9 +397,7 @@ export interface FileRoutesByFullPath {
   "/alternatives/openchamber": typeof AlternativesOpenchamberRoute;
   "/alternatives/opencode-desktop": typeof AlternativesOpencodeDesktopRoute;
   "/alternatives/superset": typeof AlternativesSupersetRoute;
-  "/blog/$": typeof BlogSplatRoute;
   "/docs/$": typeof DocsSplatRoute;
-  "/blog/": typeof BlogIndexRoute;
   "/docs/": typeof DocsIndexRoute;
 }
 export interface FileRoutesByTo {
@@ -464,7 +429,6 @@ export interface FileRoutesByTo {
   "/goose": typeof GooseRoute;
   "/grok": typeof GrokRoute;
   "/hermes": typeof HermesRoute;
-  "/hub": typeof HubRoute;
   "/junie": typeof JunieRoute;
   "/kilo": typeof KiloRoute;
   "/kimi": typeof KimiRoute;
@@ -479,7 +443,6 @@ export interface FileRoutesByTo {
   "/qoder": typeof QoderRoute;
   "/qwen-code": typeof QwenCodeRoute;
   "/sigit": typeof SigitRoute;
-  "/sponsor": typeof SponsorRoute;
   "/stakpak": typeof StakpakRoute;
   "/terms": typeof TermsRoute;
   "/vtcode": typeof VtcodeRoute;
@@ -490,9 +453,7 @@ export interface FileRoutesByTo {
   "/alternatives/openchamber": typeof AlternativesOpenchamberRoute;
   "/alternatives/opencode-desktop": typeof AlternativesOpencodeDesktopRoute;
   "/alternatives/superset": typeof AlternativesSupersetRoute;
-  "/blog/$": typeof BlogSplatRoute;
   "/docs/$": typeof DocsSplatRoute;
-  "/blog": typeof BlogIndexRoute;
   "/docs": typeof DocsIndexRoute;
 }
 export interface FileRoutesById {
@@ -503,7 +464,6 @@ export interface FileRoutesById {
   "/amp": typeof AmpRoute;
   "/auggie": typeof AuggieRoute;
   "/autohand": typeof AutohandRoute;
-  "/blog": typeof BlogRouteWithChildren;
   "/changelog": typeof ChangelogRoute;
   "/claude-code": typeof ClaudeCodeRoute;
   "/cline": typeof ClineRoute;
@@ -527,7 +487,6 @@ export interface FileRoutesById {
   "/goose": typeof GooseRoute;
   "/grok": typeof GrokRoute;
   "/hermes": typeof HermesRoute;
-  "/hub": typeof HubRoute;
   "/junie": typeof JunieRoute;
   "/kilo": typeof KiloRoute;
   "/kimi": typeof KimiRoute;
@@ -542,7 +501,6 @@ export interface FileRoutesById {
   "/qoder": typeof QoderRoute;
   "/qwen-code": typeof QwenCodeRoute;
   "/sigit": typeof SigitRoute;
-  "/sponsor": typeof SponsorRoute;
   "/stakpak": typeof StakpakRoute;
   "/terms": typeof TermsRoute;
   "/vtcode": typeof VtcodeRoute;
@@ -553,9 +511,7 @@ export interface FileRoutesById {
   "/alternatives/openchamber": typeof AlternativesOpenchamberRoute;
   "/alternatives/opencode-desktop": typeof AlternativesOpencodeDesktopRoute;
   "/alternatives/superset": typeof AlternativesSupersetRoute;
-  "/blog/$": typeof BlogSplatRoute;
   "/docs/$": typeof DocsSplatRoute;
-  "/blog/": typeof BlogIndexRoute;
   "/docs/": typeof DocsIndexRoute;
 }
 export interface FileRouteTypes {
@@ -567,7 +523,6 @@ export interface FileRouteTypes {
     | "/amp"
     | "/auggie"
     | "/autohand"
-    | "/blog"
     | "/changelog"
     | "/claude-code"
     | "/cline"
@@ -591,7 +546,6 @@ export interface FileRouteTypes {
     | "/goose"
     | "/grok"
     | "/hermes"
-    | "/hub"
     | "/junie"
     | "/kilo"
     | "/kimi"
@@ -606,7 +560,6 @@ export interface FileRouteTypes {
     | "/qoder"
     | "/qwen-code"
     | "/sigit"
-    | "/sponsor"
     | "/stakpak"
     | "/terms"
     | "/vtcode"
@@ -617,9 +570,7 @@ export interface FileRouteTypes {
     | "/alternatives/openchamber"
     | "/alternatives/opencode-desktop"
     | "/alternatives/superset"
-    | "/blog/$"
     | "/docs/$"
-    | "/blog/"
     | "/docs/";
   fileRoutesByTo: FileRoutesByTo;
   to:
@@ -651,7 +602,6 @@ export interface FileRouteTypes {
     | "/goose"
     | "/grok"
     | "/hermes"
-    | "/hub"
     | "/junie"
     | "/kilo"
     | "/kimi"
@@ -666,7 +616,6 @@ export interface FileRouteTypes {
     | "/qoder"
     | "/qwen-code"
     | "/sigit"
-    | "/sponsor"
     | "/stakpak"
     | "/terms"
     | "/vtcode"
@@ -677,9 +626,7 @@ export interface FileRouteTypes {
     | "/alternatives/openchamber"
     | "/alternatives/opencode-desktop"
     | "/alternatives/superset"
-    | "/blog/$"
     | "/docs/$"
-    | "/blog"
     | "/docs";
   id:
     | "__root__"
@@ -689,7 +636,6 @@ export interface FileRouteTypes {
     | "/amp"
     | "/auggie"
     | "/autohand"
-    | "/blog"
     | "/changelog"
     | "/claude-code"
     | "/cline"
@@ -713,7 +659,6 @@ export interface FileRouteTypes {
     | "/goose"
     | "/grok"
     | "/hermes"
-    | "/hub"
     | "/junie"
     | "/kilo"
     | "/kimi"
@@ -728,7 +673,6 @@ export interface FileRouteTypes {
     | "/qoder"
     | "/qwen-code"
     | "/sigit"
-    | "/sponsor"
     | "/stakpak"
     | "/terms"
     | "/vtcode"
@@ -739,9 +683,7 @@ export interface FileRouteTypes {
     | "/alternatives/openchamber"
     | "/alternatives/opencode-desktop"
     | "/alternatives/superset"
-    | "/blog/$"
     | "/docs/$"
-    | "/blog/"
     | "/docs/";
   fileRoutesById: FileRoutesById;
 }
@@ -752,7 +694,6 @@ export interface RootRouteChildren {
   AmpRoute: typeof AmpRoute;
   AuggieRoute: typeof AuggieRoute;
   AutohandRoute: typeof AutohandRoute;
-  BlogRoute: typeof BlogRouteWithChildren;
   ChangelogRoute: typeof ChangelogRoute;
   ClaudeCodeRoute: typeof ClaudeCodeRoute;
   ClineRoute: typeof ClineRoute;
@@ -776,7 +717,6 @@ export interface RootRouteChildren {
   GooseRoute: typeof GooseRoute;
   GrokRoute: typeof GrokRoute;
   HermesRoute: typeof HermesRoute;
-  HubRoute: typeof HubRoute;
   JunieRoute: typeof JunieRoute;
   KiloRoute: typeof KiloRoute;
   KimiRoute: typeof KimiRoute;
@@ -791,7 +731,6 @@ export interface RootRouteChildren {
   QoderRoute: typeof QoderRoute;
   QwenCodeRoute: typeof QwenCodeRoute;
   SigitRoute: typeof SigitRoute;
-  SponsorRoute: typeof SponsorRoute;
   StakpakRoute: typeof StakpakRoute;
   TermsRoute: typeof TermsRoute;
   VtcodeRoute: typeof VtcodeRoute;
@@ -846,13 +785,6 @@ declare module "@tanstack/react-router" {
       path: "/autohand";
       fullPath: "/autohand";
       preLoaderRoute: typeof AutohandRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/blog": {
-      id: "/blog";
-      path: "/blog";
-      fullPath: "/blog";
-      preLoaderRoute: typeof BlogRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/changelog": {
@@ -1016,13 +948,6 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof HermesRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/hub": {
-      id: "/hub";
-      path: "/hub";
-      fullPath: "/hub";
-      preLoaderRoute: typeof HubRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
     "/junie": {
       id: "/junie";
       path: "/junie";
@@ -1121,13 +1046,6 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof SigitRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/sponsor": {
-      id: "/sponsor";
-      path: "/sponsor";
-      fullPath: "/sponsor";
-      preLoaderRoute: typeof SponsorRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
     "/stakpak": {
       id: "/stakpak";
       path: "/stakpak";
@@ -1198,20 +1116,6 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AlternativesSupersetRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/blog/": {
-      id: "/blog/";
-      path: "/";
-      fullPath: "/blog/";
-      preLoaderRoute: typeof BlogIndexRouteImport;
-      parentRoute: typeof BlogRoute;
-    };
-    "/blog/$": {
-      id: "/blog/$";
-      path: "/$";
-      fullPath: "/blog/$";
-      preLoaderRoute: typeof BlogSplatRouteImport;
-      parentRoute: typeof BlogRoute;
-    };
     "/docs/": {
       id: "/docs/";
       path: "/";
@@ -1228,18 +1132,6 @@ declare module "@tanstack/react-router" {
     };
   }
 }
-
-interface BlogRouteChildren {
-  BlogSplatRoute: typeof BlogSplatRoute;
-  BlogIndexRoute: typeof BlogIndexRoute;
-}
-
-const BlogRouteChildren: BlogRouteChildren = {
-  BlogSplatRoute: BlogSplatRoute,
-  BlogIndexRoute: BlogIndexRoute,
-};
-
-const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren);
 
 interface DocsRouteChildren {
   DocsSplatRoute: typeof DocsSplatRoute;
@@ -1260,7 +1152,6 @@ const rootRouteChildren: RootRouteChildren = {
   AmpRoute: AmpRoute,
   AuggieRoute: AuggieRoute,
   AutohandRoute: AutohandRoute,
-  BlogRoute: BlogRouteWithChildren,
   ChangelogRoute: ChangelogRoute,
   ClaudeCodeRoute: ClaudeCodeRoute,
   ClineRoute: ClineRoute,
@@ -1284,7 +1175,6 @@ const rootRouteChildren: RootRouteChildren = {
   GooseRoute: GooseRoute,
   GrokRoute: GrokRoute,
   HermesRoute: HermesRoute,
-  HubRoute: HubRoute,
   JunieRoute: JunieRoute,
   KiloRoute: KiloRoute,
   KimiRoute: KimiRoute,
@@ -1299,7 +1189,6 @@ const rootRouteChildren: RootRouteChildren = {
   QoderRoute: QoderRoute,
   QwenCodeRoute: QwenCodeRoute,
   SigitRoute: SigitRoute,
-  SponsorRoute: SponsorRoute,
   StakpakRoute: StakpakRoute,
   TermsRoute: TermsRoute,
   VtcodeRoute: VtcodeRoute,
