@@ -474,46 +474,11 @@ function ArchitectureCarousel() {
       viewport={VIEWPORT_60}
       transition={EASE_OUT_05}
     >
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-        <SectionHeader
-          eyebrow="Architecture"
-          title="A native runtime built for developer control."
-          description="Padu runs directly on your hardware. The desktop client renders natively with GPUI, communicating with a lightweight background daemon that supervises your local agent CLIs."
-        />
-
-        {/* Carousel controls */}
-        <div className="flex items-center gap-2 mb-10 shrink-0">
-          <button
-            type="button"
-            onClick={handlePrev}
-            aria-label="Previous architecture feature"
-            className="w-8 h-8 rounded-full border border-white/10 bg-white/[0.03] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/20 transition-all cursor-pointer"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <div className="flex items-center gap-1.5 px-2">
-            {ARCHITECTURE_TABS.map((tab, idx) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(idx)}
-                aria-label={`Go to ${tab.name}`}
-                className={`h-1.5 rounded-full transition-all cursor-pointer ${
-                  activeTab === idx ? "w-6 bg-white" : "w-1.5 bg-white/20 hover:bg-white/40"
-                }`}
-              />
-            ))}
-          </div>
-          <button
-            type="button"
-            onClick={handleNext}
-            aria-label="Next architecture feature"
-            className="w-8 h-8 rounded-full border border-white/10 bg-white/[0.03] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/20 transition-all cursor-pointer"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
+      <SectionHeader
+        eyebrow="Architecture"
+        title="A native runtime built for developer control."
+        description="Padu runs directly on your hardware. The desktop client renders natively with GPUI, communicating with a lightweight background daemon that supervises your local agent CLIs."
+      />
 
       {/* Apple-style Tab Bar */}
       <div className="mb-6 flex flex-wrap items-center gap-1 sm:gap-2 bg-white/[0.03] p-1.5 rounded-2xl border border-white/[0.08] backdrop-blur-xl w-full">
@@ -597,6 +562,47 @@ function ArchitectureCarousel() {
             </div>
           </motion.div>
         </AnimatePresence>
+      </div>
+
+      {/* Carousel controls located underneath the content */}
+      <div className="mt-5 flex items-center justify-between px-2">
+        <div className="flex items-center gap-2">
+          {ARCHITECTURE_TABS.map((tab, idx) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(idx)}
+              aria-label={`Go to ${tab.name}`}
+              className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                activeTab === idx ? "w-8 bg-white" : "w-2 bg-white/20 hover:bg-white/40"
+              }`}
+            />
+          ))}
+        </div>
+
+        <div className="flex items-center gap-3">
+          <span className="font-mono text-xs text-zinc-500">
+            0{activeTab + 1} / 0{ARCHITECTURE_TABS.length}
+          </span>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={handlePrev}
+              aria-label="Previous architecture feature"
+              className="w-8 h-8 rounded-full border border-white/10 bg-white/[0.03] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/20 active:scale-95 transition-all cursor-pointer"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={handleNext}
+              aria-label="Next architecture feature"
+              className="w-8 h-8 rounded-full border border-white/10 bg-white/[0.03] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/20 active:scale-95 transition-all cursor-pointer"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
       </div>
     </motion.section>
   );
