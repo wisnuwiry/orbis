@@ -6,7 +6,7 @@ use super::*;
 use crate::ui::ActivationExt;
 
 actions!(
-    orbis_onboarding,
+    padu_onboarding,
     [
         DismissOnboarding,
         NextOnboardingStep,
@@ -49,19 +49,19 @@ impl OnboardingState {
         }
     }
 
-    pub(super) fn open(&mut self, window: &mut Window, cx: &mut Context<Orbis>) {
+    pub(super) fn open(&mut self, window: &mut Window, cx: &mut Context<Padu>) {
         self.open = true;
         self.current_step = 0;
         window.focus(&self.focus, cx);
         cx.notify();
     }
 
-    pub(super) fn dismiss(&mut self, cx: &mut Context<Orbis>) {
+    pub(super) fn dismiss(&mut self, cx: &mut Context<Padu>) {
         self.open = false;
         cx.notify();
     }
 
-    pub(super) fn next_step(&mut self, cx: &mut Context<Orbis>) {
+    pub(super) fn next_step(&mut self, cx: &mut Context<Padu>) {
         if self.current_step + 1 < TOTAL_ONBOARDING_STEPS {
             self.current_step += 1;
         } else {
@@ -70,14 +70,14 @@ impl OnboardingState {
         cx.notify();
     }
 
-    pub(super) fn previous_step(&mut self, cx: &mut Context<Orbis>) {
+    pub(super) fn previous_step(&mut self, cx: &mut Context<Padu>) {
         if self.current_step > 0 {
             self.current_step -= 1;
         }
         cx.notify();
     }
 
-    pub(super) fn set_step(&mut self, step: usize, cx: &mut Context<Orbis>) {
+    pub(super) fn set_step(&mut self, step: usize, cx: &mut Context<Padu>) {
         if step < TOTAL_ONBOARDING_STEPS {
             self.current_step = step;
             cx.notify();
@@ -85,7 +85,7 @@ impl OnboardingState {
     }
 }
 
-impl Orbis {
+impl Padu {
     pub fn open_onboarding(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         self.onboarding.open(window, cx);
     }
@@ -242,8 +242,8 @@ impl Orbis {
                     .bg(color)
                     .cursor_pointer()
                     .hover(|el| el.opacity(0.8))
-                    .on_click(cx.listener(move |orbis, _, _, cx| {
-                        orbis.onboarding.set_step(i, cx);
+                    .on_click(cx.listener(move |padu, _, _, cx| {
+                        padu.onboarding.set_step(i, cx);
                     })),
             );
         }
@@ -269,8 +269,8 @@ impl Orbis {
                     .hover(|el| el.bg(theme.overlay))
                     .active(|el| el.bg(theme.overlay_strong))
                     .child(icon("icons/x.svg", 11.5, theme.text_ghost))
-                    .on_activation(cx, |orbis, _, cx| {
-                        orbis.dismiss_onboarding(cx);
+                    .on_activation(cx, |padu, _, cx| {
+                        padu.dismiss_onboarding(cx);
                     }),
             );
 
@@ -353,8 +353,8 @@ impl Orbis {
             .text_color(theme.text_ghost)
             .hover(|el| el.text_color(theme.text_secondary))
             .child(tr!("onboarding.skip"))
-            .on_click(cx.listener(|orbis, _, _, cx| {
-                orbis.dismiss_onboarding(cx);
+            .on_click(cx.listener(|padu, _, _, cx| {
+                padu.dismiss_onboarding(cx);
             }));
 
         let back_btn = if !is_first {
@@ -375,8 +375,8 @@ impl Orbis {
                     .hover(|el| el.bg(theme.overlay))
                     .focus_visible(|style| style.border_1().border_color(theme.accent))
                     .child(tr!("onboarding.back"))
-                    .on_activation(cx, |orbis, _, cx| {
-                        orbis.previous_onboarding_step(cx);
+                    .on_activation(cx, |padu, _, cx| {
+                        padu.previous_onboarding_step(cx);
                     }),
             )
         } else {
@@ -415,8 +415,8 @@ impl Orbis {
                     .hover(|el| el.bg(theme.overlay))
             })
             .child(next_btn_label)
-            .on_activation(cx, |orbis, _, cx| {
-                orbis.next_onboarding_step(cx);
+            .on_activation(cx, |padu, _, cx| {
+                padu.next_onboarding_step(cx);
             });
 
         let footer = div()
@@ -489,7 +489,7 @@ impl Orbis {
             .justify_center()
             .on_mouse_down(
                 MouseButton::Left,
-                cx.listener(|orbis, _, _, cx| orbis.dismiss_onboarding(cx)),
+                cx.listener(|padu, _, _, cx| padu.dismiss_onboarding(cx)),
             )
             .child(card);
 

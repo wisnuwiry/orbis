@@ -1,7 +1,7 @@
-//! Signed, rollback-safe updates for Orbis's managed Linux tarball install.
+//! Signed, rollback-safe updates for Padu's managed Linux tarball install.
 //!
 //! Checks, downloads, signature verification, and extraction all run on a
-//! worker thread. Once an archive is fully staged, `orbis-updater` validates
+//! worker thread. Once an archive is fully staged, `padu-updater` validates
 //! both prefixes and acknowledges the handoff before the UI begins a normal
 //! quit. The helper then swaps the directories and only removes the previous
 //! build after the replacement opens its main window.
@@ -23,11 +23,11 @@ use flate2::read::GzDecoder;
 use super::feed::{self, AppcastItem};
 use super::{UpdateStatus, UpdaterEvent};
 
-const PUBLIC_ED_KEY: &str = env!("ORBIS_SPARKLE_PUBLIC_ED_KEY");
-const MANAGED_MARKER: &str = "share/orbis/self-update-v1";
-const MANAGED_MARKER_CONTENTS: &str = "orbis-self-update-v1\n";
-const HELPER_EXECUTABLE: &str = "orbis-updater";
-const RELAUNCH_READY_ENV: &str = "ORBIS_UPDATE_READY_FILE";
+const PUBLIC_ED_KEY: &str = env!("PADU_SPARKLE_PUBLIC_ED_KEY");
+const MANAGED_MARKER: &str = "share/padu/self-update-v1";
+const MANAGED_MARKER_CONTENTS: &str = "padu-self-update-v1\n";
+const HELPER_EXECUTABLE: &str = "padu-updater";
+const RELAUNCH_READY_ENV: &str = "PADU_UPDATE_READY_FILE";
 const MAX_FEED_BYTES: u64 = 1024 * 1024;
 const MAX_ARCHIVE_BYTES: u64 = 512 * 1024 * 1024;
 const MAX_UNPACKED_BYTES: u64 = 1024 * 1024 * 1024;
@@ -37,9 +37,9 @@ const MAX_ERROR_BYTES: u64 = 16 * 1024;
 static TEMPORARY_NONCE: AtomicU64 = AtomicU64::new(0);
 
 #[cfg(target_arch = "aarch64")]
-const FEED_URL: Option<&str> = Some("https://releases.orbis.sh/appcast-linux-aarch64.xml");
+const FEED_URL: Option<&str> = Some("https://releases.padu.dev/appcast-linux-aarch64.xml");
 #[cfg(target_arch = "x86_64")]
-const FEED_URL: Option<&str> = Some("https://releases.orbis.sh/appcast-linux-x86_64.xml");
+const FEED_URL: Option<&str> = Some("https://releases.padu.dev/appcast-linux-x86_64.xml");
 #[cfg(not(any(target_arch = "aarch64", target_arch = "x86_64")))]
 const FEED_URL: Option<&str> = None;
 
@@ -61,7 +61,7 @@ impl InstallLayout {
         }
 
         let executable = std::env::current_exe().ok()?.canonicalize().ok()?;
-        if executable.file_name()? != "orbis" || executable.parent()?.file_name()? != "bin" {
+        if executable.file_name()? != "padu" || executable.parent()?.file_name()? != "bin" {
             return None;
         }
         let prefix = executable.parent()?.parent()?.to_path_buf();
@@ -150,13 +150,13 @@ pub struct Updater {
 
 impl Updater {
     pub fn init() -> Option<Self> {
-        let forced = std::env::var_os("ORBIS_FORCE_UPDATER").is_some_and(|value| value == "1");
+        let forced = std::env::var_os("PADU_FORCE_UPDATER").is_some_and(|value| value == "1");
         if cfg!(debug_assertions) && !forced {
             return None;
         }
         FEED_URL?;
         if verifying_key().is_none() {
-            eprintln!("Orbis updater: SUPublicEDKey is not a valid ed25519 key");
+            eprintln!("Padu updater: SUPublicEDKey is not a valid ed25519 key");
             return None;
         }
 
@@ -223,7 +223,7 @@ impl Updater {
             let _ = publish_events.try_send(UpdaterEvent::StatusChanged(next));
         };
         let spawned = std::thread::Builder::new()
-            .name("orbis-updater-check".into())
+            .name("padu-updater-check".into())
             .spawn(move || {
                 let outcome = fetch_and_stage(&layout);
                 let report = explicit_check.load(Ordering::Relaxed);
@@ -245,7 +245,7 @@ impl Updater {
                         if report {
                             let _ = events.try_send(UpdaterEvent::Failed(error.to_string()));
                         } else {
-                            eprintln!("Orbis updater: {error:#}");
+                            eprintln!("Padu updater: {error:#}");
                         }
                     }
                 }
@@ -274,7 +274,7 @@ impl Updater {
         let status = self.status.clone();
         let events = self.events.clone();
         if std::thread::Builder::new()
-            .name("orbis-updater-handoff".into())
+            .name("padu-updater-handoff".into())
             .spawn(move || {
                 let Ok((mut child, update)) = handoff_rx.recv() else {
                     return;
@@ -361,7 +361,7 @@ impl Updater {
         }
         let path = self.preference_path.clone();
         let _ = std::thread::Builder::new()
-            .name("orbis-updater-preference".into())
+            .name("padu-updater-preference".into())
             .spawn(move || write_automatic_preference(&path, enabled));
         if enabled {
             self.start_check(false);
@@ -440,7 +440,7 @@ fn verifying_key() -> Option<VerifyingKey> {
 fn extract_release_archive(path: &Path, destination: &Path, version: &str) -> anyhow::Result<()> {
     let triple =
         target_triple().ok_or_else(|| anyhow::anyhow!("unsupported Linux architecture"))?;
-    let expected_root = format!("orbis-{version}-{triple}");
+    let expected_root = format!("padu-{version}-{triple}");
     let decoder = GzDecoder::new(File::open(path)?);
     let mut archive = tar::Archive::new(decoder);
     let mut seen = HashSet::new();
@@ -510,9 +510,9 @@ fn validate_packaged_layout(prefix: &Path) -> anyhow::Result<()> {
     anyhow::ensure!(
         marker_metadata.file_type().is_file()
             && fs::read_to_string(&marker).ok().as_deref() == Some(MANAGED_MARKER_CONTENTS),
-        "the install is not marked as a Orbis-managed tarball"
+        "the install is not marked as a Padu-managed tarball"
     );
-    for executable in ["orbis", "orbis-daemon", HELPER_EXECUTABLE] {
+    for executable in ["padu", "padu-daemon", HELPER_EXECUTABLE] {
         let path = prefix.join("bin").join(executable);
         let metadata = fs::symlink_metadata(&path)?;
         anyhow::ensure!(
@@ -539,10 +539,10 @@ fn validate_download_url(value: &str) -> anyhow::Result<()> {
     let url = url::Url::parse(value)?;
     anyhow::ensure!(
         url.scheme() == "https"
-            && url.host_str() == Some("releases.orbis.sh")
+            && url.host_str() == Some("releases.padu.dev")
             && url.username().is_empty()
             && url.password().is_none(),
-        "the update feed points outside releases.orbis.sh"
+        "the update feed points outside releases.padu.dev"
     );
     Ok(())
 }
@@ -580,7 +580,7 @@ impl TemporaryFile {
         for _ in 0..100 {
             let nonce = TEMPORARY_NONCE.fetch_add(1, Ordering::Relaxed);
             let path = std::env::temp_dir().join(format!(
-                "orbis-update-feed-{}-{nonce}.xml",
+                "padu-update-feed-{}-{nonce}.xml",
                 std::process::id()
             ));
             match OpenOptions::new()
@@ -688,7 +688,7 @@ fn concise_stderr(bytes: &[u8]) -> String {
 fn preference_path() -> Option<PathBuf> {
     Some(
         dirs::data_local_dir()?
-            .join(orbis_protocol::identity::DATA_DIRECTORY_NAME)
+            .join(padu_protocol::identity::DATA_DIRECTORY_NAME)
             .join("updater.json"),
     )
 }
@@ -779,7 +779,7 @@ mod tests {
 
     fn temporary_directory(label: &str) -> PathBuf {
         let path = std::env::temp_dir().join(format!(
-            "orbis-linux-updater-{label}-{}-{}",
+            "padu-linux-updater-{label}-{}-{}",
             std::process::id(),
             TEMPORARY_NONCE.fetch_add(1, Ordering::Relaxed)
         ));
@@ -807,16 +807,16 @@ mod tests {
         let output = directory.join("output");
         fs::create_dir(&output).unwrap();
         let triple = target_triple().unwrap();
-        let root = format!("orbis-9.8.7-{triple}");
+        let root = format!("padu-9.8.7-{triple}");
         let encoder = flate2::write::GzEncoder::new(
             File::create(&archive_path).unwrap(),
             flate2::Compression::default(),
         );
         let mut archive = tar::Builder::new(encoder);
         for (relative, contents, mode) in [
-            ("bin/orbis", b"app".as_slice(), 0o755),
-            ("bin/orbis-daemon", b"daemon".as_slice(), 0o755),
-            ("bin/orbis-updater", b"helper".as_slice(), 0o755),
+            ("bin/padu", b"app".as_slice(), 0o755),
+            ("bin/padu-daemon", b"daemon".as_slice(), 0o755),
+            ("bin/padu-updater", b"helper".as_slice(), 0o755),
             (MANAGED_MARKER, MANAGED_MARKER_CONTENTS.as_bytes(), 0o644),
         ] {
             let mut header = tar::Header::new_gnu();
@@ -831,7 +831,7 @@ mod tests {
 
         extract_release_archive(&archive_path, &output, "9.8.7").unwrap();
         validate_packaged_layout(&output).unwrap();
-        assert_eq!(fs::read(output.join("bin/orbis")).unwrap(), b"app");
+        assert_eq!(fs::read(output.join("bin/padu")).unwrap(), b"app");
 
         fs::remove_dir_all(directory).unwrap();
     }

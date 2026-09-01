@@ -41,7 +41,7 @@ fn line_fragment(fragment: &str) -> bool {
 
 /// Removes the `:line`, `:line:column`, or `#LlineCcolumn` suffixes Codex uses
 /// in clickable local-file references. The location is not yet consumed by
-/// Orbis's compact editor, but it must not become part of the filesystem path.
+/// Padu's compact editor, but it must not become part of the filesystem path.
 fn strip_file_location(target: &str) -> &str {
     if let Some((path, fragment)) = target.rsplit_once('#')
         && line_fragment(fragment)
@@ -179,7 +179,7 @@ pub(super) fn file_icon_for_path(path: &str) -> &'static str {
 fn review_diff_gap_icon_path(direction: crate::review_diff::ExpansionDirection) -> &'static str {
     match direction {
         // Pierre's direction attributes and rendered chevrons are inverted by
-        // CSS. Orbis names the data operation directly, so encode the resulting
+        // CSS. Padu names the data operation directly, so encode the resulting
         // visual here: reveal-from-start points down; reveal-from-end points up.
         crate::review_diff::ExpansionDirection::Start => "icons/chevron-down.svg",
         crate::review_diff::ExpansionDirection::End => "icons/chevron-up.svg",
@@ -832,17 +832,17 @@ fn file_highlighter_language(relative_path: &str) -> &'static str {
 /// Reads a file for the editor, returning its text and whether it can be saved.
 ///
 /// One unbounded `read_to_string`, so callers keep it off the UI thread; the
-/// only caller is [`Orbis::read_right_panel_file_into_editor`].
+/// only caller is [`Padu::read_right_panel_file_into_editor`].
 fn read_right_panel_file(
-    workspace: &orbis_client::WorkspaceClient,
+    workspace: &padu_client::WorkspaceClient,
     project_path: &Path,
     relative_path: &str,
 ) -> (String, bool) {
-    match workspace.request(orbis_client::WorkspaceOperation::ReadTextFile {
+    match workspace.request(padu_client::WorkspaceOperation::ReadTextFile {
         root: project_path.to_path_buf(),
         relative_path: PathBuf::from(relative_path),
     }) {
-        Ok(orbis_client::WorkspaceResult::TextFile { content }) => (content, true),
+        Ok(padu_client::WorkspaceResult::TextFile { content }) => (content, true),
         Ok(_) => (
             tr!(
                 "files.unable_to_edit",
@@ -988,7 +988,7 @@ fn fade_safe_tab_offset(
 fn tab_scroll_reveal_guard(
     scroll_handle: ScrollHandle,
     tab_index: usize,
-    orbis: WeakEntity<Orbis>,
+    padu: WeakEntity<Padu>,
 ) -> impl IntoElement {
     canvas(
         move |_, window, _| {
@@ -1009,7 +1009,7 @@ fn tab_scroll_reveal_guard(
             }
 
             window.on_next_frame(move |_, cx| {
-                let _ = orbis.update(cx, |this, cx| {
+                let _ = padu.update(cx, |this, cx| {
                     if this.right_panel_pending_tab_reveal == Some(tab_index) {
                         this.right_panel_pending_tab_reveal = None;
                         cx.notify();
@@ -1429,11 +1429,11 @@ mod tests {
 
     #[test]
     fn working_tree_only_descends_into_expanded_directories() {
-        let root = std::env::temp_dir().join(format!("orbis-working-tree-{}", Uuid::new_v4()));
+        let root = std::env::temp_dir().join(format!("padu-working-tree-{}", Uuid::new_v4()));
         std::fs::create_dir_all(root.join("src/nested")).unwrap();
         std::fs::create_dir_all(root.join(".git")).unwrap();
         std::fs::write(root.join("src/main.rs"), "fn main() {}\n").unwrap();
-        std::fs::write(root.join("README.md"), "# Orbis\n").unwrap();
+        std::fs::write(root.join("README.md"), "# Padu\n").unwrap();
 
         let collapsed = visible_working_tree_entries(&root, &HashSet::new());
         assert_eq!(
@@ -1736,7 +1736,7 @@ mod tests {
     }
 }
 
-impl Orbis {
+impl Padu {
     pub(super) fn open_transcript_link(&mut self, target: &str, cx: &mut Context<Self>) -> bool {
         match transcript_link_route(target, self.selected_workspace_path()) {
             TranscriptLinkRoute::ProjectFile(relative_path) => {
@@ -3066,9 +3066,9 @@ impl Orbis {
         editor.reading = true;
         editor.read_epoch += 1;
         let epoch = editor.read_epoch;
-        let workspace = orbis_client::WorkspaceClient::new(self.daemon.client());
+        let workspace = padu_client::WorkspaceClient::new(self.daemon.client());
 
-        cx.spawn(async move |orbis, cx| {
+        cx.spawn(async move |padu, cx| {
             let read = cx
                 .background_executor()
                 .spawn({
@@ -3077,22 +3077,22 @@ impl Orbis {
                     async move { read_right_panel_file(&workspace, &project_path, &relative_path) }
                 })
                 .await;
-            orbis.update(cx, |orbis, cx| {
-                if orbis.state.selected_session != Some(session_id)
-                    || orbis
+            padu.update(cx, |padu, cx| {
+                if padu.state.selected_session != Some(session_id)
+                    || padu
                         .selected_workspace_path()
                         .is_none_or(|path| path != project_path)
                 {
                     // The editor moved into another session's stored state, or
                     // the project changed. Clear the flag so a later reload can
                     // ask again, and drop the text.
-                    if let Some(editor) = orbis.right_panel_file_editors.get_mut(&relative_path) {
+                    if let Some(editor) = padu.right_panel_file_editors.get_mut(&relative_path) {
                         editor.reading = false;
                     }
                     return;
                 }
                 let (content, writable) = read;
-                let Some(editor) = orbis.right_panel_file_editors.get_mut(&relative_path) else {
+                let Some(editor) = padu.right_panel_file_editors.get_mut(&relative_path) else {
                     return;
                 };
                 // A save landed while the read was in flight, so this text
@@ -3408,8 +3408,8 @@ impl Orbis {
         } else {
             return;
         };
-        let workspace = orbis_client::WorkspaceClient::new(self.daemon.client());
-        cx.spawn(async move |orbis, cx| {
+        let workspace = padu_client::WorkspaceClient::new(self.daemon.client());
+        cx.spawn(async move |padu, cx| {
             let result = cx
                 .background_executor()
                 .spawn({
@@ -3417,20 +3417,20 @@ impl Orbis {
                     let relative_path = relative_path.clone();
                     let content = content.clone();
                     async move {
-                        match workspace.request(orbis_client::WorkspaceOperation::WriteTextFile {
+                        match workspace.request(padu_client::WorkspaceOperation::WriteTextFile {
                             root: project_path,
                             relative_path: PathBuf::from(relative_path),
                             content,
                         })? {
-                            orbis_client::WorkspaceResult::Ack => Ok(()),
+                            padu_client::WorkspaceResult::Ack => Ok(()),
                             _ => anyhow::bail!("the daemon returned an invalid file response"),
                         }
                     }
                 })
                 .await;
-            let _ = orbis.update(cx, |orbis, cx| {
-                if orbis.state.selected_session != Some(session_id)
-                    || orbis
+            let _ = padu.update(cx, |padu, cx| {
+                if padu.state.selected_session != Some(session_id)
+                    || padu
                         .selected_workspace_path()
                         .is_none_or(|path| path != project_path)
                 {
@@ -3438,7 +3438,7 @@ impl Orbis {
                 }
                 match result {
                     Ok(()) => {
-                        if let Some(editor) = orbis.right_panel_file_editors.get_mut(&relative_path)
+                        if let Some(editor) = padu.right_panel_file_editors.get_mut(&relative_path)
                             && editor.read_epoch == epoch
                         {
                             let current = editor.state.read(cx).content();
@@ -3446,7 +3446,7 @@ impl Orbis {
                             editor.dirty = current != content;
                         }
                     }
-                    Err(error) => orbis.show_toast(tr!(
+                    Err(error) => padu.show_toast(tr!(
                         "files.could_not_save",
                         path = relative_path,
                         error = error.to_string()
@@ -4325,18 +4325,18 @@ impl Orbis {
             Query::Pending => {}
             Query::Missing(token) => {
                 let expanded = self.right_panel_expanded_paths.clone();
-                let workspace = orbis_client::WorkspaceClient::new(self.daemon.client());
-                cx.spawn(async move |orbis, cx| {
+                let workspace = padu_client::WorkspaceClient::new(self.daemon.client());
+                cx.spawn(async move |padu, cx| {
                     let entries = cx
                         .background_executor()
                         .spawn({
                             let path = project_path.clone();
                             async move {
-                                match workspace.request(orbis_client::WorkspaceOperation::ListTree {
+                                match workspace.request(padu_client::WorkspaceOperation::ListTree {
                                     root: path,
                                     expanded_paths: expanded.into_iter().collect(),
                                 }) {
-                                    Ok(orbis_client::WorkspaceResult::WorkingTree { entries }) => {
+                                    Ok(padu_client::WorkspaceResult::WorkingTree { entries }) => {
                                         entries
                                             .into_iter()
                                             .map(|entry| WorkingTreeEntry {
@@ -4356,13 +4356,13 @@ impl Orbis {
                             }
                         })
                         .await;
-                    orbis.update(cx, |orbis, cx| {
-                        if orbis.working_trees.fulfill(token, entries.clone())
-                            && orbis
+                    padu.update(cx, |padu, cx| {
+                        if padu.working_trees.fulfill(token, entries.clone())
+                            && padu
                                 .selected_workspace_path()
                                 .is_some_and(|path| path == project_path)
                         {
-                            orbis.right_panel_working_tree = entries;
+                            padu.right_panel_working_tree = entries;
                             cx.notify();
                         }
                     })
@@ -4473,20 +4473,20 @@ impl Orbis {
         self.right_panel_diff_error = None;
         cx.notify();
 
-        let workspace = orbis_client::WorkspaceClient::new(self.daemon.client());
-        cx.spawn(async move |orbis, cx| {
+        let workspace = padu_client::WorkspaceClient::new(self.daemon.client());
+        cx.spawn(async move |padu, cx| {
             let result = cx
                 .background_executor()
                 .spawn({
                     let project_path = project_path.clone();
                     async move {
                         match workspace.request(
-                            orbis_client::WorkspaceOperation::CollectReviewDiff {
+                            padu_client::WorkspaceOperation::CollectReviewDiff {
                                 cwd: project_path,
                                 source: crate::review_diff::wire_source(source),
                             },
                         )? {
-                            orbis_client::WorkspaceResult::ReviewDiff { data } => {
+                            padu_client::WorkspaceResult::ReviewDiff { data } => {
                                 Ok(crate::review_diff::parse_collected(
                                     source,
                                     &data.numstat,
@@ -4499,48 +4499,48 @@ impl Orbis {
                     }
                 })
                 .await;
-            orbis.update(cx, |orbis, cx| {
-                let still_current = orbis.state.selected_session == Some(session_id)
-                    && orbis.right_panel_diff_generation == generation
-                    && orbis.right_panel_diff_source == source
-                    && orbis
+            padu.update(cx, |padu, cx| {
+                let still_current = padu.state.selected_session == Some(session_id)
+                    && padu.right_panel_diff_generation == generation
+                    && padu.right_panel_diff_source == source
+                    && padu
                         .selected_workspace_path()
                         .is_some_and(|path| path == project_path);
                 if !still_current {
                     return;
                 }
 
-                orbis.right_panel_diff_loading = false;
+                padu.right_panel_diff_loading = false;
                 match result {
                     Ok(snapshot) => {
-                        orbis.right_panel_diff_selection.clear();
+                        padu.right_panel_diff_selection.clear();
                         let directories = review_diff_directory_paths(&snapshot.files);
                         if had_snapshot {
-                            orbis.right_panel_diff_expanded_paths
+                            padu.right_panel_diff_expanded_paths
                                 .retain(|path| directories.contains(path));
-                            orbis.right_panel_diff_expanded_paths
+                            padu.right_panel_diff_expanded_paths
                                 .extend(directories.difference(&previous_directories).cloned());
                         } else {
-                            orbis.right_panel_diff_expanded_paths = directories;
+                            padu.right_panel_diff_expanded_paths = directories;
                         }
-                        orbis.right_panel_diff_selected_file = selected_path
+                        padu.right_panel_diff_selected_file = selected_path
                             .as_deref()
                             .and_then(|path| {
                                 snapshot.files.iter().position(|file| file.path == path)
                             })
                             .or_else(|| (!snapshot.files.is_empty()).then_some(0));
                         let line_count = snapshot.lines.len();
-                        orbis.right_panel_diff_snapshot = Some(Arc::new(snapshot));
-                        orbis.right_panel_diff_error = None;
-                        orbis.right_panel_diff_list_state.reset(line_count);
-                        orbis.sync_right_panel_diff_tree_rows(cx);
+                        padu.right_panel_diff_snapshot = Some(Arc::new(snapshot));
+                        padu.right_panel_diff_error = None;
+                        padu.right_panel_diff_list_state.reset(line_count);
+                        padu.sync_right_panel_diff_tree_rows(cx);
                     }
                     Err(error) => {
                         let message = error.to_string();
-                        if orbis.right_panel_diff_snapshot.is_some() {
-                            orbis.show_toast(tr!("diff.refresh_failed", error = message));
+                        if padu.right_panel_diff_snapshot.is_some() {
+                            padu.show_toast(tr!("diff.refresh_failed", error = message));
                         } else {
-                            orbis.right_panel_diff_error = Some(message);
+                            padu.right_panel_diff_error = Some(message);
                         }
                     }
                 }

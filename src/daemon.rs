@@ -1,35 +1,35 @@
-//! Desktop ownership of the Orbis daemon process.
+//! Desktop ownership of the Padu daemon process.
 
 use std::path::PathBuf;
 
 use anyhow::{Context as _, anyhow, bail};
 
-pub fn start_process() -> anyhow::Result<orbis_client::DaemonSupervisor> {
-    let address = std::env::var(orbis_client::DAEMON_ADDRESS_ENV)
+pub fn start_process() -> anyhow::Result<padu_client::DaemonSupervisor> {
+    let address = std::env::var(padu_client::DAEMON_ADDRESS_ENV)
         .ok()
         .filter(|value| !value.trim().is_empty());
-    let token = std::env::var(orbis_client::DAEMON_TOKEN_ENV)
+    let token = std::env::var(padu_client::DAEMON_TOKEN_ENV)
         .ok()
         .filter(|value| !value.is_empty());
     match (address, token) {
         (Some(address), Some(token)) => {
-            return orbis_client::DaemonSupervisor::connect(address.trim(), token);
+            return padu_client::DaemonSupervisor::connect(address.trim(), token);
         }
         (Some(_), None) => bail!(
             "{} is set but {} is missing",
-            orbis_client::DAEMON_ADDRESS_ENV,
-            orbis_client::DAEMON_TOKEN_ENV
+            padu_client::DAEMON_ADDRESS_ENV,
+            padu_client::DAEMON_TOKEN_ENV
         ),
         (None, Some(_)) => bail!(
             "{} is set but {} is missing",
-            orbis_client::DAEMON_TOKEN_ENV,
-            orbis_client::DAEMON_ADDRESS_ENV
+            padu_client::DAEMON_TOKEN_ENV,
+            padu_client::DAEMON_ADDRESS_ENV
         ),
         (None, None) => {}
     }
-    let app_settings = orbis_client::persistence::load_or_create_app_settings()
+    let app_settings = padu_client::persistence::load_or_create_app_settings()
         .context("could not load desktop daemon settings")?;
-    orbis_client::DaemonSupervisor::spawn_configured(
+    padu_client::DaemonSupervisor::spawn_configured(
         &daemon_executable_path()?,
         cfg!(debug_assertions),
         app_settings.daemon_exposure,
@@ -64,14 +64,14 @@ pub fn local_hostname() -> Option<String> {
 }
 
 fn daemon_executable_path() -> anyhow::Result<PathBuf> {
-    if let Some(path) = std::env::var_os("ORBIS_DAEMON_PATH").filter(|path| !path.is_empty()) {
+    if let Some(path) = std::env::var_os("PADU_DAEMON_PATH").filter(|path| !path.is_empty()) {
         return Ok(path.into());
     }
-    let executable = format!("orbis-daemon{}", std::env::consts::EXE_SUFFIX);
-    let current = std::env::current_exe().context("could not locate the Orbis executable")?;
+    let executable = format!("padu-daemon{}", std::env::consts::EXE_SUFFIX);
+    let current = std::env::current_exe().context("could not locate the Padu executable")?;
 
     // Development keeps the daemon beside Cargo's debug artifacts rather than
-    // inside Orbis Debug.app. The supervisor watches this file and swaps only
+    // inside Padu Debug.app. The supervisor watches this file and swaps only
     // the daemon when the development watcher relinks it.
     #[cfg(debug_assertions)]
     if let Some(debug_directory) = current
@@ -87,18 +87,18 @@ fn daemon_executable_path() -> anyhow::Result<PathBuf> {
     let sibling = current
         .parent()
         .map(|directory| directory.join(&executable))
-        .ok_or_else(|| anyhow!("Orbis executable has no parent directory"))?;
+        .ok_or_else(|| anyhow!("Padu executable has no parent directory"))?;
     if sibling.is_file() {
         return Ok(sibling);
     }
     #[cfg(debug_assertions)]
     bail!(
-        "Orbis daemon was not found in Cargo's debug directory or next to the app executable: {}",
+        "Padu daemon was not found in Cargo's debug directory or next to the app executable: {}",
         sibling.display(),
     );
     #[cfg(not(debug_assertions))]
     bail!(
-        "Orbis daemon is missing next to the app executable: {}",
+        "Padu daemon is missing next to the app executable: {}",
         sibling.display(),
     )
 }

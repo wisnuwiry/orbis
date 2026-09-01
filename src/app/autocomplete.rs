@@ -101,7 +101,7 @@ impl AutocompleteUi {
     }
 }
 
-impl Orbis {
+impl Padu {
     /// Refresh the drawn command and file indexes for the selected session.
     ///
     /// A cache hit lands immediately; a miss starts discovery on the
@@ -155,28 +155,28 @@ impl Orbis {
                     self.slash_command_index_key = None;
                 }
                 let path = project_path.clone();
-                let workspace = orbis_client::WorkspaceClient::new(self.daemon.client());
-                cx.spawn(async move |orbis, cx| {
+                let workspace = padu_client::WorkspaceClient::new(self.daemon.client());
+                cx.spawn(async move |padu, cx| {
                     let commands = cx
                         .background_executor()
                         .spawn(async move {
                             match workspace.request(
-                                orbis_client::WorkspaceOperation::DiscoverSlashCommands {
+                                padu_client::WorkspaceOperation::DiscoverSlashCommands {
                                     provider,
                                     project_root: path,
                                     binary_override,
                                 },
                             ) {
-                                Ok(orbis_client::WorkspaceResult::SlashCommands { commands }) => {
+                                Ok(padu_client::WorkspaceResult::SlashCommands { commands }) => {
                                     commands
                                 }
                                 Ok(_) | Err(_) => Vec::new(),
                             }
                         })
                         .await;
-                    orbis.update(cx, |orbis, cx| {
-                        if orbis.slash_commands.fulfill(token, commands) {
-                            orbis.refresh_composer_sources(cx);
+                    padu.update(cx, |padu, cx| {
+                        if padu.slash_commands.fulfill(token, commands) {
+                            padu.refresh_composer_sources(cx);
                             cx.notify();
                         }
                     })
@@ -206,27 +206,27 @@ impl Orbis {
                     self.mention_file_index_path = None;
                 }
                 let path = project_path.clone();
-                let workspace = orbis_client::WorkspaceClient::new(self.daemon.client());
-                cx.spawn(async move |orbis, cx| {
+                let workspace = padu_client::WorkspaceClient::new(self.daemon.client());
+                cx.spawn(async move |padu, cx| {
                     let files = cx
                         .background_executor()
                         .spawn(async move {
                             match workspace.request(
-                                orbis_client::WorkspaceOperation::ListProjectFiles {
+                                padu_client::WorkspaceOperation::ListProjectFiles {
                                     root: path,
                                     cap: FILE_INDEX_CAP,
                                 },
                             ) {
-                                Ok(orbis_client::WorkspaceResult::ProjectFiles { entries }) => {
+                                Ok(padu_client::WorkspaceResult::ProjectFiles { entries }) => {
                                     entries
                                 }
                                 Ok(_) | Err(_) => Vec::new(),
                             }
                         })
                         .await;
-                    orbis.update(cx, |orbis, cx| {
-                        if orbis.mention_files.fulfill(token, files) {
-                            orbis.refresh_composer_sources(cx);
+                    padu.update(cx, |padu, cx| {
+                        if padu.mention_files.fulfill(token, files) {
+                            padu.refresh_composer_sources(cx);
                             cx.notify();
                         }
                     })

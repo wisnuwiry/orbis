@@ -94,12 +94,12 @@ pub(super) fn visible_settings_pages(
         })
 }
 
-impl Orbis {
+impl Padu {
     pub(super) fn render_settings(&self, window: &Window, cx: &mut Context<Self>) -> AnyElement {
         let theme = Theme::current(cx);
 
         div()
-            .key_context("Orbis")
+            .key_context("Padu")
             .track_focus(&self.settings_focus)
             .on_action(|_: &CloseWindow, window, _| crate::platform::hide_window(window))
             .on_action(cx.listener(Self::new_session_action))
@@ -1163,7 +1163,7 @@ impl Orbis {
     fn daemon_exposure_from_fields(
         &self,
         cx: &App,
-    ) -> Result<orbis_client::DaemonExposureSettings, String> {
+    ) -> Result<padu_client::DaemonExposureSettings, String> {
         let port = self
             .daemon_port_input
             .read(cx)
@@ -1179,7 +1179,7 @@ impl Orbis {
         settings.port = port;
         settings
             .with_allowed_origins_text(&origins)
-            .and_then(orbis_client::DaemonExposureSettings::validate)
+            .and_then(padu_client::DaemonExposureSettings::validate)
             .map_err(|error| error.to_string())
     }
 
@@ -1234,14 +1234,14 @@ impl Orbis {
                 return;
             }
         };
-        settings.token = orbis_client::DaemonExposureSettings::new_token();
+        settings.token = padu_client::DaemonExposureSettings::new_token();
         self.daemon_token_revealed = false;
         self.apply_daemon_exposure(settings, cx);
     }
 
     fn apply_daemon_exposure(
         &mut self,
-        settings: orbis_client::DaemonExposureSettings,
+        settings: padu_client::DaemonExposureSettings,
         cx: &mut Context<Self>,
     ) {
         if self.daemon_reconfigure_pending || settings == self.state.daemon_exposure {
@@ -1874,7 +1874,7 @@ impl Orbis {
     }
 
     fn set_ui_font_size(&mut self, size: f32, window: &mut Window, cx: &mut Context<Self>) {
-        let size = orbis_client::persistence::sanitized_ui_font_size(size);
+        let size = padu_client::persistence::sanitized_ui_font_size(size);
         if self.state.ui_font_size == size {
             return;
         }
@@ -1888,7 +1888,7 @@ impl Orbis {
     }
 
     fn set_code_font_size(&mut self, size: f32, cx: &mut Context<Self>) {
-        let size = orbis_client::persistence::sanitized_code_font_size(size);
+        let size = padu_client::persistence::sanitized_code_font_size(size);
         if self.state.code_font_size == size {
             return;
         }
@@ -2614,14 +2614,14 @@ impl Orbis {
         let event_wake = self.event_wake_tx.clone();
         let daemon = self.daemon.client();
         std::thread::Builder::new()
-            .name("orbis-computer-permission-request".into())
+            .name("padu-computer-permission-request".into())
             .spawn(move || {
                 let result = match daemon.request(
                     Uuid::nil(),
                     Uuid::nil(),
-                    orbis_client::Command::ProbeComputerPermissions { prompt },
+                    padu_client::Command::ProbeComputerPermissions { prompt },
                 ) {
-                    Ok(orbis_client::ResponsePayload::ComputerPermissions { permissions }) => {
+                    Ok(padu_client::ResponsePayload::ComputerPermissions { permissions }) => {
                         Ok(permissions)
                     }
                     Ok(_) => Err("the daemon returned an invalid permission response".into()),
@@ -2844,7 +2844,7 @@ fn permission_status_row(
     granted: bool,
     id: &'static str,
     theme: Theme,
-    cx: &mut Context<Orbis>,
+    cx: &mut Context<Padu>,
 ) -> Div {
     let status = if granted {
         div()

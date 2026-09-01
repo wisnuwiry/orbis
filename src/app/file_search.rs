@@ -212,7 +212,7 @@ fn revealed_scroll_offset(
     (next != current_offset).then_some(next)
 }
 
-impl Orbis {
+impl Padu {
     pub(super) fn refresh_file_search_localized_text(&mut self, cx: &mut Context<Self>) {
         let Some(search) = &self.file_search else {
             return;

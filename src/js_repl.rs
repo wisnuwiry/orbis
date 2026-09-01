@@ -21,10 +21,10 @@ const MAX_REQUEST_BYTES: usize = 16 * 1024 * 1024;
 
 // Mirrors Codex node_repl's server instructions, substituting the actual QuickJS backend and
 // omitting its unsupported Node module-directory guidance.
-const SERVER_INSTRUCTIONS: &str = "Use `js` to run JavaScript in the persistent QuickJS kernel. When a skill or prompt says to use `orbis_js_repl`, call this server's `js` execution tool. Calls default to a 30000 ms (30 seconds) timeout when `timeout_ms` is omitted. The runtime exposes `nodeRepl.cwd`, `nodeRepl.homeDir`, `nodeRepl.tmpDir`, `nodeRepl.requestMeta`, `nodeRepl.setResponseMeta(...)`, and `await nodeRepl.emitImage(...)`. Top-level bindings persist across `js` calls until `js_reset`; do not redeclare existing `const` or `let` names. Reuse existing bindings, use top-level `var` for reusable state that may be assigned again, or choose a fresh descriptive name.";
+const SERVER_INSTRUCTIONS: &str = "Use `js` to run JavaScript in the persistent QuickJS kernel. When a skill or prompt says to use `padu_js_repl`, call this server's `js` execution tool. Calls default to a 30000 ms (30 seconds) timeout when `timeout_ms` is omitted. The runtime exposes `nodeRepl.cwd`, `nodeRepl.homeDir`, `nodeRepl.tmpDir`, `nodeRepl.requestMeta`, `nodeRepl.setResponseMeta(...)`, and `await nodeRepl.emitImage(...)`. Top-level bindings persist across `js` calls until `js_reset`; do not redeclare existing `const` or `let` names. Reuse existing bindings, use top-level `var` for reusable state that may be assigned again, or choose a fresh descriptive name.";
 
 const KERNEL_BOOTSTRAP: &str = include_str!("js_repl_bootstrap.js");
-const JS_TOOL_DESCRIPTION: &str = "Run JavaScript in a persistent QuickJS kernel with top-level await. This is the JavaScript execution tool for the `orbis_js_repl` MCP server; use it whenever instructions say to use `orbis_js_repl`, the Orbis JavaScript REPL MCP, or run Orbis JavaScript REPL code. If `timeout_ms` is omitted, execution times out after 30000 ms (30 seconds); pass a larger `timeout_ms` for slow Computer Use automation or other long-running operations. Use `nodeRepl.cwd`, `nodeRepl.homeDir`, and `nodeRepl.tmpDir` to inspect host paths. Use `nodeRepl.requestMeta` to inspect the current MCP request `_meta` object during a tool call. Use `nodeRepl.setResponseMeta(meta)` to attach top-level MCP result `_meta`; repeated calls shallow-merge object keys for the current tool call. Use `nodeRepl.write(value)` to add output without a newline. Strings are unchanged; other values use console-style formatting, including BigInt and circular objects. Prefer it over `console.log(...)` for final output; `console.log(...)` remains useful for debugging or multiple values. Use `await nodeRepl.emitImage(imageLike)` to return images; each call adds one image to the outer tool result, so call it multiple times to emit multiple images. Supported image inputs are a base64 data URL, a file URL, or an object with a `url` property. Saved references to `nodeRepl.write(...)` and `nodeRepl.emitImage(...)` stay reusable across calls. Scheduled callbacks only run while a JavaScript execution call is active; overdue timers resume at the start of the next call. Top-level bindings persist across calls until `js_reset`. If a call throws, prior bindings remain available and bindings that finished initializing before the throw often remain reusable. For reusable names that may be assigned again later, prefer top-level `var name = ...`; `var` can be redeclared across calls. If you hit `SyntaxError: Identifier 'x' has already been declared`, reuse the existing binding if possible, reassign it only if it was declared with `let` or `var`, or pick a new name instead of resetting immediately; a previous `const x` cannot be changed into `var x`. Use a short `{ ... }` block only for temporary scratch names, and do not wrap an entire call in block scope if you want those names reusable later. Module imports are not supported. Prefer `nodeRepl.write(...)` for text or formatted values and `nodeRepl.emitImage(...)` for images.";
+const JS_TOOL_DESCRIPTION: &str = "Run JavaScript in a persistent QuickJS kernel with top-level await. This is the JavaScript execution tool for the `padu_js_repl` MCP server; use it whenever instructions say to use `padu_js_repl`, the Padu JavaScript REPL MCP, or run Padu JavaScript REPL code. If `timeout_ms` is omitted, execution times out after 30000 ms (30 seconds); pass a larger `timeout_ms` for slow Computer Use automation or other long-running operations. Use `nodeRepl.cwd`, `nodeRepl.homeDir`, and `nodeRepl.tmpDir` to inspect host paths. Use `nodeRepl.requestMeta` to inspect the current MCP request `_meta` object during a tool call. Use `nodeRepl.setResponseMeta(meta)` to attach top-level MCP result `_meta`; repeated calls shallow-merge object keys for the current tool call. Use `nodeRepl.write(value)` to add output without a newline. Strings are unchanged; other values use console-style formatting, including BigInt and circular objects. Prefer it over `console.log(...)` for final output; `console.log(...)` remains useful for debugging or multiple values. Use `await nodeRepl.emitImage(imageLike)` to return images; each call adds one image to the outer tool result, so call it multiple times to emit multiple images. Supported image inputs are a base64 data URL, a file URL, or an object with a `url` property. Saved references to `nodeRepl.write(...)` and `nodeRepl.emitImage(...)` stay reusable across calls. Scheduled callbacks only run while a JavaScript execution call is active; overdue timers resume at the start of the next call. Top-level bindings persist across calls until `js_reset`. If a call throws, prior bindings remain available and bindings that finished initializing before the throw often remain reusable. For reusable names that may be assigned again later, prefer top-level `var name = ...`; `var` can be redeclared across calls. If you hit `SyntaxError: Identifier 'x' has already been declared`, reuse the existing binding if possible, reassign it only if it was declared with `let` or `var`, or pick a new name instead of resetting immediately; a previous `const x` cannot be changed into `var x`. Use a short `{ ... }` block only for temporary scratch names, and do not wrap an entire call in block scope if you want those names reusable later. Module imports are not supported. Prefer `nodeRepl.write(...)` for text or formatted values and `nodeRepl.emitImage(...)` for images.";
 
 #[derive(Default)]
 struct CallOutput {
@@ -200,7 +200,7 @@ fn initialize_result() -> JsonValue {
         "protocolVersion": MCP_PROTOCOL_VERSION,
         "capabilities": {"tools": {"listChanged": false}},
         "serverInfo": {
-            "name": "orbis_js_repl",
+            "name": "padu_js_repl",
             "version": env!("CARGO_PKG_VERSION")
         },
         "instructions": SERVER_INSTRUCTIONS
@@ -503,7 +503,7 @@ fn create_kernel(
             let sky_bridge = bridge.clone();
             let sky_deadline = deadline.clone();
             globals.set(
-                "__orbisSkyCall",
+                "__paduSkyCall",
                 Function::new(ctx.clone(), move |name: String, arguments: String| {
                     let deadline = *sky_deadline.lock();
                     let result = serde_json::from_str::<JsonValue>(&arguments)
@@ -520,7 +520,7 @@ fn create_kernel(
 
             let write_output = call_output.clone();
             globals.set(
-                "__orbisWrite",
+                "__paduWrite",
                 Function::new(ctx.clone(), move |text: String, newline: bool| {
                     let mut active = write_output.lock();
                     let Some(output) = active.as_mut() else {
@@ -536,7 +536,7 @@ fn create_kernel(
 
             let image_output = call_output.clone();
             globals.set(
-                "__orbisEmitImage",
+                "__paduEmitImage",
                 Function::new(ctx.clone(), move |image: String| {
                     let result = decode_image_reference(&image).and_then(|image| {
                         let mut active = image_output.lock();
@@ -555,7 +555,7 @@ fn create_kernel(
 
             let metadata_output = call_output.clone();
             globals.set(
-                "__orbisSetResponseMeta",
+                "__paduSetResponseMeta",
                 Function::new(ctx.clone(), move |metadata: String| {
                     let result = serde_json::from_str::<JsonValue>(&metadata)
                         .context("response metadata is invalid JSON")
@@ -579,7 +579,7 @@ fn create_kernel(
 
             let scheduled_timers = timers.clone();
             globals.set(
-                "__orbisScheduleTimer",
+                "__paduScheduleTimer",
                 Function::new(ctx.clone(), move |delay_ms: u32, repeat: bool| -> u32 {
                     scheduled_timers
                         .lock()
@@ -589,7 +589,7 @@ fn create_kernel(
 
             let cleared_timers = timers.clone();
             globals.set(
-                "__orbisClearTimer",
+                "__paduClearTimer",
                 Function::new(ctx.clone(), move |id: u32| {
                     cleared_timers.lock().clear(id);
                 })?,
@@ -597,7 +597,7 @@ fn create_kernel(
 
             let refreshed_timers = timers.clone();
             globals.set(
-                "__orbisRefreshTimer",
+                "__paduRefreshTimer",
                 Function::new(ctx.clone(), move |id: u32| {
                     refreshed_timers.lock().refresh(id);
                 })?,
@@ -606,14 +606,14 @@ fn create_kernel(
             let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
             let home = dirs::home_dir().unwrap_or_default();
             let temp = std::env::temp_dir();
-            globals.set("__orbisCwd", cwd.display().to_string())?;
-            globals.set("__orbisHomeDir", home.display().to_string())?;
-            globals.set("__orbisTmpDir", temp.display().to_string())?;
+            globals.set("__paduCwd", cwd.display().to_string())?;
+            globals.set("__paduHomeDir", home.display().to_string())?;
+            globals.set("__paduTmpDir", temp.display().to_string())?;
             ctx.eval::<(), _>(KERNEL_BOOTSTRAP)?;
-            let timer_dispatch = globals.get::<_, Function<'_>>("__orbisRunTimer")?;
-            let request_meta_setter = globals.get::<_, Function<'_>>("__orbisSetRequestMeta")?;
-            globals.remove("__orbisRunTimer")?;
-            globals.remove("__orbisSetRequestMeta")?;
+            let timer_dispatch = globals.get::<_, Function<'_>>("__paduRunTimer")?;
+            let request_meta_setter = globals.get::<_, Function<'_>>("__paduSetRequestMeta")?;
+            globals.remove("__paduRunTimer")?;
+            globals.remove("__paduSetRequestMeta")?;
             Ok((
                 Persistent::save(&ctx, timer_dispatch),
                 Persistent::save(&ctx, request_meta_setter),
@@ -876,7 +876,7 @@ impl RequestWatchdog {
             .ok_or_else(|| anyhow!("Computer Use request timed out"))?;
         let (completed, completion) = std::sync::mpsc::channel();
         let thread = std::thread::Builder::new()
-            .name("orbis-js-repl-computer-use-timeout".into())
+            .name("padu-js-repl-computer-use-timeout".into())
             .spawn(move || {
                 if completion.recv_timeout(remaining).is_ok() {
                     return false;
@@ -915,10 +915,10 @@ impl Drop for RequestWatchdog {
 
 impl HelperConnection {
     fn start(deadline: Option<Instant>) -> anyhow::Result<Self> {
-        let command = std::env::var_os("ORBIS_COMPUTER_USE_SERVER")
+        let command = std::env::var_os("PADU_COMPUTER_USE_SERVER")
             .map(PathBuf::from)
             .ok_or_else(|| {
-                anyhow!("ORBIS_COMPUTER_USE_SERVER is required before the first sky operation")
+                anyhow!("PADU_COMPUTER_USE_SERVER is required before the first sky operation")
             })?;
         let mut child = Command::new(&command)
             .arg("mcp")
@@ -937,10 +937,10 @@ impl HelperConnection {
             .ok_or_else(|| anyhow!("Computer Use helper stdout is unavailable"))?;
         if let Some(stderr) = child.stderr.take() {
             std::thread::Builder::new()
-                .name("orbis-js-repl-computer-use-stderr".into())
+                .name("padu-js-repl-computer-use-stderr".into())
                 .spawn(move || {
                     for line in BufReader::new(stderr).lines().map_while(Result::ok) {
-                        eprintln!("Orbis Computer Use: {line}");
+                        eprintln!("Padu Computer Use: {line}");
                     }
                 })?;
         }
@@ -955,7 +955,7 @@ impl HelperConnection {
             json!({
                 "protocolVersion": MCP_PROTOCOL_VERSION,
                 "capabilities": {},
-                "clientInfo": {"name": "orbis_js_repl", "version": env!("CARGO_PKG_VERSION")}
+                "clientInfo": {"name": "padu_js_repl", "version": env!("CARGO_PKG_VERSION")}
             }),
             deadline,
         )?;
@@ -1095,7 +1095,7 @@ mod tests {
             ["js", "js_reset"]
         );
         assert_eq!(tools[0]["description"], JS_TOOL_DESCRIPTION.trim());
-        assert!(SERVER_INSTRUCTIONS.contains("`orbis_js_repl`"));
+        assert!(SERVER_INSTRUCTIONS.contains("`padu_js_repl`"));
         assert!(!SERVER_INSTRUCTIONS.contains("`node_repl`"));
         assert!(!SERVER_INSTRUCTIONS.contains("nodeRepl.write"));
         assert!(JS_TOOL_DESCRIPTION.contains("nodeRepl.write"));

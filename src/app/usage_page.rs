@@ -35,7 +35,7 @@ fn provider_kind(provider: UsageProvider) -> ProviderKind {
     }
 }
 
-impl Orbis {
+impl Padu {
     /// Switch the settings view to `page`, warming the Usage scan when that
     /// is where the user is heading.
     pub(super) fn open_settings_page(&mut self, page: SettingsPage, cx: &mut Context<Self>) {
@@ -104,12 +104,12 @@ impl Orbis {
                     match daemon.request(
                         Uuid::nil(),
                         Uuid::nil(),
-                        orbis_client::Command::LoadUsageHistory {
+                        padu_client::Command::LoadUsageHistory {
                             window,
                             project_roots,
                         },
                     )? {
-                        orbis_client::ResponsePayload::UsageHistory { history } => Ok(history),
+                        padu_client::ResponsePayload::UsageHistory { history } => Ok(history),
                         _ => anyhow::bail!("the daemon returned an invalid usage response"),
                     }
                 })
@@ -1418,7 +1418,7 @@ impl Orbis {
         ))
     }
 
-    /// Display name and path caption for a project row: a known Orbis
+    /// Display name and path caption for a project row: a known Padu
     /// project's name when the path is one, else the directory's own name
     /// alongside its complete path, shortening only the home prefix.
     fn usage_project_identity(&self, project: &ProjectSlice) -> (String, Option<String>) {
@@ -2378,12 +2378,12 @@ fn usage_month_strip(
 /// the timeline reads honestly. The card pins its header and scrolls the
 /// rows internally, matching the projects view.
 fn usage_month_list(
-    orbis: &Orbis,
+    padu: &Padu,
     history: &UsageHistory,
     theme: &Theme,
     scroll: &ScrollHandle,
     scrollbar_state: &Rc<ScrollbarState>,
-    cx: &mut Context<Orbis>,
+    cx: &mut Context<Padu>,
 ) -> Div {
     let by_cost = rank_by_cost(history);
     let colors = usage_provider_colors(theme);
@@ -2420,7 +2420,7 @@ fn usage_month_list(
             let last = index + 1 == count;
             rows = rows.child(match history.month(*first_day) {
                 Some(month) => {
-                    let models_control = orbis.usage_models_control(
+                    let models_control = padu.usage_models_control(
                         format!("usage-month-models-{first_day}"),
                         &month.top_models,
                         month.cost_usd,
@@ -2913,17 +2913,17 @@ mod tests {
         let home = Path::new("/Users/developer");
 
         assert_eq!(
-            usage_project_path(Path::new("/Users/developer/dev/orbis"), Some(home)),
-            "~/dev/orbis"
+            usage_project_path(Path::new("/Users/developer/dev/padu"), Some(home)),
+            "~/dev/padu"
         );
         assert_eq!(usage_project_path(home, Some(home)), "~");
         assert_eq!(
-            usage_project_path(Path::new("/Users/developer-2/orbis"), Some(home)),
-            "/Users/developer-2/orbis"
+            usage_project_path(Path::new("/Users/developer-2/padu"), Some(home)),
+            "/Users/developer-2/padu"
         );
         assert_eq!(
-            usage_project_path(Path::new("/Volumes/work/orbis"), Some(home)),
-            "/Volumes/work/orbis"
+            usage_project_path(Path::new("/Volumes/work/padu"), Some(home)),
+            "/Volumes/work/padu"
         );
     }
 

@@ -9,7 +9,7 @@ use gpui::{
 #[cfg(any(target_os = "linux", target_os = "windows"))]
 use gpui::{KeyDownEvent, WindowButton};
 
-use super::Orbis;
+use super::Padu;
 use crate::theme::Theme;
 #[cfg(any(target_os = "linux", target_os = "windows"))]
 use crate::ui::{icon, tooltip::Tooltip};
@@ -23,7 +23,7 @@ pub(super) enum WindowControlSide {
     Right,
 }
 
-impl Orbis {
+impl Padu {
     /// Draw the frame a Wayland compositor delegates back to the client.
     /// Server-decorated windows pass through untouched, so X11 and Wayland
     /// compositors that provide native chrome keep doing so.
@@ -102,7 +102,7 @@ impl Orbis {
             .into_any_element()
     }
 
-    /// Render the window controls Orbis owns: the desktop's configured button
+    /// Render the window controls Padu owns: the desktop's configured button
     /// order when GPUI had to fall back from server-side to client-side
     /// decorations, and the platform order on Windows.
     pub(super) fn render_client_window_controls(
@@ -191,7 +191,7 @@ fn client_window_button(
     enabled: bool,
     is_maximized: bool,
     theme: Theme,
-    cx: &mut Context<Orbis>,
+    cx: &mut Context<Padu>,
 ) -> AnyElement {
     let (id, icon_path, label) = match button {
         WindowButton::Minimize => (

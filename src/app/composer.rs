@@ -23,7 +23,7 @@ pub(super) fn composer_submit_action(
     }
 }
 
-impl Orbis {
+impl Padu {
     // ── Permission ─────────────────────────────────────────────────────────
 
     pub(super) fn render_permission(&self, cx: &mut Context<Self>) -> Option<Div> {
@@ -1266,7 +1266,7 @@ impl Orbis {
                     .flex()
                     // The filter field keeps focus and the selected row is only
                     // drawn, never focused — the same split Zed's picker uses.
-                    // These arrive as actions bound to `OrbisMenu > TextInput`,
+                    // These arrive as actions bound to `PaduMenu > TextInput`,
                     // which is the only way to claim a key out from under a
                     // focused text field.
                     .on_action(move |_: &SelectNextEntry, _, cx| {
@@ -1947,7 +1947,7 @@ impl Orbis {
         let paths = paths.to_vec();
         let daemon = self.daemon.clone();
         let draft_owner = self.selected_composer_draft_key();
-        cx.spawn(async move |orbis, cx| {
+        cx.spawn(async move |padu, cx| {
             let result = cx
                 .background_executor()
                 .spawn(async move {
@@ -1963,9 +1963,9 @@ impl Orbis {
                         let response = daemon.client().request(
                             Uuid::nil(),
                             Uuid::nil(),
-                            orbis_client::Command::ImportAttachment { name, upload },
+                            padu_client::Command::ImportAttachment { name, upload },
                         )?;
-                        let orbis_client::ResponsePayload::AttachmentStored { attachment } =
+                        let padu_client::ResponsePayload::AttachmentStored { attachment } =
                             response
                         else {
                             anyhow::bail!("the daemon returned an invalid attachment response");
@@ -1975,14 +1975,14 @@ impl Orbis {
                     Ok::<_, anyhow::Error>(stored)
                 })
                 .await;
-            let _ = orbis.update(cx, |orbis, cx| match result {
+            let _ = padu.update(cx, |padu, cx| match result {
                 Ok(stored) => {
-                    if orbis.selected_composer_draft_key() != draft_owner {
+                    if padu.selected_composer_draft_key() != draft_owner {
                         return;
                     }
                     let mut changed = false;
                     for (attachment, preview_image, is_image) in stored {
-                        changed |= orbis.stage_daemon_attachment(
+                        changed |= padu.stage_daemon_attachment(
                             attachment.path,
                             attachment.name,
                             attachment.is_dir,
@@ -1992,12 +1992,12 @@ impl Orbis {
                         );
                     }
                     if changed {
-                        orbis.schedule_composer_draft_save(cx);
+                        padu.schedule_composer_draft_save(cx);
                         cx.notify();
                     }
                 }
                 Err(error) => {
-                    orbis.show_toast(error.to_string());
+                    padu.show_toast(error.to_string());
                     cx.notify();
                 }
             });
@@ -2038,7 +2038,7 @@ impl Orbis {
     }
 
     /// Stage the clipboard's primary image/file representation. On-disk paths
-    /// reuse drop handling immediately; raw image bytes are copied into Orbis's
+    /// reuse drop handling immediately; raw image bytes are copied into Padu's
     /// durable blob store on the background executor before their chip appears.
     pub(super) fn stage_pasted_attachments(
         &mut self,
@@ -2063,7 +2063,7 @@ impl Orbis {
 
         let daemon = self.daemon.clone();
         let draft_owner = self.selected_composer_draft_key();
-        cx.spawn(async move |orbis, cx| {
+        cx.spawn(async move |padu, cx| {
             let stored = cx
                 .background_executor()
                 .spawn(async move {
@@ -2079,13 +2079,13 @@ impl Orbis {
                                 .request(
                                     Uuid::nil(),
                                     Uuid::nil(),
-                                    orbis_client::Command::StoreBlob {
+                                    padu_client::Command::StoreBlob {
                                         mime_type: preview_image.format.mime_type().to_owned(),
                                         bytes,
                                     },
                                 )
                                 .map_err(|error| error.to_string())?;
-                            let orbis_client::ResponsePayload::BlobStored { reference, path } =
+                            let padu_client::ResponsePayload::BlobStored { reference, path } =
                                 response
                             else {
                                 return Err("the daemon returned an invalid blob response".into());
@@ -2104,14 +2104,14 @@ impl Orbis {
                         .collect::<Result<Vec<_>, _>>()
                 })
                 .await;
-            let _ = orbis.update(cx, |orbis, cx| match stored {
+            let _ = padu.update(cx, |padu, cx| match stored {
                 Ok(stored) => {
-                    if orbis.selected_composer_draft_key() != draft_owner {
+                    if padu.selected_composer_draft_key() != draft_owner {
                         return;
                     }
                     let mut staged = false;
                     for (path, name, reference, preview_image) in stored {
-                        staged |= orbis.stage_daemon_attachment(
+                        staged |= padu.stage_daemon_attachment(
                             path,
                             name,
                             false,
@@ -2121,12 +2121,12 @@ impl Orbis {
                         );
                     }
                     if staged {
-                        orbis.schedule_composer_draft_save(cx);
+                        padu.schedule_composer_draft_save(cx);
                         cx.notify();
                     }
                 }
                 Err(error) => {
-                    orbis.show_toast(tr!("errors.store_pasted_image", error = error));
+                    padu.show_toast(tr!("errors.store_pasted_image", error = error));
                     cx.notify();
                 }
             });
@@ -2202,7 +2202,7 @@ impl Orbis {
         self.composer.update(cx, |input, cx| input.clear(cx));
         // Submission notifications already hold this entity mutably. Dispatch
         // after that effect returns so the window action can safely re-enter
-        // Orbis and move focus into the Resume picker.
+        // Padu and move focus into the Resume picker.
         cx.defer(|cx| cx.dispatch_action(&OpenResumePicker));
         true
     }
@@ -3586,7 +3586,7 @@ pub(super) fn visible_branch_entries(
 // Base64 keeps the authenticated JSON transport browser-compatible but adds
 // one third of wire overhead. Stay comfortably below tungstenite's default
 // message limit until uploads move to a streaming content endpoint.
-const MAX_ATTACHMENT_BYTES: u64 = orbis_client::attachments::MAX_ATTACHMENT_BYTES as u64;
+const MAX_ATTACHMENT_BYTES: u64 = padu_client::attachments::MAX_ATTACHMENT_BYTES as u64;
 
 /// Reads a client-local drop into an upload payload. This is the explicit
 /// client/daemon boundary: none of these source paths are persisted or handed
@@ -3595,7 +3595,7 @@ fn attachment_upload_from_path(
     source: &Path,
 ) -> anyhow::Result<(
     String,
-    orbis_client::attachments::AttachmentUpload,
+    padu_client::attachments::AttachmentUpload,
     Option<Vec<u8>>,
 )> {
     let metadata = std::fs::symlink_metadata(source)
@@ -3621,7 +3621,7 @@ fn attachment_upload_from_path(
         let is_image = is_image_attachment_path(source);
         return Ok((
             name,
-            orbis_client::attachments::AttachmentUpload::File {
+            padu_client::attachments::AttachmentUpload::File {
                 data_base64: base64::engine::general_purpose::STANDARD.encode(&bytes),
             },
             is_image.then_some(bytes),
@@ -3657,10 +3657,10 @@ fn attachment_upload_from_path(
             if !metadata.is_file() {
                 continue;
             }
-            if entries.len() >= orbis_client::attachments::MAX_ATTACHMENT_FILES {
+            if entries.len() >= padu_client::attachments::MAX_ATTACHMENT_FILES {
                 anyhow::bail!(
                     "attachment directory contains more than {} files",
-                    orbis_client::attachments::MAX_ATTACHMENT_FILES
+                    padu_client::attachments::MAX_ATTACHMENT_FILES
                 );
             }
             total_bytes = total_bytes.saturating_add(metadata.len());
@@ -3673,7 +3673,7 @@ fn attachment_upload_from_path(
                 .to_path_buf();
             let bytes = std::fs::read(&path)
                 .with_context(|| format!("could not read attachment {}", path.display()))?;
-            entries.push(orbis_client::attachments::AttachmentUploadEntry {
+            entries.push(padu_client::attachments::AttachmentUploadEntry {
                 relative_path,
                 data_base64: base64::engine::general_purpose::STANDARD.encode(bytes),
             });
@@ -3681,7 +3681,7 @@ fn attachment_upload_from_path(
     }
     Ok((
         name,
-        orbis_client::attachments::AttachmentUpload::Directory { entries },
+        padu_client::attachments::AttachmentUpload::Directory { entries },
         None,
     ))
 }
@@ -3799,10 +3799,10 @@ fn model_picker_empty_state(
     theme: &Theme,
     focus: &FocusHandle,
     popover: ContextMenuHandle,
-    orbis: WeakEntity<Orbis>,
+    padu: WeakEntity<Padu>,
 ) -> AnyElement {
     let click_popover = popover.clone();
-    let click_orbis = orbis.clone();
+    let click_padu = padu.clone();
     div()
         .w(px(320.0))
         .rounded(px(13.0))
@@ -3866,11 +3866,11 @@ fn model_picker_empty_state(
                 .child(icon("icons/settings.svg", 11.0, theme.text_tertiary))
                 .child(tr!("models.open_provider_settings"))
                 .on_click(move |_, window, cx| {
-                    open_provider_settings_from_picker(&click_orbis, &click_popover, window, cx);
+                    open_provider_settings_from_picker(&click_padu, &click_popover, window, cx);
                 })
                 .on_key_down(move |event: &KeyDownEvent, window, cx| {
                     if matches!(event.keystroke.key.as_str(), "enter" | "space") {
-                        open_provider_settings_from_picker(&orbis, &popover, window, cx);
+                        open_provider_settings_from_picker(&padu, &popover, window, cx);
                         cx.stop_propagation();
                     }
                 }),
@@ -3883,13 +3883,13 @@ fn model_picker_empty_state(
 /// picker returns focus to the composer as it closes, which would otherwise
 /// pull focus straight back out of the settings view.
 fn open_provider_settings_from_picker(
-    orbis: &WeakEntity<Orbis>,
+    padu: &WeakEntity<Padu>,
     popover: &ContextMenuHandle,
     window: &mut Window,
     cx: &mut App,
 ) {
     popover.close(window, cx);
-    let _ = orbis.update(cx, |this, cx| {
+    let _ = padu.update(cx, |this, cx| {
         this.open_settings_action(&OpenSettings, window, cx);
         this.open_settings_page(SettingsPage::Providers, cx);
     });
@@ -3900,7 +3900,7 @@ fn open_provider_settings_from_picker(
 /// Installed on this machine and not switched off in the Providers settings.
 /// Both of those are settings-level facts the user has already decided, so the
 /// tab is absent rather than dimmed — the rail offers what could be picked,
-/// not a catalog of everything Orbis can speak to. A session locked to a
+/// not a catalog of everything Padu can speak to. A session locked to a
 /// provider switched off afterwards keeps its own tab, since the picker is
 /// that session's only route to another model.
 pub(super) fn picker_rail_shows_provider(

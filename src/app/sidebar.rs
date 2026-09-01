@@ -3,7 +3,7 @@ use gpui::{KeyBinding, actions};
 
 use super::*;
 
-actions!(orbis_sidebar, [CancelSessionRename]);
+actions!(padu_sidebar, [CancelSessionRename]);
 
 const SESSION_RENAME_PARENT_CONTEXT: &str = "SessionRename";
 const SESSION_RENAME_FIELD_CONTEXT: &str = "SessionRename > TextInput";
@@ -422,7 +422,7 @@ fn reveal_sidebar_list_row(
     }
 }
 
-impl Orbis {
+impl Padu {
     pub(super) fn window_drag_region(
         &self,
         region: Stateful<Div>,
@@ -1129,17 +1129,17 @@ impl Orbis {
             return;
         }
 
-        let workspace = orbis_client::WorkspaceClient::new(self.daemon.client());
-        cx.spawn(async move |orbis, cx| {
+        let workspace = padu_client::WorkspaceClient::new(self.daemon.client());
+        cx.spawn(async move |padu, cx| {
             let labels = cx
                 .background_executor()
                 .spawn(async move {
                     let mut labels = HashMap::new();
                     for path in paths {
                         let branch = match workspace.request(
-                            orbis_client::WorkspaceOperation::InspectBranches { cwd: path.clone() },
+                            padu_client::WorkspaceOperation::InspectBranches { cwd: path.clone() },
                         ) {
-                            Ok(orbis_client::WorkspaceResult::Branches {
+                            Ok(padu_client::WorkspaceResult::Branches {
                                 snapshot: Some(snapshot),
                             }) => snapshot.display_branch().map(str::to_owned),
                             _ => None,
@@ -1151,11 +1151,11 @@ impl Orbis {
                     labels
                 })
                 .await;
-            let _ = orbis.update(cx, |orbis, cx| {
-                if orbis.sidebar_branch_scan_generation.get() != generation {
+            let _ = padu.update(cx, |padu, cx| {
+                if padu.sidebar_branch_scan_generation.get() != generation {
                     return;
                 }
-                *orbis.sidebar_branch_labels.borrow_mut() = labels
+                *padu.sidebar_branch_labels.borrow_mut() = labels
                     .into_iter()
                     .map(|(path, branch)| (path, SharedString::from(branch)))
                     .collect();
@@ -2072,7 +2072,7 @@ impl Orbis {
                 )
         };
 
-        let orbis = cx.entity().downgrade();
+        let padu = cx.entity().downgrade();
         let menu = self.menu_handle(format!("session-{session_id}"), cx);
         let row_focus = menu.trigger_focus_handle().clone();
         let keyboard_menu = menu.clone();
@@ -2129,18 +2129,18 @@ impl Orbis {
                 SharedString::from(format!("session-menu-{session_id}")),
                 &menu,
                 move |_| {
-                    let rename_orbis = orbis.clone();
-                    let remove_orbis = orbis.clone();
+                    let rename_padu = padu.clone();
+                    let remove_padu = padu.clone();
                     vec![
                         MenuItem::new(tr!("common.rename"), move |window, cx| {
-                            let _ = rename_orbis.update(cx, |orbis, cx| {
-                                orbis.begin_session_rename(session_id, window, cx);
+                            let _ = rename_padu.update(cx, |padu, cx| {
+                                padu.begin_session_rename(session_id, window, cx);
                             });
                         }),
                         MenuItem::Separator,
                         MenuItem::new(tr!("common.remove"), move |_, cx| {
-                            let _ = remove_orbis
-                                .update(cx, |orbis, cx| orbis.remove_session(session_id, cx));
+                            let _ = remove_padu
+                                .update(cx, |padu, cx| padu.remove_session(session_id, cx));
                         }),
                     ]
                 },
@@ -2733,7 +2733,7 @@ mod tests {
 
     #[test]
     fn projectless_sidebar_projects_are_paths_under_the_workspace_root() {
-        let root = Path::new("/tmp/.orbis/projects");
+        let root = Path::new("/tmp/.padu/projects");
         let projectless = Project {
             id: Uuid::from_u128(1),
             name: "Task".to_owned(),

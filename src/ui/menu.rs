@@ -35,7 +35,7 @@ use gpui::{
 };
 
 actions!(
-    orbis_menu,
+    padu_menu,
     [
         DismissMenu,
         SelectNextEntry,
@@ -47,7 +47,7 @@ actions!(
 );
 
 /// Key context the open menu declares, and the scope its bindings live in.
-const MENU_CONTEXT: &str = "OrbisMenu";
+const MENU_CONTEXT: &str = "PaduMenu";
 
 /// Vertical gap between a trigger and its anchored card.
 const TRIGGER_GAP: f32 = 4.0;
@@ -59,7 +59,7 @@ const TRIGGER_GAP: f32 = 4.0;
 /// be claimed from under the focused field, and only a binding can do that:
 /// `enter`, `tab`, and the arrows reach the field as *actions*, and an action
 /// consumes the keystroke before any `on_key_down` listener above it ever runs.
-const PANEL_FIELD_CONTEXT: &str = "OrbisMenu > TextInput";
+const PANEL_FIELD_CONTEXT: &str = "PaduMenu > TextInput";
 
 /// Bind the menu's own keys. Called once at startup.
 ///
@@ -1112,7 +1112,7 @@ fn render_menu_item(
             value,
             items: _,
         } => {
-            // Orbis currently exposes one flyout level. Keeping a nested
+            // Padu currently exposes one flyout level. Keeping a nested
             // submenu row inert prevents a child builder from accidentally
             // stealing the parent flyout's keyboard state.
             if in_submenu {
