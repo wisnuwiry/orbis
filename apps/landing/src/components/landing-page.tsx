@@ -40,12 +40,10 @@ const VIEWPORT_60 = { once: true, margin: "-60px" };
 
 const PHONE_PERSPECTIVE_STYLE = { minHeight: 480, perspective: 700 };
 import { CursorFieldProvider } from "~/components/butterfly";
-import { CommandDialog } from "~/components/command-dialog";
 import { AGENT_PAGES } from "~/data/agent-pages";
 import {
   getDownloadOptions,
   useDetectedPlatform,
-  TerminalIcon,
 } from "~/downloads";
 import { useRelease } from "~/routes/__root";
 import { HeroMockup } from "~/components/hero-mockup";
@@ -370,7 +368,7 @@ function GetStarted() {
     <div className="pt-8">
       <div className="flex flex-row flex-wrap justify-center gap-3">
         <DownloadButton />
-        <ServerInstallButton />
+        <OtherPlatformsButton />
       </div>
       <div className="flex items-center justify-center gap-2 pt-6">
         <span className="text-xs text-zinc-500 font-medium">Supports</span>
@@ -411,29 +409,14 @@ function DownloadButton() {
   );
 }
 
-const SERVER_INSTALL_TRIGGER = (
-  <span className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm font-medium text-white hover:bg-white/[0.08] active:scale-[0.98] transition-all">
-    <TerminalIcon className="h-4 w-4 text-white/70" />
-    Remote CLI
-  </span>
-);
-
-const SERVER_INSTALL_FOOTNOTE = (
-  <>
-    Requires Node.js 18+. Run <span className="font-mono text-white/40">padu</span> to start the
-    daemon.
-  </>
-);
-
-function ServerInstallButton() {
+function OtherPlatformsButton() {
   return (
-    <CommandDialog
-      trigger={SERVER_INSTALL_TRIGGER}
-      title="Run agents on a remote machine"
-      description="For headless machines you want to connect to from the Padu apps. The desktop app already includes a built-in daemon."
-      command="npm install -g @padu/cli && padu"
-      footnote={SERVER_INSTALL_FOOTNOTE}
-    />
+    <a
+      href="/download"
+      className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-4.5 py-2.5 text-sm font-medium text-white hover:bg-white/[0.08] active:scale-[0.98] transition-all"
+    >
+      Other platforms
+    </a>
   );
 }
 
