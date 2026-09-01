@@ -248,8 +248,8 @@ function MultiProviderSection() {
 
   return (
     <FeatureSection
-      title="Works with your tools"
-      description="Bring your subscriptions, skills and configuration"
+      title="Multi-agent orchestration"
+      description="Switch between leading AI coding agents while keeping your local workspace context and credentials intact."
     >
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {providers.map((p) => (
@@ -275,8 +275,8 @@ function MultiProviderSection() {
 function TurnkeySection() {
   return (
     <FeatureSection
-      title="Run it anywhere"
-      description="Use Padu locally, from another machine, or in isolated worktrees"
+      title="Engineered for performance"
+      description="Run Padu natively with GPU-accelerated rendering, connect over your network, or run agents in isolated Git worktrees."
     >
       <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
         <div className="flex flex-col gap-6 border-b border-white/10 p-6 sm:flex-row sm:items-center sm:justify-between md:p-8">
@@ -285,9 +285,9 @@ function TurnkeySection() {
               <Monitor className="h-6 w-6" strokeWidth={1.5} />
             </div>
             <div className="space-y-0.5">
-              <h3 className="text-xl font-medium text-white/90">Desktop app</h3>
+              <h3 className="text-xl font-medium text-white/90">Native desktop app</h3>
               <p className="max-w-lg text-sm leading-relaxed text-white/50">
-                The one click experience, download the app and it just works
+                High-performance native app built in Rust and GPUI with instant startup and 120fps streaming.
               </p>
             </div>
           </div>
@@ -298,21 +298,21 @@ function TurnkeySection() {
             <TurnkeyExtensionCard
               icon={Smartphone}
               title="Mobile and web"
-              description="Connect to the same workspaces from any client"
+              description="Connect to the same workspace from browser and companion clients."
               ctaHref="/download"
               ctaLabel="Download"
             />
             <TurnkeyExtensionCard
               icon={Laptop}
-              title="Remote machines"
-              description="Run Padu on a home lab, or a cloud machine"
+              title="Remote daemon"
+              description="Run the Padu daemon headless on remote devboxes, home servers, or cloud VMs."
               ctaHref="/docs/cli"
               ctaLabel="Docs"
             />
             <TurnkeyExtensionCard
               icon={GitFork}
               title="Worktree isolation"
-              description="Run agents in separate git worktrees without touching your branch"
+              description="Run concurrent agents in separate Git worktrees without touching your active branch."
               ctaHref="/docs/worktrees"
               ctaLabel="Docs"
             />
