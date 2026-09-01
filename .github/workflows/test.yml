@@ -3,7 +3,27 @@ name: Tests
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "*.md"
+      - "docs/**"
+      - "website/**"
+      - "assets/**"
+      - "locales/**"
+      - "LICENSE"
+      - "NOTICE.md"
+      - "SECURITY.md"
+      - "CONTRIBUTING.md"
   pull_request:
+    paths-ignore:
+      - "*.md"
+      - "docs/**"
+      - "website/**"
+      - "assets/**"
+      - "locales/**"
+      - "LICENSE"
+      - "NOTICE.md"
+      - "SECURITY.md"
+      - "CONTRIBUTING.md"
 
 permissions:
   contents: read
@@ -62,16 +82,3 @@ jobs:
 
       - name: Run tests
         run: cargo test --locked
-
-      # The generated protocol and browser client are platform-independent, so
-      # one runner is enough to catch a drifted checked-in artifact.
-      - name: Install JavaScript dependencies
-        if: runner.os == 'Linux'
-        run: bun install --frozen-lockfile
-
-      - name: Check generated protocol and browser client
-        if: runner.os == 'Linux'
-        run: |
-          bun run protocol:check
-          bun run --filter @padu/client check
-          bun run --filter @padu/client test

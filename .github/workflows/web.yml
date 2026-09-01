@@ -1,0 +1,69 @@
+name: Web checks
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/padu-client/**"
+      - "apps/web/**"
+      - "crates/padu-protocol/**"
+      - "Cargo.lock"
+      - "bun.lock"
+      - "package.json"
+      - "tsconfig.json"
+      - ".github/workflows/web.yml"
+  pull_request:
+    paths:
+      - "packages/padu-client/**"
+      - "apps/web/**"
+      - "crates/padu-protocol/**"
+      - "Cargo.lock"
+      - "bun.lock"
+      - "package.json"
+      - "tsconfig.json"
+      - ".github/workflows/web.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Protocol + web client
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Rust
+        run: |
+          rustup toolchain install 1.96.0 --profile minimal
+          rustup default 1.96.0
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Cache Cargo
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: web-checks-rust-1.96.0-cargo-${{ hashFiles('Cargo.lock') }}
+          restore-keys: |
+            web-checks-rust-1.96.0-cargo-
+
+      - name: Install JavaScript dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Check generated protocol
+        run: bun run protocol:check
+
+      - name: Check web client
+        run: |
+          bun run --filter @padu/client check
+          bun run --filter @padu/client test

@@ -68,11 +68,23 @@ jobs:
             echo "published=false" >> "$GITHUB_OUTPUT"
           fi
 
-  linux-x86_64:
-    name: Linux x86_64
+  linux:
+    name: Linux ${{ matrix.arch }}
     needs: version
     if: needs.version.outputs.published != 'true'
-    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runs-on: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            artifact: linux-x86_64
+          - arch: arm64
+            runs-on: ubuntu-22.04-arm
+            target: aarch64-unknown-linux-gnu
+            artifact: linux-arm64
+    runs-on: ${{ matrix.runs-on }}
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v6
@@ -102,9 +114,9 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: ubuntu-22.04-rust-1.96.0-release-${{ hashFiles('Cargo.lock') }}
+          key: ${{ matrix.runs-on }}-rust-1.96.0-release-${{ hashFiles('Cargo.lock') }}
           restore-keys: |
-            ubuntu-22.04-rust-1.96.0-release-
+            ${{ matrix.runs-on }}-rust-1.96.0-release-
 
       # `target/` is restored from the release cache, so the previous
       # release's bundles are still sitting in `target/release` when this one
@@ -120,18 +132,32 @@ jobs:
 
       - uses: actions/upload-artifact@v7
         with:
-          name: linux-x86_64
+          name: ${{ matrix.artifact }}
           # Named exactly, not globbed: `if-no-files-found: error` is then a
           # real check that this version built, rather than something an older
           # bundle can satisfy.
-          path: target/release/padu-${{ needs.version.outputs.version }}-x86_64-unknown-linux-gnu.tar.gz
+          path: target/release/padu-${{ needs.version.outputs.version }}-${{ matrix.target }}.tar.gz
           if-no-files-found: error
 
-  linux-arm64:
-    name: Linux arm64
+  windows:
+    name: Windows ${{ matrix.arch }}
     needs: version
     if: needs.version.outputs.published != 'true'
-    runs-on: ubuntu-22.04-arm
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runs-on: windows-latest
+            target: x86_64-pc-windows-msvc
+            setup-arch: x86_64
+            artifact: windows-x86_64
+          - arch: arm64
+            runs-on: windows-11-arm
+            target: aarch64-pc-windows-msvc
+            setup-arch: aarch64
+            artifact: windows-arm64
+    runs-on: ${{ matrix.runs-on }}
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v6
@@ -140,63 +166,7 @@ jobs:
         run: |
           rustup toolchain install 1.96.0 --profile minimal
           rustup default 1.96.0
-
-      - name: Install Linux dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes \
-            clang \
-            cmake \
-            libfontconfig-dev \
-            libvulkan1 \
-            libwayland-dev \
-            libx11-xcb-dev \
-            libxkbcommon-x11-dev \
-            pkg-config \
-            xdg-desktop-portal
-
-      - uses: actions/cache@v6
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ubuntu-22.04-arm-rust-1.96.0-release-${{ hashFiles('Cargo.lock') }}
-          restore-keys: |
-            ubuntu-22.04-arm-rust-1.96.0-release-
-
-      # `target/` is restored from the release cache, so the previous
-      # release's bundles are still sitting in `target/release` when this one
-      # starts. Cargo does not own them, so nothing else clears them.
-      - name: Clear stale bundles
-        run: rm -f target/release/padu-*.tar.gz
-
-      - name: Bundle
-        env:
-          PADU_ANALYTICS_ENDPOINT: ${{ secrets.PADU_ANALYTICS_ENDPOINT }}
-          PADU_ANALYTICS_WEBSITE_ID: ${{ secrets.PADU_ANALYTICS_WEBSITE_ID }}
-        run: ./scripts/bundle-linux.sh
-
-      - uses: actions/upload-artifact@v7
-        with:
-          name: linux-arm64
-          path: target/release/padu-${{ needs.version.outputs.version }}-aarch64-unknown-linux-gnu.tar.gz
-          if-no-files-found: error
-
-  windows-x86_64:
-    name: Windows x86_64
-    needs: version
-    if: needs.version.outputs.published != 'true'
-    runs-on: windows-latest
-    timeout-minutes: 90
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Install Rust
-        run: |
-          rustup toolchain install 1.96.0 --profile minimal
-          rustup default 1.96.0
-          rustup target add x86_64-pc-windows-msvc
+          rustup target add ${{ matrix.target }}
 
       - uses: oven-sh/setup-bun@v2
 
@@ -209,9 +179,9 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: windows-latest-rust-1.96.0-release-${{ hashFiles('Cargo.lock') }}
+          key: ${{ matrix.runs-on }}-rust-1.96.0-release-${{ hashFiles('Cargo.lock') }}
           restore-keys: |
-            windows-latest-rust-1.96.0-release-
+            ${{ matrix.runs-on }}-rust-1.96.0-release-
 
       # `target/` is restored from the release cache, so the previous
       # release's bundles are still sitting in `target/release` when this one
@@ -229,62 +199,10 @@ jobs:
 
       - uses: actions/upload-artifact@v7
         with:
-          name: windows-x86_64
+          name: ${{ matrix.artifact }}
           path: |
-            target/release/padu-${{ needs.version.outputs.version }}-x86_64-pc-windows-msvc.zip
-            target/release/Padu-${{ needs.version.outputs.version }}-x86_64-Setup.exe
-          if-no-files-found: error
-
-  windows-arm64:
-    name: Windows arm64
-    needs: version
-    if: needs.version.outputs.published != 'true'
-    runs-on: windows-11-arm
-    timeout-minutes: 90
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Install Rust
-        run: |
-          rustup toolchain install 1.96.0 --profile minimal
-          rustup default 1.96.0
-          rustup target add aarch64-pc-windows-msvc
-
-      - uses: oven-sh/setup-bun@v2
-
-      - name: Install Inno Setup
-        run: choco install innosetup --yes --no-progress
-
-      - uses: actions/cache@v6
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: windows-11-arm-rust-1.96.0-release-${{ hashFiles('Cargo.lock') }}
-          restore-keys: |
-            windows-11-arm-rust-1.96.0-release-
-
-      # `target/` is restored from the release cache, so the previous
-      # release's bundles are still sitting in `target/release` when this one
-      # starts. Cargo does not own them, so nothing else clears them.
-      - name: Clear stale bundles
-        run: Remove-Item -Force -ErrorAction SilentlyContinue target/release/padu-*.zip, target/release/Padu-*-Setup.exe
-
-      - name: Bundle
-        env:
-          PADU_ANALYTICS_ENDPOINT: ${{ secrets.PADU_ANALYTICS_ENDPOINT }}
-          PADU_ANALYTICS_WEBSITE_ID: ${{ secrets.PADU_ANALYTICS_WEBSITE_ID }}
-          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
-          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
-        run: bun scripts/bundle-windows.ts
-
-      - uses: actions/upload-artifact@v7
-        with:
-          name: windows-arm64
-          path: |
-            target/release/padu-${{ needs.version.outputs.version }}-aarch64-pc-windows-msvc.zip
-            target/release/Padu-${{ needs.version.outputs.version }}-aarch64-Setup.exe
+            target/release/padu-${{ needs.version.outputs.version }}-${{ matrix.target }}.zip
+            target/release/Padu-${{ needs.version.outputs.version }}-${{ matrix.setup-arch }}-Setup.exe
           if-no-files-found: error
 
   macos:
@@ -340,14 +258,10 @@ jobs:
   draft-release:
     name: Draft GitHub release
     needs:
-      [
-        version,
-        linux-x86_64,
-        linux-arm64,
-        windows-x86_64,
-        windows-arm64,
-        macos,
-      ]
+      - version
+      - linux
+      - windows
+      - macos
     if: needs.version.outputs.published != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
