@@ -1,5 +1,5 @@
 import { getAlternativePages } from "~/data/alternative-pages";
-import { appStoreUrl, playStoreUrl, webAppUrl } from "~/downloads";
+import { webAppUrl } from "~/downloads";
 
 interface SiteFooterProps {
   width?: "default" | "prose";
@@ -11,44 +11,45 @@ export function SiteFooter({ width = "default" }: SiteFooterProps) {
   const alternatives = getAlternativePages();
   return (
     <footer className={`${widthClasses} mx-auto`}>
-      <div className="border-t border-white/10 pt-8 pb-4 grid grid-cols-2 sm:grid-cols-5 gap-8 text-sm">
+      <div className="border-t border-white/10 pt-10 pb-4 grid grid-cols-2 sm:grid-cols-5 gap-8 text-sm">
         <div className="space-y-3">
-          <p className="text-white/60 font-medium">Product</p>
+          <p className="text-white/70 font-medium text-xs uppercase tracking-wider">Docs</p>
           <div className="space-y-2">
             <a
               href="/docs"
               className="block text-muted-foreground hover:text-foreground transition-colors"
             >
-              Docs
-            </a>
-            <a
-              href="/changelog"
-              className="block text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Changelog
+              Overview
             </a>
             <a
               href="/docs/cli"
               className="block text-muted-foreground hover:text-foreground transition-colors"
             >
-              CLI
+              CLI Reference
             </a>
             <a
-              href="/privacy"
+              href="/docs/worktrees"
               className="block text-muted-foreground hover:text-foreground transition-colors"
             >
-              Privacy
+              Worktrees
             </a>
             <a
-              href="/terms"
+              href="/docs/configuration"
               className="block text-muted-foreground hover:text-foreground transition-colors"
             >
-              Terms
+              Configuration
+            </a>
+            <a
+              href="/docs/connectivity"
+              className="block text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Connectivity
             </a>
           </div>
         </div>
+
         <div className="space-y-3">
-          <p className="text-white/60 font-medium">Agents</p>
+          <p className="text-white/70 font-medium text-xs uppercase tracking-wider">Agents</p>
           <div className="space-y-2">
             <a
               href="/claude-code"
@@ -69,15 +70,22 @@ export function SiteFooter({ width = "default" }: SiteFooterProps) {
               OpenCode
             </a>
             <a
+              href="/pi"
+              className="block text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Pi
+            </a>
+            <a
               href="/agents"
               className="block text-muted-foreground hover:text-foreground transition-colors"
             >
-              All providers
+              All Providers
             </a>
           </div>
         </div>
+
         <div className="space-y-3">
-          <p className="text-white/60 font-medium">Alternatives</p>
+          <p className="text-white/70 font-medium text-xs uppercase tracking-wider">Alternatives</p>
           <div className="space-y-2">
             {alternatives.map((page) => (
               <a
@@ -90,9 +98,26 @@ export function SiteFooter({ width = "default" }: SiteFooterProps) {
             ))}
           </div>
         </div>
+
         <div className="space-y-3">
-          <p className="text-white/60 font-medium">Community</p>
+          <p className="text-white/70 font-medium text-xs uppercase tracking-wider">Community</p>
           <div className="space-y-2">
+            <a
+              href="https://github.com/wisnuwiry/padu"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-muted-foreground hover:text-foreground transition-colors"
+            >
+              GitHub
+            </a>
+            <a
+              href="https://github.com/wisnuwiry/padu/releases"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Releases
+            </a>
             <a
               href="https://github.com/wisnuwiry/padu/discussions"
               target="_blank"
@@ -109,42 +134,17 @@ export function SiteFooter({ width = "default" }: SiteFooterProps) {
             >
               Issues
             </a>
-            <a
-              href="https://github.com/wisnuwiry/padu"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-muted-foreground hover:text-foreground transition-colors"
-            >
-              GitHub
-            </a>
           </div>
         </div>
+
         <div className="space-y-3">
-          <p className="text-white/60 font-medium">Download</p>
+          <p className="text-white/70 font-medium text-xs uppercase tracking-wider">Product</p>
           <div className="space-y-2">
             <a
-              href={appStoreUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/download"
               className="block text-muted-foreground hover:text-foreground transition-colors"
             >
-              App Store
-            </a>
-            <a
-              href={playStoreUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Google Play
-            </a>
-            <a
-              href="https://github.com/wisnuwiry/padu/releases"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Desktop
+              Desktop App
             </a>
             <a
               href={webAppUrl}
@@ -154,9 +154,39 @@ export function SiteFooter({ width = "default" }: SiteFooterProps) {
             >
               Web App
             </a>
+            {/* App Store and Google Play links temporarily commented out until released */}
+            {/* <a href={appStoreUrl} target="_blank" rel="noopener noreferrer" className="block text-muted-foreground hover:text-foreground transition-colors">App Store</a> */}
+            {/* <a href={playStoreUrl} target="_blank" rel="noopener noreferrer" className="block text-muted-foreground hover:text-foreground transition-colors">Google Play</a> */}
+            <a
+              href="/changelog"
+              className="block text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Changelog
+            </a>
+            <a
+              href="/privacy"
+              className="block text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Privacy
+            </a>
+            <a
+              href="/terms"
+              className="block text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Terms
+            </a>
           </div>
         </div>
+      </div>
+
+      <div className="border-t border-white/10 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <img src="/padu.svg" alt="Padu" className="w-4 h-4 opacity-75" />
+          <span>Padu · Native control plane for AI coding agents</span>
+        </div>
+        <p>© 2026 Padu. Free & open source under GPL-3.0.</p>
       </div>
     </footer>
   );
 }
+

@@ -51,12 +51,8 @@ import { CursorFieldProvider } from "~/components/butterfly";
 import { CommandDialog } from "~/components/command-dialog";
 import { AGENT_PAGES } from "~/data/agent-pages";
 import {
-  appStoreUrl,
-  playStoreUrl,
   getDownloadOptions,
   useDetectedPlatform,
-  AppleIcon,
-  PlayStoreIcon,
   TerminalIcon,
 } from "~/downloads";
 import { useRelease } from "~/routes/__root";
@@ -608,24 +604,9 @@ function GetStarted() {
     <div className="pt-10">
       <div className="flex flex-row flex-wrap justify-center gap-3">
         <DownloadButton />
-        <a
-          href={appStoreUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center rounded-lg border border-white/12 px-3 py-2 text-white hover:bg-white/10 transition-colors"
-          aria-label="App Store"
-        >
-          <AppleIcon className="h-5 w-5" />
-        </a>
-        <a
-          href={playStoreUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center rounded-lg border border-white/12 px-3 py-2 text-white hover:bg-white/10 transition-colors"
-          aria-label="Google Play"
-        >
-          <PlayStoreIcon className="h-5 w-5" />
-        </a>
+        {/* App Store & Google Play buttons temporarily hidden until released */}
+        {/* <a href={appStoreUrl} ...><AppleIcon /></a> */}
+        {/* <a href={playStoreUrl} ...><PlayStoreIcon /></a> */}
         <ServerInstallButton />
       </div>
       <div className="flex items-center justify-center gap-2 pt-6">

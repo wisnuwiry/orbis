@@ -128,7 +128,8 @@ function Download() {
         <div className="divide-y divide-border">
           <PlatformRow icon={AndroidIcon} label="Android">
             <PillGroup>
-              {!onBeta && <DownloadPill href={playStoreUrl} label="Play Store" external />}
+              {/* Play Store link temporarily disabled */}
+              {/* {!onBeta && <DownloadPill href={playStoreUrl} label="Play Store" external />} */}
               <DownloadPill href={urls.androidApk} label="APK" />
             </PillGroup>
           </PlatformRow>
@@ -136,7 +137,11 @@ function Download() {
           {!onBeta && (
             <PlatformRow icon={AppleIcon} label="iOS">
               <PillGroup>
-                <DownloadPill href={appStoreUrl} label="App Store" external />
+                {/* App Store link temporarily disabled */}
+                {/* <DownloadPill href={appStoreUrl} label="App Store" external /> */}
+                <span className="text-xs text-muted-foreground px-3 py-1.5 rounded-md bg-white/5 border border-white/10">
+                  Coming Soon
+                </span>
               </PillGroup>
             </PlatformRow>
           )}
