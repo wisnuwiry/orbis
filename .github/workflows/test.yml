@@ -70,6 +70,14 @@ jobs:
       - name: Install Bun
         uses: oven-sh/setup-bun@v2
 
+      - name: Cache Bun dependencies
+        uses: actions/cache@v6
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ matrix.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            ${{ matrix.os }}-bun-
+
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
         run: |
