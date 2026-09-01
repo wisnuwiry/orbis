@@ -3,29 +3,27 @@ name: Tests
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - "*.md"
-      - "docs/**"
-      - "public-docs/**"
-      - "apps/landing/**"
-      - "apps/web/**"
-      - "apps/mobile/**"
-      - "LICENSE"
-      - "NOTICE.md"
-      - "SECURITY.md"
-      - "CONTRIBUTING.md"
+    paths:
+      - "apps/desktop/**"
+      - "crates/**"
+      - "assets/**"
+      - "locales/**"
+      - "resources/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "rust-toolchain.toml"
+      - ".github/workflows/test.yml"
   pull_request:
-    paths-ignore:
-      - "*.md"
-      - "docs/**"
-      - "public-docs/**"
-      - "apps/landing/**"
-      - "apps/web/**"
-      - "apps/mobile/**"
-      - "LICENSE"
-      - "NOTICE.md"
-      - "SECURITY.md"
-      - "CONTRIBUTING.md"
+    paths:
+      - "apps/desktop/**"
+      - "crates/**"
+      - "assets/**"
+      - "locales/**"
+      - "resources/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "rust-toolchain.toml"
+      - ".github/workflows/test.yml"
 
 permissions:
   contents: read
