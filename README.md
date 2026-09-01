@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="website/public/logo-wordmark.svg">
-    <img alt="Padu" src="website/public/logo-wordmark.svg" width="240">
+    <source media="(prefers-color-scheme: dark)" srcset="website/public/padu.svg">
+    <img alt="Padu" src="website/public/padu.svg" width="240">
   </picture>
 </p>
 
