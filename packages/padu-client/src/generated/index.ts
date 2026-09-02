@@ -33,6 +33,7 @@ export type { DaemonSettings } from "./DaemonSettings";
 export type { DaySlice } from "./DaySlice";
 export type { FileEntry } from "./FileEntry";
 export type { GoalOperation } from "./GoalOperation";
+export type { HostProfile } from "./HostProfile";
 export type { InteractionMode } from "./InteractionMode";
 export type { Message } from "./Message";
 export type { MessageAttachment } from "./MessageAttachment";
