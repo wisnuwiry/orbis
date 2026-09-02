@@ -2664,6 +2664,16 @@ mod tests {
     }
 
     #[test]
+    fn format_time_ago_handles_time_boundaries() {
+        assert_eq!(format_time_ago(30), "just now");
+        assert_eq!(format_time_ago(90), "1m");
+        assert_eq!(format_time_ago(3_600), "1h");
+        assert_eq!(format_time_ago(7_200), "2h");
+        assert_eq!(format_time_ago(86_400), "1d");
+        assert_eq!(format_time_ago(172_800), "2d");
+    }
+
+    #[test]
     fn future_sessions_stay_in_today() {
         let today = NaiveDate::from_ymd_opt(2026, 8, 12).unwrap();
         let tomorrow = NaiveDate::from_ymd_opt(2026, 8, 13).unwrap();
