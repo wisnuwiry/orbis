@@ -2211,7 +2211,8 @@ impl Padu {
                             this.begin_session_rename(session_id, window, cx);
                             cx.stop_propagation();
                         } else if (key == "delete" || key == "backspace")
-                            && (event.keystroke.modifiers.platform || event.keystroke.modifiers.control)
+                            && (event.keystroke.modifiers.platform
+                                || event.keystroke.modifiers.control)
                         {
                             this.remove_session(session_id, cx);
                             cx.stop_propagation();
