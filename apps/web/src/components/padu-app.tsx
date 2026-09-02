@@ -25,6 +25,7 @@ import { CommitDialog } from '@/components/commit-dialog'
 import { Composer } from '@/components/composer'
 import { ControlMenu } from '@/components/control-menu'
 import { DaemonFilePicker } from '@/components/daemon-file-picker'
+import { OnboardingModal } from '@/components/onboarding-modal'
 import { RightPanel, type PanelSurface } from '@/components/right-panel'
 import { Sidebar } from '@/components/sidebar'
 import { StartupScreen } from '@/components/startup-screen'
@@ -148,6 +149,9 @@ export function PaduApp() {
   const projectPickerReturnFocus = useRef<HTMLElement | null>(null)
   const [projectlessPending, setProjectlessPending] = useState(false)
   const projectlessRequest = useRef(false)
+  const [onboardingOpen, setOnboardingOpen] = useState(() => {
+    try { return !localStorage.getItem('padu.has-completed-onboarding') } catch { return false }
+  })
   const composerDraftState = useRef<ComposerDrafts>({})
   const composerDraftTimers = useRef(new Map<string, number>())
   const composerDraftWriteQueue = useRef<Promise<void>>(Promise.resolve())
@@ -319,6 +323,25 @@ export function PaduApp() {
   useEffect(() => {
     if (!search.session && newTaskMode) enteringNewTask.current = false
   }, [newTaskMode, search.session])
+
+  useEffect(() => {
+    // Replay-onboarding flag set by the settings page before navigating home.
+    try {
+      if (localStorage.getItem('padu.open-onboarding') === '1') {
+        localStorage.removeItem('padu.open-onboarding')
+        localStorage.removeItem('padu.has-completed-onboarding')
+        setOnboardingOpen(true)
+      }
+    } catch { /* noop */ }
+    const handler = (event: StorageEvent) => {
+      if (event.key === 'padu.open-onboarding' && event.newValue === '1') {
+        try { localStorage.removeItem('padu.open-onboarding') } catch { /* noop */ }
+        setOnboardingOpen(true)
+      }
+    }
+    window.addEventListener('storage', handler)
+    return () => window.removeEventListener('storage', handler)
+  }, [])
 
   useEffect(() => {
     const hydrated = selected.data
@@ -959,6 +982,7 @@ export function PaduApp() {
     toggleSidebar: () => setSidebarVisible((value) => !value),
     toggleRightPanel,
     openSettings,
+    openOnboarding: () => setOnboardingOpen(true),
     selectTask: (sessionId) => {
       if (!newTaskMode && current?.id === sessionId) {
         setFocusComposerSignal((value) => value + 1)
@@ -988,6 +1012,15 @@ export function PaduApp() {
 
   return (
     <div className="flex h-dvh w-full overflow-hidden bg-background">
+      <OnboardingModal
+        open={onboardingOpen}
+        onOpenChange={(open) => {
+          setOnboardingOpen(open)
+          if (!open) {
+            try { localStorage.setItem('padu.has-completed-onboarding', '1') } catch { /* noop */ }
+          }
+        }}
+      />
       {sidebarVisible && (
         <Sidebar
           mobileOpen={mobileSidebar}
