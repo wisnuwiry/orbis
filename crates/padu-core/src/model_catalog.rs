@@ -84,10 +84,20 @@ pub fn fallback_models(provider: ProviderKind) -> Vec<ProviderModel> {
         // model the user configured. An invented fallback would offer a model
         // the CLI rejects, so discovery is authoritative.
         ProviderKind::Grok => Vec::new(),
-        // Pi, Oh My Pi, and Kimi Code all take their catalog from the user's
-        // configured LLM providers. A fabricated fallback would make
+        // Gemini's model is configured locally rather than exposed by a
+        // discovery command. The fallback is used until that configuration is
+        // read by `discover_gemini_models`.
+        ProviderKind::Gemini => vec![
+            ProviderModel::new("gemini-3.5-flash", "Gemini 3.5 Flash"),
+            ProviderModel::new("gemini-3.1-pro-preview", "Gemini 3.1 Pro Preview").default(),
+            ProviderModel::new("gemini-3-flash-preview", "Gemini 3 Flash Preview"),
+        ],
+        // Pi, Oh My Pi, Kimi Code, and Elph all take their catalog from the
+        // user's configured LLM providers. A fabricated fallback would make
         // unavailable models look selectable.
-        ProviderKind::Kimi | ProviderKind::OhMyPi | ProviderKind::Pi => Vec::new(),
+        ProviderKind::Kimi | ProviderKind::OhMyPi | ProviderKind::Pi | ProviderKind::Elph => {
+            Vec::new()
+        }
     }
 }
 
@@ -129,6 +139,12 @@ pub fn discover_catalog(
         ProviderKind::Kimi => (discover_kimi_models(binary), None),
         ProviderKind::Pi => (discover_pi_models(binary, PiDialect::Pi), None),
         ProviderKind::OhMyPi => (discover_pi_models(binary, PiDialect::OhMyPi), None),
+        // Gemini resolves its model from local settings/environment rather
+        // than exposing a model discovery command.
+        ProviderKind::Gemini => (discover_gemini_models(), None),
+        // Elph discovers its model catalog through an ACP session/new
+        // handshake, reading the Model-category config option.
+        ProviderKind::Elph => (discover_elph_models(binary), None),
     };
     let models = if discovered.is_empty() {
         // A failed or empty probe keeps the last successful discovery over
@@ -538,6 +554,43 @@ fn parse_opencode_models(output: &str) -> Vec<ProviderModel> {
         .collect()
 }
 
+fn discover_gemini_models() -> Vec<ProviderModel> {
+    // Gemini CLI's effective model is local configuration. `GEMINI_MODEL`
+    // takes precedence over settings files, followed by project settings and
+    // then the user's global settings. Padu does not pass `--model` when
+    // probing, so these are the local values that the CLI will use.
+    let model = std::env::var("GEMINI_MODEL")
+        .ok()
+        .filter(|model| !model.trim().is_empty())
+        .or_else(|| {
+            let project_settings = std::env::current_dir().ok()?.join(".gemini/settings.json");
+            read_gemini_model(&project_settings)
+        })
+        .or_else(|| {
+            dirs::home_dir().and_then(|home| read_gemini_model(&home.join(".gemini/settings.json")))
+        });
+
+    model
+        .map(|id| vec![ProviderModel::new(&id, display_name_from_slug(&id)).default()])
+        .unwrap_or_default()
+}
+
+fn read_gemini_model(path: &Path) -> Option<String> {
+    let contents = std::fs::read(path).ok()?;
+    let settings = serde_json::from_slice::<Value>(&contents).ok()?;
+    parse_gemini_model(&settings)
+}
+
+fn parse_gemini_model(settings: &Value) -> Option<String> {
+    let model = settings
+        .get("model")
+        .and_then(|model| model.get("name").or(Some(model)))
+        .and_then(Value::as_str)
+        .map(str::trim)
+        .filter(|model| !model.is_empty())?;
+    Some(model.to_owned())
+}
+
 fn discover_grok_models(binary: &Path) -> Vec<ProviderModel> {
     let mut command = crate::command_env::command(binary);
     let command = command.arg("models");
@@ -622,6 +675,82 @@ fn parse_kimi_default_model(output: &str) -> Option<String> {
             .filter(|value| !value.is_empty())
             .map(str::to_owned)
     })
+}
+
+/// Elph discovers its model catalog through an ACP `session/new` handshake.
+/// The response includes a `configOptions` with a `Model`-category select whose
+/// values are the available models. This runs on the daemon request thread,
+/// never a render path.
+fn discover_elph_models(binary: &Path) -> Vec<ProviderModel> {
+    use agent_client_protocol::schema::ProtocolVersion;
+    use agent_client_protocol::schema::v1::{
+        ClientCapabilities, Implementation, InitializeRequest, NewSessionRequest,
+        SessionConfigKind, SessionConfigOptionCategory, SessionConfigSelectOptions,
+    };
+    use agent_client_protocol::{Agent, Client, ConnectionTo};
+
+    let Ok(agent) = crate::driver::catalog_agent(
+        ProviderKind::Elph,
+        binary,
+        &std::env::current_dir().unwrap_or_default(),
+    ) else {
+        return Vec::new();
+    };
+    let Ok(models) = smol::block_on(Client.builder().name("padu-elph-catalog").connect_with(
+        agent,
+        async move |connection: ConnectionTo<Agent>| {
+            connection
+                .send_request(
+                    InitializeRequest::new(ProtocolVersion::V1)
+                        .client_capabilities(ClientCapabilities::new().terminal(false))
+                        .client_info(Implementation::new("padu", env!("CARGO_PKG_VERSION"))),
+                )
+                .block_task()
+                .await?;
+            let session = connection
+                .send_request(NewSessionRequest::new(
+                    &std::env::current_dir().unwrap_or_default(),
+                ))
+                .block_task()
+                .await?;
+            Ok(session.config_options.unwrap_or_default())
+        },
+    )) else {
+        return Vec::new();
+    };
+    let Some(model_option) = models
+        .iter()
+        .find(|option| option.category.as_ref() == Some(&SessionConfigOptionCategory::Model))
+    else {
+        return Vec::new();
+    };
+    let SessionConfigKind::Select(select) = &model_option.kind else {
+        return Vec::new();
+    };
+    let values = match &select.options {
+        SessionConfigSelectOptions::Ungrouped(options) => options
+            .iter()
+            .map(|o| o.value.0.as_ref())
+            .collect::<Vec<_>>(),
+        SessionConfigSelectOptions::Grouped(groups) => groups
+            .iter()
+            .flat_map(|g| g.options.iter())
+            .map(|o| o.value.0.as_ref())
+            .collect(),
+        _ => return Vec::new(),
+    };
+    let current = select.current_value.0.as_ref();
+    values
+        .into_iter()
+        .map(|id| {
+            let name = display_name_from_slug(id);
+            let mut model = ProviderModel::new(id, &name);
+            if id == current {
+                model = model.default();
+            }
+            model
+        })
+        .collect()
 }
 
 fn parse_kimi_models(catalog: &Value, default_model: Option<&str>) -> Vec<ProviderModel> {
@@ -1366,6 +1495,21 @@ printf '%s\n' '{"type":"control_response","response":{"request_id":"padu-initial
         assert_eq!(models.len(), 1);
         assert_eq!(models[0].id, "cc-switch-model");
         assert_eq!(models[0].name, "CC Switch Model");
+    }
+
+    #[test]
+    fn parses_gemini_model_from_local_settings() {
+        assert_eq!(
+            parse_gemini_model(&json!({"model": {"name": "gemini-2.5-pro"}})),
+            Some("gemini-2.5-pro".to_owned())
+        );
+        // Accept the legacy scalar form too, so upgrading Gemini CLI does not
+        // make an existing local selection disappear from the picker.
+        assert_eq!(
+            parse_gemini_model(&json!({"model": "gemma-3-27b-it"})),
+            Some("gemma-3-27b-it".to_owned())
+        );
+        assert_eq!(parse_gemini_model(&json!({"model": {"name": "  "}})), None);
     }
 
     #[test]

@@ -68,7 +68,11 @@ struct AcpLaunch {
     env: Vec<(String, String)>,
 }
 
-fn launch_for(provider: ProviderKind, reasoning_effort: Option<&str>) -> anyhow::Result<AcpLaunch> {
+fn launch_for(
+    provider: ProviderKind,
+    reasoning_effort: Option<&str>,
+    model: Option<&str>,
+) -> anyhow::Result<AcpLaunch> {
     match provider {
         ProviderKind::Cursor => Ok(AcpLaunch {
             args: vec!["acp".into()],
@@ -96,6 +100,20 @@ fn launch_for(provider: ProviderKind, reasoning_effort: Option<&str>) -> anyhow:
         }),
         ProviderKind::OpenCode => Ok(AcpLaunch {
             args: vec!["acp".into()],
+            env: Vec::new(),
+        }),
+        ProviderKind::Gemini => {
+            let mut args = vec!["--acp".into()];
+            if let Some(model) = model.filter(|model| !model.trim().is_empty()) {
+                args.extend(["--model".into(), model.to_owned()]);
+            }
+            Ok(AcpLaunch {
+                args,
+                env: Vec::new(),
+            })
+        }
+        ProviderKind::Elph => Ok(AcpLaunch {
+            args: vec!["acp".into(), "--stdio".into()],
             env: Vec::new(),
         }),
         _ => Err(anyhow!(
@@ -143,7 +161,7 @@ impl AcpDriver {
             None => None,
         };
 
-        let launch = launch_for(provider, reasoning_effort.as_deref())?;
+        let launch = launch_for(provider, reasoning_effort.as_deref(), model.as_deref())?;
         let computer_use = (provider == ProviderKind::Grok && computer_use_enabled)
             .then(|| super::support::HeadlessComputerUseRuntime::start(provider, events.clone()))
             .transpose()?;
@@ -266,7 +284,7 @@ pub(crate) fn catalog_agent(
     binary: &Path,
     cwd: &Path,
 ) -> anyhow::Result<AcpAgent> {
-    let launch = launch_for(provider, None)?;
+    let launch = launch_for(provider, None, None)?;
     sdk_agent(binary, cwd, launch, None, Arc::new(Mutex::new(Vec::new())))
 }
 
@@ -526,16 +544,21 @@ async fn run_sdk_connection(
 
             let mut current_model = model;
             let mut current_effort = reasoning_effort;
-            apply_model(
-                &connection,
-                provider,
-                &session_id,
-                config_options.as_deref(),
-                current_model.as_deref(),
-                current_effort.as_deref(),
-                &events,
-            )
-            .await;
+            // Gemini receives its initial model as a CLI argument. Sending a
+            // second `session/set_model` during startup blocks older Gemini
+            // ACP versions before the prompt loop becomes available.
+            if provider != ProviderKind::Gemini {
+                apply_model(
+                    &connection,
+                    provider,
+                    &session_id,
+                    config_options.as_deref(),
+                    current_model.as_deref(),
+                    current_effort.as_deref(),
+                    &events,
+                )
+                .await;
+            }
             let mut fork_context = fork_context;
 
             while let Ok(command) = commands.recv().await {
@@ -2127,9 +2150,18 @@ mod tests {
 
     #[test]
     fn fx_launches_its_documented_acp_subcommand() {
-        let launch = launch_for(ProviderKind::Fx, None).unwrap();
+        let launch = launch_for(ProviderKind::Fx, None, None).unwrap();
         assert_eq!(launch.args, ["acp"]);
         assert!(launch.env.is_empty());
+    }
+
+    #[test]
+    fn gemini_initial_model_is_passed_at_process_launch() {
+        let launch = launch_for(ProviderKind::Gemini, None, Some("gemini-2.5-pro")).unwrap();
+        assert_eq!(launch.args, ["--acp", "--model", "gemini-2.5-pro"]);
+
+        let launch = launch_for(ProviderKind::Gemini, None, None).unwrap();
+        assert_eq!(launch.args, ["--acp"]);
     }
 
     #[test]
@@ -2429,12 +2461,12 @@ mod tests {
 
     #[test]
     fn grok_launch_passes_reasoning_effort_before_stdio() {
-        let launch = launch_for(ProviderKind::Grok, Some("xhigh")).unwrap();
+        let launch = launch_for(ProviderKind::Grok, Some("xhigh"), None).unwrap();
         assert_eq!(
             launch.args,
             ["agent", "--reasoning-effort", "xhigh", "stdio"]
         );
-        let bare = launch_for(ProviderKind::Grok, None).unwrap();
+        let bare = launch_for(ProviderKind::Grok, None, None).unwrap();
         assert_eq!(bare.args, ["agent", "stdio"]);
     }
 

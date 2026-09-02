@@ -464,7 +464,10 @@ impl Backend for PaduBackend {
                     ProviderKind::Codex => {
                         crate::codex_session::list_provider_sessions(&binary, limit)?
                     }
-                    ProviderKind::Cursor | ProviderKind::Fx | ProviderKind::OpenCode => {
+                    ProviderKind::Cursor
+                    | ProviderKind::Fx
+                    | ProviderKind::OpenCode
+                    | ProviderKind::Elph => {
                         crate::acp_session::list_provider_sessions(provider, &binary, &[], limit)?
                     }
                     ProviderKind::DeepSeek => {
@@ -472,6 +475,14 @@ impl Backend for PaduBackend {
                     }
                     ProviderKind::Grok => crate::grok_session::list_provider_sessions(limit)?,
                     ProviderKind::Kimi => crate::kimi_session::list_provider_sessions(limit)?,
+                    ProviderKind::Gemini => {
+                        // Gemini CLI does not advertise `sessionCapabilities.list`
+                        // in its ACP initialize response. Resume of
+                        // Padu-started sessions still works via `loadSession`
+                        // with the stored cursor. Native session history import
+                        // from `~/.gemini/tmp/` is a possible follow-up.
+                        Vec::new()
+                    }
                     ProviderKind::OhMyPi | ProviderKind::Pi => {
                         crate::pi_session::list_provider_sessions(provider, limit)?
                     }
@@ -529,7 +540,9 @@ impl Backend for PaduBackend {
                     | ProviderResumeCursor::Fx { session_id }
                     | ProviderResumeCursor::OpenCode { session_id }
                     | ProviderResumeCursor::Grok { session_id }
-                    | ProviderResumeCursor::Kimi { session_id } => {
+                    | ProviderResumeCursor::Kimi { session_id }
+                    | ProviderResumeCursor::Gemini { session_id }
+                    | ProviderResumeCursor::Elph { session_id } => {
                         let provider = cursor.provider();
                         let binary = self.provider_binary(provider)?;
                         crate::acp_session::provider_session_history(
@@ -1190,7 +1203,7 @@ impl PaduBackend {
             }
             // Unreachable through the UI, which hides branching for providers
             // that answer `supports_conversation_fork` with false.
-            ProviderKind::Fx | ProviderKind::Kimi => {
+            ProviderKind::Fx | ProviderKind::Kimi | ProviderKind::Gemini | ProviderKind::Elph => {
                 bail!(
                     "{} cannot branch a conversation at a turn",
                     source.provider.display_name()
@@ -1295,7 +1308,11 @@ impl PaduBackend {
         let reset_native_session = retained_turn_count == 0
             && matches!(
                 source.provider,
-                ProviderKind::Claude | ProviderKind::Cursor | ProviderKind::Grok
+                ProviderKind::Claude
+                    | ProviderKind::Cursor
+                    | ProviderKind::Grok
+                    | ProviderKind::Gemini
+                    | ProviderKind::Elph
             );
         if reset_native_session {
             return Ok((None, HashMap::new(), true));
@@ -1393,7 +1410,7 @@ impl PaduBackend {
             )),
             // Unreachable through the UI, which hides rewinding for providers
             // that answer `supports_conversation_rollback` with false.
-            ProviderKind::Fx | ProviderKind::Kimi => {
+            ProviderKind::Fx | ProviderKind::Kimi | ProviderKind::Gemini | ProviderKind::Elph => {
                 bail!(
                     "{} cannot rewind a conversation to a turn",
                     source.provider.display_name()

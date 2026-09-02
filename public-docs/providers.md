@@ -8,7 +8,7 @@ category: Providers
 
 # Providers overview
 
-Padu is a native control plane and workspace for AI coding agents. It launches and supervises **locally installed coding agent CLIs** (Claude Code, OpenAI Codex, OpenCode, Pi Agent, Cursor CLI, and more).
+Padu is a native control plane and workspace for AI coding agents. It launches and supervises **locally installed coding agent CLIs** (Claude Code, OpenAI Codex, OpenCode, Pi Agent, Cursor CLI, Gemini CLI, Elph, and more).
 
 Your API keys, subscriptions, configuration files, and MCP servers remain directly in your control on your machine. Padu provides the native GPUI workspace, split-diff inspection, multi-agent orchestration, and worktree isolation on top.
 
@@ -22,7 +22,7 @@ A **provider** defines the communication contract between Padu and an external a
 
 ## Integration Tiers
 
-1. **Native Direct Drivers:** Built-in optimized drivers in `crates/padu-core` for top agents (Claude Code, Codex, OpenCode, Pi Agent, Amp, DeepSeek, Cursor CLI, Fx, Grok Build, Kimi Code).
+1. **Native Direct Drivers:** Built-in optimized drivers in `crates/padu-core` for top agents (Claude Code, Codex, OpenCode, Pi Agent, Amp, DeepSeek, Cursor CLI, Fx, Grok Build, Kimi Code, Gemini CLI, Elph).
 2. **Agent Client Protocol (ACP):** Universal support for any agent implementing the open [Agent Client Protocol (ACP)](https://agentclientprotocol.com) over standard I/O streams (`stdio`).
 3. **Daemon Overrides:** Configure binary paths or disable providers via `~/.padu/settings.json` or the Settings UI.
 
