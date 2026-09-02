@@ -11,7 +11,7 @@ const DEFAULT_TIMEOUT: Duration = Duration::from_secs(60);
 fn usage() -> &'static str {
     "Usage: cargo run -p padu-core --bin padu-provider-check -- <provider> [options]\n\n\
 Providers: amp claude codex cursor deepseek elph fx gemini opencode grok kimi ohmypi pi\n\
-Options:\n  --model <id>       Model to test (otherwise use the discovered default)\n  --binary <path>    Provider executable override\n  --prompt <text>    Prompt to send (default: reply with exactly: Padu provider check passed)\n  --timeout <secs>   Timeout for startup and prompt completion (default: 60)\n  -h, --help         Show this help"
+Options:\n  --model <id>       Model to test (otherwise use the discovered default)\n  --binary <path>    Provider executable override\n  --prompt <text>    Prompt to send (default: reply with exactly: Padu provider check passed)\n  --timeout <secs>   Timeout for startup and prompt completion (default: 60)\n  --catalog-only     Discover models and exit without starting a chat\n  -h, --help         Show this help"
 }
 
 fn parse_provider(value: &str) -> Option<ProviderKind> {
@@ -37,6 +37,7 @@ fn main() -> Result<()> {
     let mut binary = None;
     let mut prompt = "reply with exactly: Padu provider check passed".to_owned();
     let mut timeout = DEFAULT_TIMEOUT;
+    let mut catalog_only = false;
     while let Some(argument) = args.next() {
         match argument.as_str() {
             "--model" => model = Some(next_value(&mut args, "--model")?),
@@ -48,6 +49,7 @@ fn main() -> Result<()> {
                 })?;
                 timeout = Duration::from_secs(seconds.max(1));
             }
+            "--catalog-only" => catalog_only = true,
             "-h" | "--help" => {
                 println!("{}", usage());
                 return Ok(());
@@ -93,6 +95,22 @@ fn main() -> Result<()> {
                 .join(", ")
         );
     }
+    if catalog_only {
+        println!("catalog entries: {}", discovered.len());
+        for model in discovered.iter().take(10) {
+            println!(
+                "  {} — {}{}",
+                model.id,
+                model.name,
+                model
+                    .sub_provider
+                    .as_deref()
+                    .map_or(String::new(), |provider| format!(" [{provider}]"))
+            );
+        }
+        return Ok(());
+    }
+
     println!("prompt:   {prompt}");
     println!("starting provider...");
 
@@ -129,7 +147,7 @@ fn main() -> Result<()> {
                 println!("connected: cursor={provider_cursor:?}");
                 break;
             }
-            DriverEvent::Error(error) => eprintln!("startup error: {error}"),
+            DriverEvent::Error(error) => bail!("provider startup error: {error}"),
             DriverEvent::ProcessExited => bail!("provider exited before connecting"),
             other => println!("startup event: {other:?}"),
         }
@@ -166,7 +184,7 @@ fn main() -> Result<()> {
                 }
                 bail!("provider returned an unsuccessful turn")
             }
-            DriverEvent::Error(error) => eprintln!("\nprovider error: {error}"),
+            DriverEvent::Error(error) => bail!("provider error: {error}"),
             DriverEvent::Permission { title, detail, .. } => {
                 eprintln!("\npermission requested unexpectedly: {title}: {detail}")
             }

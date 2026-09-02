@@ -698,34 +698,46 @@ fn parse_elph_models(output: &str) -> Vec<ProviderModel> {
     let mut provider = None;
     output
         .lines()
-        .filter_map(|line| {
+        .flat_map(|line| {
             let cleaned = strip_ansi(line);
             let line = cleaned.trim();
             if line.is_empty() || line.starts_with('─') {
-                return None;
+                return Vec::new();
             }
-            if !line.contains(" · ") {
-                if let Some((name, id)) = line
-                    .strip_suffix(')')
-                    .and_then(|line| line.rsplit_once(" ("))
-                {
-                    provider = Some((name.to_owned(), id.to_owned()));
+            if let Some((name, id)) = line
+                .strip_suffix(')')
+                .and_then(|line| line.rsplit_once(" ("))
+            {
+                provider = Some((name.to_owned(), id.to_owned()));
+                return Vec::new();
+            }
+            let Some((provider_name, _)) = &provider else {
+                return Vec::new();
+            };
+            if let Some((model_text, _)) = line.split_once(" · ") {
+                let Some(id) = model_text.split_whitespace().last() else {
+                    return Vec::new();
+                };
+                let Some(name_end) = model_text.rfind(id) else {
+                    return Vec::new();
+                };
+                let name = model_text[..name_end].trim();
+                if name.is_empty() || id.is_empty() {
+                    return Vec::new();
                 }
-                return None;
-            }
-
-            let (model_text, _) = line.split_once(" · ")?;
-            let id = model_text.split_whitespace().last()?;
-            let name_end = model_text.rfind(id)?;
-            let name = model_text[..name_end].trim();
-            if name.is_empty() || id.is_empty() {
-                return None;
-            }
-            let mut model = ProviderModel::new(id, name);
-            if let Some((provider_name, _)) = &provider {
+                let mut model = ProviderModel::new(id, name);
                 model = model.sub_provider(provider_name);
+                return vec![model];
             }
-            Some(model)
+            line.split(',')
+                .map(str::trim)
+                .filter(|id| !id.is_empty() && !id.chars().any(char::is_whitespace))
+                .map(|id| {
+                    let mut model = ProviderModel::new(id, display_name_from_slug(id));
+                    model = model.sub_provider(provider_name);
+                    model
+                })
+                .collect()
         })
         .collect()
 }

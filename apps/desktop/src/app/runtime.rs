@@ -404,6 +404,12 @@ fn perform_provider_rewind(
     if request.rollback_turns == 0 || reset_native_session {
         return Ok((None, None, None));
     }
+    if !provider.supports_conversation_rollback() {
+        return Err(anyhow::anyhow!(tr!(
+            "errors.provider_turn_branching_unsupported",
+            provider = provider.display_name()
+        )));
+    }
 
     match provider {
         ProviderKind::Claude => {
@@ -558,14 +564,10 @@ fn perform_provider_rewind(
             let cursor = driver.rollback(request.rollback_turns)?;
             Ok((cursor, None, prepared_driver))
         }
-        // Unreachable through the UI, which hides rewinding for providers that
-        // answer `supports_conversation_rollback` with false.
-        ProviderKind::Fx | ProviderKind::Kimi | ProviderKind::Gemini | ProviderKind::Elph => {
-            Err(anyhow::anyhow!(tr!(
-                "errors.provider_turn_branching_unsupported",
-                provider = provider.display_name()
-            )))
-        }
+        _ => Err(anyhow::anyhow!(tr!(
+            "errors.provider_turn_branching_unsupported",
+            provider = provider.display_name()
+        ))),
     }
 }
 
@@ -655,6 +657,12 @@ fn fork_response_with_driver(
 
 fn perform_response_fork(mut request: ResponseForkRequest) -> Result<PreparedResponseFork, String> {
     let provider = request.source.provider;
+    if !provider.supports_conversation_fork() {
+        return Err(tr!(
+            "errors.provider_turn_branching_unsupported",
+            provider = provider.display_name()
+        ));
+    }
     let native_fork = (|| -> anyhow::Result<ProviderForkResult> {
         match provider {
             ProviderKind::Claude => {
@@ -851,14 +859,10 @@ fn perform_response_fork(mut request: ResponseForkRequest) -> Result<PreparedRes
                 let (cursor, prepared_driver) = fork_response_with_driver(&mut request)?;
                 Ok((cursor, None, prepared_driver))
             }
-            // Unreachable through the UI, which hides branching for providers
-            // that answer `supports_conversation_fork` with false.
-            ProviderKind::Fx | ProviderKind::Kimi | ProviderKind::Gemini | ProviderKind::Elph => {
-                anyhow::bail!(tr!(
-                    "errors.provider_turn_branching_unsupported",
-                    provider = provider.display_name()
-                ))
-            }
+            _ => anyhow::bail!(tr!(
+                "errors.provider_turn_branching_unsupported",
+                provider = provider.display_name()
+            )),
         }
     })();
 

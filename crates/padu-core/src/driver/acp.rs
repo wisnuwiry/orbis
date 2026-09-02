@@ -68,6 +68,51 @@ struct AcpLaunch {
     env: Vec<(String, String)>,
 }
 
+#[derive(Clone, Copy)]
+enum ModelApplication {
+    None,
+    SessionConfig {
+        validate_advertisement: bool,
+        switch_gateway: bool,
+    },
+    SessionSetModel,
+}
+
+#[derive(Clone, Copy)]
+struct AcpProviderConfig {
+    model_application: ModelApplication,
+    skip_initial_model: bool,
+}
+
+fn provider_config(provider: ProviderKind) -> AcpProviderConfig {
+    match provider {
+        ProviderKind::Gemini => AcpProviderConfig {
+            model_application: ModelApplication::None,
+            skip_initial_model: true,
+        },
+        ProviderKind::Fx => AcpProviderConfig {
+            model_application: ModelApplication::SessionConfig {
+                validate_advertisement: true,
+                switch_gateway: true,
+            },
+            skip_initial_model: false,
+        },
+        ProviderKind::Elph => AcpProviderConfig {
+            model_application: ModelApplication::SessionConfig {
+                // Elph's local catalog is more complete than its ACP model
+                // advertisement, so validation is delegated to Elph.
+                validate_advertisement: false,
+                switch_gateway: false,
+            },
+            skip_initial_model: false,
+        },
+        _ => AcpProviderConfig {
+            model_application: ModelApplication::SessionSetModel,
+            skip_initial_model: false,
+        },
+    }
+}
+
 fn launch_for(
     provider: ProviderKind,
     reasoning_effort: Option<&str>,
@@ -376,6 +421,7 @@ async fn run_sdk_connection(
     let prompt_requests = Arc::new(Mutex::new(PendingPrompts::default()));
     let title_refresh = super::title_refresh::NativeTitleRefresh::default();
     let auto_approve = mode != RuntimeMode::Ask;
+    let acp_config = provider_config(provider);
 
     Client
         .builder()
@@ -544,13 +590,13 @@ async fn run_sdk_connection(
 
             let mut current_model = model;
             let mut current_effort = reasoning_effort;
-            // Gemini receives its initial model as a CLI argument. Sending a
-            // second `session/set_model` during startup blocks older Gemini
-            // ACP versions before the prompt loop becomes available.
-            if provider != ProviderKind::Gemini {
+            // Some providers receive their initial model at process launch;
+            // applying it again during startup can block their ACP loop.
+            if !acp_config.skip_initial_model {
                 apply_model(
                     &connection,
                     provider,
+                    acp_config,
                     &session_id,
                     config_options.as_deref(),
                     current_model.as_deref(),
@@ -668,6 +714,7 @@ async fn run_sdk_connection(
                             apply_model(
                                 &connection,
                                 provider,
+                                provider_config(provider),
                                 &session_id,
                                 config_options.as_deref(),
                                 current_model.as_deref(),
@@ -1023,6 +1070,7 @@ fn set_model_params(
 async fn apply_model(
     connection: &ConnectionTo<Agent>,
     provider: ProviderKind,
+    provider_config: AcpProviderConfig,
     session_id: &SessionId,
     config_options: Option<&[SessionConfigOption]>,
     model: Option<&str>,
@@ -1074,97 +1122,115 @@ async fn apply_model(
         return;
     }
 
-    if provider == ProviderKind::Fx {
-        let mut options = config_options.unwrap_or_default().to_vec();
-        if let Some((provider_option, value)) = fx_model_provider_switch(&options, model) {
-            let config_id = provider_option.id.clone();
-            match connection
+    let ModelApplication::SessionConfig {
+        validate_advertisement,
+        switch_gateway,
+    } = provider_config.model_application
+    else {
+        if let ModelApplication::None = provider_config.model_application {
+            return;
+        }
+        // SessionSetModel is the legacy ACP path used by providers without a
+        // model config option.
+        let request = match UntypedMessage::new(
+            "session/set_model",
+            set_model_params(session_id, model, reasoning_effort, provider),
+        ) {
+            Ok(request) => request,
+            Err(error) => {
+                let _ = events.send(DriverEvent::Error(tr!(
+                    "errors.select_model",
+                    error = error
+                )));
+                return;
+            }
+        };
+        if let Err(error) = connection.send_request(request).block_task().await {
+            let _ = events.send(DriverEvent::Error(tr!(
+                "errors.select_model",
+                error = error
+            )));
+            return;
+        }
+        if let Some(effort) = reasoning_effort {
+            // Reasoning effort is an optional config extension and is
+            // deliberately non-fatal when an agent does not expose it.
+            let _ = connection
                 .send_request(SetSessionConfigOptionRequest::new(
                     session_id.clone(),
-                    config_id,
-                    value,
+                    reasoning_effort_config_id(provider),
+                    effort,
                 ))
                 .block_task()
-                .await
-            {
-                Ok(response) => options = response.config_options,
-                Err(error) => {
-                    let _ = events.send(DriverEvent::Error(tr!(
-                        "errors.select_model",
-                        error = error
-                    )));
-                    return;
-                }
-            }
+                .await;
         }
-        let Some(option) = fx_model_option(&options) else {
-            let _ = events.send(DriverEvent::Error(tr!(
-                "errors.select_model",
-                error = "Fx did not advertise its model configuration"
-            )));
-            return;
-        };
-        if !session_config_select_values(option).contains(&model) {
-            let _ = events.send(DriverEvent::Error(tr!(
-                "errors.select_model",
-                error = format!("Fx did not advertise model {model}")
-            )));
-            return;
-        }
-        if let Err(error) = connection
+        return;
+    };
+
+    let mut options = config_options.unwrap_or_default().to_vec();
+    if switch_gateway
+        && let Some((provider_option, value)) = fx_model_provider_switch(&options, model)
+    {
+        let config_id = provider_option.id.clone();
+        match connection
             .send_request(SetSessionConfigOptionRequest::new(
                 session_id.clone(),
-                option.id.clone(),
-                model,
+                config_id,
+                value,
             ))
             .block_task()
             .await
         {
-            let _ = events.send(DriverEvent::Error(tr!(
-                "errors.select_model",
-                error = error
-            )));
+            Ok(response) => options = response.config_options,
+            Err(error) => {
+                let _ = events.send(DriverEvent::Error(tr!(
+                    "errors.select_model",
+                    error = error
+                )));
+                return;
+            }
         }
+    }
+    let Some(option) = fx_model_option(&options) else {
+        let _ = events.send(DriverEvent::Error(tr!(
+            "errors.select_model",
+            error = format!(
+                "{} did not advertise its model configuration",
+                provider.display_name()
+            )
+        )));
+        return;
+    };
+    // Elph's picker catalog comes from `elph models`, which is more
+    // complete than the partial model values it may advertise in
+    // session/new. Let Elph validate the catalog-backed value instead of
+    // rejecting it locally. Fx, whose model list is authoritative in ACP,
+    // keeps the defensive check.
+    if validate_advertisement && !session_config_select_values(option).contains(&model) {
+        let _ = events.send(DriverEvent::Error(tr!(
+            "errors.select_model",
+            error = format!(
+                "{} did not advertise model {model}",
+                provider.display_name()
+            )
+        )));
         return;
     }
-
-    // Grok, Kimi, OpenCode, and Cursor agents that do not advertise a model
-    // config option retain the legacy request unchanged. Fx intentionally
-    // stays on session/set_config_option, its documented model API.
-    let request = match UntypedMessage::new(
-        "session/set_model",
-        set_model_params(session_id, model, reasoning_effort, provider),
-    ) {
-        Ok(request) => request,
-        Err(error) => {
-            let _ = events.send(DriverEvent::Error(tr!(
-                "errors.select_model",
-                error = error
-            )));
-            return;
-        }
-    };
-    if let Err(error) = connection.send_request(request).block_task().await {
+    if let Err(error) = connection
+        .send_request(SetSessionConfigOptionRequest::new(
+            session_id.clone(),
+            option.id.clone(),
+            model,
+        ))
+        .block_task()
+        .await
+    {
         let _ = events.send(DriverEvent::Error(tr!(
             "errors.select_model",
             error = error
         )));
-        return;
     }
-    if provider != ProviderKind::Grok
-        && let Some(effort) = reasoning_effort
-    {
-        // Reasoning effort is an optional config extension and is deliberately
-        // non-fatal when an agent does not expose it.
-        let _ = connection
-            .send_request(SetSessionConfigOptionRequest::new(
-                session_id.clone(),
-                reasoning_effort_config_id(provider),
-                effort,
-            ))
-            .block_task()
-            .await;
-    }
+    return;
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -2162,6 +2228,26 @@ mod tests {
 
         let launch = launch_for(ProviderKind::Gemini, None, None).unwrap();
         assert_eq!(launch.args, ["--acp"]);
+    }
+
+    #[test]
+    fn elph_uses_catalog_models_without_advertisement_validation() {
+        let ModelApplication::SessionConfig {
+            validate_advertisement: elph_validates,
+            ..
+        } = provider_config(ProviderKind::Elph).model_application
+        else {
+            panic!("Elph should use a session config model");
+        };
+        let ModelApplication::SessionConfig {
+            validate_advertisement: fx_validates,
+            ..
+        } = provider_config(ProviderKind::Fx).model_application
+        else {
+            panic!("Fx should use a session config model");
+        };
+        assert!(!elph_validates);
+        assert!(fx_validates);
     }
 
     #[test]
