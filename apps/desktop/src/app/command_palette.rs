@@ -2096,12 +2096,16 @@ impl Padu {
                                 .gap(px(4.0))
                                 .child(
                                     div()
-                                        .px(px(4.0))
-                                        .py(px(1.0))
-                                        .rounded(px(4.0))
-                                        .border_1()
-                                        .border_color(theme.border)
-                                        .text_size(sp(10.0))
+                                        .h(px(20.0))
+                                        .min_w(px(24.0))
+                                        .px(px(6.0))
+                                        .rounded(px(6.0))
+                                        .flex()
+                                        .items_center()
+                                        .justify_center()
+                                        .bg(theme.overlay_strong)
+                                        .text_size(sp(12.0))
+                                        .text_color(theme.text_tertiary)
                                         .child(SharedString::from("Esc")),
                                 )
                                 .child(SharedString::from("Close")),

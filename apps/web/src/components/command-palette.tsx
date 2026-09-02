@@ -486,7 +486,7 @@ export function CommandPalette({
             Select
           </span>
           <span className="flex items-center gap-1">
-            <kbd className="rounded border bg-muted px-1 py-0.5 text-[10px] leading-none">Esc</kbd>
+            <kbd className="flex h-5 min-w-6 shrink-0 items-center justify-center rounded-md bg-[color:var(--foreground)]/[0.07] px-1.5 font-sans text-[11px] text-[var(--text-tertiary)]">Esc</kbd>
             Close
           </span>
         </div>
