@@ -584,6 +584,8 @@ impl Padu {
                     .child(
                         div()
                             .id("replay-onboarding-btn")
+                            .tab_index(0)
+                            .focus_visible(|style| style.border_1().border_color(theme.accent))
                             .h(px(32.0))
                             .px(px(14.0))
                             .rounded(px(8.0))
@@ -596,6 +598,7 @@ impl Padu {
                             .justify_center()
                             .cursor_pointer()
                             .hover(|el| el.bg(theme.overlay))
+                            .active(|el| el.opacity(0.85))
                             .child(tr!("onboarding.replay_button"))
                             .on_click(cx.listener(|this, _, window, cx| {
                                 this.settings_page = None;
