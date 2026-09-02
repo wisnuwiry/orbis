@@ -1,12 +1,14 @@
 import { useQueryClient } from '@tanstack/react-query'
 import type {
   DaemonSettings,
+  HostProfile,
   Project,
   ProviderKind,
 } from '@padu/client'
 import { useEffect, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import { ControlMenu } from '@/components/control-menu'
+import { HostDialog } from '@/components/host-dialog'
 import { KeybindingsSettings } from '@/components/keybindings-settings'
 import { SkillsSettings } from '@/components/skills-settings'
 import { Button } from '@/components/ui/button'
@@ -466,6 +468,107 @@ function abbreviateHomePath(path: string) {
     .replace(/^\/root(?=\/|$)/, '~')
 }
 
+function RemoteHostsCard() {
+  const { t } = useI18n()
+  const { hosts, activeHostId, switchHost, addHost, updateHost, removeHost } = useDaemon()
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [editingHost, setEditingHost] = useState<HostProfile | null>(null)
+
+  return (
+    <SettingsCard>
+      <div className="flex items-center justify-between">
+        <div className="text-[13.5px] font-medium">{t('host.remote_hosts')}</div>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            setEditingHost(null)
+            setDialogOpen(true)
+          }}
+        >
+          <PaduIcon name="plus" />
+          {t('host.add_host')}
+        </Button>
+      </div>
+
+      {hosts.length === 0 ? (
+        <p className="mt-3 text-[12.5px] text-[var(--text-tertiary)]">{t('host.no_remote_hosts')}</p>
+      ) : (
+        <div className="mt-3 flex flex-col gap-2">
+          {hosts.map((host) => {
+            const isActive = activeHostId === host.id
+            return (
+              <div
+                key={host.id}
+                className={cn(
+                  'flex h-11 items-center justify-between rounded-lg border bg-card px-3',
+                  isActive && 'border-ring',
+                )}
+              >
+                <div className="flex min-w-0 flex-1 items-center gap-2">
+                  <PaduIcon
+                    className={cn('size-3.5 shrink-0', isActive ? 'text-ring' : 'text-[var(--text-secondary)]')}
+                    name="server"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[13px] font-medium text-foreground">
+                      {host.name || host.address}
+                    </div>
+                    <div className="truncate text-[11.5px] text-[var(--text-tertiary)]">
+                      {host.address}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  {!isActive && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => void switchHost(host.id).catch(() => {})}
+                    >
+                      {t('host.connect')}
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setEditingHost(host)
+                      setDialogOpen(true)
+                    }}
+                  >
+                    {t('common.edit')}
+                  </Button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      <HostDialog
+        editingHost={editingHost}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onDelete={async (id) => {
+          await removeHost(id)
+        }}
+        onSave={async (data) => {
+          if (editingHost) {
+            await updateHost(editingHost.id, data)
+            if (activeHostId === editingHost.id) {
+              await switchHost(editingHost.id)
+            }
+          } else {
+            const created = await addHost(data)
+            await switchHost(created.id)
+          }
+        }}
+      />
+    </SettingsCard>
+  )
+}
+
 function DaemonSettings() {
   const { t } = useI18n()
   const { config, phase, reconnect, disconnect, forget } = useDaemon()
@@ -478,6 +581,7 @@ function DaemonSettings() {
           description={t('daemon.web_external_description')}
         />
       </SettingsCard>
+      <RemoteHostsCard />
       <SettingsCard>
         <SettingText title={t('daemon.credentials_title')} description={t('daemon.web_connection_description')} />
         <div className="mt-4 divide-y rounded-xl border bg-background px-3">

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { normalizeDaemonAddress, validateConnectionConfig } from './connection'
+import { displayHost, normalizeDaemonAddress, validateConnectionConfig } from './connection'
 
 describe('normalizeDaemonAddress', () => {
   test('normalizes host, HTTP, and daemon paths', () => {
@@ -30,5 +30,13 @@ describe('normalizeDaemonAddress', () => {
       token: 'secret',
       remember: false,
     })
+  })
+})
+
+describe('displayHost and host persistence', () => {
+  test('formats display host correctly', () => {
+    expect(displayHost('ws://127.0.0.1:4400')).toBe('127.0.0.1:4400')
+    expect(displayHost('wss://server.internal')).toBe('server.internal')
+    expect(displayHost('invalid')).toBe('invalid')
   })
 })

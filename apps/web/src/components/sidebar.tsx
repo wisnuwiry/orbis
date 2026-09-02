@@ -3,11 +3,13 @@ import { ContextMenu } from '@base-ui/react/context-menu'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Virtuoso } from 'react-virtuoso'
 import { Button } from '@/components/ui/button'
-import { ControlMenu } from '@/components/control-menu'
+import { ControlMenu, type ControlMenuItem } from '@/components/control-menu'
+import { HostDialog } from '@/components/host-dialog'
 import { Input } from '@/components/ui/input'
 import { Tooltip } from '@/components/ui/tooltip'
 import { PanelResizeHandle } from '@/components/panel-resize-handle'
 import { PaduIcon } from '@/components/padu-icon'
+import { displayHost } from '@/lib/connection'
 import { displayTitle, type TaskState } from '@/lib/daemon-api'
 import { useDaemon } from '@/lib/daemon-context'
 import { useI18n } from '@/lib/i18n'
@@ -99,6 +101,37 @@ export function Sidebar({
   const [revealedOlderCounts, setRevealedOlderCounts] = useState<Record<string, number>>({})
   const [liveWidth, setLiveWidth] = useState(width)
   const [nowSeconds, setNowSeconds] = useState(() => Math.floor(Date.now() / 1_000))
+  const { hosts, activeHost, activeHostId, config, phase, switchHost, addHost } = useDaemon()
+  const [hostDialogOpen, setHostDialogOpen] = useState(false)
+
+  const currentHostDisplayName = phase === 'connecting'
+    ? t('host.connecting')
+    : activeHost?.name || (config ? displayHost(config.address) : t('host.local'))
+
+  const hostMenuItems: ControlMenuItem[] = [
+    ...hosts.map((host) => ({
+      id: host.id,
+      label: host.name || host.address,
+      icon: 'server' as const,
+      selected: activeHostId === host.id,
+      onSelect: () => {
+        void switchHost(host.id).catch(() => {})
+      },
+    })),
+    {
+      id: 'add-host',
+      label: t('host.add_host'),
+      icon: 'plus' as const,
+      separatorBefore: hosts.length > 0,
+      onSelect: () => setHostDialogOpen(true),
+    },
+    {
+      id: 'host-settings',
+      label: t('host.settings'),
+      icon: 'settings' as const,
+      onSelect: () => onSettings(),
+    },
+  ]
 
   const sidebarShortcut = usePrimaryShortcut('⌘B', 'Ctrl+B')
   const settingsShortcut = usePrimaryShortcut('⌘,', 'Ctrl+,')
@@ -394,6 +427,14 @@ export function Sidebar({
               <PaduIcon name="settings" />
             </Button>
           </Tooltip>
+          <ControlMenu
+            align="left"
+            icon="server"
+            items={hostMenuItems}
+            label={currentHostDisplayName}
+            placement="above"
+            triggerClassName="h-[26px] max-w-[130px] px-1.5 text-[12px]"
+          />
           <div className="flex-1" />
           {onUsage && (
             <Tooltip content={t('settings.usage')} shortcut={usageShortcut}>
@@ -422,6 +463,15 @@ export function Sidebar({
         />
       </aside>
 
+      <HostDialog
+        editingHost={null}
+        open={hostDialogOpen}
+        onOpenChange={setHostDialogOpen}
+        onSave={async (data) => {
+          const newHost = await addHost(data)
+          await switchHost(newHost.id)
+        }}
+      />
     </>
   )
 }
