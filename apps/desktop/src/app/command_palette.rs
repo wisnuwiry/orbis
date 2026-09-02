@@ -42,7 +42,7 @@ const CONTENT_RESULT_ROW_HEIGHT: f32 = 54.0;
 const EMPTY_RESULTS_HEIGHT: f32 = 160.0;
 const RESULTS_BOTTOM_PADDING: f32 = 6.0;
 const MAX_CARD_HEIGHT: f32 = 440.0;
-const FOOTER_HEIGHT: f32 = 32.0;
+const FOOTER_HEIGHT: f32 = 36.0;
 
 /// Bind list navigation beneath the focused one-line input. This is registered
 /// after the input's bindings, although the more-specific key context would
@@ -2058,14 +2058,15 @@ impl Padu {
                 .child(
                     div()
                         .h(px(FOOTER_HEIGHT))
-                        .px(px(12.0))
+                        .px(px(16.0))
+                        .py(px(6.0))
                         .flex_none()
                         .flex()
                         .items_center()
-                        .gap(px(14.0))
+                        .gap(px(18.0))
                         .border_t_1()
                         .border_color(theme.border)
-                        .bg(theme.canvas.opacity(0.6))
+                        .bg(theme.canvas.opacity(0.75))
                         .text_size(sp(11.0))
                         .text_color(theme.text_tertiary)
                         .child(

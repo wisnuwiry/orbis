@@ -475,8 +475,8 @@ export function CommandPalette({
             <PaletteRows items={items} query={query} selected={selected} t={t} onExecute={execute} onSelected={setSelected} />
           )}
         </div>
-        <div className="flex h-8 shrink-0 items-center gap-3.5 border-t bg-[var(--card)] px-3 text-[11px] text-[var(--text-tertiary)]">
-          <span className="flex items-center gap-1">
+        <div className="flex h-9 shrink-0 items-center gap-4 border-t bg-[var(--card)]/90 px-4 py-1 text-[11px] text-[var(--text-tertiary)]">
+          <span className="flex items-center gap-1.5">
             <kbd className="flex h-5 min-w-6 shrink-0 items-center justify-center rounded-md bg-[color:var(--foreground)]/[0.07] px-1 font-sans text-[var(--text-tertiary)]">
               <PaduIcon className="size-2.5" name="arrowUp" />
             </kbd>
@@ -485,13 +485,13 @@ export function CommandPalette({
             </kbd>
             Navigate
           </span>
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-1.5">
             <kbd className="flex h-5 min-w-6 shrink-0 items-center justify-center rounded-md bg-[color:var(--foreground)]/[0.07] px-1.5 font-sans text-[var(--text-tertiary)]">
               <PaduIcon className="size-3" name="cornerDownRight" />
             </kbd>
             Select
           </span>
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-1.5">
             <kbd className="flex h-5 min-w-6 shrink-0 items-center justify-center rounded-md bg-[color:var(--foreground)]/[0.07] px-1.5 font-sans text-[11px] text-[var(--text-tertiary)]">Esc</kbd>
             Close
           </span>
