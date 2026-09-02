@@ -415,6 +415,7 @@ impl Padu {
                                 .cursor_pointer()
                                 .text_size(sp(12.5))
                                 .text_color(gpui::hsla(0.0, 0.7, 0.55, 1.0))
+                                .focus_visible(|style| style.border_1().border_color(theme.accent))
                                 .hover(|e| e.bg(theme.overlay))
                                 .flex()
                                 .items_center()
@@ -451,17 +452,22 @@ impl Padu {
                                     .tab_index(0)
                                     .h(px(30.0))
                                     .px(px(12.0))
+                                    .gap(px(6.0))
                                     .rounded(px(7.0))
                                     .border_1()
                                     .border_color(theme.border_strong)
                                     .cursor_pointer()
                                     .text_size(sp(12.5))
                                     .text_color(theme.text_secondary)
+                                    .focus_visible(|style| {
+                                        style.border_1().border_color(theme.accent)
+                                    })
                                     .hover(|e| e.bg(theme.overlay))
                                     .flex()
                                     .items_center()
                                     .justify_center()
                                     .child(tr!("common.cancel"))
+                                    .child(kbd_badge("Esc", &theme))
                                     .on_click(cx.listener(|this, _, window, cx| {
                                         this.close_host_dialog(window, cx);
                                     }))
@@ -486,17 +492,27 @@ impl Padu {
                                     .tab_index(0)
                                     .h(px(30.0))
                                     .px(px(14.0))
+                                    .gap(px(6.0))
                                     .rounded(px(7.0))
                                     .bg(theme.inverse)
                                     .cursor_pointer()
                                     .text_size(sp(12.5))
                                     .font_weight(FontWeight::MEDIUM)
                                     .text_color(theme.on_inverse)
+                                    .focus_visible(|style| {
+                                        style.border_1().border_color(theme.accent)
+                                    })
                                     .hover(|e| e.opacity(0.9))
                                     .flex()
                                     .items_center()
                                     .justify_center()
                                     .child(save_label)
+                                    .child(kbd_badge_styled(
+                                        "↵",
+                                        theme.inverse,
+                                        theme.on_inverse,
+                                        gpui::hsla(0.0, 0.0, 1.0, 0.2),
+                                    ))
                                     .on_click(cx.listener(|this, _, window, cx| {
                                         this.host_dialog_save(window, cx);
                                     }))

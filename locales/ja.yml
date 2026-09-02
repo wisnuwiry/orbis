@@ -207,6 +207,8 @@ host.local: ローカル
 host.add_host: ホストを追加…
 host.edit_host: ホストを編集
 host.remove_host: ホストを削除
+host.delete_confirm_title: ホストプロファイルを削除
+host.delete_confirm_message: "「%{name}」を削除してもよろしいですか？この操作は取り消せません。"
 host.name: 名前
 host.name_placeholder: 例：開発サーバー
 host.address: アドレス

@@ -1994,157 +1994,160 @@ impl Padu {
             }
         }
 
-        let card =
-            div()
-                .id("command-palette-card")
-                .key_context("CommandPalette")
-                .on_action(cx.listener(Self::toggle_command_palette_action))
-                .on_action(cx.listener(|this, _: &SelectNext, _, cx| {
+        let card = div()
+            .id("command-palette-card")
+            .key_context("CommandPalette")
+            .on_action(cx.listener(Self::toggle_command_palette_action))
+            .on_action(
+                cx.listener(|this, _: &SelectNext, _, cx| {
                     this.move_command_palette_selection(1, cx)
-                }))
-                .on_action(cx.listener(|this, _: &SelectPrevious, _, cx| {
-                    this.move_command_palette_selection(-1, cx)
-                }))
-                .on_action(cx.listener(|this, _: &SelectFirst, _, cx| {
-                    this.move_command_palette_selection(isize::MIN, cx)
-                }))
-                .on_action(cx.listener(|this, _: &SelectLast, _, cx| {
-                    this.move_command_palette_selection(isize::MAX, cx)
-                }))
-                .on_action(cx.listener(|this, _: &SelectPageDown, _, cx| {
-                    this.move_command_palette_selection(PAGE_STEP, cx)
-                }))
-                .on_action(cx.listener(|this, _: &SelectPageUp, _, cx| {
-                    this.move_command_palette_selection(-PAGE_STEP, cx)
-                }))
-                .on_action(cx.listener(|this, _: &Confirm, window, cx| {
-                    this.execute_command_palette_selection(None, window, cx)
-                }))
-                .on_action(cx.listener(|this, _: &Dismiss, window, cx| {
+                }),
+            )
+            .on_action(cx.listener(|this, _: &SelectPrevious, _, cx| {
+                this.move_command_palette_selection(-1, cx)
+            }))
+            .on_action(cx.listener(|this, _: &SelectFirst, _, cx| {
+                this.move_command_palette_selection(isize::MIN, cx)
+            }))
+            .on_action(cx.listener(|this, _: &SelectLast, _, cx| {
+                this.move_command_palette_selection(isize::MAX, cx)
+            }))
+            .on_action(cx.listener(|this, _: &SelectPageDown, _, cx| {
+                this.move_command_palette_selection(PAGE_STEP, cx)
+            }))
+            .on_action(cx.listener(|this, _: &SelectPageUp, _, cx| {
+                this.move_command_palette_selection(-PAGE_STEP, cx)
+            }))
+            .on_action(cx.listener(|this, _: &Confirm, window, cx| {
+                this.execute_command_palette_selection(None, window, cx)
+            }))
+            .on_action(
+                cx.listener(|this, _: &Dismiss, window, cx| {
                     this.dismiss_command_palette(window, cx)
-                }))
-                .w_full()
-                .max_w(px(640.0))
-                .h(px(card_height))
-                .overflow_hidden()
-                .rounded(px(12.0))
-                .bg(theme.raised)
-                .shadow_xl()
-                .relative()
-                .flex()
-                .flex_col()
-                .on_mouse_down(MouseButton::Left, |_, _, cx| cx.stop_propagation())
-                .child(
-                    div()
-                        .h(px(SEARCH_ROW_HEIGHT))
-                        .px(px(16.0))
-                        .flex_none()
-                        .flex()
-                        .items_center()
-                        .gap(px(10.0))
-                        .border_b_1()
-                        .border_color(theme.border)
-                        .text_size(sp(14.0))
-                        .text_color(theme.text)
-                        .child(icon("icons/search.svg", 14.0, theme.text_tertiary))
-                        .child(
-                            div()
-                                .min_w_0()
-                                .flex_1()
-                                .child(self.command_palette.search.clone()),
-                        ),
-                )
-                .child(results)
-                .child(
-                    div()
-                        .h(px(FOOTER_HEIGHT))
-                        .px(px(16.0))
-                        .py(px(6.0))
-                        .flex_none()
-                        .flex()
-                        .items_center()
-                        .gap(px(18.0))
-                        .border_t_1()
-                        .border_color(theme.border)
-                        .bg(theme.canvas.opacity(0.75))
-                        .text_size(sp(11.0))
-                        .text_color(theme.text_tertiary)
-                        .child(
-                            div()
-                                .flex()
-                                .items_center()
-                                .gap(px(4.0))
-                                .child(
-                                    div()
-                                        .h(px(20.0))
-                                        .min_w(px(24.0))
-                                        .px(px(6.0))
-                                        .rounded(px(6.0))
-                                        .flex()
-                                        .items_center()
-                                        .justify_center()
-                                        .bg(theme.overlay_strong)
-                                        .child(icon("icons/arrow-up.svg", 10.0, theme.text_tertiary)),
-                                )
-                                .child(
-                                    div()
-                                        .h(px(20.0))
-                                        .min_w(px(24.0))
-                                        .px(px(6.0))
-                                        .rounded(px(6.0))
-                                        .flex()
-                                        .items_center()
-                                        .justify_center()
-                                        .bg(theme.overlay_strong)
-                                        .child(icon("icons/arrow-down.svg", 10.0, theme.text_tertiary)),
-                                )
-                                .child(SharedString::from("Navigate")),
-                        )
-                        .child(
-                            div()
-                                .flex()
-                                .items_center()
-                                .gap(px(4.0))
-                                .child(
-                                    div()
-                                        .h(px(20.0))
-                                        .min_w(px(24.0))
-                                        .px(px(6.0))
-                                        .rounded(px(6.0))
-                                        .flex()
-                                        .items_center()
-                                        .justify_center()
-                                        .bg(theme.overlay_strong)
-                                        .child(icon(
-                                            "icons/corner-down-right.svg",
-                                            10.0,
-                                            theme.text_tertiary,
-                                        )),
-                                )
-                                .child(SharedString::from("Select")),
-                        )
-                        .child(
-                            div()
-                                .flex()
-                                .items_center()
-                                .gap(px(4.0))
-                                .child(
-                                    div()
-                                        .h(px(20.0))
-                                        .min_w(px(24.0))
-                                        .px(px(6.0))
-                                        .rounded(px(6.0))
-                                        .flex()
-                                        .items_center()
-                                        .justify_center()
-                                        .bg(theme.overlay_strong)
-                                        .text_size(sp(12.0))
-                                        .text_color(theme.text_tertiary)
-                                        .child(SharedString::from("Esc")),
-                                )
-                                .child(SharedString::from("Close")),
-                        ),
-                );
+                }),
+            )
+            .w_full()
+            .max_w(px(640.0))
+            .h(px(card_height))
+            .overflow_hidden()
+            .rounded(px(12.0))
+            .bg(theme.raised)
+            .shadow_xl()
+            .relative()
+            .flex()
+            .flex_col()
+            .on_mouse_down(MouseButton::Left, |_, _, cx| cx.stop_propagation())
+            .child(
+                div()
+                    .h(px(SEARCH_ROW_HEIGHT))
+                    .px(px(16.0))
+                    .flex_none()
+                    .flex()
+                    .items_center()
+                    .gap(px(10.0))
+                    .border_b_1()
+                    .border_color(theme.border)
+                    .text_size(sp(14.0))
+                    .text_color(theme.text)
+                    .child(icon("icons/search.svg", 14.0, theme.text_tertiary))
+                    .child(
+                        div()
+                            .min_w_0()
+                            .flex_1()
+                            .child(self.command_palette.search.clone()),
+                    ),
+            )
+            .child(results)
+            .child(
+                div()
+                    .h(px(FOOTER_HEIGHT))
+                    .px(px(16.0))
+                    .py(px(6.0))
+                    .flex_none()
+                    .flex()
+                    .items_center()
+                    .gap(px(18.0))
+                    .border_t_1()
+                    .border_color(theme.border)
+                    .bg(theme.canvas.opacity(0.75))
+                    .text_size(sp(11.0))
+                    .text_color(theme.text_tertiary)
+                    .child(
+                        div()
+                            .flex()
+                            .items_center()
+                            .gap(px(4.0))
+                            .child(
+                                div()
+                                    .h(px(20.0))
+                                    .min_w(px(24.0))
+                                    .px(px(6.0))
+                                    .rounded(px(6.0))
+                                    .flex()
+                                    .items_center()
+                                    .justify_center()
+                                    .bg(theme.overlay_strong)
+                                    .child(icon("icons/arrow-up.svg", 10.0, theme.text_tertiary)),
+                            )
+                            .child(
+                                div()
+                                    .h(px(20.0))
+                                    .min_w(px(24.0))
+                                    .px(px(6.0))
+                                    .rounded(px(6.0))
+                                    .flex()
+                                    .items_center()
+                                    .justify_center()
+                                    .bg(theme.overlay_strong)
+                                    .child(icon("icons/arrow-down.svg", 10.0, theme.text_tertiary)),
+                            )
+                            .child(SharedString::from("Navigate")),
+                    )
+                    .child(
+                        div()
+                            .flex()
+                            .items_center()
+                            .gap(px(4.0))
+                            .child(
+                                div()
+                                    .h(px(20.0))
+                                    .min_w(px(24.0))
+                                    .px(px(6.0))
+                                    .rounded(px(6.0))
+                                    .flex()
+                                    .items_center()
+                                    .justify_center()
+                                    .bg(theme.overlay_strong)
+                                    .child(icon(
+                                        "icons/corner-down-right.svg",
+                                        10.0,
+                                        theme.text_tertiary,
+                                    )),
+                            )
+                            .child(SharedString::from("Select")),
+                    )
+                    .child(
+                        div()
+                            .flex()
+                            .items_center()
+                            .gap(px(4.0))
+                            .child(
+                                div()
+                                    .h(px(20.0))
+                                    .min_w(px(24.0))
+                                    .px(px(6.0))
+                                    .rounded(px(6.0))
+                                    .flex()
+                                    .items_center()
+                                    .justify_center()
+                                    .bg(theme.overlay_strong)
+                                    .text_size(sp(12.0))
+                                    .text_color(theme.text_tertiary)
+                                    .child(SharedString::from("Esc")),
+                            )
+                            .child(SharedString::from("Close")),
+                    ),
+            );
 
         let scrim = if theme.is_dark {
             gpui::hsla(0.0, 0.0, 0.0, 0.26)

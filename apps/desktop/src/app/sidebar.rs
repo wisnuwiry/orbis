@@ -2325,12 +2325,16 @@ impl Padu {
                             let _ = rename_padu.update(cx, |padu, cx| {
                                 padu.begin_session_rename(session_id, window, cx);
                             });
-                        }),
+                        })
+                        .icon("icons/pencil.svg"),
                         MenuItem::Separator,
                         MenuItem::new(tr!("common.remove"), move |window, cx| {
-                            let _ = remove_padu
-                                .update(cx, |padu, cx| padu.confirm_delete_session(session_id, window, cx));
-                        }),
+                            let _ = remove_padu.update(cx, |padu, cx| {
+                                padu.confirm_delete_session(session_id, window, cx)
+                            });
+                        })
+                        .icon("icons/trash.svg")
+                        .destructive(true),
                     ]
                 },
             )

@@ -228,12 +228,16 @@ impl Padu {
                     .child(cancel_button)
                     .child(confirm_button),
             )
-            .on_action(cx.listener(|padu, _: &ConfirmDeleteSessionDialog, window, cx| {
-                padu.execute_delete_session_dialog(window, cx);
-            }))
-            .on_action(cx.listener(|padu, _: &DismissDeleteSessionDialog, window, cx| {
-                padu.close_delete_session_dialog(window, cx);
-            }));
+            .on_action(
+                cx.listener(|padu, _: &ConfirmDeleteSessionDialog, window, cx| {
+                    padu.execute_delete_session_dialog(window, cx);
+                }),
+            )
+            .on_action(
+                cx.listener(|padu, _: &DismissDeleteSessionDialog, window, cx| {
+                    padu.close_delete_session_dialog(window, cx);
+                }),
+            );
 
         let scrim = if theme.is_dark {
             gpui::hsla(0.0, 0.0, 0.0, 0.38)

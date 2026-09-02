@@ -203,6 +203,8 @@ host.local: 本地
 host.add_host: 添加主机…
 host.edit_host: 编辑主机
 host.remove_host: 删除主机
+host.delete_confirm_title: 删除主机配置
+host.delete_confirm_message: "确定要删除“%{name}”吗？此操作无法撤消。"
 host.name: 名称
 host.name_placeholder: 例如：开发服务器
 host.address: 地址

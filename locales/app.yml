@@ -410,6 +410,10 @@ host.edit_host:
   en: Edit Host
 host.remove_host:
   en: Remove Host
+host.delete_confirm_title:
+  en: Remove Host Profile
+host.delete_confirm_message:
+  en: "Are you sure you want to remove \"%{name}\"? This action cannot be undone."
 host.name:
   en: Name
 host.name_placeholder:

@@ -94,6 +94,8 @@ pub enum MenuItem {
         /// Shown greyed and inert. Preferred over omitting the row when the
         /// action is temporarily unavailable, so the menu keeps a stable shape.
         disabled: bool,
+        /// Highlight and text colored using danger theme token.
+        destructive: bool,
         #[allow(clippy::type_complexity)]
         on_click: Rc<dyn Fn(&mut Window, &mut App)>,
     },
@@ -130,6 +132,7 @@ impl MenuItem {
             image: None,
             selected: false,
             disabled: false,
+            destructive: false,
             on_click: Rc::new(on_click),
         }
     }
@@ -171,6 +174,13 @@ impl MenuItem {
     pub fn disabled(mut self, value: bool) -> Self {
         if let Self::Entry { disabled, .. } = &mut self {
             *disabled = value;
+        }
+        self
+    }
+
+    pub fn destructive(mut self, value: bool) -> Self {
+        if let Self::Entry { destructive, .. } = &mut self {
+            *destructive = value;
         }
         self
     }
@@ -1079,16 +1089,19 @@ fn render_menu_item(
             image,
             selected,
             disabled,
+            destructive,
             on_click,
         } => {
-            let color = match (disabled, selected) {
-                (true, _) => theme.text_ghost,
-                (false, true) => theme.text,
-                (false, false) => theme.text_secondary,
+            let color = match (disabled, selected, destructive) {
+                (true, _, _) => theme.text_ghost,
+                (false, _, true) => theme.danger,
+                (false, true, _) => theme.text,
+                (false, false, _) => theme.text_secondary,
             };
             let entry = row(
                 index,
                 highlighted,
+                destructive,
                 theme,
                 handle.clone(),
                 (!disabled).then_some(on_click),
@@ -1116,7 +1129,7 @@ fn render_menu_item(
             // submenu row inert prevents a child builder from accidentally
             // stealing the parent flyout's keyboard state.
             if in_submenu {
-                return row(index, highlighted, theme, handle, None)
+                return row(index, highlighted, false, theme, handle, None)
                     .text_color(theme.text_ghost)
                     .child(div().flex_1().min_w_0().truncate().child(label))
                     .child(icon("icons/chevron-right.svg", 10.0, theme.text_ghost))
@@ -1125,7 +1138,7 @@ fn render_menu_item(
             let hover = theme.overlay;
             let hover_handle = handle.clone();
             let click_handle = handle.clone();
-            row(index, highlighted, theme, handle, None)
+            row(index, highlighted, false, theme, handle, None)
                 .cursor_pointer()
                 .hover(move |element| element.bg(hover))
                 .text_color(theme.text_secondary)
@@ -1156,8 +1169,15 @@ fn render_menu_item(
             let body = render(window, cx);
             match on_click {
                 Some(on_click) => {
-                    let entry =
-                        row(index, highlighted, theme, handle.clone(), Some(on_click)).child(body);
+                    let entry = row(
+                        index,
+                        highlighted,
+                        false,
+                        theme,
+                        handle.clone(),
+                        Some(on_click),
+                    )
+                    .child(body);
                     track_pointer_highlight(entry, index, in_submenu, false, handle)
                         .into_any_element()
                 }
@@ -1211,12 +1231,21 @@ fn track_pointer_highlight(
 fn row(
     index: usize,
     highlighted: bool,
+    destructive: bool,
     theme: &Theme,
     handle: ContextMenuHandle,
     on_click: Option<Rc<dyn Fn(&mut Window, &mut App)>>,
 ) -> gpui::Stateful<gpui::Div> {
-    let hover = theme.overlay;
-    let highlight = theme.overlay_strong;
+    let hover = if destructive {
+        theme.danger_soft
+    } else {
+        theme.overlay
+    };
+    let highlight = if destructive {
+        theme.danger_soft
+    } else {
+        theme.overlay_strong
+    };
     div()
         .id(index)
         .mx(px(4.0))
@@ -1735,5 +1764,16 @@ mod tests {
         assert_eq!(next_highlight(&focusable, Some(0), "end"), Some(3));
         assert_eq!(next_highlight(&focusable, Some(0), "tab"), None);
         assert_eq!(next_highlight(&[], None, "down"), None);
+    }
+
+    #[test]
+    fn destructive_menu_item_preserves_focusability_and_state() {
+        let item = MenuItem::new("Delete", |_, _| {}).destructive(true);
+        assert!(item.is_focusable());
+        if let MenuItem::Entry { destructive, .. } = item {
+            assert!(destructive);
+        } else {
+            panic!("expected MenuItem::Entry");
+        }
     }
 }
