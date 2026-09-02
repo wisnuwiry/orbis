@@ -23,6 +23,7 @@ pub(super) struct DeleteSessionDialogState {
     pub title: String,
     pub cancel_focus: FocusHandle,
     pub confirm_focus: FocusHandle,
+    pub previous_focus: Option<FocusHandle>,
 }
 
 impl Padu {
@@ -36,14 +37,17 @@ impl Padu {
             return;
         };
         let title = session.display_title().to_owned();
+        let previous_focus = window.focused(cx);
         let cancel_focus = cx.focus_handle();
         let confirm_focus = cx.focus_handle();
-        window.focus(&confirm_focus, cx);
+        let focus_target = confirm_focus.clone();
+        window.on_next_frame(move |window, cx| window.focus(&focus_target, cx));
         self.delete_session_dialog = Some(DeleteSessionDialogState {
             session_id,
             title,
             cancel_focus,
             confirm_focus,
+            previous_focus,
         });
         cx.notify();
     }
@@ -53,9 +57,13 @@ impl Padu {
         window: &mut Window,
         cx: &mut Context<Self>,
     ) {
-        if self.delete_session_dialog.take().is_some() {
-            let focus = self.composer_focus(cx);
-            window.focus(&focus, cx);
+        if let Some(dialog) = self.delete_session_dialog.take() {
+            if let Some(prev) = dialog.previous_focus {
+                window.focus(&prev, cx);
+            } else {
+                let focus = self.composer_focus(cx);
+                window.focus(&focus, cx);
+            }
             cx.notify();
         }
     }
@@ -82,6 +90,7 @@ impl Padu {
         let theme = Theme::current(cx);
         let title = dialog.title.clone();
 
+        let cancel_focus_next = dialog.confirm_focus.clone();
         let cancel_button = div()
             .id("delete-session-cancel")
             .track_focus(&dialog.cancel_focus)
@@ -102,8 +111,26 @@ impl Padu {
             .child(tr!("common.cancel"))
             .on_click(cx.listener(|padu, _, window, cx| {
                 padu.close_delete_session_dialog(window, cx);
+            }))
+            .on_key_down(cx.listener(move |padu, event: &KeyDownEvent, window, cx| {
+                match event.keystroke.key.as_str() {
+                    "right" => {
+                        window.focus(&cancel_focus_next, cx);
+                        cx.stop_propagation();
+                    }
+                    "enter" | "space" => {
+                        padu.close_delete_session_dialog(window, cx);
+                        cx.stop_propagation();
+                    }
+                    "escape" => {
+                        padu.close_delete_session_dialog(window, cx);
+                        cx.stop_propagation();
+                    }
+                    _ => {}
+                }
             }));
 
+        let confirm_focus_prev = dialog.cancel_focus.clone();
         let confirm_button = div()
             .id("delete-session-confirm")
             .track_focus(&dialog.confirm_focus)
@@ -124,10 +151,28 @@ impl Padu {
             .child(tr!("session.delete_confirm"))
             .on_click(cx.listener(|padu, _, window, cx| {
                 padu.execute_delete_session_dialog(window, cx);
+            }))
+            .on_key_down(cx.listener(move |padu, event: &KeyDownEvent, window, cx| {
+                match event.keystroke.key.as_str() {
+                    "left" => {
+                        window.focus(&confirm_focus_prev, cx);
+                        cx.stop_propagation();
+                    }
+                    "enter" | "space" => {
+                        padu.execute_delete_session_dialog(window, cx);
+                        cx.stop_propagation();
+                    }
+                    "escape" => {
+                        padu.close_delete_session_dialog(window, cx);
+                        cx.stop_propagation();
+                    }
+                    _ => {}
+                }
             }));
 
         let card = div()
             .key_context(DIALOG_CONTEXT)
+            .tab_group()
             .w(px(400.0))
             .rounded(px(14.0))
             .bg(theme.surface)
@@ -226,6 +271,7 @@ mod tests {
             title: "Ship UI Polish".to_string(),
             cancel_focus,
             confirm_focus,
+            previous_focus: None,
         };
         assert_eq!(state.session_id, session_id);
         assert_eq!(state.title, "Ship UI Polish");
