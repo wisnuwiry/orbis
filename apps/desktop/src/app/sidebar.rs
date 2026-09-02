@@ -984,7 +984,8 @@ impl Padu {
         let menu_open = menu.is_open();
         let weak = cx.entity().downgrade();
         let is_local_active = self.state.is_local_host();
-        let active_display_name = self.state.active_host_display_name(&self.daemon_hostname);
+        let local_label = tr!("host.local");
+        let active_display_name = self.state.active_host_display_name(&local_label);
         let hosts = self.state.hosts.clone();
         let active_host_id = self.state.active_host_id.clone();
         let is_connecting = self.host_switch_pending;
