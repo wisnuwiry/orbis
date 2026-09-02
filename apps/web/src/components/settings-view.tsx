@@ -72,11 +72,13 @@ export function SettingsView({
   projects,
   onBack,
   onPageChange,
+  onOpenOnboarding,
 }: {
   page: SettingsPageId
   projects: Project[]
   onBack: () => void
   onPageChange: (page: SettingsPageId) => void
+  onOpenOnboarding?: () => void
 }) {
   const { t } = useI18n()
   const [query, setQuery] = useState('')
@@ -157,7 +159,7 @@ export function SettingsView({
         ) : (
           <div className={cn('mx-auto w-full', page === 'usage' ? 'max-w-[1024px]' : 'max-w-[760px]')}>
             <h1 className="text-[18px] font-medium">{activePage?.localizedLabel}</h1>
-            {page === 'general' && <GeneralSettings />}
+            {page === 'general' && <GeneralSettings onOpenOnboarding={onOpenOnboarding} />}
             {page === 'appearance' && <AppearanceSettings />}
             {page === 'keybindings' && <KeybindingsSettings />}
             {page === 'providers' && <ProvidersSettings />}
@@ -170,7 +172,7 @@ export function SettingsView({
   )
 }
 
-function GeneralSettings() {
+function GeneralSettings({ onOpenOnboarding }: { onOpenOnboarding?: () => void }) {
   const { t } = useI18n()
   const [analytics, setAnalytics] = useStoredBoolean('padu.analytics-enabled', true)
   return (
@@ -188,6 +190,21 @@ function GeneralSettings() {
         />
         <Toggle checked={analytics} label={t('settings.share_anonymous_usage_data')} onChange={setAnalytics} />
       </SettingsCard>
+      {onOpenOnboarding && (
+        <SettingsCard row>
+          <SettingText
+            title={t('onboarding.command_title')}
+            description={t('onboarding.welcome_subtitle')}
+          />
+          <button
+            className="flex h-8 shrink-0 items-center justify-center rounded-lg bg-accent px-3.5 text-[12.5px] font-medium text-foreground outline-none hover:bg-accent/80 active:opacity-80 focus-visible:ring-1 focus-visible:ring-ring"
+            type="button"
+            onClick={onOpenOnboarding}
+          >
+            {t('onboarding.replay_button')}
+          </button>
+        </SettingsCard>
+      )}
     </div>
   )
 }
