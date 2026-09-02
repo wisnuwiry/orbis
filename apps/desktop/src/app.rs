@@ -1033,10 +1033,13 @@ impl Default for ActivityScrollViewport {
 }
 
 pub struct Padu {
-    /// Owns the headless provider process for exactly as long as the desktop
-    /// app entity. Debug builds can replace it independently after a rebuild;
-    /// all live driver handles below are lightweight RPC proxies.
+    /// Owns the active headless provider process/connection. All live driver
+    /// handles below are lightweight RPC proxies.
     daemon: padu_client::DaemonSupervisor,
+    /// Preserves the desktop-managed local daemon supervisor so it remains running
+    /// when the user connects to a remote host, and allows instant reconnection
+    /// without spawning a redundant daemon process.
+    local_daemon: Option<padu_client::DaemonSupervisor>,
     /// Cached once at construction for the Daemon settings connection URL;
     /// rendering must not query account or network configuration.
     daemon_hostname: String,
@@ -1841,12 +1844,20 @@ impl Padu {
             .and_then(|id| self.state.hosts.iter().find(|h| &h.id == id))
             .cloned();
 
+        let existing_local = self.local_daemon.clone();
+
         cx.spawn(async move |this, cx| {
             let result = cx
                 .background_executor()
                 .spawn(async move {
                     match profile {
-                        None => crate::daemon::start_process(),
+                        None => {
+                            if let Some(local) = existing_local {
+                                Ok(local)
+                            } else {
+                                crate::daemon::start_process()
+                            }
+                        }
                         Some(p) => {
                             let token = p.token.unwrap_or_default();
                             padu_client::DaemonSupervisor::connect(&p.address, token)
@@ -1862,6 +1873,9 @@ impl Padu {
                 this.host_switch_pending = false;
                 match result {
                     Ok(daemon) => {
+                        if !daemon.is_remote() {
+                            this.local_daemon = Some(daemon.clone());
+                        }
                         this.apply_new_daemon(daemon, cx);
                     }
                     Err(error) => {
@@ -2850,8 +2864,15 @@ impl Padu {
                 })
             };
 
+            let local_daemon = if !daemon.is_remote() {
+                Some(daemon.clone())
+            } else {
+                None
+            };
+
             Self {
                 daemon,
+                local_daemon,
                 daemon_hostname,
                 session_hydrations: HashSet::new(),
                 pending_session_activation: None,
