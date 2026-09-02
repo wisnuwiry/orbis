@@ -198,6 +198,13 @@ describe('desktop sidebar presentation', () => {
     })
     expect(nextSidebarUpdateDelay([working], 150)).toBe(1)
   })
+
+  test('group headers and session items support keyboard interaction invariants', () => {
+    const groups = groupSessions([], [], new Date(), 'Unknown', 'No project', 'project', 'newest')
+    const rows = sidebarRows(groups, new Set())
+    expect(rows[0]?.kind).toBe('search')
+    expect(rows[0]?.key).toBe('search')
+  })
 })
 
 function atLocalNoon(year: number, month: number, day: number): number {

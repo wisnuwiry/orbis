@@ -620,7 +620,16 @@ function SessionRow({
             type="button"
             onClick={() => onSelect(item.session.id)}
             onKeyDown={(event) => {
-              if ((event.shiftKey && event.key === 'F10') || event.key === 'ContextMenu') {
+              if (event.key === 'F2') {
+                event.preventDefault()
+                setRenaming(true)
+              } else if (
+                event.key === 'Delete' ||
+                ((event.metaKey || event.ctrlKey) && event.key === 'Backspace')
+              ) {
+                event.preventDefault()
+                onRemove(item.session.id)
+              } else if ((event.shiftKey && event.key === 'F10') || event.key === 'ContextMenu') {
                 event.preventDefault()
                 restoreMenuFocus.current = true
                 setMenuOpen(true)
@@ -659,7 +668,16 @@ function SessionRow({
             type="button"
             onClick={() => onSelect(item.session.id)}
             onKeyDown={(event) => {
-              if ((event.shiftKey && event.key === 'F10') || event.key === 'ContextMenu') {
+              if (event.key === 'F2') {
+                event.preventDefault()
+                setRenaming(true)
+              } else if (
+                event.key === 'Delete' ||
+                ((event.metaKey || event.ctrlKey) && event.key === 'Backspace')
+              ) {
+                event.preventDefault()
+                onRemove(item.session.id)
+              } else if ((event.shiftKey && event.key === 'F10') || event.key === 'ContextMenu') {
                 event.preventDefault()
                 restoreMenuFocus.current = true
                 setMenuOpen(true)

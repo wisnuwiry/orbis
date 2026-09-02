@@ -2207,6 +2207,14 @@ impl Padu {
                         if matches!(key, "enter" | "space") {
                             this.select_session(session_id, cx);
                             cx.stop_propagation();
+                        } else if key == "f2" {
+                            this.begin_session_rename(session_id, window, cx);
+                            cx.stop_propagation();
+                        } else if (key == "delete" || key == "backspace")
+                            && (event.keystroke.modifiers.platform || event.keystroke.modifiers.control)
+                        {
+                            this.remove_session(session_id, cx);
+                            cx.stop_propagation();
                         } else if key == "f10" && event.keystroke.modifiers.shift {
                             keyboard_menu.open_context_menu(window, cx);
                             cx.stop_propagation();
