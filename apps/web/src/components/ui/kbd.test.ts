@@ -19,6 +19,12 @@ describe('kbdVariants', () => {
     expect(classes).toContain('bg-[color:var(--foreground)]/[0.07]')
   })
 
+  test('inverse variant renders white text and dark overlay background', () => {
+    const classes = kbdVariants({ variant: 'inverse' })
+    expect(classes).toContain('text-white')
+    expect(classes).toContain('bg-black/25')
+  })
+
   test('custom size applies dimensions', () => {
     const classes = kbdVariants({ size: 'xs' })
     expect(classes).toContain('h-4')

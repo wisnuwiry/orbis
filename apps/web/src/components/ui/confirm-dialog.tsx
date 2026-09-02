@@ -118,8 +118,7 @@ export function ConfirmDialog({
             {showShortcuts && (
               <Kbd
                 size="xs"
-                variant="subtle"
-                className={isDanger ? 'bg-black/25 text-white/90 border-transparent' : undefined}
+                variant={isDanger ? 'inverse' : 'subtle'}
               >
                 ↵
               </Kbd>

@@ -10,6 +10,7 @@ const kbdVariants = cva(
         default: 'rounded-[5px] bg-[var(--inset)] text-[var(--text-tertiary)] border border-border/30',
         outline: 'rounded-[5px] border border-border bg-transparent text-[var(--text-secondary)]',
         subtle: 'rounded-[5px] bg-[color:var(--foreground)]/[0.07] text-[var(--text-tertiary)]',
+        inverse: 'rounded-[5px] bg-black/25 text-white border border-white/20',
       },
       size: {
         xs: 'h-4 min-w-4 px-1 text-[10px]',

@@ -152,7 +152,7 @@ impl Padu {
             .hover(|s| s.bg(theme.danger_soft))
             .focus_visible(|s| s.border_1().border_color(rgb(0xFFFFFF)))
             .child(tr!("session.delete_confirm"))
-            .child(kbd_badge("↵", &theme))
+            .child(kbd_badge_on_danger("↵"))
             .on_click(cx.listener(|padu, _, window, cx| {
                 padu.execute_delete_session_dialog(window, cx);
             }))
