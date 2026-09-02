@@ -222,24 +222,78 @@ function AppearanceSettings() {
     systemAppearance.addEventListener('change', apply)
     return () => systemAppearance.removeEventListener('change', apply)
   }, [theme])
-  const themeLabel = t(`settings.theme_${theme}`)
   return (
     <div className="mt-[15px] w-full overflow-hidden rounded-[13px] bg-[var(--raised)]">
-      <div className="flex min-h-[60px] items-center gap-6 px-5 py-3">
+      <div className="flex flex-col gap-3 px-5 py-4">
         <SettingText title={t('settings.theme')} description={t('settings.theme_description')} />
-        <ControlMenu
-          align="right"
-          items={(['system', 'light', 'dark'] as ThemeChoice[]).map((choice) => ({
-            id: choice,
-            label: t(`settings.theme_${choice}`),
-            selected: choice === theme,
-            onSelect: () => setTheme(choice),
-          }))}
-          label={themeLabel}
-          menuClassName="w-[140px]"
-          placement="below"
-          triggerClassName="h-8 w-[116px] max-w-none justify-between border bg-background px-3 text-[12px]"
-        />
+        <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-3">
+          {(['system', 'light', 'dark'] as ThemeChoice[]).map((choice) => {
+            const selected = choice === theme
+            // TODO: Replace this procedural preview with a branded SVG/image asset.
+            const isDark = choice === 'dark'
+            const isSystem = choice === 'system'
+            const preview = isDark ? 'bg-[#151922]' : 'bg-[#f8fafc]'
+            const panel = isDark ? 'bg-[#202633]' : 'bg-white'
+            const foreground = isDark ? 'bg-[#f1f5f9]' : 'bg-[#172033]'
+            const accent = isDark ? 'bg-[#818cf8]' : 'bg-[#4f46e5]'
+            return (
+              <button
+                aria-pressed={selected}
+                className={cn(
+                  'rounded-[10px] border p-2 text-left outline-none transition-colors focus-visible:ring-1 focus-visible:ring-ring',
+                  selected
+                    ? 'border-ring bg-ring/8'
+                    : 'border-[var(--border)] bg-background hover:bg-accent',
+                )}
+                key={choice}
+                type="button"
+                onClick={() => setTheme(choice)}
+              >
+                <div className={cn('flex h-[72px] overflow-hidden rounded-lg border', preview)}>
+                  {isSystem ? (
+                    <>
+                      <div className="flex flex-1 flex-col gap-1.5 bg-[#f8fafc] p-1.5">
+                        <div className="h-1.5 w-full rounded-sm bg-white" />
+                        <div className="flex min-h-0 flex-1 gap-1">
+                          <div className="w-4 rounded-sm bg-white" />
+                          <div className="flex flex-1 flex-col gap-1 pt-0.5">
+                            <div className="h-1 w-8 rounded-sm bg-[#172033]/70" />
+                            <div className="h-1 w-6 rounded-sm bg-[#4f46e5]/80" />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="w-px bg-[#8c96a8]" />
+                      <div className="flex flex-1 flex-col gap-1.5 bg-[#151922] p-1.5">
+                        <div className="h-1.5 w-full rounded-sm bg-[#202633]" />
+                        <div className="flex min-h-0 flex-1 gap-1">
+                          <div className="w-4 rounded-sm bg-[#202633]" />
+                          <div className="flex flex-1 flex-col gap-1 pt-0.5">
+                            <div className="h-1 w-8 rounded-sm bg-[#f1f5f9]/70" />
+                            <div className="h-1 w-6 rounded-sm bg-[#818cf8]/80" />
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className={cn('flex flex-1 flex-col gap-1.5 p-1.5', preview)}>
+                      <div className={cn('h-1.5 w-full rounded-sm', panel)} />
+                      <div className="flex min-h-0 flex-1 gap-1">
+                        <div className={cn('w-5 rounded-sm', panel)} />
+                        <div className="flex flex-1 flex-col gap-1 pt-0.5">
+                          <div className={cn('h-1 w-10 rounded-sm opacity-70', foreground)} />
+                          <div className={cn('h-1 w-7 rounded-sm opacity-80', accent)} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <span className="mt-2 block text-[12px] font-medium text-foreground">
+                  {t(`settings.theme_${choice}`)}
+                </span>
+              </button>
+            )
+          })}
+        </div>
       </div>
       <div className="mx-5 border-t" />
       <div className="flex min-h-[60px] items-center gap-6 px-5 py-3">
