@@ -277,6 +277,15 @@ export function Sidebar({
                             [row.groupId]: (current[row.groupId] ?? 0) + 10,
                           }))
                         }}
+                        onKeyDown={(event) => {
+                          if (event.key === 'ArrowDown') {
+                            event.preventDefault()
+                            navigateSidebarItem('next', event.currentTarget)
+                          } else if (event.key === 'ArrowUp') {
+                            event.preventDefault()
+                            navigateSidebarItem('prev', event.currentTarget)
+                          }
+                        }}
                       >
                         {t('sidebar.show_more')}
                       </button>
@@ -319,6 +328,18 @@ export function Sidebar({
                               next.delete(row.group.id)
                               return next
                             })
+                          } else if (event.key === 'ArrowDown') {
+                            event.preventDefault()
+                            navigateSidebarItem('next', event.currentTarget)
+                          } else if (event.key === 'ArrowUp') {
+                            event.preventDefault()
+                            navigateSidebarItem('prev', event.currentTarget)
+                          } else if (event.key === 'Home') {
+                            event.preventDefault()
+                            navigateSidebarItem('first', event.currentTarget)
+                          } else if (event.key === 'End') {
+                            event.preventDefault()
+                            navigateSidebarItem('last', event.currentTarget)
                           }
                         }}
                       >
@@ -485,6 +506,39 @@ export function Sidebar({
   )
 }
 
+function navigateSidebarItem(
+  direction: 'next' | 'prev' | 'first' | 'last',
+  currentElement: HTMLElement | null,
+) {
+  if (!currentElement) return
+  const container = currentElement.closest('[data-virtuoso-scroller]') ?? currentElement.closest('aside')
+  if (!container) return
+  const focusables = Array.from(
+    container.querySelectorAll<HTMLElement>(
+      'button:not([disabled]):not([tabindex="-1"]), [tabindex="0"]',
+    ),
+  ).filter((el) => el.offsetParent !== null)
+
+  const currentIndex = focusables.indexOf(currentElement)
+  if (currentIndex === -1) return
+
+  let targetIndex = currentIndex
+  if (direction === 'next') {
+    targetIndex = Math.min(currentIndex + 1, focusables.length - 1)
+  } else if (direction === 'prev') {
+    targetIndex = Math.max(currentIndex - 1, 0)
+  } else if (direction === 'first') {
+    targetIndex = 0
+  } else if (direction === 'last') {
+    targetIndex = focusables.length - 1
+  }
+
+  const target = focusables[targetIndex]
+  if (target && target !== currentElement) {
+    target.focus()
+  }
+}
+
 function SidebarAction({
   icon,
   label,
@@ -633,6 +687,18 @@ function SessionRow({
                 event.preventDefault()
                 restoreMenuFocus.current = true
                 setMenuOpen(true)
+              } else if (event.key === 'ArrowDown') {
+                event.preventDefault()
+                navigateSidebarItem('next', event.currentTarget)
+              } else if (event.key === 'ArrowUp') {
+                event.preventDefault()
+                navigateSidebarItem('prev', event.currentTarget)
+              } else if (event.key === 'Home') {
+                event.preventDefault()
+                navigateSidebarItem('first', event.currentTarget)
+              } else if (event.key === 'End') {
+                event.preventDefault()
+                navigateSidebarItem('last', event.currentTarget)
               }
             }}
           >
@@ -681,6 +747,18 @@ function SessionRow({
                 event.preventDefault()
                 restoreMenuFocus.current = true
                 setMenuOpen(true)
+              } else if (event.key === 'ArrowDown') {
+                event.preventDefault()
+                navigateSidebarItem('next', event.currentTarget)
+              } else if (event.key === 'ArrowUp') {
+                event.preventDefault()
+                navigateSidebarItem('prev', event.currentTarget)
+              } else if (event.key === 'Home') {
+                event.preventDefault()
+                navigateSidebarItem('first', event.currentTarget)
+              } else if (event.key === 'End') {
+                event.preventDefault()
+                navigateSidebarItem('last', event.currentTarget)
               }
             }}
           >

@@ -1744,16 +1744,20 @@ impl Padu {
             }))
             .on_key_down(cx.listener(move |this, event: &KeyDownEvent, _, cx| {
                 match event.keystroke.key.as_str() {
-                    "enter" | "space" => {
-                        this.toggle_sidebar_group(group, cx);
-                        cx.stop_propagation();
-                    }
                     "left" if !collapsed => {
                         this.set_sidebar_group_collapsed(group, true, cx);
                         cx.stop_propagation();
                     }
                     "right" if collapsed => {
                         this.set_sidebar_group_collapsed(group, false, cx);
+                        cx.stop_propagation();
+                    }
+                    "down" => {
+                        this.select_adjacent_sidebar_session(None, 1, cx);
+                        cx.stop_propagation();
+                    }
+                    "up" => {
+                        this.select_adjacent_sidebar_session(None, -1, cx);
                         cx.stop_propagation();
                     }
                     _ => {}
@@ -1826,6 +1830,67 @@ impl Padu {
         *revealed = revealed.saturating_add(SIDEBAR_PROJECT_REVEAL_BATCH);
         self.sidebar_rows_fingerprint.set(None);
         cx.notify();
+    }
+
+    fn select_adjacent_sidebar_session(
+        &mut self,
+        current_session: Option<Uuid>,
+        delta: isize,
+        cx: &mut Context<Self>,
+    ) {
+        let rows = self.sidebar_rows_cached(Local::now().date_naive(), unix_time());
+        let sessions = rows
+            .iter()
+            .filter_map(|r| match r {
+                SidebarRow::Session(id) => Some(*id),
+                _ => None,
+            })
+            .collect::<Vec<_>>();
+        if sessions.is_empty() {
+            return;
+        }
+        let next_session =
+            match current_session.and_then(|id| sessions.iter().position(|&s| s == id)) {
+                Some(pos) => {
+                    let next_pos = if delta > 0 {
+                        (pos + 1).min(sessions.len() - 1)
+                    } else {
+                        pos.saturating_sub(1)
+                    };
+                    sessions[next_pos]
+                }
+                None => {
+                    if delta > 0 {
+                        sessions[0]
+                    } else {
+                        sessions[sessions.len() - 1]
+                    }
+                }
+            };
+        self.select_session(next_session, cx);
+        self.reveal_sidebar_session(next_session);
+    }
+
+    fn select_first_sidebar_session(&mut self, cx: &mut Context<Self>) {
+        let rows = self.sidebar_rows_cached(Local::now().date_naive(), unix_time());
+        if let Some(first) = rows.iter().find_map(|r| match r {
+            SidebarRow::Session(id) => Some(*id),
+            _ => None,
+        }) {
+            self.select_session(first, cx);
+            self.reveal_sidebar_session(first);
+        }
+    }
+
+    fn select_last_sidebar_session(&mut self, cx: &mut Context<Self>) {
+        let rows = self.sidebar_rows_cached(Local::now().date_naive(), unix_time());
+        if let Some(last) = rows.iter().rev().find_map(|r| match r {
+            SidebarRow::Session(id) => Some(*id),
+            _ => None,
+        }) {
+            self.select_session(last, cx);
+            self.reveal_sidebar_session(last);
+        }
     }
 
     fn toggle_sidebar_group(&mut self, group: SidebarGroup, cx: &mut Context<Self>) {
@@ -2204,7 +2269,19 @@ impl Padu {
                     .focus_visible(|style| style.border_1().border_color(theme.accent))
                     .on_key_down(cx.listener(move |this, event: &KeyDownEvent, window, cx| {
                         let key = event.keystroke.key.as_str();
-                        if matches!(key, "enter" | "space") {
+                        if key == "down" {
+                            this.select_adjacent_sidebar_session(Some(session_id), 1, cx);
+                            cx.stop_propagation();
+                        } else if key == "up" {
+                            this.select_adjacent_sidebar_session(Some(session_id), -1, cx);
+                            cx.stop_propagation();
+                        } else if key == "home" {
+                            this.select_first_sidebar_session(cx);
+                            cx.stop_propagation();
+                        } else if key == "end" {
+                            this.select_last_sidebar_session(cx);
+                            cx.stop_propagation();
+                        } else if matches!(key, "enter" | "space") {
                             this.select_session(session_id, cx);
                             cx.stop_propagation();
                         } else if key == "f2" {
