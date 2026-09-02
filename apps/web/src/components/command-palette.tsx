@@ -477,12 +477,18 @@ export function CommandPalette({
         </div>
         <div className="flex h-8 shrink-0 items-center gap-3.5 border-t bg-[var(--card)] px-3 text-[11px] text-[var(--text-tertiary)]">
           <span className="flex items-center gap-1">
-            <PaduIcon className="size-2.5" name="arrowUp" />
-            <PaduIcon className="size-2.5" name="arrowDown" />
+            <kbd className="flex h-5 min-w-6 shrink-0 items-center justify-center rounded-md bg-[color:var(--foreground)]/[0.07] px-1 font-sans text-[var(--text-tertiary)]">
+              <PaduIcon className="size-2.5" name="arrowUp" />
+            </kbd>
+            <kbd className="flex h-5 min-w-6 shrink-0 items-center justify-center rounded-md bg-[color:var(--foreground)]/[0.07] px-1 font-sans text-[var(--text-tertiary)]">
+              <PaduIcon className="size-2.5" name="arrowDown" />
+            </kbd>
             Navigate
           </span>
           <span className="flex items-center gap-1">
-            <PaduIcon className="size-2.5" name="cornerDownRight" />
+            <kbd className="flex h-5 min-w-6 shrink-0 items-center justify-center rounded-md bg-[color:var(--foreground)]/[0.07] px-1.5 font-sans text-[var(--text-tertiary)]">
+              <PaduIcon className="size-3" name="cornerDownRight" />
+            </kbd>
             Select
           </span>
           <span className="flex items-center gap-1">

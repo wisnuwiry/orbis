@@ -2073,8 +2073,30 @@ impl Padu {
                                 .flex()
                                 .items_center()
                                 .gap(px(4.0))
-                                .child(icon("icons/arrow-up.svg", 10.0, theme.text_tertiary))
-                                .child(icon("icons/arrow-down.svg", 10.0, theme.text_tertiary))
+                                .child(
+                                    div()
+                                        .h(px(20.0))
+                                        .min_w(px(24.0))
+                                        .px(px(6.0))
+                                        .rounded(px(6.0))
+                                        .flex()
+                                        .items_center()
+                                        .justify_center()
+                                        .bg(theme.overlay_strong)
+                                        .child(icon("icons/arrow-up.svg", 10.0, theme.text_tertiary)),
+                                )
+                                .child(
+                                    div()
+                                        .h(px(20.0))
+                                        .min_w(px(24.0))
+                                        .px(px(6.0))
+                                        .rounded(px(6.0))
+                                        .flex()
+                                        .items_center()
+                                        .justify_center()
+                                        .bg(theme.overlay_strong)
+                                        .child(icon("icons/arrow-down.svg", 10.0, theme.text_tertiary)),
+                                )
                                 .child(SharedString::from("Navigate")),
                         )
                         .child(
@@ -2082,11 +2104,22 @@ impl Padu {
                                 .flex()
                                 .items_center()
                                 .gap(px(4.0))
-                                .child(icon(
-                                    "icons/corner-down-right.svg",
-                                    10.0,
-                                    theme.text_tertiary,
-                                ))
+                                .child(
+                                    div()
+                                        .h(px(20.0))
+                                        .min_w(px(24.0))
+                                        .px(px(6.0))
+                                        .rounded(px(6.0))
+                                        .flex()
+                                        .items_center()
+                                        .justify_center()
+                                        .bg(theme.overlay_strong)
+                                        .child(icon(
+                                            "icons/corner-down-right.svg",
+                                            10.0,
+                                            theme.text_tertiary,
+                                        )),
+                                )
                                 .child(SharedString::from("Select")),
                         )
                         .child(
