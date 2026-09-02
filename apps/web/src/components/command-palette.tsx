@@ -50,6 +50,7 @@ export interface CommandPaletteActions {
   toggleSidebar: () => void
   toggleRightPanel: () => void
   openSettings: (page: SettingsPageId) => void
+  openOnboarding?: () => void
   selectTask: (sessionId: string) => void
   resumeProviderSession: (summary: ProviderSessionSummary) => Promise<void>
 }
@@ -622,6 +623,9 @@ function buildItems({
     commands.push(command('focus-composer', 'commands', t('menu.focus_composer'), 'pencil', shortcut('⌘L', 'Ctrl+L'), `focus composer prompt input message ${t('menu.focus_composer')}`, actions.focusComposer))
     if (canToggleUsage) {
       commands.push(command('toggle-usage', 'commands', t('menu.toggle_usage_panel'), 'gauge', shortcut('⌘U', 'Ctrl+U'), `toggle usage limits rate quota panel ${t('menu.toggle_usage_panel')}`, actions.toggleUsage))
+    }
+    if (actions.openOnboarding) {
+      commands.push(command('open-onboarding', 'commands', t('onboarding.command_title'), 'sparkle', undefined, `onboarding tour welcome guide get started ${t('onboarding.command_title')}`, actions.openOnboarding))
     }
     commands.push(
       command('toggle-sidebar', 'commands', t(sidebarVisible ? 'command_palette.hide_sidebar' : 'command_palette.show_sidebar'), 'panelLeft', shortcut('⌘B', 'Ctrl+B'), 'toggle show hide left sidebar history tasks', actions.toggleSidebar),
