@@ -1025,9 +1025,9 @@ impl Padu {
                 )
                 .child(icon(
                     if menu_open {
-                        "icons/chevron-down.svg"
-                    } else {
                         "icons/chevron-up.svg"
+                    } else {
+                        "icons/chevron-down.svg"
                     },
                     10.0,
                     theme.text_ghost,

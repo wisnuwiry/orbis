@@ -76,7 +76,7 @@ export function ControlMenu({
               'size-2.5 text-[var(--text-ghost)] transition-transform duration-150',
               open && 'rotate-180',
             )}
-            name={placement === 'above' ? 'chevronUp' : 'chevronDown'}
+            name="chevronDown"
           />
         )}
       </Menu.Trigger>
