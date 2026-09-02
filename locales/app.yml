@@ -1858,6 +1858,10 @@ files.preparing_editor:
   en: Preparing editor…
 files.preparing_syntax:
   en: Preparing syntax highlighting.
+files.copy_path:
+  en: Copy path
+files.copied_path:
+  en: "Copied %{path} to clipboard"
 
 file_picker.open_project:
   en: Open Project
