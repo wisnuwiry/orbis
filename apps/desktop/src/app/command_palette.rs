@@ -42,6 +42,7 @@ const CONTENT_RESULT_ROW_HEIGHT: f32 = 54.0;
 const EMPTY_RESULTS_HEIGHT: f32 = 160.0;
 const RESULTS_BOTTOM_PADDING: f32 = 6.0;
 const MAX_CARD_HEIGHT: f32 = 440.0;
+const FOOTER_HEIGHT: f32 = 32.0;
 
 /// Bind list navigation beneath the focused one-line input. This is registered
 /// after the input's bindings, although the more-specific key context would
@@ -1689,8 +1690,8 @@ impl Padu {
         let show_placeholder_state = show_empty_state || show_loading_state;
         let results_height =
             command_palette_results_height(&self.command_palette.results, show_placeholder_state)
-                .min((card_max_height - SEARCH_ROW_HEIGHT).max(0.0));
-        let card_height = SEARCH_ROW_HEIGHT + results_height;
+                .min((card_max_height - SEARCH_ROW_HEIGHT - FOOTER_HEIGHT).max(0.0));
+        let card_height = SEARCH_ROW_HEIGHT + results_height + FOOTER_HEIGHT;
 
         let mut results = div()
             .id("command-palette-results")
@@ -2053,7 +2054,59 @@ impl Padu {
                                 .child(self.command_palette.search.clone()),
                         ),
                 )
-                .child(results);
+                .child(results)
+                .child(
+                    div()
+                        .h(px(FOOTER_HEIGHT))
+                        .px(px(12.0))
+                        .flex_none()
+                        .flex()
+                        .items_center()
+                        .gap(px(14.0))
+                        .border_t_1()
+                        .border_color(theme.border)
+                        .bg(theme.canvas.opacity(0.6))
+                        .text_size(sp(11.0))
+                        .text_color(theme.text_tertiary)
+                        .child(
+                            div()
+                                .flex()
+                                .items_center()
+                                .gap(px(4.0))
+                                .child(icon("icons/arrow-up.svg", 10.0, theme.text_tertiary))
+                                .child(icon("icons/arrow-down.svg", 10.0, theme.text_tertiary))
+                                .child(SharedString::from("Navigate")),
+                        )
+                        .child(
+                            div()
+                                .flex()
+                                .items_center()
+                                .gap(px(4.0))
+                                .child(icon(
+                                    "icons/corner-down-right.svg",
+                                    10.0,
+                                    theme.text_tertiary,
+                                ))
+                                .child(SharedString::from("Select")),
+                        )
+                        .child(
+                            div()
+                                .flex()
+                                .items_center()
+                                .gap(px(4.0))
+                                .child(
+                                    div()
+                                        .px(px(4.0))
+                                        .py(px(1.0))
+                                        .rounded(px(4.0))
+                                        .border_1()
+                                        .border_color(theme.border)
+                                        .text_size(sp(10.0))
+                                        .child(SharedString::from("Esc")),
+                                )
+                                .child(SharedString::from("Close")),
+                        ),
+                );
 
         let scrim = if theme.is_dark {
             gpui::hsla(0.0, 0.0, 0.0, 0.26)

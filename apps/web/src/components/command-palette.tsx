@@ -475,6 +475,21 @@ export function CommandPalette({
             <PaletteRows items={items} query={query} selected={selected} t={t} onExecute={execute} onSelected={setSelected} />
           )}
         </div>
+        <div className="flex h-8 shrink-0 items-center gap-3.5 border-t bg-[var(--card)] px-3 text-[11px] text-[var(--text-tertiary)]">
+          <span className="flex items-center gap-1">
+            <PaduIcon className="size-2.5" name="arrowUp" />
+            <PaduIcon className="size-2.5" name="arrowDown" />
+            Navigate
+          </span>
+          <span className="flex items-center gap-1">
+            <PaduIcon className="size-2.5" name="cornerDownRight" />
+            Select
+          </span>
+          <span className="flex items-center gap-1">
+            <kbd className="rounded border bg-muted px-1 py-0.5 text-[10px] leading-none">Esc</kbd>
+            Close
+          </span>
+        </div>
       </div>
     </div>
   )
