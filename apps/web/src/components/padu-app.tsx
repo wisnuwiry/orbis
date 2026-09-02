@@ -1629,7 +1629,7 @@ function NewTaskCanvas({
   return (
     <div className="flex min-h-0 flex-1 items-center justify-center px-8 pb-12">
       <div className="text-center">
-        <PaduIcon className="mx-auto size-5 text-ring" name="sparkle" />
+        <PaduIcon className="mx-auto size-8 text-ring" name="logo" />
         <div className="mt-3 flex flex-wrap items-baseline justify-center gap-1 text-xl font-medium">
           {projectless ? (
             <span>{t('onboarding.what_should_we_build')}</span>

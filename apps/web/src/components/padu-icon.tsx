@@ -35,6 +35,7 @@ export const PADU_ICONS = {
   globe: 'i-padu-globe',
   github: 'i-padu-github',
   info: 'i-padu-info',
+  logo: 'i-padu-logo',
   laptop: 'i-padu-laptop',
   list: 'i-padu-list',
   listFilter: 'i-padu-list-filter',
