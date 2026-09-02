@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Tooltip } from '@/components/ui/tooltip'
 import { PanelResizeHandle } from '@/components/panel-resize-handle'
 import { PaduIcon } from '@/components/padu-icon'
+import { DeleteSessionDialog } from '@/components/delete-session-dialog'
 import { displayHost } from '@/lib/connection'
 import { displayTitle, type TaskState } from '@/lib/daemon-api'
 import { useDaemon } from '@/lib/daemon-context'
@@ -101,6 +102,7 @@ export function Sidebar({
   const [revealedOlderCounts, setRevealedOlderCounts] = useState<Record<string, number>>({})
   const [liveWidth, setLiveWidth] = useState(width)
   const [nowSeconds, setNowSeconds] = useState(() => Math.floor(Date.now() / 1_000))
+  const [sessionToDelete, setSessionToDelete] = useState<{ id: string; title?: string } | null>(null)
   const { hosts, activeHost, activeHostId, config, phase, switchHost, addHost } = useDaemon()
   const [hostDialogOpen, setHostDialogOpen] = useState(false)
 
@@ -432,7 +434,10 @@ export function Sidebar({
                     nowSeconds={nowSeconds}
                     selected={selectedSessionId === row.item.session.id}
                     t={t}
-                    onRemove={onRemoveSession}
+                    onRemove={(sessionId) => {
+                      const session = taskState.sessions.find((s) => s.id === sessionId)
+                      setSessionToDelete({ id: sessionId, title: session?.title })
+                    }}
                     onRename={onRenameSession}
                     onSelect={(sessionId) => {
                       onSelectSession(sessionId)
@@ -501,6 +506,12 @@ export function Sidebar({
           const newHost = await addHost(data)
           await switchHost(newHost.id)
         }}
+      />
+
+      <DeleteSessionDialog
+        session={sessionToDelete}
+        onClose={() => setSessionToDelete(null)}
+        onConfirm={onRemoveSession}
       />
     </>
   )
@@ -583,7 +594,7 @@ function SessionRow({
   groupedByProject?: boolean
   onSelect: (sessionId: string) => void
   onRename: (sessionId: string, title: string) => Promise<void>
-  onRemove: (sessionId: string) => Promise<void>
+  onRemove: (sessionId: string) => void | Promise<void>
   t: Translator
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -801,7 +812,7 @@ function SessionRow({
               onClick={() => {
                 restoreMenuFocus.current = false
                 setMenuOpen(false)
-                void onRemove(item.session.id).catch(() => {})
+                void Promise.resolve(onRemove(item.session.id)).catch(() => {})
               }}
             >
               <PaduIcon className="size-3" name="trash" /> {t('common.remove')}

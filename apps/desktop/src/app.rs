@@ -1216,6 +1216,7 @@ pub struct Padu {
     /// Window-modal Git commit/push UI. Its repository snapshot is filled
     /// off-thread; frames only read this in-memory value.
     commit_dialog: Option<commit_dialog::CommitDialogState>,
+    delete_session_dialog: Option<delete_session_dialog::DeleteSessionDialogState>,
     goal_dialog: Option<goal_dialog::GoalDialogState>,
     goal_dialog_request: Option<goal_dialog::GoalDialogRequest>,
     host_dialog: Option<host_dialog::HostDialogState>,
@@ -1611,6 +1612,7 @@ mod command_palette;
 mod commit_dialog;
 mod components;
 mod composer;
+mod delete_session_dialog;
 mod drafts;
 mod file_search;
 mod goal_dialog;
@@ -1640,6 +1642,7 @@ use background_work::{
 pub use command_palette::init as init_command_palette;
 pub use commit_dialog::init as init_commit_dialog_keys;
 use components::*;
+pub use delete_session_dialog::init as init_delete_session_dialog_keys;
 pub use goal_dialog::init as init_goal_dialog_keys;
 pub use host_dialog::init as init_host_dialog_keys;
 pub use image_preview::init as init_image_preview_keys;
@@ -2972,6 +2975,7 @@ impl Padu {
                 visible_branch_snapshot: None,
                 branch_operation_pending: false,
                 commit_dialog: None,
+                delete_session_dialog: None,
                 goal_dialog: None,
                 goal_dialog_request: None,
                 host_dialog: None,

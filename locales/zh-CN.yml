@@ -384,6 +384,9 @@ session.revert_to_here: 回退到这里
 session.revert_to_here_title: 回退到这里
 session.reverting_message: 正在回退消息…
 session.reverting_message_title: 正在回退消息…
+session.delete_title: 删除对话
+session.delete_message: "确定要删除“%{title}”吗？此操作无法撤消。"
+session.delete_confirm: 删除
 time.yesterday_at: 昨天 %{time}
 time.weekday_at: "%{weekday} %{time}"
 time.date_at: "%{month}月%{day}日 %{time}"

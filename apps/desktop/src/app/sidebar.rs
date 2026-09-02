@@ -2291,7 +2291,7 @@ impl Padu {
                             && (event.keystroke.modifiers.platform
                                 || event.keystroke.modifiers.control)
                         {
-                            this.remove_session(session_id, cx);
+                            this.confirm_delete_session(session_id, window, cx);
                             cx.stop_propagation();
                         } else if key == "f10" && event.keystroke.modifiers.shift {
                             keyboard_menu.open_context_menu(window, cx);
@@ -2327,9 +2327,9 @@ impl Padu {
                             });
                         }),
                         MenuItem::Separator,
-                        MenuItem::new(tr!("common.remove"), move |_, cx| {
+                        MenuItem::new(tr!("common.remove"), move |window, cx| {
                             let _ = remove_padu
-                                .update(cx, |padu, cx| padu.remove_session(session_id, cx));
+                                .update(cx, |padu, cx| padu.confirm_delete_session(session_id, window, cx));
                         }),
                     ]
                 },

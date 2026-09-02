@@ -784,6 +784,12 @@ session.reverting_message:
   en: Reverting message…
 session.reverting_message_title:
   en: Reverting Message…
+session.delete_title:
+  en: Delete Conversation
+session.delete_message:
+  en: "Are you sure you want to delete “%{title}”? This action cannot be undone."
+session.delete_confirm:
+  en: Delete
 
 time.yesterday_at:
   en: Yesterday %{time}

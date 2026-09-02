@@ -400,6 +400,9 @@ session.revert_to_here: ここまで戻す
 session.revert_to_here_title: ここまで戻す
 session.reverting_message: メッセージを戻しています…
 session.reverting_message_title: メッセージを戻しています…
+session.delete_title: 会話を削除
+session.delete_message: "「%{title}」を削除してもよろしいですか？この操作は取り消せません。"
+session.delete_confirm: 削除
 
 time.yesterday_at: 昨日 %{time}
 time.weekday_at: "%{weekday} %{time}"
