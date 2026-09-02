@@ -138,6 +138,34 @@ describe('desktop sidebar presentation', () => {
     const groupsOldest = groupSessions([], [today, month], now, 'Unknown', 'No project', 'updated', 'oldest')
     expect(groupsOldest.map((g) => g.dateGroup)).toEqual(['month', 'today'])
   })
+
+  test('handles time labels and elapsed counters across different time deltas', () => {
+    expect(formatTimeAgo(30)).toBe('just now')
+    expect(formatTimeAgo(90)).toBe('1m')
+    expect(formatTimeAgo(3_600)).toBe('1h')
+    expect(formatTimeAgo(7_200)).toBe('2h')
+    expect(formatTimeAgo(86_400)).toBe('1d')
+    expect(formatTimeAgo(172_800)).toBe('2d')
+  })
+
+  test('sidebarRows respects collapsed state and inserts spacers between groups', () => {
+    const now = new Date(2026, 7, 15, 12)
+    const nowSeconds = Math.floor(now.getTime() / 1000)
+    const s1 = session({ id: 's1', created_at: nowSeconds, last_reply_at: nowSeconds, messages: [{ id: 'm1' } as never] })
+    const s2 = session({ id: 's2', created_at: nowSeconds - 10 * 86_400, last_reply_at: nowSeconds - 10 * 86_400, messages: [{ id: 'm2' } as never] })
+
+    const groups = groupSessions([], [s1, s2], now, 'Unknown', 'No project', 'updated', 'newest')
+    expect(groups.length).toBe(2)
+
+    const uncollapsedRows = sidebarRows(groups, new Set())
+    expect(uncollapsedRows.some((r) => r.kind === 'session' && r.item.session.id === 's1')).toBe(true)
+    expect(uncollapsedRows.some((r) => r.kind === 'session' && r.item.session.id === 's2')).toBe(true)
+
+    // When group 1 is collapsed, session 1 is hidden
+    const collapsedRows = sidebarRows(groups, new Set([groups[0]!.id]))
+    expect(collapsedRows.some((r) => r.kind === 'session' && r.item.session.id === 's1')).toBe(false)
+    expect(collapsedRows.some((r) => r.kind === 'session' && r.item.session.id === 's2')).toBe(true)
+  })
 })
 
 function atLocalNoon(year: number, month: number, day: number): number {
