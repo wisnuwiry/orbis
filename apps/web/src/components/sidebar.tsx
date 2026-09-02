@@ -80,7 +80,7 @@ export function Sidebar({
       const saved = window.localStorage.getItem('padu:sidebar_grouping')
       if (saved === 'project' || saved === 'updated') return saved
     }
-    return 'updated'
+    return 'project'
   })
   const [ordering, setOrdering] = useState<SidebarOrdering>(() => {
     if (typeof window !== 'undefined') {

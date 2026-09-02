@@ -75,10 +75,12 @@ describe('desktop sidebar presentation', () => {
       path: '/home/me/.padu/projects/session',
       created_at: 1,
     }
+    const now = new Date(2026, 7, 15, 12)
+    const nowSeconds = Math.floor(now.getTime() / 1000)
     const groups = groupSessions(
       [project],
-      [session({ messages: [{ id: 'message' } as never] })],
-      new Date(2026, 7, 15, 12),
+      [session({ created_at: nowSeconds, messages: [{ id: 'message' } as never] })],
+      now,
       'Unknown project',
       'プロジェクトなし',
     )
