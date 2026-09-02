@@ -46,7 +46,7 @@ interface DaemonContextValue {
   addHost: (input: { name: string; address: string; token?: string }) => Promise<HostProfile>
   updateHost: (id: string, updates: Partial<HostProfile>) => Promise<void>
   removeHost: (id: string) => Promise<void>
-  switchHost: (id: string) => Promise<void>
+  switchHost: (id: string | null) => Promise<void>
 }
 
 const DaemonContext = createContext<DaemonContextValue | null>(null)
@@ -167,7 +167,16 @@ export function DaemonProvider({ children }: { children: ReactNode }) {
   )
 
   const switchHost = useCallback(
-    async (id: string) => {
+    async (id: string | null) => {
+      if (id === null) {
+        setActiveHostId(null)
+        storeActiveHostId(null)
+        const stored = loadStoredConnection()
+        if (stored) {
+          await open(stored)
+        }
+        return
+      }
       const target = hosts.find((h) => h.id === id)
       if (!target) return
       await open(

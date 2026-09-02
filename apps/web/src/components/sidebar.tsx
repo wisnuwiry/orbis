@@ -106,9 +106,20 @@ export function Sidebar({
 
   const currentHostDisplayName = phase === 'connecting'
     ? t('host.connecting')
-    : activeHost?.name || (config ? displayHost(config.address) : t('host.local'))
+    : (activeHostId === null ? t('host.local') : (activeHost?.name || (config ? displayHost(config.address) : t('host.local'))))
+
+  const isLocalActive = activeHostId === null
 
   const hostMenuItems: ControlMenuItem[] = [
+    {
+      id: 'host-local',
+      label: t('host.local'),
+      icon: 'server' as const,
+      selected: isLocalActive,
+      onSelect: () => {
+        void switchHost(null).catch(() => {})
+      },
+    },
     ...hosts.map((host) => ({
       id: host.id,
       label: host.name || host.address,
@@ -122,7 +133,7 @@ export function Sidebar({
       id: 'add-host',
       label: t('host.add_host'),
       icon: 'plus' as const,
-      separatorBefore: hosts.length > 0,
+      separatorBefore: true,
       onSelect: () => setHostDialogOpen(true),
     },
     {
