@@ -21,6 +21,9 @@ updates:
         update-types:
           - "minor"
           - "patch"
+    # Ignore glib updates until wry upgrades beyond the GTK 0.18 / glib 0.18 requirement
+    ignore:
+      - dependency-name: "glib"
 
   # Bun workspace dependencies (root, apps/*, packages/*)
   - package-ecosystem: "bun"
