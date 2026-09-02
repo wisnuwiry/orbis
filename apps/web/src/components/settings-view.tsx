@@ -60,7 +60,7 @@ export const SETTINGS_PAGES: Array<{
   { id: 'providers', label: 'Providers', labelKey: 'settings.providers', icon: 'bot', keywords: 'providers agents models cli version install detect claude codex cursor opencode amp grok pi omp oh my pi kimi', keywordsKey: 'settings.providers_keywords' },
   { id: 'skills', label: 'Skills', labelKey: 'settings.skills', icon: 'package', keywords: 'skills library agent disable enable delete shared', keywordsKey: 'settings.skills_keywords' },
   { id: 'usage', label: 'Usage', labelKey: 'settings.usage', icon: 'chartColumn', keywords: 'usage tokens cost spend cache daily monthly project model history', keywordsKey: 'settings.usage_keywords' },
-  { id: 'daemon', label: 'Daemon', labelKey: 'settings.daemon', icon: 'server', keywords: 'daemon server remote web network connection url token websocket', keywordsKey: 'settings.daemon_keywords' },
+  { id: 'daemon', label: 'Hosts & Daemon', labelKey: 'settings.daemon', icon: 'server', keywords: 'hosts host remote server devbox cloud daemon web network connection url token websocket ssh lan', keywordsKey: 'settings.daemon_keywords' },
 ]
 
 export function isSettingsPageId(value: string): value is SettingsPageId {
@@ -635,12 +635,6 @@ function DaemonSettings() {
   const [error, setError] = useState<string | null>(null)
   return (
     <div>
-      <SettingsCard>
-        <SettingText
-          title={t('daemon.external_title')}
-          description={t('daemon.web_external_description')}
-        />
-      </SettingsCard>
       <RemoteHostsCard />
       <SettingsCard>
         <SettingText title={t('daemon.credentials_title')} description={t('daemon.web_connection_description')} />

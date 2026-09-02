@@ -155,7 +155,7 @@ settings.providers:
 settings.usage:
   en: Usage
 settings.daemon:
-  en: Daemon
+  en: Hosts & Daemon
 settings.computer_use:
   en: Computer Use
 settings.general_keywords:
@@ -173,7 +173,7 @@ settings.skills_keywords:
 settings.usage_keywords:
   en: usage tokens cost spend cache daily chart model breakdown history claude codex
 settings.daemon_keywords:
-  en: daemon server remote web network expose origin token port websocket
+  en: hosts host remote server devbox cloud daemon web network expose origin token port websocket ssh lan
 settings.computer_use_keywords:
   en: computer use screen recording accessibility apps control codex
 keybindings.section_general:
@@ -307,9 +307,9 @@ settings.back:
 settings.search:
   en: Search Settings
 daemon.expose_title:
-  en: Expose managed daemon
+  en: Allow Remote & Web Connections
 daemon.expose_description:
-  en: Listen beyond this machine so another Padu client can connect. Changing this restarts only the daemon.
+  en: Allow Padu Web in a browser or other devices on your local network to connect to this machine's AI agent runtimes.
 daemon.status_local:
   en: Local only
 daemon.status_exposed:
@@ -317,7 +317,7 @@ daemon.status_exposed:
 daemon.status_restarting:
   en: Restarting
 daemon.connection_title:
-  en: Listener access
+  en: Network & Origin Policy
 daemon.connection_description:
   en: Browser origins must match exactly. Separate multiple origins with commas.
 daemon.port:
@@ -337,9 +337,9 @@ daemon.apply:
 daemon.restarting:
   en: Restarting…
 daemon.credentials_title:
-  en: Connection details
+  en: Daemon Access Credentials
 daemon.credentials_description:
-  en: Enter these in Padu Web. The URL uses this machine’s local network hostname.
+  en: Use these connection credentials in Padu Web or remote client apps to connect to this machine.
 daemon.websocket_url:
   en: WebSocket URL
 daemon.token:
@@ -352,10 +352,16 @@ daemon.regenerate_token:
   en: Regenerate
 daemon.security_warning:
   en: The token grants full access to tasks, files, Git, attachments, and coding agents on this machine. Use WSS through a trusted TLS proxy outside a private network.
+daemon.remote_active_banner_title:
+  en: "Connected to Remote Host: %{name}"
+daemon.remote_active_banner_desc:
+  en: All agent runs, transcripts, and workspace operations are executing on this remote daemon host.
+daemon.switch_to_local:
+  en: Switch to Local Daemon
 daemon.external_title:
-  en: External daemon
+  en: Remote Daemon Host
 daemon.external_description:
-  en: This desktop is connected to a daemon managed outside Padu. Configure its listener, browser origins, and token on that host.
+  en: This Padu instance is currently connected to a remote daemon host.
 daemon.web_external_description:
   en: Padu Web connects to a daemon managed outside this browser. Configure its listener, browser origins, and token on that host.
 daemon.web_connection_description:
