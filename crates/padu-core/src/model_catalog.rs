@@ -677,78 +677,55 @@ fn parse_kimi_default_model(output: &str) -> Option<String> {
     })
 }
 
-/// Elph discovers its model catalog through an ACP `session/new` handshake.
-/// The response includes a `configOptions` with a `Model`-category select whose
-/// values are the available models. This runs on the daemon request thread,
-/// never a render path.
+/// Elph publishes its complete configured inventory through `elph models`.
+/// Its ACP `session/new` response is intended for session configuration and may
+/// contain only a partial model selector (or none at all), so the CLI listing
+/// is authoritative for the picker. This runs on the discovery thread, never a
+/// render path.
 fn discover_elph_models(binary: &Path) -> Vec<ProviderModel> {
-    use agent_client_protocol::schema::ProtocolVersion;
-    use agent_client_protocol::schema::v1::{
-        ClientCapabilities, Implementation, InitializeRequest, NewSessionRequest,
-        SessionConfigKind, SessionConfigOptionCategory, SessionConfigSelectOptions,
+    let mut command = crate::command_env::command(binary);
+    let Ok(output) = crate::command_env::output(command.arg("models")) else {
+        return Vec::new();
     };
-    use agent_client_protocol::{Agent, Client, ConnectionTo};
+    parse_elph_models(&format!(
+        "{}\n{}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    ))
+}
 
-    let Ok(agent) = crate::driver::catalog_agent(
-        ProviderKind::Elph,
-        binary,
-        &std::env::current_dir().unwrap_or_default(),
-    ) else {
-        return Vec::new();
-    };
-    let Ok(models) = smol::block_on(Client.builder().name("padu-elph-catalog").connect_with(
-        agent,
-        async move |connection: ConnectionTo<Agent>| {
-            connection
-                .send_request(
-                    InitializeRequest::new(ProtocolVersion::V1)
-                        .client_capabilities(ClientCapabilities::new().terminal(false))
-                        .client_info(Implementation::new("padu", env!("CARGO_PKG_VERSION"))),
-                )
-                .block_task()
-                .await?;
-            let session = connection
-                .send_request(NewSessionRequest::new(
-                    &std::env::current_dir().unwrap_or_default(),
-                ))
-                .block_task()
-                .await?;
-            Ok(session.config_options.unwrap_or_default())
-        },
-    )) else {
-        return Vec::new();
-    };
-    let Some(model_option) = models
-        .iter()
-        .find(|option| option.category.as_ref() == Some(&SessionConfigOptionCategory::Model))
-    else {
-        return Vec::new();
-    };
-    let SessionConfigKind::Select(select) = &model_option.kind else {
-        return Vec::new();
-    };
-    let values = match &select.options {
-        SessionConfigSelectOptions::Ungrouped(options) => options
-            .iter()
-            .map(|o| o.value.0.as_ref())
-            .collect::<Vec<_>>(),
-        SessionConfigSelectOptions::Grouped(groups) => groups
-            .iter()
-            .flat_map(|g| g.options.iter())
-            .map(|o| o.value.0.as_ref())
-            .collect(),
-        _ => return Vec::new(),
-    };
-    let current = select.current_value.0.as_ref();
-    values
-        .into_iter()
-        .map(|id| {
-            let name = display_name_from_slug(id);
-            let mut model = ProviderModel::new(id, &name);
-            if id == current {
-                model = model.default();
+fn parse_elph_models(output: &str) -> Vec<ProviderModel> {
+    let mut provider = None;
+    output
+        .lines()
+        .filter_map(|line| {
+            let cleaned = strip_ansi(line);
+            let line = cleaned.trim();
+            if line.is_empty() || line.starts_with('─') {
+                return None;
             }
-            model
+            if !line.contains(" · ") {
+                if let Some((name, id)) = line
+                    .strip_suffix(')')
+                    .and_then(|line| line.rsplit_once(" ("))
+                {
+                    provider = Some((name.to_owned(), id.to_owned()));
+                }
+                return None;
+            }
+
+            let (model_text, _) = line.split_once(" · ")?;
+            let id = model_text.split_whitespace().last()?;
+            let name_end = model_text.rfind(id)?;
+            let name = model_text[..name_end].trim();
+            if name.is_empty() || id.is_empty() {
+                return None;
+            }
+            let mut model = ProviderModel::new(id, name);
+            if let Some((provider_name, _)) = &provider {
+                model = model.sub_provider(provider_name);
+            }
+            Some(model)
         })
         .collect()
 }
@@ -1495,6 +1472,20 @@ printf '%s\n' '{"type":"control_response","response":{"request_id":"padu-initial
         assert_eq!(models.len(), 1);
         assert_eq!(models[0].id, "cc-switch-model");
         assert_eq!(models[0].name, "CC Switch Model");
+    }
+
+    #[test]
+    fn parses_elph_cli_models_with_provider_groups() {
+        let models = parse_elph_models(
+            "Models\n────────────────\n\nAzure OpenAI (azure-openai-responses)\n────────────────\n  GPT-4                     gpt-4                · 8k ctx · $30.00/$60.00 per M\n\nGoogle (google)\n──────────────\n  Gemini 2.5 Flash          google/gemini-2.5-flash · 1.0M ctx · reasoning\n",
+        );
+
+        assert_eq!(models.len(), 2);
+        assert_eq!(models[0].id, "gpt-4");
+        assert_eq!(models[0].name, "GPT-4");
+        assert_eq!(models[0].sub_provider.as_deref(), Some("Azure OpenAI"));
+        assert_eq!(models[1].id, "google/gemini-2.5-flash");
+        assert_eq!(models[1].sub_provider.as_deref(), Some("Google"));
     }
 
     #[test]
