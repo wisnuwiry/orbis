@@ -1672,7 +1672,7 @@ function ActivitySection({
   }, [])
   return (
     <div className="flex min-w-0 flex-col gap-[3px]">
-      {section.label && (
+      {section.label ? (
         <div className="flex h-5 items-center justify-between font-medium">
           <span>{section.label}</span>
           {section.content && (
@@ -1696,7 +1696,26 @@ function ActivitySection({
             </button>
           )}
         </div>
-      )}
+      ) : section.content ? (
+        <div className="flex justify-end">
+          <button
+            aria-label={copied ? t('common.copied') : t('common.copy')}
+            className="grid size-5 place-items-center rounded-[5px] text-[var(--text-ghost)] outline-none hover:bg-accent focus-visible:ring-1 focus-visible:ring-ring"
+            type="button"
+            onClick={() => {
+              void navigator.clipboard.writeText(section.content)
+              setCopied(true)
+              if (copiedTimeout.current !== null) window.clearTimeout(copiedTimeout.current)
+              copiedTimeout.current = window.setTimeout(() => {
+                setCopied(false)
+                copiedTimeout.current = null
+              }, 2_000)
+            }}
+          >
+            <PaduIcon className="size-[11px]" name={copied ? 'check' : 'copy'} />
+          </button>
+        </div>
+      ) : null}
       {section.content && (
         scrollable ? (
           <ActivityScrollableContent
