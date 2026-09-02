@@ -266,8 +266,8 @@ export function Sidebar({
               if (row.kind === 'showMore') {
                 return (
                   <div className="relative px-2.5 pb-1">
-                    <div className="pointer-events-none absolute left-[18px] top-0 h-[14px] w-[9px] rounded-bl-[4px] border-b border-l border-border/40" />
-                    <div className="pl-6 pr-2">
+                    <div className="pointer-events-none absolute left-[15px] top-0 h-[14px] w-[8px] rounded-bl-[4px] border-b border-l border-border/40" />
+                    <div className="pl-5 pr-2">
                       <button
                         className="flex h-7 items-center justify-start rounded-[5px] px-2 text-[12px] font-medium text-[var(--text-tertiary)] hover:bg-sidebar-accent hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
                         type="button"
@@ -293,9 +293,9 @@ export function Sidebar({
                 return (
                   <div className="relative px-2.5">
                     {isProjectGroup && hasExpandedChildren && (
-                      <div className="pointer-events-none absolute bottom-0 left-[18px] top-[22px] w-px bg-border/40" />
+                      <div className="pointer-events-none absolute bottom-0 left-[15px] top-[22px] w-px bg-border/40" />
                     )}
-                    <div className="group/header flex h-7 items-center justify-between px-2">
+                    <div className="group/header flex h-7 items-center justify-between px-1.5">
                       <button
                         aria-expanded={!row.collapsed}
                         className="group flex h-[22px] min-w-0 flex-1 items-center gap-[5px] rounded px-1 text-[12.5px] font-medium text-[var(--text-tertiary)] outline-none hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring"
@@ -405,7 +405,7 @@ export function Sidebar({
               return (
                 <div className="relative px-2.5 pb-px">
                   {grouping === 'project' && (
-                    <div className="pointer-events-none absolute bottom-0 left-[18px] top-0 w-px bg-border/40" />
+                    <div className="pointer-events-none absolute bottom-0 left-[15px] top-0 w-px bg-border/40" />
                   )}
                   <SessionRow
                     groupedByProject={grouping === 'project'}
@@ -586,7 +586,7 @@ function SessionRow({
           <div
             className={cn(
               'flex w-full min-w-0 flex-col rounded-[7px]',
-              groupedByProject ? 'h-[36px] justify-center pl-6 pr-2 py-1' : 'h-[51px] gap-1 px-2 py-[7px]',
+              groupedByProject ? 'h-[36px] justify-center pl-5 pr-2 py-1' : 'h-[51px] gap-1 px-2 py-[7px]',
             )}
           >
             <span className="flex min-w-0 w-full items-center gap-1.5 leading-[18px]">
@@ -617,7 +617,7 @@ function SessionRow({
           <button
             aria-current={selected ? 'page' : undefined}
             aria-haspopup="menu"
-            className="flex h-[34px] w-full min-w-0 items-center justify-between gap-2 rounded-[6px] pl-6 pr-2 text-left outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
+            className="flex h-[34px] w-full min-w-0 items-center justify-between gap-2 rounded-[6px] pl-5 pr-2 text-left outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
             ref={rowButton}
             type="button"
             onClick={() => onSelect(item.session.id)}

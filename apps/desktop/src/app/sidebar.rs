@@ -142,7 +142,7 @@ fn session_date_group_for_dates(session_date: NaiveDate, today: NaiveDate) -> Se
 fn session_group_header(theme: &Theme) -> Div {
     div()
         .h(px(SIDEBAR_GROUP_HEADER_HEIGHT))
-        .px(px(8.0))
+        .px(px(6.0))
         .flex()
         .items_center()
         .text_size(sp(13.0))
@@ -217,8 +217,8 @@ const SIDEBAR_GROUP_HEADER_HEIGHT: f32 = 28.0;
 const SIDEBAR_GROUP_HEADER_BOTTOM_GAP: f32 = 2.0;
 const SIDEBAR_SHOW_MORE_ROW_HEIGHT: f32 = 30.0;
 const SIDEBAR_GROUP_SPACER_HEIGHT: f32 = 10.0;
-const SIDEBAR_GROUP_GUIDE_X: f32 = 15.0;
-const SIDEBAR_GROUP_CHILD_PADDING: f32 = 28.0;
+const SIDEBAR_GROUP_GUIDE_X: f32 = 13.0;
+const SIDEBAR_GROUP_CHILD_PADDING: f32 = 24.0;
 const SIDEBAR_PROJECT_RECENT_WINDOW_SECONDS: u64 = 3 * 24 * 60 * 60;
 const SIDEBAR_PROJECT_REVEAL_BATCH: usize = 30;
 
@@ -2727,6 +2727,15 @@ mod tests {
             collapsed,
             vec![SidebarRow::Header(group), SidebarRow::GroupSpacer]
         );
+    }
+
+    #[test]
+    fn sidebar_group_tree_guide_and_child_padding_geometry() {
+        assert!(SIDEBAR_GROUP_CHILD_PADDING > SIDEBAR_GROUP_GUIDE_X);
+        let hook_width = SIDEBAR_GROUP_CHILD_PADDING - SIDEBAR_GROUP_GUIDE_X - 4.0;
+        assert!(hook_width >= 5.0 && hook_width <= 10.0);
+        assert_eq!(SIDEBAR_GROUP_GUIDE_X, 13.0);
+        assert_eq!(SIDEBAR_GROUP_CHILD_PADDING, 24.0);
     }
 
     #[test]
