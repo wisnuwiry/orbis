@@ -126,9 +126,10 @@ impl Padu {
 
         let theme = Theme::current(cx);
         let step = self.onboarding.current_step;
+        let is_last = step + 1 == TOTAL_ONBOARDING_STEPS;
 
         // Slide Data: 3 focused, simplified steps
-        let (badge, title, desc, _icon_path, items) = match step {
+        let (_badge, title, desc, _icon_path, items) = match step {
             0 => (
                 tr!("onboarding.slide1_badge"),
                 tr!("onboarding.slide1_title"),
@@ -159,7 +160,7 @@ impl Padu {
                 "icons/queue.svg",
                 [
                     (
-                        "icons/queue.svg",
+                        "icons/folder.svg",
                         tr!("onboarding.slide2_item1_title"),
                         tr!("onboarding.slide2_item1_desc"),
                     ),
@@ -169,7 +170,7 @@ impl Padu {
                         tr!("onboarding.slide2_item2_desc"),
                     ),
                     (
-                        "icons/command.svg",
+                        "icons/rewind.svg",
                         tr!("onboarding.slide2_item3_title"),
                         tr!("onboarding.slide2_item3_desc"),
                     ),
@@ -251,28 +252,18 @@ impl Padu {
                     }),
             );
 
-        // Hero Typography Section with category badge chip
-        let badge_chip = div()
-            .flex()
-            .items_center()
-            .px(px(8.0))
-            .py(px(2.5))
-            .rounded_full()
-            .bg(theme.accent.opacity(0.12))
-            .text_size(sp(11.0))
-            .font_weight(FontWeight::SEMIBOLD)
-            .text_color(theme.accent)
-            .child(badge);
-
+        // Keep every slide's introduction centered around the Padu brand.
         let hero_section = div()
             .flex()
             .flex_col()
-            .mt(px(18.0))
-            .mb(px(22.0))
-            .child(div().flex().child(badge_chip))
+            .items_center()
+            .text_center()
+            .mt(px(28.0))
+            .mb(px(28.0))
+            .child(icon("icons/logo.svg", 72.0, theme.accent))
             .child(
                 div()
-                    .mt(px(8.0))
+                    .mt(px(18.0))
                     .text_size(sp(20.0))
                     .font_weight(FontWeight::BOLD)
                     .text_color(theme.text)
@@ -280,60 +271,67 @@ impl Padu {
             )
             .child(
                 div()
-                    .mt(px(6.0))
+                    .mt(px(8.0))
+                    .max_w(px(360.0))
                     .text_size(sp(13.0))
                     .line_height(sp(19.0))
                     .text_color(theme.text_secondary)
                     .child(desc),
             );
 
-        // Feature items: structured list with polished icon containers
-        let mut items_col = div().flex().flex_col().gap(px(14.0)).w_full();
-        for (item_icon, item_title, item_desc) in items {
-            let row = div()
-                .flex()
-                .items_start()
-                .gap(px(12.0))
-                .child(
-                    div()
-                        .size(px(28.0))
-                        .rounded(px(7.0))
-                        .bg(theme.raised)
-                        .border_1()
-                        .border_color(theme.border_strong)
-                        .flex_none()
-                        .flex()
-                        .items_center()
-                        .justify_center()
-                        .child(icon(item_icon, 13.5, theme.text_secondary)),
-                )
-                .child(
-                    div()
-                        .flex()
-                        .flex_col()
-                        .flex_1()
-                        .min_w_0()
-                        .gap(px(2.0))
-                        .child(
-                            div()
-                                .text_size(sp(13.0))
-                                .font_weight(FontWeight::SEMIBOLD)
-                                .text_color(theme.text)
-                                .child(item_title),
-                        )
-                        .child(
-                            div()
-                                .text_size(sp(12.0))
-                                .line_height(sp(16.5))
-                                .text_color(theme.text_secondary)
-                                .child(item_desc),
-                        ),
-                );
-            items_col = items_col.child(row);
+        // Step 2 highlights the core project workflow in compact cards.
+        let mut items_col = div().flex().flex_col().gap(px(10.0)).w_full();
+        if step == 1 {
+            for (item_icon, item_title, item_desc) in items {
+                let row = div()
+                    .flex()
+                    .items_start()
+                    .gap(px(12.0))
+                    .p(px(12.0))
+                    .rounded(px(10.0))
+                    .bg(theme.raised)
+                    .border_1()
+                    .border_color(theme.border)
+                    .child(
+                        div()
+                            .size(px(28.0))
+                            .rounded(px(7.0))
+                            .bg(theme.raised)
+                            .border_1()
+                            .border_color(theme.border_strong)
+                            .flex_none()
+                            .flex()
+                            .items_center()
+                            .justify_center()
+                            .child(icon(item_icon, 13.5, theme.text_secondary)),
+                    )
+                    .child(
+                        div()
+                            .flex()
+                            .flex_col()
+                            .flex_1()
+                            .min_w_0()
+                            .gap(px(2.0))
+                            .child(
+                                div()
+                                    .text_size(sp(13.0))
+                                    .font_weight(FontWeight::SEMIBOLD)
+                                    .text_color(theme.text)
+                                    .child(item_title),
+                            )
+                            .child(
+                                div()
+                                    .text_size(sp(12.0))
+                                    .line_height(sp(16.5))
+                                    .text_color(theme.text_secondary)
+                                    .child(item_desc),
+                            ),
+                    );
+                items_col = items_col.child(row);
+            }
         }
 
         // Footer buttons with spacious top margin
-        let is_last = step + 1 == TOTAL_ONBOARDING_STEPS;
         let is_first = step == 0;
 
         let skip_btn = div()

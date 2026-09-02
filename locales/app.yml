@@ -413,7 +413,7 @@ host.remove_host:
 host.delete_confirm_title:
   en: Remove Host Profile
 host.delete_confirm_message:
-  en: "Are you sure you want to remove \"%{name}\"? This action cannot be undone."
+  en: 'Are you sure you want to remove "%{name}"? This action cannot be undone.'
 host.name:
   en: Name
 host.name_placeholder:
@@ -435,7 +435,7 @@ host.settings:
 host.connection_failed:
   en: "Connection failed: %{error}"
 host.confirm_remove:
-  en: "Remove host \"%{name}\"?"
+  en: 'Remove host "%{name}"?'
 host.connecting:
   en: Connecting...
 host.remote_hosts:
@@ -2413,23 +2413,23 @@ onboarding.slide1_item3_desc:
   en: Your code, transcripts, and credentials stay securely on your machine.
 
 onboarding.slide2_badge:
-  en: Workflows
+  en: Your Workspace
 onboarding.slide2_title:
-  en: Steer, Inspect & Control
+  en: Build With Your Agents
 onboarding.slide2_desc:
-  en: Stay in the driver's seat with interactive tools and real-time feedback.
+  en: Keep projects, sessions, and changes together while you stay in control.
 onboarding.slide2_item1_title:
-  en: Live Steering & Message Queue
+  en: One Workspace for Every Project
 onboarding.slide2_item1_desc:
-  en: Queue follow-up prompts or guide agent direction mid-turn without breaking context.
+  en: Keep your repositories and independent agent sessions organized in one place.
 onboarding.slide2_item2_title:
-  en: Real-Time Diffs & Checkpoints
+  en: Queue and Steer While Agents Work
 onboarding.slide2_item2_desc:
-  en: Inspect file modifications side-by-side and rewind working directory changes anytime.
+  en: Send follow-up prompts mid-turn without losing the conversation context.
 onboarding.slide2_item3_title:
-  en: Command Palette (Cmd/Ctrl + K)
+  en: Review and Rewind With Git
 onboarding.slide2_item3_desc:
-  en: Jump between tasks, trigger actions, and search settings with instant keyboard search.
+  en: Inspect file changes and return to an earlier point in your task when needed.
 
 onboarding.slide3_badge:
   en: Get Started
@@ -2449,5 +2449,3 @@ onboarding.slide3_item3_title:
   en: Switch Models On the Fly
 onboarding.slide3_item3_desc:
   en: Choose models, tune reasoning effort, and switch providers anytime with Cmd/Ctrl + /.
-
-

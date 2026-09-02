@@ -47,7 +47,7 @@ const ONBOARDING_SLIDES: OnboardingSlide[] = [
     descKey: 'onboarding.slide2_desc',
     items: [
       {
-        icon: 'queue',
+        icon: 'folder',
         titleKey: 'onboarding.slide2_item1_title',
         descKey: 'onboarding.slide2_item1_desc',
       },
@@ -57,7 +57,7 @@ const ONBOARDING_SLIDES: OnboardingSlide[] = [
         descKey: 'onboarding.slide2_item2_desc',
       },
       {
-        icon: 'command',
+        icon: 'rewind',
         titleKey: 'onboarding.slide2_item3_title',
         descKey: 'onboarding.slide2_item3_desc',
       },
@@ -135,6 +135,7 @@ export function OnboardingModal({
   const isFirst = step === 0
   const isLast = step + 1 === TOTAL_ONBOARDING_STEPS
 
+
   const handleNext = () => {
     if (isLast) {
       onOpenChange(false)
@@ -190,39 +191,44 @@ export function OnboardingModal({
           </button>
         </div>
 
-        {/* Hero Section */}
-        <div className="mb-[22px] mt-[18px] flex flex-col">
-          <div className="flex">
-            <span className="inline-flex items-center rounded-full bg-ring/12 px-2 py-[2.5px] text-[11px] font-semibold text-ring">
-              {t(currentSlide.badgeKey)}
-            </span>
-          </div>
+        {/* Center every slide around the Padu brand. */}
+        <div
+          className="mt-7 mb-7 flex flex-col items-center text-center"
+        >
+          <PaduIcon className="size-[72px] text-ring" name="logo" />
           <h2 className="mt-2 text-[20px] font-bold tracking-tight text-foreground">
             {t(currentSlide.titleKey)}
           </h2>
-          <p className="mt-1.5 text-[13px] leading-[19px] text-[var(--text-secondary)]">
+          <p
+            className="mt-2 max-w-[360px] text-[13px] leading-[19px] text-[var(--text-secondary)]"
+          >
             {t(currentSlide.descKey)}
           </p>
         </div>
 
-        {/* Feature Items List */}
-        <div className="flex w-full flex-col gap-3.5">
-          {currentSlide.items.map((item) => (
-            <div className="flex items-start gap-3" key={item.titleKey}>
-              <div className="grid size-7 shrink-0 place-items-center rounded-[7px] border border-[var(--border-strong)] bg-[var(--raised)] text-[var(--text-secondary)] shadow-2xs">
-                <PaduIcon className="size-3.5" name={item.icon} />
-              </div>
-              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <div className="text-[13px] font-semibold text-foreground">
-                  {t(item.titleKey)}
+        {/* Step 2 presents the core project workflow in compact cards. */}
+        {step === 1 && (
+          <div className="flex w-full flex-col gap-2.5">
+            {currentSlide.items.map((item) => (
+              <div
+                className="flex items-start gap-3 rounded-[10px] border border-[var(--border-strong)] bg-[var(--raised)] p-3"
+                key={item.titleKey}
+              >
+                <div className="grid size-7 shrink-0 place-items-center rounded-[7px] border border-[var(--border-strong)] bg-background text-[var(--text-secondary)] shadow-2xs">
+                  <PaduIcon className="size-3.5" name={item.icon} />
                 </div>
-                <div className="text-[12px] leading-[16.5px] text-[var(--text-secondary)]">
-                  {t(item.descKey)}
+                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <div className="text-[13px] font-semibold text-foreground">
+                    {t(item.titleKey)}
+                  </div>
+                  <div className="text-[12px] leading-[16.5px] text-[var(--text-secondary)]">
+                    {t(item.descKey)}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Footer actions */}
         <div className="mt-[26px] flex w-full items-center justify-between">
