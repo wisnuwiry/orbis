@@ -154,7 +154,7 @@ export function ModelPicker({
             initialFocus={search}
             role="dialog"
           >
-          <div className="flex h-full w-[40px] shrink-0 flex-col items-center gap-0.5 overflow-y-auto border-r bg-background p-1">
+          <div className="flex h-full w-[40px] shrink-0 flex-col items-center gap-0.5 overflow-y-auto overflow-x-hidden border-r bg-background p-1">
             <ModelTab active={tab === 'favorites' && !query} label={t('models.favorites')} onClick={() => { setTab('favorites'); setQuery(''); setHighlight(null) }}>
               <PaduIcon className="size-[13.5px]" name="star" />
             </ModelTab>
@@ -174,7 +174,7 @@ export function ModelPicker({
               )
             })}
           </div>
-          <div className="flex min-w-0 flex-1 flex-col bg-card">
+          <div className="flex min-w-0 flex-1 flex-col overflow-hidden bg-card">
             <div className="h-[42px] shrink-0 px-2 pb-1.5 pt-1.5">
               <label className="flex h-[28px] items-center gap-1.5 rounded-[7px] bg-[var(--raised)] px-2">
                 <PaduIcon className="size-[12.5px] text-[var(--text-secondary)]" name="search" />
@@ -213,7 +213,7 @@ export function ModelPicker({
                 />
               </label>
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto p-[5px] flex flex-col gap-0.5" ref={list}>
+            <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-[5px] flex flex-col gap-0.5" ref={list}>
               {!rows.length && (
                 <div className="grid h-full place-items-center text-[11.5px] text-[var(--text-ghost)]">
                   {t(query
@@ -232,7 +232,7 @@ export function ModelPicker({
                   <div
                     aria-selected={selected}
                     className={cn(
-                      'flex h-[36px] w-full items-center gap-2 rounded-[6px] border border-transparent px-[7px] text-left outline-none hover:bg-accent',
+                      'flex h-[36px] w-full min-w-0 items-center gap-2 overflow-hidden rounded-[6px] border border-transparent px-[7px] text-left outline-none hover:bg-accent',
                       selected && 'border-border bg-accent',
                       index === highlight && 'border-ring/50 bg-accent',
                     )}
