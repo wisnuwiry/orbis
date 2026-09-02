@@ -479,6 +479,12 @@ function PanelTabButton({
       role="tab"
       tabIndex={active ? 0 : -1}
       onClick={onActivate}
+      onMouseDown={(event) => {
+        if (event.button === 1) {
+          event.preventDefault()
+          onClose()
+        }
+      }}
       onKeyDown={(event) => {
         if (event.target !== event.currentTarget) return
         if (event.key === 'Enter' || event.key === ' ') {
@@ -565,6 +571,58 @@ interface FileBuffer {
   revision: number
   saving: boolean
   editor?: Editor<undefined>
+}
+
+function FileBreadcrumbs({
+  path,
+  dirty,
+}: {
+  path: string
+  dirty?: boolean
+}) {
+  const { t } = useI18n()
+  const [copied, setCopied] = useState(false)
+  const segments = path.split('/')
+  const fileName = segments.at(-1) ?? path
+  const dirSegments = segments.slice(0, -1)
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(path)
+    setCopied(true)
+    toast.success(t('files.copied_path', { path }))
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="flex h-[42px] shrink-0 items-center gap-1.5 border-b px-3 text-[12px] text-[var(--text-secondary)]">
+      <FileTypeIcon className="size-4 shrink-0" path={path} />
+      <div className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
+        {dirSegments.map((segment, i) => (
+          <span key={i} className="flex shrink-0 items-center gap-1 text-[var(--text-tertiary)]">
+            <span className="truncate max-w-[120px]">{segment}</span>
+            <span className="text-[var(--text-ghost)]">/</span>
+          </span>
+        ))}
+        <span className="truncate font-medium text-foreground">{fileName}</span>
+        {dirty && (
+          <span
+            className="size-1.5 shrink-0 rounded-full bg-[var(--warning)] ml-0.5"
+            title={t('files.unsaved_changes', { shortcut: '⌘S' })}
+          />
+        )}
+      </div>
+      <Tooltip content={copied ? t('common.copied') : t('files.copy_path')}>
+        <button
+          type="button"
+          aria-label={t('files.copy_path')}
+          className="grid size-6 shrink-0 place-items-center rounded hover:bg-accent text-[var(--text-tertiary)] hover:text-foreground cursor-pointer transition-colors"
+          onClick={handleCopy}
+        >
+          <PaduIcon className="size-3.5" name={copied ? 'check' : 'copy'} />
+        </button>
+      </Tooltip>
+    </div>
+  )
 }
 
 function FilesPanel({
@@ -864,13 +922,11 @@ function FilesPanel({
         revision: 0,
         saving: false,
       })
+  const isDirty = Boolean(buffer && buffer.content !== buffer.diskContent)
   return (
     <div className="flex min-h-0 flex-1">
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        <div className="flex h-[42px] shrink-0 items-center gap-2 border-b px-4 text-[11px] text-[var(--text-secondary)]">
-          <FileTypeIcon className="size-[13px]" path={selected} />
-          <span className="min-w-0 flex-1 truncate">{selected}</span>
-        </div>
+        <FileBreadcrumbs path={selected} dirty={isDirty} />
         {!buffer && file.isPending
           ? <PanelMessage title={t('files.loading_file')} detail={t('files.reading_from_daemon')} />
           : !buffer && file.error

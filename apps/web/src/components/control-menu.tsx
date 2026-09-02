@@ -70,7 +70,15 @@ export function ControlMenu({
       >
         {icon && <PaduIcon className="size-[11px] text-[var(--text-tertiary)]" name={icon} />}
         {children ?? <span className="truncate">{label}</span>}
-        {caret && <PaduIcon className="size-2.5 text-[var(--text-ghost)]" name="chevronDown" />}
+        {caret && (
+          <PaduIcon
+            className={cn(
+              'size-2.5 text-[var(--text-ghost)] transition-transform duration-150 motion-reduce:transition-none',
+              open && 'rotate-180',
+            )}
+            name="chevronDown"
+          />
+        )}
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner

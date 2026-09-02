@@ -962,16 +962,16 @@ impl Padu {
                 }
 
                 let mut sidebar = div()
-                    .w(px(50.0))
+                    .w(px(40.0))
                     .h_full()
                     .flex_none()
                     .flex()
                     .flex_col()
                     .items_center()
-                    .gap(px(4.0))
-                    .p(px(5.0))
-                    .rounded_tl(px(12.0))
-                    .rounded_bl(px(12.0))
+                    .gap(px(2.0))
+                    .p(px(4.0))
+                    .rounded_tl(px(10.0))
+                    .rounded_bl(px(10.0))
                     .bg(theme.canvas)
                     .border_r_1()
                     .border_color(theme.border);
@@ -982,9 +982,9 @@ impl Padu {
                     .child(
                         div()
                             .id("model-tab-favorites")
-                            .w(px(38.0))
-                            .h(px(38.0))
-                            .rounded(px(7.0))
+                            .w(px(30.0))
+                            .h(px(30.0))
+                            .rounded(px(6.0))
                             .flex()
                             .items_center()
                             .justify_center()
@@ -995,7 +995,7 @@ impl Padu {
                             .hover(|element| element.bg(theme.overlay))
                             .child(icon(
                                 "icons/star.svg",
-                                17.0,
+                                13.5,
                                 if favorites_selected {
                                     theme.text
                                 } else {
@@ -1008,7 +1008,7 @@ impl Padu {
                                 });
                             }),
                     )
-                    .child(div().w(px(34.0)).h(px(1.0)).my(px(3.0)).bg(theme.border));
+                    .child(div().w(px(26.0)).h(px(1.0)).my(px(2.0)).bg(theme.border));
 
                 // One predicate with the `tab` cycle, so clicking and cycling
                 // agree on which tabs are usable.
@@ -1035,9 +1035,9 @@ impl Padu {
                     sidebar = sidebar.child(
                         div()
                             .id(SharedString::from(format!("model-tab-{}", kind.id())))
-                            .w(px(38.0))
-                            .h(px(38.0))
-                            .rounded(px(7.0))
+                            .w(px(30.0))
+                            .h(px(30.0))
+                            .rounded(px(6.0))
                             .flex()
                             .items_center()
                             .justify_center()
@@ -1059,7 +1059,7 @@ impl Padu {
                             })
                             .child(icon(
                                 provider_icon(kind),
-                                18.0,
+                                14.0,
                                 if selected {
                                     theme.text
                                 } else if usable {
@@ -1072,24 +1072,24 @@ impl Padu {
                 }
 
                 let search_input = div()
-                    .h(px(52.0))
-                    .px(px(12.0))
-                    .pt(px(10.0))
-                    .pb(px(8.0))
+                    .h(px(42.0))
+                    .px(px(8.0))
+                    .pt(px(6.0))
+                    .pb(px(6.0))
                     .flex_none()
                     .flex()
                     .items_center()
                     .child(
                         div()
                             .w_full()
-                            .h(px(34.0))
-                            .px(px(10.0))
-                            .rounded(px(9.0))
+                            .h(px(28.0))
+                            .px(px(8.0))
+                            .rounded(px(7.0))
                             .bg(theme.raised)
                             .flex()
                             .items_center()
-                            .gap(px(8.0))
-                            .child(icon("icons/search.svg", 15.0, theme.text_secondary))
+                            .gap(px(6.0))
+                            .child(icon("icons/search.svg", 12.5, theme.text_secondary))
                             .child(div().flex_1().min_w_0().child(search.clone())),
                     );
 
@@ -1098,7 +1098,10 @@ impl Padu {
                     .size_full()
                     .overflow_y_scroll()
                     .track_scroll(&scroll)
-                    .p(px(9.0));
+                    .p(px(5.0))
+                    .flex()
+                    .flex_col()
+                    .gap(px(2.0));
                 if available_models.is_empty() {
                     let label = if searching {
                         tr!("models.none_found")
@@ -1146,26 +1149,47 @@ impl Padu {
                                 kind.id(),
                                 model.id
                             )))
-                            .h(px(58.0))
-                            .px(px(12.0))
-                            .rounded(px(9.0))
+                            .h(px(36.0))
+                            .px(px(7.0))
+                            .rounded(px(6.0))
                             .flex()
                             .items_center()
-                            .gap(px(10.0))
+                            .gap(px(8.0))
                             .cursor_pointer()
                             // Reserved on every row so highlighting one cannot
                             // resize it and shift the list by a pixel.
                             .border_1()
                             .border_color(gpui::transparent_black())
-                            .when(is_selected, |element| element.bg(theme.overlay_strong))
+                            .when(is_selected, |element| {
+                                element.bg(theme.overlay).border_color(theme.border)
+                            })
                             // The keyboard cursor reads as a ring rather than a
                             // fill, so it stays legible on the current model's
                             // already-filled row.
                             .when(is_highlighted, |element| {
-                                element.bg(theme.overlay).border_color(theme.accent)
+                                element
+                                    .bg(theme.overlay)
+                                    .border_color(theme.accent.opacity(0.5))
                             })
                             .hover(|element| element.bg(theme.overlay))
-                            .active(|element| element.opacity(0.85))
+                            .active(|element| element.opacity(0.9))
+                            .child(
+                                div()
+                                    .w(px(22.0))
+                                    .h(px(22.0))
+                                    .rounded(px(5.0))
+                                    .flex_none()
+                                    .flex()
+                                    .items_center()
+                                    .justify_center()
+                                    .bg(theme.overlay)
+                                    .when(is_selected, |el| el.bg(theme.overlay_strong))
+                                    .child(icon(
+                                        provider_icon(kind),
+                                        11.0,
+                                        provider_color(&theme, kind).opacity(0.9),
+                                    )),
+                            )
                             .child(
                                 div()
                                     .min_w_0()
@@ -1173,31 +1197,27 @@ impl Padu {
                                     .child(
                                         div()
                                             .truncate()
-                                            .text_size(sp(13.0))
-                                            .font_weight(FontWeight::SEMIBOLD)
-                                            .text_color(theme.text)
+                                            .text_size(sp(12.0))
+                                            .font_weight(FontWeight::MEDIUM)
+                                            .text_color(if is_selected {
+                                                theme.text
+                                            } else {
+                                                theme.text_secondary
+                                            })
                                             .child(SharedString::from(model.name.clone())),
                                     )
                                     .child(
                                         div()
-                                            .mt(px(4.0))
-                                            .flex()
-                                            .items_center()
-                                            .gap(px(6.0))
-                                            .child(icon(
-                                                provider_icon(kind),
-                                                10.5,
-                                                provider_color(&theme, kind).opacity(0.85),
-                                            ))
-                                            .child(
-                                                div()
-                                                    .truncate()
-                                                    .text_size(sp(12.5))
-                                                    .text_color(theme.text_tertiary)
-                                                    .child(SharedString::from(subtitle)),
-                                            ),
+                                            .mt(px(1.0))
+                                            .truncate()
+                                            .text_size(sp(10.5))
+                                            .text_color(theme.text_tertiary)
+                                            .child(SharedString::from(subtitle)),
                                     ),
                             )
+                            .when(is_selected, |el| {
+                                el.child(icon("icons/check.svg", 11.0, theme.text_tertiary))
+                            })
                             .child(
                                 div()
                                     .id(SharedString::from(format!(
@@ -1205,9 +1225,10 @@ impl Padu {
                                         kind.id(),
                                         model.id
                                     )))
-                                    .w(px(28.0))
-                                    .h(px(28.0))
-                                    .rounded(px(6.0))
+                                    .w(px(20.0))
+                                    .h(px(20.0))
+                                    .rounded(px(4.0))
+                                    .flex_none()
                                     .flex()
                                     .items_center()
                                     .justify_center()
@@ -1218,11 +1239,11 @@ impl Padu {
                                         } else {
                                             "icons/star.svg"
                                         },
-                                        14.0,
+                                        10.0,
                                         if is_favorite {
                                             theme.favorite
                                         } else {
-                                            theme.text_ghost
+                                            theme.text_ghost.opacity(0.7)
                                         },
                                     ))
                                     .on_click(move |_, _, cx| {
@@ -1255,9 +1276,9 @@ impl Padu {
                 let confirm_weak = weak.clone();
                 let confirm_popover = popover.clone();
                 div()
-                    .w(px(460.0))
-                    .h(px(390.0))
-                    .rounded(px(13.0))
+                    .w(px(400.0))
+                    .h(px(332.0))
+                    .rounded(px(10.0))
                     .overflow_hidden()
                     .border_1()
                     .border_color(theme.border_strong)
@@ -1303,8 +1324,8 @@ impl Padu {
                             .flex_1()
                             .flex()
                             .flex_col()
-                            .rounded_tr(px(12.0))
-                            .rounded_br(px(12.0))
+                            .rounded_tr(px(10.0))
+                            .rounded_br(px(10.0))
                             .bg(theme.surface)
                             .child(search_input)
                             .child(
@@ -1828,32 +1849,45 @@ impl Padu {
         } else {
             InteractionMode::Plan
         };
+        let is_plan = mode == InteractionMode::Plan;
         let weak = cx.entity().downgrade();
         div()
             .id("interaction-mode")
-            .h(px(24.0))
+            .h(px(22.0))
             .px(px(7.0))
-            .rounded(px(6.0))
+            .rounded(px(5.0))
             .flex()
             .items_center()
-            .gap(px(6.0))
+            .gap(px(5.0))
             .when(interactive, |el| el.cursor_pointer())
             .when(!interactive, |el| el.cursor_default())
-            .text_size(sp(12.5))
-            .line_height(sp(14.0))
-            .text_color(if mode == InteractionMode::Plan {
+            .text_size(sp(11.5))
+            .line_height(sp(13.0))
+            .font_weight(FontWeight::MEDIUM)
+            .border_1()
+            .border_color(if is_plan {
+                theme.accent.opacity(0.14)
+            } else {
+                gpui::transparent_black()
+            })
+            .bg(if is_plan {
+                theme.accent.opacity(0.08)
+            } else {
+                gpui::transparent_black()
+            })
+            .text_color(if is_plan {
                 theme.accent
             } else {
-                theme.text_secondary
+                theme.text_tertiary
             })
             .child(icon(
-                if mode == InteractionMode::Plan {
+                if is_plan {
                     "icons/list.svg"
                 } else {
                     "icons/wrench.svg"
                 },
-                10.5,
-                if mode == InteractionMode::Plan {
+                10.0,
+                if is_plan {
                     theme.accent
                 } else {
                     theme.text_tertiary
@@ -1862,7 +1896,13 @@ impl Padu {
             .child(mode.label())
             .when(interactive, |element| {
                 element
-                    .hover(|element| element.bg(theme.overlay))
+                    .hover(|element| {
+                        if is_plan {
+                            element.bg(theme.accent.opacity(0.12))
+                        } else {
+                            element.bg(theme.overlay)
+                        }
+                    })
                     .on_click(move |_, _, cx| {
                         let _ = weak.update(cx, |this, cx| {
                             this.set_interaction_mode(next_mode, cx);
@@ -1871,7 +1911,7 @@ impl Padu {
             })
             .when(!interactive, |element| {
                 element
-                    .opacity(0.7)
+                    .opacity(0.55)
                     .tooltip(Tooltip::text(plan_unavailable_message))
             })
             .into_any_element()
@@ -2596,7 +2636,8 @@ impl Padu {
                                 this.remove_queued_message(session_id, message_id, cx);
                             });
                         })
-                        .icon("icons/trash.svg"),
+                        .icon("icons/trash.svg")
+                        .destructive(true),
                     ]
                 },
             );

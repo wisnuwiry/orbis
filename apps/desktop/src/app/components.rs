@@ -50,6 +50,49 @@ pub(super) fn working_wave_dots(color: Hsla) -> AnyElement {
     .into_any_element()
 }
 
+pub(super) fn kbd_badge_styled(
+    label: impl Into<SharedString>,
+    bg: Hsla,
+    text_color: Hsla,
+    border_color: Hsla,
+) -> AnyElement {
+    div()
+        .h(px(20.0))
+        .min_w(px(20.0))
+        .px(px(5.0))
+        .rounded(px(5.0))
+        .flex_none()
+        .flex()
+        .items_center()
+        .justify_center()
+        .bg(bg)
+        .border_1()
+        .border_color(border_color)
+        .text_size(sp(11.0))
+        .font_weight(FontWeight::MEDIUM)
+        .text_color(text_color)
+        .child(label.into())
+        .into_any_element()
+}
+
+pub(super) fn kbd_badge(label: impl Into<SharedString>, theme: &Theme) -> AnyElement {
+    kbd_badge_styled(
+        label,
+        theme.overlay_strong,
+        theme.text_tertiary,
+        theme.border,
+    )
+}
+
+pub(super) fn kbd_badge_on_danger(label: impl Into<SharedString>) -> AnyElement {
+    kbd_badge_styled(
+        label,
+        gpui::hsla(0.0, 0.0, 0.0, 0.25),
+        gpui::rgb(0xFFFFFF).into(),
+        gpui::hsla(0.0, 0.0, 1.0, 0.2),
+    )
+}
+
 pub(super) fn format_message_time(created_at: u64) -> String {
     format_message_time_at(created_at, Local::now())
 }

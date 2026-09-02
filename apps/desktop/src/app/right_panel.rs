@@ -2412,6 +2412,15 @@ impl Padu {
                     .on_mouse_down(MouseButton::Left, |_, _, cx| {
                         cx.stop_propagation();
                     })
+                    .on_mouse_down(MouseButton::Middle, {
+                        let close_weak = close_weak.clone();
+                        move |_, _, cx| {
+                            cx.stop_propagation();
+                            let _ = close_weak.update(cx, |this, cx| {
+                                this.close_right_panel_surface(index, cx);
+                            });
+                        }
+                    })
                     .when(active, |element| element.bg(theme.overlay_strong))
                     .when(!active, |element| {
                         element.hover(|element| element.bg(theme.overlay))
@@ -2847,7 +2856,7 @@ impl Padu {
     ) -> Div {
         let theme = Theme::current(cx);
         let file_tree_width = fitted_file_tree_width(panel_width, self.right_panel_file_tree_width);
-        let (editor_state, writable, _) =
+        let (editor_state, writable, dirty) =
             self.ensure_right_panel_file_editor(&relative_path, window, cx);
 
         // Markdown files carry the global source/preview toggle; every other
@@ -2897,6 +2906,94 @@ impl Padu {
                 }))
         });
 
+        let copy_focus = self.transcript_control_focus("right-panel-copy-path", cx);
+        let copy_path = relative_path.clone();
+        let copy_button = div()
+            .id("right-panel-copy-path")
+            .track_focus(&copy_focus)
+            .tab_index(0)
+            .size(px(26.0))
+            .rounded(px(7.0))
+            .flex_none()
+            .flex()
+            .items_center()
+            .justify_center()
+            .cursor_pointer()
+            .focus_visible(|style| style.border_1().border_color(theme.accent))
+            .hover(|style| style.bg(theme.overlay))
+            .child(icon("icons/copy.svg", 12.0, theme.text_tertiary))
+            .tooltip(|window, cx| Tooltip::new(tr!("files.copy_path")).build(window, cx))
+            .on_click(cx.listener(move |this, _, _, cx| {
+                cx.write_to_clipboard(ClipboardItem::new_string(copy_path.clone()));
+                this.show_toast(tr!("files.copied_path", path = copy_path.clone()));
+            }))
+            .on_key_down(cx.listener({
+                let copy_path = relative_path.clone();
+                move |this, event: &KeyDownEvent, _, cx| {
+                    if matches!(event.keystroke.key.as_str(), "enter" | "space") {
+                        cx.write_to_clipboard(ClipboardItem::new_string(copy_path.clone()));
+                        this.show_toast(tr!("files.copied_path", path = copy_path.clone()));
+                        cx.stop_propagation();
+                    }
+                }
+            }));
+
+        let segments: Vec<&str> = relative_path.split('/').collect();
+        let file_name = segments.last().copied().unwrap_or(&relative_path);
+        let dir_segments = &segments[..segments.len().saturating_sub(1)];
+
+        let breadcrumb_trail = div()
+            .min_w_0()
+            .flex_1()
+            .flex()
+            .items_center()
+            .gap(px(4.0))
+            .overflow_hidden()
+            .children(dir_segments.iter().map(|segment| {
+                div()
+                    .flex()
+                    .items_center()
+                    .gap(px(4.0))
+                    .flex_none()
+                    .child(
+                        div()
+                            .text_size(sp(12.5))
+                            .text_color(theme.text_tertiary)
+                            .child(segment.to_string()),
+                    )
+                    .child(
+                        div()
+                            .text_size(sp(12.0))
+                            .text_color(theme.text_ghost)
+                            .child("/"),
+                    )
+            }))
+            .child(
+                div()
+                    .truncate()
+                    .text_size(sp(12.5))
+                    .font_weight(FontWeight::MEDIUM)
+                    .text_color(theme.text)
+                    .child(file_name.to_string()),
+            )
+            .when(dirty, |trail| {
+                trail.child(
+                    div()
+                        .id("right-panel-file-breadcrumb-dirty")
+                        .size(px(6.0))
+                        .rounded_full()
+                        .bg(theme.warning)
+                        .flex_none()
+                        .tooltip(|window, cx| {
+                            Tooltip::new(tr!(
+                                "files.unsaved_changes",
+                                shortcut = crate::platform::primary_shortcut("⌘S", "Ctrl+S")
+                            ))
+                            .build(window, cx)
+                        }),
+                )
+            });
+
         let editor = div()
             .flex_1()
             .min_h_0()
@@ -2907,22 +3004,15 @@ impl Padu {
                 div()
                     .h(px(42.0))
                     .flex_none()
-                    .px(px(16.0))
+                    .px(px(14.0))
                     .flex()
                     .items_center()
                     .gap(px(8.0))
                     .border_b_1()
                     .border_color(theme.border)
-                    .child(file_icon(file_icon_for_path(&relative_path), 13.0))
-                    .child(
-                        div()
-                            .min_w_0()
-                            .flex_1()
-                            .truncate()
-                            .text_size(sp(12.5))
-                            .text_color(theme.text_secondary)
-                            .child(relative_path.clone()),
-                    )
+                    .child(file_icon(file_icon_for_path(&relative_path), 14.0))
+                    .child(breadcrumb_trail)
+                    .child(copy_button)
                     .children(preview_toggle),
             )
             .child(body);

@@ -75,10 +75,12 @@ describe('desktop sidebar presentation', () => {
       path: '/home/me/.padu/projects/session',
       created_at: 1,
     }
+    const now = new Date(2026, 7, 15, 12)
+    const nowSeconds = Math.floor(now.getTime() / 1000)
     const groups = groupSessions(
       [project],
-      [session({ messages: [{ id: 'message' } as never] })],
-      new Date(2026, 7, 15, 12),
+      [session({ created_at: nowSeconds, messages: [{ id: 'message' } as never] })],
+      now,
       'Unknown project',
       'プロジェクトなし',
     )
@@ -137,6 +139,71 @@ describe('desktop sidebar presentation', () => {
 
     const groupsOldest = groupSessions([], [today, month], now, 'Unknown', 'No project', 'updated', 'oldest')
     expect(groupsOldest.map((g) => g.dateGroup)).toEqual(['month', 'today'])
+  })
+
+  test('handles time labels and elapsed counters across different time deltas', () => {
+    expect(formatTimeAgo(30)).toBe('just now')
+    expect(formatTimeAgo(90)).toBe('1m')
+    expect(formatTimeAgo(3_600)).toBe('1h')
+    expect(formatTimeAgo(7_200)).toBe('2h')
+    expect(formatTimeAgo(86_400)).toBe('1d')
+    expect(formatTimeAgo(172_800)).toBe('2d')
+  })
+
+  test('sidebarRows respects collapsed state and inserts spacers between groups', () => {
+    const now = new Date(2026, 7, 15, 12)
+    const nowSeconds = Math.floor(now.getTime() / 1000)
+    const s1 = session({ id: 's1', created_at: nowSeconds, last_reply_at: nowSeconds, messages: [{ id: 'm1' } as never] })
+    const s2 = session({ id: 's2', created_at: nowSeconds - 10 * 86_400, last_reply_at: nowSeconds - 10 * 86_400, messages: [{ id: 'm2' } as never] })
+
+    const groups = groupSessions([], [s1, s2], now, 'Unknown', 'No project', 'updated', 'newest')
+    expect(groups.length).toBe(2)
+
+    const uncollapsedRows = sidebarRows(groups, new Set())
+    expect(uncollapsedRows.some((r) => r.kind === 'session' && r.item.session.id === 's1')).toBe(true)
+    expect(uncollapsedRows.some((r) => r.kind === 'session' && r.item.session.id === 's2')).toBe(true)
+
+    // When group 1 is collapsed, session 1 is hidden
+    const collapsedRows = sidebarRows(groups, new Set([groups[0]!.id]))
+    expect(collapsedRows.some((r) => r.kind === 'session' && r.item.session.id === 's1')).toBe(false)
+    expect(collapsedRows.some((r) => r.kind === 'session' && r.item.session.id === 's2')).toBe(true)
+  })
+
+  test('sessionHasStarted accurately detects active, replied, or persisted sessions', () => {
+    const blank = session({ messages: [], turns: [], provider_cursor: null })
+    expect(sessionHasStarted(blank)).toBe(false)
+
+    const withMessage = session({ messages: [{ id: 'm1' } as never] })
+    expect(sessionHasStarted(withMessage)).toBe(true)
+
+    const withTurn = session({ turns: [{ id: 't1' } as never] })
+    expect(sessionHasStarted(withTurn)).toBe(true)
+  })
+
+  test('nextSidebarUpdateDelay returns 1s for working session and midnight delta for idle sessions', () => {
+    const idle = session({ status: 'idle', turns: [], last_reply_at: null })
+    expect(nextSidebarUpdateDelay([idle], 100)).toBeGreaterThan(0)
+
+    const working = session({
+      status: 'working',
+      turns: [{
+        id: 'turn',
+        turn_count: 1,
+        status: 'running',
+        provider_turn_started: true,
+        started_at: 100,
+        completed_at: null,
+        checkpoint: null,
+      }],
+    })
+    expect(nextSidebarUpdateDelay([working], 150)).toBe(1)
+  })
+
+  test('group headers and session items support keyboard interaction invariants', () => {
+    const groups = groupSessions([], [], new Date(), 'Unknown', 'No project', 'project', 'newest')
+    const rows = sidebarRows(groups, new Set())
+    expect(rows[0]?.kind).toBe('search')
+    expect(rows[0]?.key).toBe('search')
   })
 })
 

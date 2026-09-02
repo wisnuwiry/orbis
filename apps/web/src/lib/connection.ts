@@ -1,3 +1,5 @@
+import type { HostProfile } from '@padu/client'
+
 export interface ConnectionConfig {
   address: string
   token: string
@@ -6,8 +8,19 @@ export interface ConnectionConfig {
 
 const SESSION_KEY = 'padu.remote.session.v1'
 const PERSISTENT_KEY = 'padu.remote.persistent.v1'
+const HOSTS_KEY = 'padu.remote.hosts.v1'
+const ACTIVE_HOST_KEY = 'padu.remote.active_host_id.v1'
 
 type ConnectionTranslator = (key: string) => string
+
+export function displayHost(address: string): string {
+  try {
+    const url = new URL(address)
+    return url.port ? `${url.hostname}:${url.port}` : url.hostname
+  } catch {
+    return address
+  }
+}
 
 export function normalizeDaemonAddress(
   value: string,
@@ -79,6 +92,45 @@ export function clearStoredConnection(): void {
   if (typeof window === 'undefined') return
   window.sessionStorage.removeItem(SESSION_KEY)
   window.localStorage.removeItem(PERSISTENT_KEY)
+}
+
+export function loadStoredHosts(): HostProfile[] {
+  if (typeof window === 'undefined') return []
+  try {
+    const raw = window.localStorage.getItem(HOSTS_KEY)
+    if (!raw) return []
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? (parsed as HostProfile[]) : []
+  } catch {
+    return []
+  }
+}
+
+export function storeHosts(hosts: HostProfile[]): void {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.setItem(HOSTS_KEY, JSON.stringify(hosts))
+  } catch {}
+}
+
+export function loadActiveHostId(): string | null {
+  if (typeof window === 'undefined') return null
+  try {
+    return window.localStorage.getItem(ACTIVE_HOST_KEY)
+  } catch {
+    return null
+  }
+}
+
+export function storeActiveHostId(id: string | null): void {
+  if (typeof window === 'undefined') return
+  try {
+    if (id) {
+      window.localStorage.setItem(ACTIVE_HOST_KEY, id)
+    } else {
+      window.localStorage.removeItem(ACTIVE_HOST_KEY)
+    }
+  } catch {}
 }
 
 function parseStoredConnection(

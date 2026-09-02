@@ -105,7 +105,7 @@ export function groupSessions(
   now = new Date(),
   unknownProject = 'Unknown project',
   projectlessName = 'No project',
-  grouping: SidebarGrouping = 'updated',
+  grouping: SidebarGrouping = 'project',
   ordering: SidebarOrdering = 'newest',
   revealedOlderCounts: Record<string, number> = {},
 ): SessionGroup[] {

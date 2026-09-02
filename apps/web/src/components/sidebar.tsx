@@ -3,11 +3,15 @@ import { ContextMenu } from '@base-ui/react/context-menu'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Virtuoso } from 'react-virtuoso'
 import { Button } from '@/components/ui/button'
-import { ControlMenu } from '@/components/control-menu'
+import { ControlMenu, type ControlMenuItem } from '@/components/control-menu'
+import { HostDialog } from '@/components/host-dialog'
 import { Input } from '@/components/ui/input'
+import { Kbd } from '@/components/ui/kbd'
 import { Tooltip } from '@/components/ui/tooltip'
 import { PanelResizeHandle } from '@/components/panel-resize-handle'
 import { PaduIcon } from '@/components/padu-icon'
+import { DeleteSessionDialog } from '@/components/delete-session-dialog'
+import { displayHost } from '@/lib/connection'
 import { displayTitle, type TaskState } from '@/lib/daemon-api'
 import { useDaemon } from '@/lib/daemon-context'
 import { useI18n } from '@/lib/i18n'
@@ -78,7 +82,7 @@ export function Sidebar({
       const saved = window.localStorage.getItem('padu:sidebar_grouping')
       if (saved === 'project' || saved === 'updated') return saved
     }
-    return 'updated'
+    return 'project'
   })
   const [ordering, setOrdering] = useState<SidebarOrdering>(() => {
     if (typeof window !== 'undefined') {
@@ -99,6 +103,49 @@ export function Sidebar({
   const [revealedOlderCounts, setRevealedOlderCounts] = useState<Record<string, number>>({})
   const [liveWidth, setLiveWidth] = useState(width)
   const [nowSeconds, setNowSeconds] = useState(() => Math.floor(Date.now() / 1_000))
+  const [sessionToDelete, setSessionToDelete] = useState<{ id: string; title?: string } | null>(null)
+  const { hosts, activeHost, activeHostId, config, phase, switchHost, addHost } = useDaemon()
+  const [hostDialogOpen, setHostDialogOpen] = useState(false)
+
+  const currentHostDisplayName = phase === 'connecting'
+    ? t('host.connecting')
+    : (activeHostId === null ? t('host.local') : (activeHost?.name || (config ? displayHost(config.address) : t('host.local'))))
+
+  const isLocalActive = activeHostId === null
+
+  const hostMenuItems: ControlMenuItem[] = [
+    {
+      id: 'host-local',
+      label: t('host.local'),
+      icon: 'server' as const,
+      selected: isLocalActive,
+      onSelect: () => {
+        void switchHost(null).catch(() => {})
+      },
+    },
+    ...hosts.map((host) => ({
+      id: host.id,
+      label: host.name || host.address,
+      icon: 'server' as const,
+      selected: activeHostId === host.id,
+      onSelect: () => {
+        void switchHost(host.id).catch(() => {})
+      },
+    })),
+    {
+      id: 'add-host',
+      label: t('host.add_host'),
+      icon: 'plus' as const,
+      separatorBefore: true,
+      onSelect: () => setHostDialogOpen(true),
+    },
+    {
+      id: 'host-settings',
+      label: t('host.settings'),
+      icon: 'settings' as const,
+      onSelect: () => onSettings(),
+    },
+  ]
 
   const sidebarShortcut = usePrimaryShortcut('⌘B', 'Ctrl+B')
   const settingsShortcut = usePrimaryShortcut('⌘,', 'Ctrl+,')
@@ -222,8 +269,8 @@ export function Sidebar({
               if (row.kind === 'showMore') {
                 return (
                   <div className="relative px-2.5 pb-1">
-                    <div className="pointer-events-none absolute left-[18px] top-0 h-[14px] w-[9px] rounded-bl-[4px] border-b border-l border-border/40" />
-                    <div className="pl-6 pr-2">
+                    <div className="pointer-events-none absolute left-[15px] top-0 h-[14px] w-[8px] rounded-bl-[4px] border-b border-l border-border/40" />
+                    <div className="pl-5 pr-2">
                       <button
                         className="flex h-7 items-center justify-start rounded-[5px] px-2 text-[12px] font-medium text-[var(--text-tertiary)] hover:bg-sidebar-accent hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
                         type="button"
@@ -232,6 +279,15 @@ export function Sidebar({
                             ...current,
                             [row.groupId]: (current[row.groupId] ?? 0) + 10,
                           }))
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === 'ArrowDown') {
+                            event.preventDefault()
+                            navigateSidebarItem('next', event.currentTarget)
+                          } else if (event.key === 'ArrowUp') {
+                            event.preventDefault()
+                            navigateSidebarItem('prev', event.currentTarget)
+                          }
                         }}
                       >
                         {t('sidebar.show_more')}
@@ -249,9 +305,9 @@ export function Sidebar({
                 return (
                   <div className="relative px-2.5">
                     {isProjectGroup && hasExpandedChildren && (
-                      <div className="pointer-events-none absolute bottom-0 left-[18px] top-[22px] w-px bg-border/40" />
+                      <div className="pointer-events-none absolute bottom-0 left-[15px] top-[22px] w-px bg-border/40" />
                     )}
-                    <div className="group/header flex h-7 items-center justify-between px-2">
+                    <div className="group/header flex h-7 items-center justify-between px-1.5">
                       <button
                         aria-expanded={!row.collapsed}
                         className="group flex h-[22px] min-w-0 flex-1 items-center gap-[5px] rounded px-1 text-[12.5px] font-medium text-[var(--text-tertiary)] outline-none hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring"
@@ -275,6 +331,18 @@ export function Sidebar({
                               next.delete(row.group.id)
                               return next
                             })
+                          } else if (event.key === 'ArrowDown') {
+                            event.preventDefault()
+                            navigateSidebarItem('next', event.currentTarget)
+                          } else if (event.key === 'ArrowUp') {
+                            event.preventDefault()
+                            navigateSidebarItem('prev', event.currentTarget)
+                          } else if (event.key === 'Home') {
+                            event.preventDefault()
+                            navigateSidebarItem('first', event.currentTarget)
+                          } else if (event.key === 'End') {
+                            event.preventDefault()
+                            navigateSidebarItem('last', event.currentTarget)
                           }
                         }}
                       >
@@ -285,12 +353,10 @@ export function Sidebar({
                           />
                         )}
                         <span className="truncate">{label}</span>
-                        {!isProjectGroup && (
-                          <PaduIcon
-                            className="size-3 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"
-                            name={row.collapsed ? 'chevronRight' : 'chevronDown'}
-                          />
-                        )}
+                        <PaduIcon
+                          className="size-3 opacity-0 transition-opacity motion-reduce:transition-none group-hover:opacity-100 group-focus-visible:opacity-100"
+                          name={row.collapsed ? 'chevronRight' : 'chevronDown'}
+                        />
                       </button>
                       <div className="flex items-center gap-0.5">
                         {row.first && (
@@ -361,7 +427,7 @@ export function Sidebar({
               return (
                 <div className="relative px-2.5 pb-px">
                   {grouping === 'project' && (
-                    <div className="pointer-events-none absolute bottom-0 left-[18px] top-0 w-px bg-border/40" />
+                    <div className="pointer-events-none absolute bottom-0 left-[15px] top-0 w-px bg-border/40" />
                   )}
                   <SessionRow
                     groupedByProject={grouping === 'project'}
@@ -369,7 +435,10 @@ export function Sidebar({
                     nowSeconds={nowSeconds}
                     selected={selectedSessionId === row.item.session.id}
                     t={t}
-                    onRemove={onRemoveSession}
+                    onRemove={(sessionId) => {
+                      const session = taskState.sessions.find((s) => s.id === sessionId)
+                      setSessionToDelete({ id: sessionId, title: session?.title })
+                    }}
                     onRename={onRenameSession}
                     onSelect={(sessionId) => {
                       onSelectSession(sessionId)
@@ -394,6 +463,14 @@ export function Sidebar({
               <PaduIcon name="settings" />
             </Button>
           </Tooltip>
+          <ControlMenu
+            align="left"
+            icon="server"
+            items={hostMenuItems}
+            label={currentHostDisplayName}
+            placement="above"
+            triggerClassName="h-[26px] max-w-[130px] px-1.5 text-[12px]"
+          />
           <div className="flex-1" />
           {onUsage && (
             <Tooltip content={t('settings.usage')} shortcut={usageShortcut}>
@@ -422,8 +499,56 @@ export function Sidebar({
         />
       </aside>
 
+      <HostDialog
+        editingHost={null}
+        open={hostDialogOpen}
+        onOpenChange={setHostDialogOpen}
+        onSave={async (data) => {
+          const newHost = await addHost(data)
+          await switchHost(newHost.id)
+        }}
+      />
+
+      <DeleteSessionDialog
+        session={sessionToDelete}
+        onClose={() => setSessionToDelete(null)}
+        onConfirm={onRemoveSession}
+      />
     </>
   )
+}
+
+function navigateSidebarItem(
+  direction: 'next' | 'prev' | 'first' | 'last',
+  currentElement: HTMLElement | null,
+) {
+  if (!currentElement) return
+  const container = currentElement.closest('[data-virtuoso-scroller]') ?? currentElement.closest('aside')
+  if (!container) return
+  const focusables = Array.from(
+    container.querySelectorAll<HTMLElement>(
+      'button:not([disabled]):not([tabindex="-1"]), [tabindex="0"]',
+    ),
+  ).filter((el) => el.offsetParent !== null)
+
+  const currentIndex = focusables.indexOf(currentElement)
+  if (currentIndex === -1) return
+
+  let targetIndex = currentIndex
+  if (direction === 'next') {
+    targetIndex = Math.min(currentIndex + 1, focusables.length - 1)
+  } else if (direction === 'prev') {
+    targetIndex = Math.max(currentIndex - 1, 0)
+  } else if (direction === 'first') {
+    targetIndex = 0
+  } else if (direction === 'last') {
+    targetIndex = focusables.length - 1
+  }
+
+  const target = focusables[targetIndex]
+  if (target && target !== currentElement) {
+    target.focus()
+  }
 }
 
 function SidebarAction({
@@ -445,11 +570,7 @@ function SidebarAction({
     >
       <span className="grid size-5 place-items-center [&>svg]:size-4">{icon}</span>
       <span className="min-w-0 flex-1 truncate">{label}</span>
-      {shortcut && (
-        <span className="flex h-5 min-w-6 flex-none items-center justify-center rounded-[5px] bg-[var(--inset)] px-1.5 text-[11px] font-medium text-[var(--text-tertiary)]">
-          {shortcut}
-        </span>
-      )}
+      {shortcut && <Kbd size="sm">{shortcut}</Kbd>}
     </button>
   )
 }
@@ -470,7 +591,7 @@ function SessionRow({
   groupedByProject?: boolean
   onSelect: (sessionId: string) => void
   onRename: (sessionId: string, title: string) => Promise<void>
-  onRemove: (sessionId: string) => Promise<void>
+  onRemove: (sessionId: string) => void | Promise<void>
   t: Translator
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -525,7 +646,7 @@ function SessionRow({
           <div
             className={cn(
               'flex w-full min-w-0 flex-col rounded-[7px]',
-              groupedByProject ? 'h-[36px] justify-center pl-6 pr-2 py-1' : 'h-[51px] gap-1 px-2 py-[7px]',
+              groupedByProject ? 'h-[36px] justify-center pl-5 pr-2 py-1' : 'h-[51px] gap-1 px-2 py-[7px]',
             )}
           >
             <span className="flex min-w-0 w-full items-center gap-1.5 leading-[18px]">
@@ -556,15 +677,36 @@ function SessionRow({
           <button
             aria-current={selected ? 'page' : undefined}
             aria-haspopup="menu"
-            className="flex h-[34px] w-full min-w-0 items-center justify-between gap-2 rounded-[6px] pl-6 pr-2 text-left outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
+            className="flex h-[34px] w-full min-w-0 items-center justify-between gap-2 rounded-[6px] pl-5 pr-2 text-left outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
             ref={rowButton}
             type="button"
             onClick={() => onSelect(item.session.id)}
             onKeyDown={(event) => {
-              if ((event.shiftKey && event.key === 'F10') || event.key === 'ContextMenu') {
+              if (event.key === 'F2') {
+                event.preventDefault()
+                setRenaming(true)
+              } else if (
+                event.key === 'Delete' ||
+                ((event.metaKey || event.ctrlKey) && event.key === 'Backspace')
+              ) {
+                event.preventDefault()
+                onRemove(item.session.id)
+              } else if ((event.shiftKey && event.key === 'F10') || event.key === 'ContextMenu') {
                 event.preventDefault()
                 restoreMenuFocus.current = true
                 setMenuOpen(true)
+              } else if (event.key === 'ArrowDown') {
+                event.preventDefault()
+                navigateSidebarItem('next', event.currentTarget)
+              } else if (event.key === 'ArrowUp') {
+                event.preventDefault()
+                navigateSidebarItem('prev', event.currentTarget)
+              } else if (event.key === 'Home') {
+                event.preventDefault()
+                navigateSidebarItem('first', event.currentTarget)
+              } else if (event.key === 'End') {
+                event.preventDefault()
+                navigateSidebarItem('last', event.currentTarget)
               }
             }}
           >
@@ -600,15 +742,41 @@ function SessionRow({
             type="button"
             onClick={() => onSelect(item.session.id)}
             onKeyDown={(event) => {
-              if ((event.shiftKey && event.key === 'F10') || event.key === 'ContextMenu') {
+              if (event.key === 'F2') {
+                event.preventDefault()
+                setRenaming(true)
+              } else if (
+                event.key === 'Delete' ||
+                ((event.metaKey || event.ctrlKey) && event.key === 'Backspace')
+              ) {
+                event.preventDefault()
+                onRemove(item.session.id)
+              } else if ((event.shiftKey && event.key === 'F10') || event.key === 'ContextMenu') {
                 event.preventDefault()
                 restoreMenuFocus.current = true
                 setMenuOpen(true)
+              } else if (event.key === 'ArrowDown') {
+                event.preventDefault()
+                navigateSidebarItem('next', event.currentTarget)
+              } else if (event.key === 'ArrowUp') {
+                event.preventDefault()
+                navigateSidebarItem('prev', event.currentTarget)
+              } else if (event.key === 'Home') {
+                event.preventDefault()
+                navigateSidebarItem('first', event.currentTarget)
+              } else if (event.key === 'End') {
+                event.preventDefault()
+                navigateSidebarItem('last', event.currentTarget)
               }
             }}
           >
             <span className="flex min-w-0 w-full items-center gap-1.5 leading-[18px]">
-              <span className="min-w-0 flex-1 truncate text-[13.5px] text-foreground">
+              <span
+                className={cn(
+                  'min-w-0 flex-1 truncate text-[13.5px] text-foreground',
+                  selected && 'font-medium',
+                )}
+              >
                 {currentTitle}
               </span>
               <SessionStatus status={item.session.status} t={t} />
@@ -641,7 +809,7 @@ function SessionRow({
               onClick={() => {
                 restoreMenuFocus.current = false
                 setMenuOpen(false)
-                void onRemove(item.session.id).catch(() => {})
+                void Promise.resolve(onRemove(item.session.id)).catch(() => {})
               }}
             >
               <PaduIcon className="size-3" name="trash" /> {t('common.remove')}

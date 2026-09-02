@@ -161,3 +161,27 @@ pub struct SessionMessageMatch {
     pub source: MessageRole,
     pub snippet: String,
 }
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
+pub struct HostProfile {
+    pub id: String,
+    pub name: String,
+    pub address: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub token: Option<String>,
+    pub created_at: u64,
+    pub updated_at: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_connected_at: Option<u64>,
+}
+
+impl HostProfile {
+    pub fn display_name(&self) -> &str {
+        if self.name.is_empty() {
+            &self.address
+        } else {
+            &self.name
+        }
+    }
+}

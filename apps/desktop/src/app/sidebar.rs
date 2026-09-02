@@ -142,7 +142,7 @@ fn session_date_group_for_dates(session_date: NaiveDate, today: NaiveDate) -> Se
 fn session_group_header(theme: &Theme) -> Div {
     div()
         .h(px(SIDEBAR_GROUP_HEADER_HEIGHT))
-        .px(px(8.0))
+        .px(px(6.0))
         .flex()
         .items_center()
         .text_size(sp(13.0))
@@ -217,8 +217,8 @@ const SIDEBAR_GROUP_HEADER_HEIGHT: f32 = 28.0;
 const SIDEBAR_GROUP_HEADER_BOTTOM_GAP: f32 = 2.0;
 const SIDEBAR_SHOW_MORE_ROW_HEIGHT: f32 = 30.0;
 const SIDEBAR_GROUP_SPACER_HEIGHT: f32 = 10.0;
-const SIDEBAR_GROUP_GUIDE_X: f32 = 15.0;
-const SIDEBAR_GROUP_CHILD_PADDING: f32 = 28.0;
+const SIDEBAR_GROUP_GUIDE_X: f32 = 13.0;
+const SIDEBAR_GROUP_CHILD_PADDING: f32 = 24.0;
 const SIDEBAR_PROJECT_RECENT_WINDOW_SECONDS: u64 = 3 * 24 * 60 * 60;
 const SIDEBAR_PROJECT_REVEAL_BATCH: usize = 30;
 
@@ -978,6 +978,121 @@ impl Padu {
         }
     }
 
+    fn render_sidebar_host_button(&self, cx: &mut Context<Self>) -> AnyElement {
+        let theme = Theme::current(cx);
+        let menu = self.menu_handle("sidebar-host", cx);
+        let menu_open = menu.is_open();
+        let weak = cx.entity().downgrade();
+        let is_local_active = self.state.is_local_host();
+        let local_label = tr!("host.local");
+        let active_display_name = self.state.active_host_display_name(&local_label);
+        let hosts = self.state.hosts.clone();
+        let active_host_id = self.state.active_host_id.clone();
+        let is_connecting = self.host_switch_pending;
+
+        let host_name_label = if is_connecting {
+            tr!("host.connecting")
+        } else {
+            active_display_name
+        };
+
+        dropdown_menu(
+            div()
+                .id("sidebar-host-button")
+                .tab_index(0)
+                .focus_visible(|style| style.border_1().border_color(theme.accent))
+                .h(px(26.0))
+                .px(px(6.0))
+                .rounded(px(6.0))
+                .flex_none()
+                .flex()
+                .items_center()
+                .gap(px(5.0))
+                .cursor_pointer()
+                .when(menu_open, |element| element.bg(theme.overlay_strong))
+                .hover(|element| element.bg(theme.overlay))
+                .active(|element| element.bg(theme.overlay_strong))
+                .tooltip(Tooltip::text(tr!("host.switch_host")))
+                .child(icon("icons/server.svg", 13.0, theme.text_tertiary))
+                .child(
+                    div()
+                        .max_w(px(100.0))
+                        .min_w_0()
+                        .truncate()
+                        .text_size(sp(12.0))
+                        .text_color(theme.text_secondary)
+                        .child(host_name_label),
+                )
+                .child(icon(
+                    if menu_open {
+                        "icons/chevron-up.svg"
+                    } else {
+                        "icons/chevron-down.svg"
+                    },
+                    10.0,
+                    theme.text_ghost,
+                )),
+            "sidebar-host-menu",
+            &menu,
+            MenuAlign::AboveLeft,
+            move |_| {
+                let mut items = vec![MenuItem::Header(tr!("host.hosts").into())];
+
+                let local_weak = weak.clone();
+                items.push(
+                    MenuItem::new(tr!("host.local"), move |_, cx| {
+                        let _ = local_weak.update(cx, |this, cx| {
+                            this.switch_to_host(None, cx);
+                        });
+                    })
+                    .icon("icons/server.svg")
+                    .selected(is_local_active),
+                );
+
+                for host in &hosts {
+                    let host_id = host.id.clone();
+                    let host_weak = weak.clone();
+                    let is_selected = active_host_id.as_deref() == Some(&host.id);
+                    items.push(
+                        MenuItem::new(host.display_name().to_string(), move |_, cx| {
+                            let _ = host_weak.update(cx, |this, cx| {
+                                this.switch_to_host(Some(host_id.clone()), cx);
+                            });
+                        })
+                        .icon("icons/server.svg")
+                        .selected(is_selected),
+                    );
+                }
+
+                items.push(MenuItem::Separator);
+
+                let add_weak = weak.clone();
+                items.push(
+                    MenuItem::new(tr!("host.add_host"), move |_, cx| {
+                        let _ = add_weak.update(cx, |this, cx| {
+                            this.request_host_dialog(None, cx);
+                        });
+                    })
+                    .icon("icons/plus.svg"),
+                );
+
+                let settings_weak = weak.clone();
+                items.push(
+                    MenuItem::new(tr!("host.settings"), move |window, cx| {
+                        let _ = settings_weak.update(cx, |this, cx| {
+                            this.open_settings_action(&OpenSettings, window, cx);
+                            this.open_settings_page(SettingsPage::Daemon, cx);
+                        });
+                    })
+                    .icon("icons/settings.svg"),
+                );
+
+                items
+            },
+        )
+        .into_any_element()
+    }
+
     fn render_sidebar_footer(&self, cx: &mut Context<Self>) -> Div {
         let theme = Theme::current(cx);
         div()
@@ -1017,6 +1132,7 @@ impl Padu {
                         }
                     })),
             )
+            .child(self.render_sidebar_host_button(cx))
             .child(div().flex_1())
             .child(
                 div()
@@ -1562,14 +1678,14 @@ impl Padu {
                 .unwrap_or_else(|| tr!("project.no_project_name")),
             SidebarGroup::Projectless => tr!("project.no_project_name"),
         };
-        let updated_chevron = matches!(group, SidebarGroup::Updated(_)).then(|| {
+        let group_chevron = Some(
             icon("icons/chevron-down.svg", 14.0, theme.text_secondary)
                 .when(collapsed, |icon| {
                     icon.with_transformation(gpui::Transformation::rotate(gpui::percentage(0.75)))
                 })
                 .invisible()
-                .group_hover(group_name.clone(), |icon| icon.visible())
-        });
+                .group_hover(group_name.clone(), |icon| icon.visible()),
+        );
 
         let header = session_group_header(&theme)
             .id(SharedString::from(format!(
@@ -1605,7 +1721,7 @@ impl Padu {
                             .items_center()
                             .gap(px(2.0))
                             .child(div().min_w_0().truncate().child(label))
-                            .when_some(updated_chevron, |element, chevron| element.child(chevron)),
+                            .when_some(group_chevron, |element, chevron| element.child(chevron)),
                     )
                     .child(div().flex_1()),
             )
@@ -1628,16 +1744,20 @@ impl Padu {
             }))
             .on_key_down(cx.listener(move |this, event: &KeyDownEvent, _, cx| {
                 match event.keystroke.key.as_str() {
-                    "enter" | "space" => {
-                        this.toggle_sidebar_group(group, cx);
-                        cx.stop_propagation();
-                    }
                     "left" if !collapsed => {
                         this.set_sidebar_group_collapsed(group, true, cx);
                         cx.stop_propagation();
                     }
                     "right" if collapsed => {
                         this.set_sidebar_group_collapsed(group, false, cx);
+                        cx.stop_propagation();
+                    }
+                    "down" => {
+                        this.select_adjacent_sidebar_session(None, 1, cx);
+                        cx.stop_propagation();
+                    }
+                    "up" => {
+                        this.select_adjacent_sidebar_session(None, -1, cx);
                         cx.stop_propagation();
                     }
                     _ => {}
@@ -1710,6 +1830,67 @@ impl Padu {
         *revealed = revealed.saturating_add(SIDEBAR_PROJECT_REVEAL_BATCH);
         self.sidebar_rows_fingerprint.set(None);
         cx.notify();
+    }
+
+    fn select_adjacent_sidebar_session(
+        &mut self,
+        current_session: Option<Uuid>,
+        delta: isize,
+        cx: &mut Context<Self>,
+    ) {
+        let rows = self.sidebar_rows_cached(Local::now().date_naive(), unix_time());
+        let sessions = rows
+            .iter()
+            .filter_map(|r| match r {
+                SidebarRow::Session(id) => Some(*id),
+                _ => None,
+            })
+            .collect::<Vec<_>>();
+        if sessions.is_empty() {
+            return;
+        }
+        let next_session =
+            match current_session.and_then(|id| sessions.iter().position(|&s| s == id)) {
+                Some(pos) => {
+                    let next_pos = if delta > 0 {
+                        (pos + 1).min(sessions.len() - 1)
+                    } else {
+                        pos.saturating_sub(1)
+                    };
+                    sessions[next_pos]
+                }
+                None => {
+                    if delta > 0 {
+                        sessions[0]
+                    } else {
+                        sessions[sessions.len() - 1]
+                    }
+                }
+            };
+        self.select_session(next_session, cx);
+        self.reveal_sidebar_session(next_session);
+    }
+
+    fn select_first_sidebar_session(&mut self, cx: &mut Context<Self>) {
+        let rows = self.sidebar_rows_cached(Local::now().date_naive(), unix_time());
+        if let Some(first) = rows.iter().find_map(|r| match r {
+            SidebarRow::Session(id) => Some(*id),
+            _ => None,
+        }) {
+            self.select_session(first, cx);
+            self.reveal_sidebar_session(first);
+        }
+    }
+
+    fn select_last_sidebar_session(&mut self, cx: &mut Context<Self>) {
+        let rows = self.sidebar_rows_cached(Local::now().date_naive(), unix_time());
+        if let Some(last) = rows.iter().rev().find_map(|r| match r {
+            SidebarRow::Session(id) => Some(*id),
+            _ => None,
+        }) {
+            self.select_session(last, cx);
+            self.reveal_sidebar_session(last);
+        }
     }
 
     fn toggle_sidebar_group(&mut self, group: SidebarGroup, cx: &mut Context<Self>) {
@@ -2088,8 +2269,29 @@ impl Padu {
                     .focus_visible(|style| style.border_1().border_color(theme.accent))
                     .on_key_down(cx.listener(move |this, event: &KeyDownEvent, window, cx| {
                         let key = event.keystroke.key.as_str();
-                        if matches!(key, "enter" | "space") {
+                        if key == "down" {
+                            this.select_adjacent_sidebar_session(Some(session_id), 1, cx);
+                            cx.stop_propagation();
+                        } else if key == "up" {
+                            this.select_adjacent_sidebar_session(Some(session_id), -1, cx);
+                            cx.stop_propagation();
+                        } else if key == "home" {
+                            this.select_first_sidebar_session(cx);
+                            cx.stop_propagation();
+                        } else if key == "end" {
+                            this.select_last_sidebar_session(cx);
+                            cx.stop_propagation();
+                        } else if matches!(key, "enter" | "space") {
                             this.select_session(session_id, cx);
+                            cx.stop_propagation();
+                        } else if key == "f2" {
+                            this.begin_session_rename(session_id, window, cx);
+                            cx.stop_propagation();
+                        } else if (key == "delete" || key == "backspace")
+                            && (event.keystroke.modifiers.platform
+                                || event.keystroke.modifiers.control)
+                        {
+                            this.confirm_delete_session(session_id, window, cx);
                             cx.stop_propagation();
                         } else if key == "f10" && event.keystroke.modifiers.shift {
                             keyboard_menu.open_context_menu(window, cx);
@@ -2123,12 +2325,16 @@ impl Padu {
                             let _ = rename_padu.update(cx, |padu, cx| {
                                 padu.begin_session_rename(session_id, window, cx);
                             });
-                        }),
+                        })
+                        .icon("icons/pencil.svg"),
                         MenuItem::Separator,
-                        MenuItem::new(tr!("common.remove"), move |_, cx| {
-                            let _ = remove_padu
-                                .update(cx, |padu, cx| padu.remove_session(session_id, cx));
-                        }),
+                        MenuItem::new(tr!("common.remove"), move |window, cx| {
+                            let _ = remove_padu.update(cx, |padu, cx| {
+                                padu.confirm_delete_session(session_id, window, cx)
+                            });
+                        })
+                        .icon("icons/trash.svg")
+                        .destructive(true),
                     ]
                 },
             )
@@ -2314,7 +2520,7 @@ impl Padu {
                 .justify_center()
                 .px_8()
                 .pb(px(46.0))
-                .child(icon("icons/sparkle.svg", 24.0, theme.accent))
+                .child(icon("icons/logo.svg", 32.0, theme.text))
                 .child(
                     div()
                         .mt(px(16.0))
@@ -2484,7 +2690,7 @@ impl Padu {
             .justify_center()
             .px_8()
             .pb(px(52.0))
-            .child(icon("icons/sparkle.svg", 20.0, theme.accent))
+            .child(icon("icons/logo.svg", 28.0, theme.text))
             .child(
                 div()
                     .mt(px(14.0))
@@ -2548,6 +2754,16 @@ mod tests {
     }
 
     #[test]
+    fn format_time_ago_handles_time_boundaries() {
+        assert_eq!(format_time_ago(30), "just now");
+        assert_eq!(format_time_ago(90), "1m");
+        assert_eq!(format_time_ago(3_600), "1h");
+        assert_eq!(format_time_ago(7_200), "2h");
+        assert_eq!(format_time_ago(86_400), "1d");
+        assert_eq!(format_time_ago(172_800), "2d");
+    }
+
+    #[test]
     fn future_sessions_stay_in_today() {
         let today = NaiveDate::from_ymd_opt(2026, 8, 12).unwrap();
         let tomorrow = NaiveDate::from_ymd_opt(2026, 8, 13).unwrap();
@@ -2601,6 +2817,15 @@ mod tests {
             collapsed,
             vec![SidebarRow::Header(group), SidebarRow::GroupSpacer]
         );
+    }
+
+    #[test]
+    fn sidebar_group_tree_guide_and_child_padding_geometry() {
+        assert!(SIDEBAR_GROUP_CHILD_PADDING > SIDEBAR_GROUP_GUIDE_X);
+        let hook_width = SIDEBAR_GROUP_CHILD_PADDING - SIDEBAR_GROUP_GUIDE_X - 4.0;
+        assert!(hook_width >= 5.0 && hook_width <= 10.0);
+        assert_eq!(SIDEBAR_GROUP_GUIDE_X, 13.0);
+        assert_eq!(SIDEBAR_GROUP_CHILD_PADDING, 24.0);
     }
 
     #[test]

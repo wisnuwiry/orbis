@@ -75,7 +75,7 @@ settings.appearance: 外观
 settings.keybindings: 快捷键
 settings.providers: 服务商
 settings.usage: 用量
-settings.daemon: 守护进程
+settings.daemon: 主机与守护进程
 settings.computer_use: 电脑操作
 settings.general_keywords: 通用 本地 项目 对话 隐私 匿名 使用数据 分析 分享 更新 自动 版本
 settings.appearance_keywords: 外观 主题 系统 浅色 深色 语言 英语 中文 简体 字号 字体 大小 编辑器
@@ -84,7 +84,7 @@ settings.providers_keywords: 服务商 智能体 模型 命令行 版本 安装 
 settings.skills: 技能
 settings.skills_keywords: 技能 技能库 智能体 禁用 启用 删除 claude codex cursor opencode pi amp 共享
 settings.usage_keywords: 用量 令牌 费用 支出 缓存 每日 图表 模型 明细 历史 claude codex
-settings.daemon_keywords: 守护进程 服务 远程 网页 网络 暴露 来源 令牌 端口 websocket
+settings.daemon_keywords: 主机 远程 服务器 云主机 守护进程 服务 网页 网络 暴露 来源 令牌 端口 websocket ssh 局域网
 settings.computer_use_keywords: 电脑操作 屏幕录制 辅助功能 应用 控制 codex
 keybindings.section_general: 通用与窗口
 keybindings.section_navigation: 导航与面板
@@ -151,12 +151,12 @@ keybindings.search: 搜索快捷键...
 keybindings.no_results: 未找到快捷键
 settings.back: 返回
 settings.search: 搜索设置
-daemon.expose_title: 暴露由 Padu 管理的守护进程
-daemon.expose_description: 允许本机之外的 Padu 客户端连接。更改此项只会重启守护进程。
+daemon.expose_title: 允许远程与 Web 连接
+daemon.expose_description: 允许浏览器中的 Padu Web 或局域网中的其他设备连接到本机的 AI 智能体运行环境。
 daemon.status_local: 仅本机
 daemon.status_exposed: 已暴露
 daemon.status_restarting: 正在重启
-daemon.connection_title: 监听访问
+daemon.connection_title: 网络与来源策略
 daemon.connection_description: 浏览器来源必须完全匹配。多个来源请用逗号分隔。
 daemon.port: 端口
 daemon.port_description: 启用暴露后，Padu 会在所有网络接口的此端口上监听。
@@ -166,16 +166,19 @@ daemon.allowed_origins_description: 可打开 WebSocket 的确切 http:// 或 ht
 daemon.allowed_origins_placeholder: https://padu.example.com, http://localhost:3001
 daemon.apply: 应用
 daemon.restarting: 正在重启…
-daemon.credentials_title: 连接信息
-daemon.credentials_description: 在 Padu Web 中输入这些信息。此地址使用本机的局域网主机名。
+daemon.credentials_title: 守护进程访问凭据
+daemon.credentials_description: 在 Padu Web 或远程客户端应用中使用此凭据连接到本机。
 daemon.websocket_url: WebSocket 地址
 daemon.token: 令牌
 daemon.reveal_token: 显示令牌
 daemon.hide_token: 隐藏令牌
 daemon.regenerate_token: 重新生成
 daemon.security_warning: 此令牌可完全访问本机上的任务、文件、Git、附件和编程智能体。在私有网络之外请通过受信任的 TLS 代理使用 WSS。
-daemon.external_title: 外部守护进程
-daemon.external_description: 此桌面应用连接到由 Padu 之外管理的守护进程。请在对应主机上配置监听地址、浏览器来源和令牌。
+daemon.remote_active_banner_title: "已连接到远程主机：%{name}"
+daemon.remote_active_banner_desc: 所有智能体运行、会话记录和工作区文件修改均在此远程主机上执行。
+daemon.switch_to_local: 切换至本地守护进程
+daemon.external_title: 远程守护进程主机
+daemon.external_description: 此 Padu 实例当前连接到远程守护进程主机。
 daemon.web_external_description: Padu Web 连接到由浏览器之外管理的守护进程。请在对应主机上配置监听地址、浏览器来源和令牌。
 daemon.web_connection_description: 此浏览器不会启动或停止守护进程。
 daemon.not_configured: 未配置
@@ -195,6 +198,35 @@ daemon.settings_applied: 守护进程访问设置已更新
 daemon.restart_failed: 无法重启守护进程：%{error}
 daemon.url_copied: 已复制 WebSocket 地址
 daemon.token_copied: 已复制守护进程令牌
+host.hosts: 主机
+host.local: 本地
+host.add_host: 添加主机…
+host.edit_host: 编辑主机
+host.remove_host: 删除主机
+host.delete_confirm_title: 删除主机配置
+host.delete_confirm_message: "确定要删除“%{name}”吗？此操作无法撤消。"
+host.name: 名称
+host.name_placeholder: 例如：开发服务器
+host.address: 地址
+host.address_placeholder: 例如：192.168.1.100:34123
+host.token: 令牌
+host.token_placeholder: 守护进程认证令牌（可选）
+host.save_and_connect: 保存并连接
+host.save: 保存
+host.settings: 主机设置…
+host.connection_failed: "连接失败：%{error}"
+host.confirm_remove: "确定删除主机 \"%{name}\"？"
+host.connecting: 正在连接…
+host.remote_hosts: 远程主机
+host.remote_hosts_description: 连接到在远程服务器或工作站上运行的 Padu 守护进程实例。
+host.active: 当前活跃
+host.authenticated: 已配置凭据
+host.no_auth: 无令牌
+host.no_remote_hosts: 未配置远程主机
+host.last_connected: "上次连接于 %{time}"
+host.never_connected: 从未连接
+host.switch_host: 切换主机
+host.connect: 连接
 web.connect_title: 连接 Padu 守护进程
 web.connect_description: 输入桌面应用“设置 → 守护进程”中显示的远程监听地址和令牌。
 web.token_placeholder: 守护进程访问令牌
@@ -344,6 +376,7 @@ common.copy_selection: 复制所选内容
 common.copy_to_composer: 复制到输入框
 common.copy_code: 复制代码
 common.cancel: 取消
+common.edit: 编辑
 common.send: 发送
 session.fork_task: 从此处派生任务
 session.fork_task_title: 从此处派生任务
@@ -353,6 +386,9 @@ session.revert_to_here: 回退到这里
 session.revert_to_here_title: 回退到这里
 session.reverting_message: 正在回退消息…
 session.reverting_message_title: 正在回退消息…
+session.delete_title: 删除对话
+session.delete_message: "确定要删除“%{title}”吗？此操作无法撤消。"
+session.delete_confirm: 删除
 time.yesterday_at: 昨天 %{time}
 time.weekday_at: "%{weekday} %{time}"
 time.date_at: "%{month}月%{day}日 %{time}"
@@ -874,6 +910,8 @@ files.file_unavailable: 文件不可用
 files.loading_editor: 正在加载编辑器
 files.preparing_editor: 正在准备编辑器…
 files.preparing_syntax: 正在准备语法高亮。
+files.copy_path: 复制路径
+files.copied_path: "已复制 %{path} 到剪贴板"
 file_picker.open_project: 打开项目
 file_picker.attach: 添加附件
 file_picker.daemon_folders: 守护进程文件夹

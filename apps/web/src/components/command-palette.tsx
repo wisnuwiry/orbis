@@ -2,6 +2,7 @@ import type { AgentSession, ProviderKind, ProviderSessionSummary, SessionMessage
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { ProviderIcon, PROVIDERS, providerMeta, PaduIcon, type PaduIconName } from '@/components/padu-icon'
+import { Kbd } from '@/components/ui/kbd'
 import type { SettingsPageId } from '@/components/settings-view'
 import { SETTINGS_PAGES } from '@/components/settings-view'
 import {
@@ -347,9 +348,9 @@ export function CommandPalette({
         if (event.target === event.currentTarget) dismiss()
       }}
     >
-      <div className="flex max-h-[min(480px,calc(100dvh-108px))] w-full max-w-[680px] flex-col overflow-hidden rounded-[15px] bg-[var(--raised)] shadow-[0_24px_80px_rgba(0,0,0,0.26)]">
-        <div className="flex h-[60px] shrink-0 items-center gap-3 border-b px-[19px]">
-          <PaduIcon className="size-4 shrink-0 text-[var(--text-tertiary)]" name="search" />
+      <div className="flex max-h-[min(440px,calc(100dvh-108px))] w-full max-w-[640px] flex-col overflow-hidden rounded-[12px] bg-[var(--raised)] shadow-[0_24px_80px_rgba(0,0,0,0.26)]">
+        <div className="flex h-[52px] shrink-0 items-center gap-2.5 border-b px-4">
+          <PaduIcon className="size-3.5 shrink-0 text-[var(--text-tertiary)]" name="search" />
           <input
             aria-activedescendant={items[selected] ? `palette-${items[selected]!.id}` : undefined}
             aria-controls="command-palette-results"
@@ -359,7 +360,7 @@ export function CommandPalette({
                 ? 'command_palette.resume_provider_placeholder'
                 : 'command_palette.placeholder')}
             autoComplete="off"
-            className="h-full min-w-0 flex-1 bg-transparent text-[15.5px] outline-none placeholder:text-[var(--text-ghost)]"
+            className="h-full min-w-0 flex-1 bg-transparent text-[14px] outline-none placeholder:text-[var(--text-ghost)]"
             placeholder={t(view === 'resume'
               ? 'command_palette.resume_placeholder'
               : view === 'resumeProviders'
@@ -434,20 +435,20 @@ export function CommandPalette({
             </button>
           ))}
         </div>
-        <div className="min-h-0 overflow-y-auto px-2 pb-2" id="command-palette-results" role="listbox">
+        <div className="min-h-0 overflow-y-auto px-1.5 pb-1.5" id="command-palette-results" role="listbox">
           {!items.length ? (
-            <div className="grid h-[180px] place-items-center text-center">
+            <div className="grid h-[160px] place-items-center text-center">
               <div>
                 <PaduIcon
                   className={cn(
-                    'mx-auto size-[18px] text-[var(--text-ghost)]',
+                    'mx-auto size-4 text-[var(--text-ghost)]',
                     view === 'resume' && resultsPending && 'animate-spin motion-reduce:animate-none',
                   )}
                   name={view === 'resume' && resultsPending
                     ? 'loaderCircle'
                     : view === 'resume' && providerSessionError ? 'alert' : 'search'}
                 />
-                <div className="mt-3 text-[13px] font-medium text-[var(--text-secondary)]">
+                <div className="mt-2.5 text-[12.5px] font-medium text-[var(--text-secondary)]">
                   {view === 'resume' && resultsPending
                     ? t('command_palette.loading_sessions')
                     : view === 'resume' && providerSessionError
@@ -459,7 +460,7 @@ export function CommandPalette({
                             : 'command_palette.no_results')}
                 </div>
                 {!(view === 'resume' && resultsPending) && (
-                  <div className="mt-[5px] text-[11.5px] text-[var(--text-tertiary)]">
+                  <div className="mt-1 text-[12px] text-[var(--text-tertiary)]">
                     {view === 'resume' && providerSessionError
                       ? providerSessionError
                       : view === 'resumeProviders'
@@ -474,6 +475,27 @@ export function CommandPalette({
           ) : (
             <PaletteRows items={items} query={query} selected={selected} t={t} onExecute={execute} onSelected={setSelected} />
           )}
+        </div>
+        <div className="flex h-9 shrink-0 items-center gap-4 border-t bg-[var(--card)]/90 px-4 py-1 text-[11px] text-[var(--text-tertiary)]">
+          <span className="flex items-center gap-1.5">
+            <Kbd variant="subtle" size="sm" className="px-1">
+              <PaduIcon className="size-2.5" name="arrowUp" />
+            </Kbd>
+            <Kbd variant="subtle" size="sm" className="px-1">
+              <PaduIcon className="size-2.5" name="arrowDown" />
+            </Kbd>
+            Navigate
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Kbd variant="subtle" size="sm" className="px-1.5">
+              <PaduIcon className="size-3" name="cornerDownRight" />
+            </Kbd>
+            Select
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Kbd variant="subtle" size="sm">Esc</Kbd>
+            Close
+          </span>
         </div>
       </div>
     </div>
@@ -502,15 +524,15 @@ function PaletteRows({
     return (
       <div className={cn(header && item.section === 'providers' && 'pt-2')} key={item.id}>
         {header && item.section !== 'providers' && (
-          <div className="flex h-[30px] items-center px-[9px] pt-2.5 text-[11px] font-medium text-[var(--text-tertiary)]">
+          <div className="flex h-[26px] items-center px-2 pt-2 text-[11px] font-medium text-[var(--text-tertiary)]">
             {t(`command_palette.${item.section}`)}
           </div>
         )}
         <button
           aria-selected={index === selected}
           className={cn(
-            'flex w-full items-center gap-2.5 rounded-[9px] border border-transparent px-[11px] text-left outline-none hover:bg-accent',
-            item.content ? 'h-[60px]' : 'h-11',
+            'flex w-full items-center gap-2 rounded-[8px] border border-transparent px-2.5 text-left outline-none hover:bg-accent',
+            item.content ? 'h-[54px]' : 'h-10',
             index === selected && 'border-input bg-accent',
           )}
           id={`palette-${item.id}`}
@@ -519,29 +541,29 @@ function PaletteRows({
           onClick={() => onExecute(index)}
           onMouseEnter={() => onSelected(index)}
         >
-          <span className="grid size-5 shrink-0 place-items-center text-[var(--text-secondary)]">
+          <span className="grid size-[18px] shrink-0 place-items-center text-[var(--text-secondary)]">
             {item.pending
-              ? <PaduIcon className="size-4 animate-spin motion-reduce:animate-none" name="loaderCircle" />
+              ? <PaduIcon className="size-3.5 animate-spin motion-reduce:animate-none" name="loaderCircle" />
               : item.provider
-              ? <ProviderIcon className="size-4" provider={item.provider} />
-              : item.icon && <PaduIcon className="size-4" name={item.icon} />}
+              ? <ProviderIcon className="size-3.5" provider={item.provider} />
+              : item.icon && <PaduIcon className="size-3.5" name={item.icon} />}
           </span>
           <span className="min-w-0 flex-1">
             <span className="flex min-w-0 items-baseline gap-[7px]">
-              <span className={cn('truncate text-[14px] text-[var(--text-secondary)]', index === selected && 'font-medium text-foreground')}>{item.label}</span>
-              {item.detail && <span className="truncate text-[11.5px] text-[var(--text-tertiary)]">{item.detail}</span>}
+              <span className={cn('truncate text-[13px] text-[var(--text-secondary)]', index === selected && 'font-medium text-foreground')}>{item.label}</span>
+              {item.detail && <span className="truncate text-[12px] text-[var(--text-tertiary)]">{item.detail}</span>}
             </span>
             {item.content && (
-              <span className="mt-0.5 block truncate text-[11.5px] text-[var(--text-tertiary)]">
+              <span className="mt-0.5 block truncate text-[12px] text-[var(--text-tertiary)]">
                 <span className="font-medium text-[var(--text-secondary)]">{item.content.source}: </span>
                 <Highlighted text={item.content.snippet} query={query} />
               </span>
             )}
           </span>
           {item.shortcut && (
-            <kbd className="flex h-[22px] min-w-7 shrink-0 items-center justify-center rounded-[7px] bg-[color:var(--foreground)]/[0.07] px-[7px] font-sans text-[11.5px] text-[var(--text-tertiary)]">
+            <Kbd variant="subtle" size="sm">
               {item.shortcut}
-            </kbd>
+            </Kbd>
           )}
         </button>
       </div>

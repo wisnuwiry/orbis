@@ -79,7 +79,7 @@ settings.appearance: 外観
 settings.keybindings: キーバインド
 settings.providers: プロバイダー
 settings.usage: 使用状況
-settings.daemon: デーモン
+settings.daemon: ホストとデーモン
 settings.computer_use: コンピュータ操作
 settings.general_keywords: 一般 ローカル プロジェクト 会話 プライバシー 分析 テレメトリ 匿名 共有 アップデート 自動 バージョン
 settings.appearance_keywords: 外観 テーマ システム ライト ダーク 言語 英語 中国語 簡体字 日本語 フォント サイズ 文字 エディタ
@@ -88,7 +88,7 @@ settings.providers_keywords: プロバイダー エージェント モデル CLI
 settings.skills: スキル
 settings.skills_keywords: スキル ライブラリ エージェント 無効 有効 削除 claude codex cursor opencode pi amp 共有
 settings.usage_keywords: 使用状況 トークン コスト 支出 キャッシュ 日別 グラフ モデル 内訳 履歴 claude codex
-settings.daemon_keywords: デーモン サーバー リモート ウェブ ネットワーク 公開 オリジン トークン ポート websocket
+settings.daemon_keywords: ホスト リモート サーバー クラウド デーモン ウェブ ネットワーク 公開 オリジン トークン ポート websocket ssh lan
 settings.computer_use_keywords: コンピュータ 操作 画面収録 アクセシビリティ アプリ 制御 codex
 keybindings.section_general: 一般とウィンドウ
 keybindings.section_navigation: ナビゲーションとパネル
@@ -155,12 +155,12 @@ keybindings.search: ショートカットを検索...
 keybindings.no_results: ショートカットが見つかりません
 settings.back: 戻る
 settings.search: 設定を検索
-daemon.expose_title: 管理対象デーモンを公開
-daemon.expose_description: このマシン以外の Padu クライアントから接続できるようにします。変更時はデーモンだけが再起動します。
+daemon.expose_title: リモートおよび Web 接続を許可
+daemon.expose_description: ブラウザの Padu Web やローカルネットワーク上の他のデバイスから、このマシンの AI エージェント実行環境に接続できるようにします。
 daemon.status_local: このマシンのみ
 daemon.status_exposed: 公開中
 daemon.status_restarting: 再起動中
-daemon.connection_title: リスナーアクセス
+daemon.connection_title: ネットワークとオリジンポリシー
 daemon.connection_description: ブラウザのオリジンは完全一致が必要です。複数指定する場合はカンマで区切ります。
 daemon.port: ポート
 daemon.port_description: 公開中は、すべてのネットワークインターフェイスのこのポートで待ち受けます。
@@ -170,16 +170,19 @@ daemon.allowed_origins_description: WebSocket を開ける正確な http:// ま�
 daemon.allowed_origins_placeholder: https://padu.example.com, http://localhost:3001
 daemon.apply: 適用
 daemon.restarting: 再起動中…
-daemon.credentials_title: 接続情報
-daemon.credentials_description: Padu Web に入力してください。URL にはこのマシンのローカルネットワーク用ホスト名が使われます。
+daemon.credentials_title: デーモンアクセス認証情報
+daemon.credentials_description: Padu Web やリモートクライアントからこのマシンに接続する際にこの認証情報を使用します。
 daemon.websocket_url: WebSocket URL
 daemon.token: トークン
 daemon.reveal_token: トークンを表示
 daemon.hide_token: トークンを隠す
 daemon.regenerate_token: 再生成
 daemon.security_warning: このトークンは、このマシン上のタスク、ファイル、Git、添付ファイル、コーディングエージェントへの完全なアクセス権を持ちます。プライベートネットワーク外では信頼できる TLS プロキシ経由で WSS を使用してください。
-daemon.external_title: 外部デーモン
-daemon.external_description: このデスクトップは Padu の外部で管理されているデーモンに接続しています。リスナー、ブラウザオリジン、トークンは接続先ホストで設定してください。
+daemon.remote_active_banner_title: "リモートホストに接続中：%{name}"
+daemon.remote_active_banner_desc: すべてのエージェント実行、ログ、ワークスペースの変更はこのリモートホスト上で行われます。
+daemon.switch_to_local: ローカルデーモンに切り替え
+daemon.external_title: リモートデーモンホスト
+daemon.external_description: この Padu インスタンスは現在リモートデーモンホストに接続しています。
 daemon.web_external_description: Padu Web はブラウザの外部で管理されているデーモンに接続します。リスナー、ブラウザオリジン、トークンは接続先ホストで設定してください。
 daemon.web_connection_description: このブラウザがデーモンを起動または停止することはありません。
 daemon.not_configured: 未設定
@@ -199,6 +202,35 @@ daemon.settings_applied: デーモンのアクセス設定を更新しました
 daemon.restart_failed: デーモンを再起動できませんでした：%{error}
 daemon.url_copied: WebSocket URL をコピーしました
 daemon.token_copied: デーモントークンをコピーしました
+host.hosts: ホスト
+host.local: ローカル
+host.add_host: ホストを追加…
+host.edit_host: ホストを編集
+host.remove_host: ホストを削除
+host.delete_confirm_title: ホストプロファイルを削除
+host.delete_confirm_message: "「%{name}」を削除してもよろしいですか？この操作は取り消せません。"
+host.name: 名前
+host.name_placeholder: 例：開発サーバー
+host.address: アドレス
+host.address_placeholder: 例：192.168.1.100:34123
+host.token: トークン
+host.token_placeholder: デーモン認証トークン（省略可）
+host.save_and_connect: 保存して接続
+host.save: 保存
+host.settings: ホスト設定…
+host.connection_failed: "接続に失敗しました：%{error}"
+host.confirm_remove: "ホスト \"%{name}\" を削除しますか？"
+host.connecting: 接続中…
+host.remote_hosts: リモートホスト
+host.remote_hosts_description: リモートサーバーやワークステーションで実行されている Padu デーモンインスタンスに接続します。
+host.active: アクティブ
+host.authenticated: 認証済み
+host.no_auth: トークンなし
+host.no_remote_hosts: リモートホストは設定されていません
+host.last_connected: "最終接続 %{time}"
+host.never_connected: 未接続
+host.switch_host: ホストを切り替え
+host.connect: 接続
 web.connect_title: Padu デーモンに接続
 web.connect_description: デスクトップアプリの「設定 → デーモン」に表示されるリモートリスナー URL とトークンを入力してください。
 web.token_placeholder: デーモンアクセストークン
@@ -359,6 +391,7 @@ common.copy_selection: 選択範囲をコピー
 common.copy_to_composer: 入力欄にコピー
 common.copy_code: コードをコピー
 common.cancel: キャンセル
+common.edit: 編集
 common.send: 送信
 
 session.fork_task: タスクをフォーク
@@ -369,6 +402,9 @@ session.revert_to_here: ここまで戻す
 session.revert_to_here_title: ここまで戻す
 session.reverting_message: メッセージを戻しています…
 session.reverting_message_title: メッセージを戻しています…
+session.delete_title: 会話を削除
+session.delete_message: "「%{title}」を削除してもよろしいですか？この操作は取り消せません。"
+session.delete_confirm: 削除
 
 time.yesterday_at: 昨日 %{time}
 time.weekday_at: "%{weekday} %{time}"
@@ -916,6 +952,8 @@ files.file_unavailable: ファイルを利用できません
 files.loading_editor: エディタを読み込み中
 files.preparing_editor: エディタを準備中…
 files.preparing_syntax: シンタックスハイライトを準備しています。
+files.copy_path: パスをコピー
+files.copied_path: "%{path} をクリップボードにコピーしました"
 file_picker.open_project: プロジェクトを開く
 file_picker.attach: 添付
 file_picker.daemon_folders: デーモンのフォルダ

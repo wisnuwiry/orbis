@@ -54,23 +54,37 @@ export function ModelPicker({
     onOpenSignalHandled?.()
   }, [onOpenSignalHandled, openSignal])
 
-  useEffect(() => {
-    if (!open) return
-    setQuery('')
-    setTab(session.provider)
-    setHighlight(null)
-  }, [open, session.provider])
-
   const probeMap = ({
     ...(probes.data ?? {}),
     ...(currentProbe ? { [session.provider]: currentProbe } : {}),
   }) as Partial<Record<ProviderKind, ProviderProbe>>
 
   const usable = PROVIDERS.filter(({ id }) => {
+    const installed = probeMap[id]?.installed
+    if (!installed) return false
+    const disabled = settings.data?.disabled_providers.includes(id) ?? false
+    if (disabled && lockedProvider !== id) return false
     if (lockedProvider && id !== lockedProvider) return false
-    if (id === session.provider) return true
-    return !settings.data?.disabled_providers.includes(id) && probeMap[id]?.installed
+    return true
   })
+
+  useEffect(() => {
+    if (!open) return
+    setQuery('')
+    const providerEnabled = usable.some(({ id }) => id === session.provider)
+    const fallback = providerEnabled ? session.provider : usable[0]?.id ?? 'favorites'
+    setTab(fallback)
+    setHighlight(null)
+  }, [open, session.provider, usable])
+
+  useEffect(() => {
+    if (!open || query) return
+    if (tab === 'favorites') return
+    if (usable.some(({ id }) => id === tab)) return
+    setTab(usable[0]?.id ?? 'favorites')
+    setHighlight(null)
+  }, [usable, tab, query, open])
+
   const rows = (() => {
     const normalized = query.trim().toLowerCase()
     const providers = normalized ? usable : usable.filter(({ id }) => tab === 'favorites' || id === tab)
@@ -147,37 +161,33 @@ export function ModelPicker({
         >
           <Popover.Popup
             aria-label={t('models.choose')}
-            className="padu-popover-surface flex h-[390px] w-[460px] max-w-[calc(100vw-32px)] overflow-hidden rounded-[12px] outline-none"
+            className="padu-popover-surface flex h-[332px] w-[400px] max-w-[calc(100vw-32px)] overflow-hidden rounded-[10px] outline-none"
             finalFocus={returnFocus
               ? (closeType) => closeType === 'keyboard' ? true : returnFocus.current
               : undefined}
             initialFocus={search}
             role="dialog"
           >
-          <div className="flex h-full w-[50px] shrink-0 flex-col items-center gap-1 overflow-y-auto border-r bg-background p-[5px]">
+          <div className="flex h-full w-[40px] shrink-0 flex-col items-center gap-0.5 overflow-y-auto overflow-x-hidden border-r bg-background p-1">
             <ModelTab active={tab === 'favorites' && !query} label={t('models.favorites')} onClick={() => { setTab('favorites'); setQuery(''); setHighlight(null) }}>
-              <PaduIcon className="size-[17px]" name="star" />
+              <PaduIcon className="size-[13.5px]" name="star" />
             </ModelTab>
-            <div className="my-[3px] h-px w-[34px] shrink-0 bg-border" />
-            {PROVIDERS.map((provider) => {
-              const enabled = usable.some((candidate) => candidate.id === provider.id)
-              return (
-                <ModelTab
-                  active={tab === provider.id && !query}
-                  disabled={!enabled}
-                  key={provider.id}
-                  label={provider.name}
-                  onClick={() => { setTab(provider.id); setQuery(''); setHighlight(null) }}
-                >
-                  <ProviderIcon className="size-[18px]" provider={provider.id} />
-                </ModelTab>
-              )
-            })}
+            <div className="my-[2px] h-px w-[26px] shrink-0 bg-border" />
+            {PROVIDERS.filter((provider) => usable.some((candidate) => candidate.id === provider.id)).map((provider) => (
+              <ModelTab
+                active={tab === provider.id && !query}
+                key={provider.id}
+                label={provider.name}
+                onClick={() => { setTab(provider.id); setQuery(''); setHighlight(null) }}
+              >
+                <ProviderIcon className="size-[14px]" provider={provider.id} />
+              </ModelTab>
+            ))}
           </div>
-          <div className="flex min-w-0 flex-1 flex-col bg-card">
-            <div className="h-[52px] shrink-0 px-3 pb-2 pt-2.5">
-              <label className="flex h-[34px] items-center gap-2 rounded-[9px] bg-[var(--raised)] px-2.5">
-                <PaduIcon className="size-[15px] text-[var(--text-secondary)]" name="search" />
+          <div className="flex min-w-0 flex-1 flex-col overflow-hidden bg-card">
+            <div className="h-[42px] shrink-0 px-2 pb-1.5 pt-1.5">
+              <label className="flex h-[28px] items-center gap-1.5 rounded-[7px] bg-[var(--raised)] px-2">
+                <PaduIcon className="size-[12.5px] text-[var(--text-secondary)]" name="search" />
                 <input
                   aria-activedescendant={highlight !== null && rows[highlight]
                     ? `model-${rows[highlight]!.provider}-${rows[highlight]!.model.id}`
@@ -213,7 +223,7 @@ export function ModelPicker({
                 />
               </label>
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto p-[9px]" ref={list}>
+            <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-[5px] flex flex-col gap-0.5" ref={list}>
               {!rows.length && (
                 <div className="grid h-full place-items-center text-[11.5px] text-[var(--text-ghost)]">
                   {t(query
@@ -232,9 +242,9 @@ export function ModelPicker({
                   <div
                     aria-selected={selected}
                     className={cn(
-                      'flex h-[58px] w-full items-center gap-2.5 rounded-[9px] border border-transparent px-3 text-left outline-none hover:bg-accent',
-                      selected && 'bg-accent',
-                      index === highlight && 'border-ring bg-accent',
+                      'flex h-[36px] w-full min-w-0 items-center gap-2 overflow-hidden rounded-[6px] border border-transparent px-[7px] text-left outline-none hover:bg-accent',
+                      selected && 'border-border bg-accent',
+                      index === highlight && 'border-ring/50 bg-accent',
                     )}
                     id={`model-${row.provider}-${row.model.id}`}
                     key={`${row.provider}-${row.model.id}`}
@@ -250,16 +260,19 @@ export function ModelPicker({
                     }}
                     onMouseEnter={() => setHighlight(index)}
                   >
+                    <span className="grid size-[22px] shrink-0 place-items-center rounded-[5px] bg-accent data-[selected=true]:bg-accent-foreground/10" data-selected={selected}>
+                      <ProviderIcon className="size-[11px]" provider={row.provider} />
+                    </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[13px] font-semibold">{row.model.name}</span>
-                      <span className="mt-1 flex items-center gap-1.5 truncate text-[11px] text-[var(--text-tertiary)]">
-                        <ProviderIcon className="size-[10.5px]" provider={row.provider} />
+                      <span className={cn('block truncate text-[12px] font-medium', selected ? 'text-foreground' : 'text-[var(--text-secondary)]')}>{row.model.name}</span>
+                      <span className="mt-px block truncate text-[10.5px] text-[var(--text-tertiary)]">
                         {row.model.sub_provider ?? providerMeta(row.provider).name}
                       </span>
                     </span>
+                    {selected && <PaduIcon className="size-[11px] shrink-0 text-[var(--text-tertiary)]" name="check" />}
                     <span
                       aria-label={t(favorite ? 'models.remove_favorite' : 'models.add_favorite')}
-                      className="grid size-7 shrink-0 place-items-center rounded-md hover:bg-[color:var(--foreground)]/[0.08]"
+                      className="grid size-5 shrink-0 place-items-center rounded-[4px] hover:bg-[color:var(--foreground)]/[0.08]"
                       role="button"
                       tabIndex={0}
                       onClick={(event) => { event.stopPropagation(); toggleFavorite(row.provider, row.model.id) }}
@@ -271,7 +284,7 @@ export function ModelPicker({
                         }
                       }}
                     >
-                      <PaduIcon className={cn('size-3.5 text-[var(--text-ghost)]', favorite && 'text-amber-500')} name={favorite ? 'starFilled' : 'star'} />
+                      <PaduIcon className={cn('size-2.5 text-[var(--text-ghost)] opacity-70', favorite && 'text-amber-500 opacity-100')} name={favorite ? 'starFilled' : 'star'} />
                     </span>
                   </div>
                 )
@@ -289,7 +302,7 @@ function ModelTab({ children, label, active, disabled = false, onClick }: { chil
   return (
     <button
       aria-label={label}
-      className={cn('grid size-[38px] shrink-0 place-items-center rounded-[7px] text-[var(--text-tertiary)] outline-none hover:bg-accent focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-35', active && 'bg-accent text-foreground')}
+      className={cn('grid size-[30px] shrink-0 place-items-center rounded-[6px] text-[var(--text-tertiary)] outline-none hover:bg-accent focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-35', active && 'bg-accent text-foreground')}
       disabled={disabled}
       type="button"
       onClick={onClick}

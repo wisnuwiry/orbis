@@ -3,6 +3,7 @@ import type { AgentSession, Project } from '@padu/client'
 import { useEffect, useState, type RefObject } from 'react'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { Kbd } from '@/components/ui/kbd'
 import { PaduIcon, type PaduIconName } from '@/components/padu-icon'
 import {
   commitWorkspace,
@@ -227,7 +228,7 @@ function CommitActionRow({
     >
       <PaduIcon className={cn('size-3.5 text-[var(--text-secondary)]', pending && 'motion-safe:animate-spin')} name={pending ? 'loaderCircle' : icon} />
       <span className="min-w-0 flex-1 truncate text-left">{label}</span>
-      {shortcut && <span className="text-[11px] text-[var(--text-ghost)]">{shortcut}</span>}
+      {shortcut && <Kbd size="xs" variant="outline">{shortcut}</Kbd>}
     </button>
   )
 }

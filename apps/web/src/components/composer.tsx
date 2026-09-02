@@ -1577,9 +1577,11 @@ function InteractionModeControl({
     <button
       aria-label={t('mode.switch_to', { mode: t(plan ? 'mode.build' : 'mode.plan') })}
       className={cn(
-        'flex h-6 shrink-0 items-center gap-1.5 rounded-md px-[7px] text-[11.5px] text-[var(--text-secondary)] outline-none focus-visible:ring-1 focus-visible:ring-ring',
-        plan && 'text-ring',
-        interactive ? 'hover:bg-accent' : 'opacity-50',
+        'flex h-[22px] shrink-0 items-center gap-[5px] rounded-[5px] border px-[7px] text-[11.5px] font-medium outline-none focus-visible:ring-1 focus-visible:ring-ring',
+        plan
+          ? 'border-[var(--ring)]/15 bg-[var(--ring)]/10 text-ring'
+          : 'border-transparent bg-transparent text-[var(--text-tertiary)]',
+        interactive ? (plan ? 'hover:bg-[var(--ring)]/15' : 'hover:bg-accent') : 'opacity-50',
       )}
       disabled={!interactive}
       title={
@@ -1590,7 +1592,7 @@ function InteractionModeControl({
       type="button"
       onClick={() => onPatch({ interaction_mode: plan ? 'build' : 'plan' })}
     >
-      <PaduIcon className={cn('size-[10.5px] text-[var(--text-tertiary)]', plan && 'text-ring')} name={plan ? 'list' : 'wrench'} />
+      <PaduIcon className={cn('size-[10px] text-[var(--text-tertiary)]', plan && 'text-ring')} name={plan ? 'list' : 'wrench'} />
       {t(plan ? 'mode.plan' : 'mode.build')}
     </button>
   )
