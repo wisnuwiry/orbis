@@ -54,23 +54,37 @@ export function ModelPicker({
     onOpenSignalHandled?.()
   }, [onOpenSignalHandled, openSignal])
 
-  useEffect(() => {
-    if (!open) return
-    setQuery('')
-    setTab(session.provider)
-    setHighlight(null)
-  }, [open, session.provider])
-
   const probeMap = ({
     ...(probes.data ?? {}),
     ...(currentProbe ? { [session.provider]: currentProbe } : {}),
   }) as Partial<Record<ProviderKind, ProviderProbe>>
 
   const usable = PROVIDERS.filter(({ id }) => {
+    const installed = probeMap[id]?.installed
+    if (!installed) return false
+    const disabled = settings.data?.disabled_providers.includes(id) ?? false
+    if (disabled && lockedProvider !== id) return false
     if (lockedProvider && id !== lockedProvider) return false
-    if (id === session.provider) return true
-    return !settings.data?.disabled_providers.includes(id) && probeMap[id]?.installed
+    return true
   })
+
+  useEffect(() => {
+    if (!open) return
+    setQuery('')
+    const providerEnabled = usable.some(({ id }) => id === session.provider)
+    const fallback = providerEnabled ? session.provider : usable[0]?.id ?? 'favorites'
+    setTab(fallback)
+    setHighlight(null)
+  }, [open, session.provider, usable])
+
+  useEffect(() => {
+    if (!open || query) return
+    if (tab === 'favorites') return
+    if (usable.some(({ id }) => id === tab)) return
+    setTab(usable[0]?.id ?? 'favorites')
+    setHighlight(null)
+  }, [usable, tab, query, open])
+
   const rows = (() => {
     const normalized = query.trim().toLowerCase()
     const providers = normalized ? usable : usable.filter(({ id }) => tab === 'favorites' || id === tab)
@@ -159,20 +173,16 @@ export function ModelPicker({
               <PaduIcon className="size-[13.5px]" name="star" />
             </ModelTab>
             <div className="my-[2px] h-px w-[26px] shrink-0 bg-border" />
-            {PROVIDERS.map((provider) => {
-              const enabled = usable.some((candidate) => candidate.id === provider.id)
-              return (
-                <ModelTab
-                  active={tab === provider.id && !query}
-                  disabled={!enabled}
-                  key={provider.id}
-                  label={provider.name}
-                  onClick={() => { setTab(provider.id); setQuery(''); setHighlight(null) }}
-                >
-                  <ProviderIcon className="size-[14px]" provider={provider.id} />
-                </ModelTab>
-              )
-            })}
+            {PROVIDERS.filter((provider) => usable.some((candidate) => candidate.id === provider.id)).map((provider) => (
+              <ModelTab
+                active={tab === provider.id && !query}
+                key={provider.id}
+                label={provider.name}
+                onClick={() => { setTab(provider.id); setQuery(''); setHighlight(null) }}
+              >
+                <ProviderIcon className="size-[14px]" provider={provider.id} />
+              </ModelTab>
+            ))}
           </div>
           <div className="flex min-w-0 flex-1 flex-col overflow-hidden bg-card">
             <div className="h-[42px] shrink-0 px-2 pb-1.5 pt-1.5">
