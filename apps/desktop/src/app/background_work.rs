@@ -1008,9 +1008,16 @@ impl Padu {
                     .border_color(theme.accent)
             })
             .hover(|style| style.bg(theme.overlay))
-            .when(handle.is_open(), |style| style.bg(theme.overlay_strong))
             .tooltip(Tooltip::text(tr!("open_in.choose")))
-            .child(icon("icons/chevron-down.svg", 11.0, theme.text_tertiary));
+            .child(icon(
+                if handle.is_open() {
+                    "icons/chevron-up.svg"
+                } else {
+                    "icons/chevron-down.svg"
+                },
+                11.0,
+                theme.text_tertiary,
+            ));
 
         let weak = cx.entity().downgrade();
         let menu = dropdown_menu(

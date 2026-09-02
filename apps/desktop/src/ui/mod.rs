@@ -368,7 +368,15 @@ impl RenderOnce for MenuChip {
                     .child(self.label),
             )
             .when(self.caret, |element| {
-                element.child(icon("icons/chevron-down.svg", 10.5, theme.text_ghost))
+                element.child(icon(
+                    if self.selected {
+                        "icons/chevron-up.svg"
+                    } else {
+                        "icons/chevron-down.svg"
+                    },
+                    10.5,
+                    theme.text_ghost,
+                ))
             })
     }
 }

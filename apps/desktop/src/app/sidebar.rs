@@ -1023,7 +1023,15 @@ impl Padu {
                         .text_color(theme.text_secondary)
                         .child(host_name_label),
                 )
-                .child(icon("icons/chevron-up.svg", 10.0, theme.text_ghost)),
+                .child(icon(
+                    if menu_open {
+                        "icons/chevron-down.svg"
+                    } else {
+                        "icons/chevron-up.svg"
+                    },
+                    10.0,
+                    theme.text_ghost,
+                )),
             "sidebar-host-menu",
             &menu,
             MenuAlign::AboveLeft,

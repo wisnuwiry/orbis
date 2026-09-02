@@ -13,6 +13,8 @@ export const PADU_ICONS = {
   check: 'i-padu-check',
   chevronDown: 'i-padu-chevron-down',
   chevronRight: 'i-padu-chevron-right',
+  chevronUp: 'i-padu-chevron-up',
+  chevronsUpDown: 'i-padu-chevrons-up-down',
   cloudUpload: 'i-padu-cloud-upload',
   command: 'i-padu-command',
   compose: 'i-padu-compose',

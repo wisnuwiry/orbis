@@ -1402,7 +1402,15 @@ impl Padu {
                 models = count_noun(model_count, "model")
             ))))
             .child(div().min_w_0().truncate().child(SharedString::from(label)))
-            .child(icon("icons/chevron-down.svg", 8.0, theme.text_ghost));
+            .child(icon(
+                if handle.is_open() {
+                    "icons/chevron-up.svg"
+                } else {
+                    "icons/chevron-down.svg"
+                },
+                8.0,
+                theme.text_ghost,
+            ));
 
         Some(dropdown_menu(
             trigger,
