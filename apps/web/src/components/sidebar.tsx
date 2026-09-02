@@ -331,7 +331,7 @@ export function Sidebar({
                         <span className="truncate">{label}</span>
                         {!isProjectGroup && (
                           <PaduIcon
-                            className="size-3 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"
+                            className="size-3 opacity-0 transition-opacity motion-reduce:transition-none group-hover:opacity-100 group-focus-visible:opacity-100"
                             name={row.collapsed ? 'chevronRight' : 'chevronDown'}
                           />
                         )}
@@ -669,7 +669,12 @@ function SessionRow({
             }}
           >
             <span className="flex min-w-0 w-full items-center gap-1.5 leading-[18px]">
-              <span className="min-w-0 flex-1 truncate text-[13.5px] text-foreground">
+              <span
+                className={cn(
+                  'min-w-0 flex-1 truncate text-[13.5px] text-foreground',
+                  selected && 'font-medium',
+                )}
+              >
                 {currentTitle}
               </span>
               <SessionStatus status={item.session.status} t={t} />

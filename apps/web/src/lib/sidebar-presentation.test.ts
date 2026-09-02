@@ -166,6 +166,36 @@ describe('desktop sidebar presentation', () => {
     expect(collapsedRows.some((r) => r.kind === 'session' && r.item.session.id === 's1')).toBe(false)
     expect(collapsedRows.some((r) => r.kind === 'session' && r.item.session.id === 's2')).toBe(true)
   })
+
+  test('sessionHasStarted accurately detects active, replied, or persisted sessions', () => {
+    const blank = session({ messages: [], turns: [], provider_cursor: null })
+    expect(sessionHasStarted(blank)).toBe(false)
+
+    const withMessage = session({ messages: [{ id: 'm1' } as never] })
+    expect(sessionHasStarted(withMessage)).toBe(true)
+
+    const withTurn = session({ turns: [{ id: 't1' } as never] })
+    expect(sessionHasStarted(withTurn)).toBe(true)
+  })
+
+  test('nextSidebarUpdateDelay returns 1s for working session and midnight delta for idle sessions', () => {
+    const idle = session({ status: 'idle', turns: [], last_reply_at: null })
+    expect(nextSidebarUpdateDelay([idle], 100)).toBeGreaterThan(0)
+
+    const working = session({
+      status: 'working',
+      turns: [{
+        id: 'turn',
+        turn_count: 1,
+        status: 'running',
+        provider_turn_started: true,
+        started_at: 100,
+        completed_at: null,
+        checkpoint: null,
+      }],
+    })
+    expect(nextSidebarUpdateDelay([working], 150)).toBe(1)
+  })
 })
 
 function atLocalNoon(year: number, month: number, day: number): number {
