@@ -1215,6 +1215,10 @@ pub struct Padu {
     commit_dialog: Option<commit_dialog::CommitDialogState>,
     goal_dialog: Option<goal_dialog::GoalDialogState>,
     goal_dialog_request: Option<goal_dialog::GoalDialogRequest>,
+    host_dialog: Option<host_dialog::HostDialogState>,
+    host_dialog_request: Option<host_dialog::HostDialogRequest>,
+    host_switch_pending: bool,
+    host_switch_generation: u64,
     onboarding: onboarding::OnboardingState,
     /// Goal operations accepted before the session's runtime exists. Goals
     /// attach to the provider thread, not to any turn, so `/goal` on a fresh
@@ -1607,6 +1611,7 @@ mod composer;
 mod drafts;
 mod file_search;
 mod goal_dialog;
+mod host_dialog;
 mod image_preview;
 mod onboarding;
 mod render;
@@ -1633,6 +1638,7 @@ pub use command_palette::init as init_command_palette;
 pub use commit_dialog::init as init_commit_dialog_keys;
 use components::*;
 pub use goal_dialog::init as init_goal_dialog_keys;
+pub use host_dialog::init as init_host_dialog_keys;
 pub use image_preview::init as init_image_preview_keys;
 pub use onboarding::init as init_onboarding_keys;
 pub use settings::init as init_settings_keys;
@@ -1795,6 +1801,128 @@ impl Padu {
                 cx.quit();
             }
         }
+        cx.notify();
+    }
+
+    pub(super) fn teardown_all_runtimes(&mut self) {
+        let session_ids = self.runtimes.keys().copied().collect::<Vec<_>>();
+        for session_id in session_ids {
+            self.reset_session_runtime(session_id);
+        }
+        self.session_hydrations.clear();
+        self.pending_session_activation = None;
+        self.background_work.clear();
+        self.branch_snapshots.clear();
+        self.working_trees.clear();
+        self.slash_commands.clear();
+        self.mention_files.clear();
+        self.sidebar_branch_scan_fingerprint.set(None);
+        self.sidebar_rows_fingerprint.set(None);
+        self.transcript_row_kinds_fingerprint.set(None);
+        self.transcript_navigation_turns_fingerprint.set(None);
+        self.assistant_footer_fingerprint.set(None);
+    }
+
+    pub(super) fn switch_to_host(&mut self, host_id: Option<String>, cx: &mut Context<Self>) {
+        self.save();
+
+        self.state.set_active_host(host_id.clone());
+        let _ = self.store.write_app_settings(&self.state.app_settings());
+
+        self.teardown_all_runtimes();
+
+        self.host_switch_generation = self.host_switch_generation.wrapping_add(1);
+        let generation = self.host_switch_generation;
+        self.host_switch_pending = true;
+        cx.notify();
+
+        let profile = host_id
+            .as_ref()
+            .and_then(|id| self.state.hosts.iter().find(|h| &h.id == id))
+            .cloned();
+
+        cx.spawn(async move |this, cx| {
+            let result = cx
+                .background_executor()
+                .spawn(async move {
+                    match profile {
+                        None => crate::daemon::start_process(),
+                        Some(p) => {
+                            let token = p.token.unwrap_or_default();
+                            padu_client::DaemonSupervisor::connect(&p.address, token)
+                        }
+                    }
+                })
+                .await;
+
+            this.update(cx, |this, cx| {
+                if this.host_switch_generation != generation {
+                    return;
+                }
+                this.host_switch_pending = false;
+                match result {
+                    Ok(daemon) => {
+                        this.apply_new_daemon(daemon, cx);
+                    }
+                    Err(error) => {
+                        this.show_toast(tr!("host.connection_failed", error = error.to_string()));
+                        this.state.set_active_host(None);
+                        let _ = this.store.write_app_settings(&this.state.app_settings());
+                        cx.notify();
+                    }
+                }
+            })
+            .ok();
+        })
+        .detach();
+    }
+
+    fn apply_new_daemon(&mut self, daemon: padu_client::DaemonSupervisor, cx: &mut Context<Self>) {
+        self.daemon = daemon.clone();
+        self.store = StateStore::remote(daemon.clone());
+        self.composer_draft_store = ComposerDraftStore::remote(daemon.clone());
+        self.composer_drafts = self.composer_draft_store.load().unwrap_or_default();
+
+        let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+        let mut new_state = self.store.load_or_fresh(cwd);
+        new_state.apply_daemon_settings(daemon.settings());
+
+        // Carry over desktop-owned settings
+        new_state.hosts = self.state.hosts.clone();
+        new_state.active_host_id = self.state.active_host_id.clone();
+        new_state.analytics_enabled = self.state.analytics_enabled;
+        new_state.favorite_models = self.state.favorite_models.clone();
+        new_state.theme = self.state.theme;
+        new_state.language = self.state.language;
+        new_state.ui_font_size = self.state.ui_font_size;
+        new_state.code_font_size = self.state.code_font_size;
+        new_state.daemon_exposure = self.state.daemon_exposure.clone();
+        new_state.open_in_app = self.state.open_in_app.clone();
+        new_state.sidebar_visible = self.state.sidebar_visible;
+        new_state.right_panel_visible = self.state.right_panel_visible;
+        new_state.sidebar_width = self.state.sidebar_width;
+        new_state.right_panel_width = self.state.right_panel_width;
+        new_state.sidebar_grouping = self.state.sidebar_grouping;
+        new_state.sidebar_ordering = self.state.sidebar_ordering;
+        new_state.markdown_preview = self.state.markdown_preview;
+        new_state.window_state = self.state.window_state;
+        new_state.has_completed_onboarding = self.state.has_completed_onboarding;
+
+        if let Some(id) = &new_state.active_host_id {
+            if let Some(profile) = new_state.hosts.iter_mut().find(|h| &h.id == id) {
+                profile.last_connected_at = Some(unix_time());
+            }
+        }
+
+        self.state = new_state;
+
+        let row_count = self.transcript_row_count();
+        self.reset_transcript_rows(row_count);
+
+        self.restart_task_state_sync();
+        self.refresh_composer_sources(cx);
+        self.refresh_provider_detection(None);
+
         cx.notify();
     }
 
@@ -2825,6 +2953,10 @@ impl Padu {
                 commit_dialog: None,
                 goal_dialog: None,
                 goal_dialog_request: None,
+                host_dialog: None,
+                host_dialog_request: None,
+                host_switch_pending: false,
+                host_switch_generation: 0,
                 onboarding,
                 pending_goal_operations: HashMap::new(),
                 goal_runtime_starts: HashSet::new(),

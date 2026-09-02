@@ -624,31 +624,225 @@ impl Padu {
         cx.notify();
     }
 
+    fn render_remote_hosts_section(&self, cx: &mut Context<Self>) -> Div {
+        let theme = Theme::current(cx);
+        let hosts = &self.state.hosts;
+        let active_host_id = self.state.active_host_id.as_deref();
+
+        div()
+            .px(px(20.0))
+            .py(px(15.0))
+            .rounded(px(13.0))
+            .bg(theme.raised)
+            .child(
+                div()
+                    .flex()
+                    .items_center()
+                    .justify_between()
+                    .child(
+                        div()
+                            .text_size(sp(13.5))
+                            .font_weight(FontWeight::MEDIUM)
+                            .text_color(theme.text)
+                            .child(tr!("host.remote_hosts")),
+                    )
+                    .child(
+                        div()
+                            .id("add-remote-host-btn")
+                            .tab_index(0)
+                            .h(px(27.0))
+                            .px(px(9.0))
+                            .rounded(px(6.0))
+                            .border_1()
+                            .border_color(theme.border_strong)
+                            .flex()
+                            .items_center()
+                            .gap(px(4.0))
+                            .cursor_pointer()
+                            .text_size(sp(12.5))
+                            .text_color(theme.text_secondary)
+                            .hover(|e| e.bg(theme.overlay))
+                            .focus_visible(|style| style.border_color(theme.accent))
+                            .child(icon("icons/plus.svg", 12.0, theme.text_secondary))
+                            .child(tr!("host.add_host"))
+                            .on_click(cx.listener(|this, _, _, cx| {
+                                this.request_host_dialog(None, cx);
+                            }))
+                            .on_key_down(cx.listener(|this, event: &KeyDownEvent, _, cx| {
+                                if !event.keystroke.modifiers.modified()
+                                    && matches!(event.keystroke.key.as_str(), "enter" | "space")
+                                {
+                                    this.request_host_dialog(None, cx);
+                                    cx.stop_propagation();
+                                }
+                            })),
+                    ),
+            )
+            .child(if hosts.is_empty() {
+                div()
+                    .mt(px(10.0))
+                    .text_size(sp(12.5))
+                    .text_color(theme.text_tertiary)
+                    .child(tr!("host.no_remote_hosts"))
+            } else {
+                div()
+                    .mt(px(10.0))
+                    .flex()
+                    .flex_col()
+                    .gap(px(8.0))
+                    .children(hosts.iter().map(|host| {
+                        let host_id = host.id.clone();
+                        let is_active = active_host_id == Some(&host.id);
+                        let edit_id = host_id.clone();
+                        let switch_id = host_id.clone();
+                        div()
+                            .id(SharedString::from(format!("remote-host-{}", host.id)))
+                            .h(px(44.0))
+                            .px(px(12.0))
+                            .rounded(px(8.0))
+                            .bg(theme.surface)
+                            .border_1()
+                            .border_color(if is_active {
+                                theme.accent
+                            } else {
+                                theme.border
+                            })
+                            .flex()
+                            .items_center()
+                            .justify_between()
+                            .child(
+                                div()
+                                    .flex()
+                                    .items_center()
+                                    .gap(px(8.0))
+                                    .min_w_0()
+                                    .flex_1()
+                                    .child(icon(
+                                        "icons/server.svg",
+                                        14.0,
+                                        if is_active {
+                                            theme.accent
+                                        } else {
+                                            theme.text_secondary
+                                        },
+                                    ))
+                                    .child(
+                                        div()
+                                            .min_w_0()
+                                            .flex()
+                                            .flex_col()
+                                            .child(
+                                                div()
+                                                    .text_size(sp(13.0))
+                                                    .font_weight(FontWeight::MEDIUM)
+                                                    .text_color(theme.text)
+                                                    .truncate()
+                                                    .child(host.display_name().to_string()),
+                                            )
+                                            .child(
+                                                div()
+                                                    .text_size(sp(11.5))
+                                                    .text_color(theme.text_tertiary)
+                                                    .truncate()
+                                                    .child(host.address.clone()),
+                                            ),
+                                    ),
+                            )
+                            .child(
+                                div()
+                                    .flex()
+                                    .items_center()
+                                    .gap(px(6.0))
+                                    .when(!is_active, |row| {
+                                        let switch_id = switch_id.clone();
+                                        row.child(
+                                            div()
+                                                .id(SharedString::from(format!(
+                                                    "connect-host-{}",
+                                                    switch_id
+                                                )))
+                                                .tab_index(0)
+                                                .h(px(26.0))
+                                                .px(px(8.0))
+                                                .rounded(px(5.0))
+                                                .border_1()
+                                                .border_color(theme.border_strong)
+                                                .flex()
+                                                .items_center()
+                                                .cursor_pointer()
+                                                .text_size(sp(12.0))
+                                                .text_color(theme.text_secondary)
+                                                .hover(|e| e.bg(theme.overlay))
+                                                .child(tr!("host.connect"))
+                                                .on_click(cx.listener(move |this, _, _, cx| {
+                                                    this.switch_to_host(
+                                                        Some(switch_id.clone()),
+                                                        cx,
+                                                    );
+                                                })),
+                                        )
+                                    })
+                                    .child(
+                                        div()
+                                            .id(SharedString::from(format!(
+                                                "edit-host-{}",
+                                                edit_id
+                                            )))
+                                            .tab_index(0)
+                                            .h(px(26.0))
+                                            .px(px(8.0))
+                                            .rounded(px(5.0))
+                                            .border_1()
+                                            .border_color(theme.border_strong)
+                                            .flex()
+                                            .items_center()
+                                            .cursor_pointer()
+                                            .text_size(sp(12.0))
+                                            .text_color(theme.text_secondary)
+                                            .hover(|e| e.bg(theme.overlay))
+                                            .child(tr!("common.edit"))
+                                            .on_click(cx.listener(move |this, _, _, cx| {
+                                                this.request_host_dialog(Some(edit_id.clone()), cx);
+                                            })),
+                                    ),
+                            )
+                    }))
+            })
+    }
+
     fn render_daemon_settings(&self, cx: &mut Context<Self>) -> AnyElement {
         let theme = Theme::current(cx);
         if self.daemon.is_remote() {
             return div()
                 .mt(px(15.0))
                 .w_full()
-                .px(px(20.0))
-                .py(px(16.0))
-                .rounded(px(13.0))
-                .bg(theme.raised)
+                .flex()
+                .flex_col()
+                .gap(px(12.0))
                 .child(
                     div()
-                        .text_size(sp(13.5))
-                        .font_weight(FontWeight::MEDIUM)
-                        .text_color(theme.text)
-                        .child(tr!("daemon.external_title")),
+                        .w_full()
+                        .px(px(20.0))
+                        .py(px(16.0))
+                        .rounded(px(13.0))
+                        .bg(theme.raised)
+                        .child(
+                            div()
+                                .text_size(sp(13.5))
+                                .font_weight(FontWeight::MEDIUM)
+                                .text_color(theme.text)
+                                .child(tr!("daemon.external_title")),
+                        )
+                        .child(
+                            div()
+                                .mt(px(5.0))
+                                .text_size(sp(12.5))
+                                .line_height(sp(18.0))
+                                .text_color(theme.text_secondary)
+                                .child(tr!("daemon.external_description")),
+                        ),
                 )
-                .child(
-                    div()
-                        .mt(px(5.0))
-                        .text_size(sp(12.5))
-                        .line_height(sp(18.0))
-                        .text_color(theme.text_secondary)
-                        .child(tr!("daemon.external_description")),
-                )
+                .child(self.render_remote_hosts_section(cx))
                 .into_any_element();
         }
 
@@ -1157,6 +1351,7 @@ impl Padu {
                         ),
                 )
             })
+            .child(self.render_remote_hosts_section(cx))
             .into_any_element()
     }
 

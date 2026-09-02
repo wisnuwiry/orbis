@@ -978,6 +978,112 @@ impl Padu {
         }
     }
 
+    fn render_sidebar_host_button(&self, cx: &mut Context<Self>) -> AnyElement {
+        let theme = Theme::current(cx);
+        let menu = self.menu_handle("sidebar-host", cx);
+        let menu_open = menu.is_open();
+        let weak = cx.entity().downgrade();
+        let is_local_active = self.state.is_local_host();
+        let active_display_name = self.state.active_host_display_name(&self.daemon_hostname);
+        let hosts = self.state.hosts.clone();
+        let active_host_id = self.state.active_host_id.clone();
+        let is_connecting = self.host_switch_pending;
+
+        let host_name_label = if is_connecting {
+            tr!("host.connecting")
+        } else {
+            active_display_name
+        };
+
+        dropdown_menu(
+            div()
+                .id("sidebar-host-button")
+                .tab_index(0)
+                .focus_visible(|style| style.border_1().border_color(theme.accent))
+                .h(px(26.0))
+                .px(px(6.0))
+                .rounded(px(6.0))
+                .flex_none()
+                .flex()
+                .items_center()
+                .gap(px(5.0))
+                .cursor_pointer()
+                .when(menu_open, |element| element.bg(theme.overlay_strong))
+                .hover(|element| element.bg(theme.overlay))
+                .active(|element| element.bg(theme.overlay_strong))
+                .tooltip(Tooltip::text(tr!("host.switch_host")))
+                .child(icon("icons/server.svg", 13.0, theme.text_tertiary))
+                .child(
+                    div()
+                        .max_w(px(100.0))
+                        .min_w_0()
+                        .truncate()
+                        .text_size(sp(12.0))
+                        .text_color(theme.text_secondary)
+                        .child(host_name_label),
+                )
+                .child(icon("icons/chevron-up.svg", 10.0, theme.text_ghost)),
+            "sidebar-host-menu",
+            &menu,
+            MenuAlign::AboveLeft,
+            move |_| {
+                let mut items = vec![MenuItem::Header(tr!("host.hosts").into())];
+
+                let local_weak = weak.clone();
+                items.push(
+                    MenuItem::new(tr!("host.local"), move |_, cx| {
+                        let _ = local_weak.update(cx, |this, cx| {
+                            this.switch_to_host(None, cx);
+                        });
+                    })
+                    .icon("icons/server.svg")
+                    .selected(is_local_active),
+                );
+
+                for host in &hosts {
+                    let host_id = host.id.clone();
+                    let host_weak = weak.clone();
+                    let is_selected = active_host_id.as_deref() == Some(&host.id);
+                    items.push(
+                        MenuItem::new(host.display_name().to_string(), move |_, cx| {
+                            let _ = host_weak.update(cx, |this, cx| {
+                                this.switch_to_host(Some(host_id.clone()), cx);
+                            });
+                        })
+                        .icon("icons/server.svg")
+                        .selected(is_selected),
+                    );
+                }
+
+                items.push(MenuItem::Separator);
+
+                let add_weak = weak.clone();
+                items.push(
+                    MenuItem::new(tr!("host.add_host"), move |_, cx| {
+                        let _ = add_weak.update(cx, |this, cx| {
+                            this.request_host_dialog(None, cx);
+                        });
+                    })
+                    .icon("icons/plus.svg"),
+                );
+
+                let settings_weak = weak.clone();
+                items.push(
+                    MenuItem::new(tr!("host.settings"), move |window, cx| {
+                        let _ = settings_weak.update(cx, |this, cx| {
+                            this.open_settings_action(&OpenSettings, window, cx);
+                            this.open_settings_page(SettingsPage::Daemon, cx);
+                        });
+                    })
+                    .icon("icons/settings.svg"),
+                );
+
+                items
+            },
+        )
+        .into_any_element()
+    }
+
     fn render_sidebar_footer(&self, cx: &mut Context<Self>) -> Div {
         let theme = Theme::current(cx);
         div()
@@ -1017,6 +1123,7 @@ impl Padu {
                         }
                     })),
             )
+            .child(self.render_sidebar_host_button(cx))
             .child(div().flex_1())
             .child(
                 div()
