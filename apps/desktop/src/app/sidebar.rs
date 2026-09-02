@@ -2520,7 +2520,7 @@ impl Padu {
                 .justify_center()
                 .px_8()
                 .pb(px(46.0))
-                .child(icon("icons/logo.svg", 32.0, theme.text))
+                .child(icon("icons/logo.svg", 64.0, theme.text))
                 .child(
                     div()
                         .mt(px(16.0))
@@ -2690,7 +2690,7 @@ impl Padu {
             .justify_center()
             .px_8()
             .pb(px(52.0))
-            .child(icon("icons/logo.svg", 28.0, theme.text))
+            .child(icon("icons/logo.svg", 56.0, theme.text))
             .child(
                 div()
                     .mt(px(14.0))
