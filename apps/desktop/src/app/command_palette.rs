@@ -34,14 +34,14 @@ const MESSAGE_SEARCH_LIMIT: usize = 50;
 const MESSAGE_SEARCH_CACHE_CAPACITY: usize = 24;
 const PAGE_STEP: isize = 7;
 const MESSAGE_SEARCH_DEBOUNCE: Duration = Duration::from_millis(90);
-const SEARCH_ROW_HEIGHT: f32 = 60.0;
-const SECTION_HEADER_HEIGHT: f32 = 30.0;
-const PROVIDER_SECTION_TOP_MARGIN: f32 = 8.0;
-const RESULT_ROW_HEIGHT: f32 = 44.0;
-const CONTENT_RESULT_ROW_HEIGHT: f32 = 60.0;
-const EMPTY_RESULTS_HEIGHT: f32 = 180.0;
-const RESULTS_BOTTOM_PADDING: f32 = 8.0;
-const MAX_CARD_HEIGHT: f32 = 480.0;
+const SEARCH_ROW_HEIGHT: f32 = 52.0;
+const SECTION_HEADER_HEIGHT: f32 = 26.0;
+const PROVIDER_SECTION_TOP_MARGIN: f32 = 6.0;
+const RESULT_ROW_HEIGHT: f32 = 40.0;
+const CONTENT_RESULT_ROW_HEIGHT: f32 = 54.0;
+const EMPTY_RESULTS_HEIGHT: f32 = 160.0;
+const RESULTS_BOTTOM_PADDING: f32 = 6.0;
+const MAX_CARD_HEIGHT: f32 = 440.0;
 
 /// Bind list navigation beneath the focused one-line input. This is registered
 /// after the input's bindings, although the more-specific key context would
@@ -1698,8 +1698,8 @@ impl Padu {
             .flex_none()
             .overflow_y_scroll()
             .track_scroll(&self.command_palette.scroll)
-            .px(px(8.0))
-            .pb(px(8.0));
+            .px(px(6.0))
+            .pb(px(6.0));
 
         if show_placeholder_state {
             let error = resume_view
@@ -1734,7 +1734,7 @@ impl Padu {
                     false,
                 )
             };
-            let empty_icon = icon(icon_path, 18.0, theme.text_ghost);
+            let empty_icon = icon(icon_path, 16.0, theme.text_ghost);
             results = results.child(
                 div()
                     .h(px(EMPTY_RESULTS_HEIGHT))
@@ -1749,8 +1749,8 @@ impl Padu {
                     })
                     .child(
                         div()
-                            .mt(px(12.0))
-                            .text_size(sp(13.0))
+                            .mt(px(10.0))
+                            .text_size(sp(12.5))
                             .font_weight(FontWeight::MEDIUM)
                             .text_color(theme.text_secondary)
                             .child(title),
@@ -1758,9 +1758,9 @@ impl Padu {
                     .when_some(hint, |empty, hint| {
                         empty.child(
                             div()
-                                .max_w(px(540.0))
-                                .mt(px(5.0))
-                                .text_size(sp(12.5))
+                                .max_w(px(520.0))
+                                .mt(px(4.0))
+                                .text_size(sp(12.0))
                                 .text_color(theme.text_tertiary)
                                 .child(hint),
                         )
@@ -1831,11 +1831,11 @@ impl Padu {
                         results = results.child(
                             div()
                                 .h(px(SECTION_HEADER_HEIGHT))
-                                .px(px(9.0))
-                                .pt(px(10.0))
+                                .px(px(8.0))
+                                .pt(px(8.0))
                                 .flex()
                                 .items_center()
-                                .text_size(sp(12.5))
+                                .text_size(sp(12.0))
                                 .font_weight(FontWeight::MEDIUM)
                                 .text_color(theme.text_tertiary)
                                 .child(item.section.label()),
@@ -1876,8 +1876,8 @@ impl Padu {
                             |row| row.mt(px(PROVIDER_SECTION_TOP_MARGIN)),
                         )
                         .h(px(command_palette_row_height(item)))
-                        .px(px(11.0))
-                        .rounded(px(9.0))
+                        .px(px(10.0))
+                        .rounded(px(8.0))
                         .border_1()
                         .border_color(if highlighted {
                             theme.border_strong
@@ -1886,7 +1886,7 @@ impl Padu {
                         })
                         .flex()
                         .items_center()
-                        .gap(px(10.0))
+                        .gap(px(8.0))
                         .cursor_pointer()
                         .when(highlighted, |row| row.bg(theme.overlay_strong))
                         .hover(|row| row.bg(theme.overlay))
@@ -1902,15 +1902,15 @@ impl Padu {
                         }))
                         .child(
                             div()
-                                .size(px(20.0))
+                                .size(px(18.0))
                                 .flex_none()
                                 .flex()
                                 .items_center()
                                 .justify_center()
                                 .child(if importing {
-                                    motion::spin(icon("icons/loader-circle.svg", 16.0, icon_color))
+                                    motion::spin(icon("icons/loader-circle.svg", 14.0, icon_color))
                                 } else {
-                                    icon(icon_path, 16.0, icon_color).into_any_element()
+                                    icon(icon_path, 14.0, icon_color).into_any_element()
                                 }),
                         )
                         .child(
@@ -1931,7 +1931,7 @@ impl Padu {
                                             div()
                                                 .min_w_0()
                                                 .truncate()
-                                                .text_size(sp(14.0))
+                                                .text_size(sp(13.0))
                                                 .font_weight(if highlighted {
                                                     FontWeight::MEDIUM
                                                 } else {
@@ -1949,7 +1949,7 @@ impl Padu {
                                                 div()
                                                     .min_w_0()
                                                     .truncate()
-                                                    .text_size(sp(12.5))
+                                                    .text_size(sp(12.0))
                                                     .text_color(theme.text_tertiary)
                                                     .child(detail),
                                             )
@@ -1962,7 +1962,7 @@ impl Padu {
                                             .w_full()
                                             .overflow_hidden()
                                             .whitespace_nowrap()
-                                            .text_size(sp(12.5))
+                                            .text_size(sp(12.0))
                                             .child(palette_content_match_text(
                                                 &matched,
                                                 &search_query,
@@ -1975,16 +1975,16 @@ impl Padu {
                         .when_some(shortcut, |row, shortcut| {
                             row.child(
                                 div()
-                                    .h(px(22.0))
-                                    .min_w(px(28.0))
-                                    .px(px(7.0))
-                                    .rounded(px(7.0))
+                                    .h(px(20.0))
+                                    .min_w(px(24.0))
+                                    .px(px(6.0))
+                                    .rounded(px(6.0))
                                     .flex_none()
                                     .flex()
                                     .items_center()
                                     .justify_center()
                                     .bg(theme.overlay_strong)
-                                    .text_size(sp(12.5))
+                                    .text_size(sp(12.0))
                                     .text_color(theme.text_tertiary)
                                     .child(shortcut),
                             )
@@ -2023,10 +2023,10 @@ impl Padu {
                     this.dismiss_command_palette(window, cx)
                 }))
                 .w_full()
-                .max_w(px(680.0))
+                .max_w(px(640.0))
                 .h(px(card_height))
                 .overflow_hidden()
-                .rounded(px(15.0))
+                .rounded(px(12.0))
                 .bg(theme.raised)
                 .shadow_xl()
                 .relative()
@@ -2036,16 +2036,16 @@ impl Padu {
                 .child(
                     div()
                         .h(px(SEARCH_ROW_HEIGHT))
-                        .px(px(19.0))
+                        .px(px(16.0))
                         .flex_none()
                         .flex()
                         .items_center()
-                        .gap(px(12.0))
+                        .gap(px(10.0))
                         .border_b_1()
                         .border_color(theme.border)
-                        .text_size(sp(15.5))
+                        .text_size(sp(14.0))
                         .text_color(theme.text)
-                        .child(icon("icons/search.svg", 16.0, theme.text_tertiary))
+                        .child(icon("icons/search.svg", 14.0, theme.text_tertiary))
                         .child(
                             div()
                                 .min_w_0()
