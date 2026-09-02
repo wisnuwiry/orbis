@@ -1169,43 +1169,34 @@ onboarding.get_started: 开始使用
 onboarding.command_title: 欢迎导览与新手入门
 onboarding.replay_button: 重新播放导览
 
-onboarding.slide1_badge: 多智能体中心
-onboarding.slide1_title: 原生多智能体控制台
-onboarding.slide1_desc: Padu 通过结构化协议流直接连接您常用的本地智能体 CLI，无需任何云端中转。
-onboarding.slide1_item1_title: 广泛的 CLI 支持
-onboarding.slide1_item1_desc: 无缝运行 Claude Code、Codex CLI、Cursor CLI、Amp、OpenCode、Grok、Kimi、Pi 与 Fx。
-onboarding.slide1_item2_title: 自动发现
-onboarding.slide1_item2_desc: 自动探测已安装的智能体 CLI 并管理认证与会话状态。
-onboarding.slide1_item3_title: 高性能原生 GUI
-onboarding.slide1_item3_desc: 基于 Rust 与 GPUI 构建，带来流畅的 120Hz 渲染和极低资源占用。
+onboarding.slide1_badge: 欢迎
+onboarding.slide1_title: 欢迎使用 Padu
+onboarding.slide1_desc: 极速的原生控制台，直接连接您常用的本地 AI 编程智能体。
+onboarding.slide1_item1_title: 多智能体支持
+onboarding.slide1_item1_desc: 无缝运行 Claude Code、Codex、Cursor、OpenCode 等，零云端中转。
+onboarding.slide1_item2_title: 原生极速与流畅
+onboarding.slide1_item2_desc: 基于 Rust 与 GPUI 构建，带来即时响应和流畅的 120 FPS 渲染。
+onboarding.slide1_item3_title: 100% 本地与隐私
+onboarding.slide1_item3_desc: 您的代码、转录记录与凭证安全地保存在本地设备中。
 
-onboarding.slide2_badge: 工作区与控制
-onboarding.slide2_title: 多会话工作区与实时引导
-onboarding.slide2_desc: 轻松组织管理多个项目，并在智能体执行过程中保持实时掌控。
+onboarding.slide2_badge: 工作流
+onboarding.slide2_title: 实时引导、检查与掌控
+onboarding.slide2_desc: 借助交互式工具与实时反馈，全面掌控智能体的执行过程。
 onboarding.slide2_item1_title: 实时引导与消息队列
 onboarding.slide2_item1_desc: 在不中断当前任务的情况下，将后续指令加入队列或中途调整智能体方向。
-onboarding.slide2_item2_title: 线程目标与斜杠命令
-onboarding.slide2_item2_desc: 使用 /goal 设定宏观目标，并执行内置的斜杠命令工作流。
-onboarding.slide2_item3_title: 灵活的模型选择
-onboarding.slide2_item3_desc: 随时调整思考力度、切换提供商模型并选择服务层级。
+onboarding.slide2_item2_title: 实时差异与检查点
+onboarding.slide2_item2_desc: 并排审查实时代码修改，并随时将工作目录回退到历史检查点。
+onboarding.slide2_item3_title: 命令面板 (Cmd/Ctrl + K)
+onboarding.slide2_item3_desc: 通过极速键盘搜索快速跳转任务、触发操作或配置设置。
 
-onboarding.slide3_badge: 差异比对与检查点
-onboarding.slide3_title: 代码变更检查与即时 Git 回退
-onboarding.slide3_desc: 凭借可视化的代码差异与对话检查点，放心地让智能体协助修改代码。
-onboarding.slide3_item1_title: 可折叠右侧面板 (Cmd/Ctrl + B)
-onboarding.slide3_item1_desc: 在智能体编辑文件时，实时以并排或内联方式审查代码差异。
-onboarding.slide3_item2_title: 对话感知检查点
-onboarding.slide3_item2_desc: 随时将工作目录回退到之前的任意消息节点，或派生出新会话分支。
-onboarding.slide3_item3_title: 内置终端与文件预览
-onboarding.slide3_item3_desc: 无需离开 Padu 即可实时渲染 Markdown 预览并使用集成终端。
+onboarding.slide3_badge: 开始使用
+onboarding.slide3_title: 准备好开启高效编程了吗？
+onboarding.slide3_desc: 一切准备就绪，选择您想要开启的方式：
+onboarding.slide3_item1_title: 打开项目文件夹
+onboarding.slide3_item1_desc: 添加现有的 Git 仓库或本地工作区，立即开始与智能体协作。
+onboarding.slide3_item2_title: 快速草稿模式
+onboarding.slide3_item2_desc: 无需项目即可立即开始，适合快速提问、编写脚本与灵感原型。
+onboarding.slide3_item3_title: 随心切换模型
+onboarding.slide3_item3_desc: 随时通过 Cmd/Ctrl + / 选择提供商与模型，并调节思考力度。
 
-onboarding.slide4_badge: 生产力与隐私
-onboarding.slide4_title: 键盘极速操作，100% 本地存储
-onboarding.slide4_desc: Padu 采用键盘优先设计，并对您的专有代码提供完全的本地隐私保护。
-onboarding.slide4_item1_title: 命令面板 (Cmd/Ctrl + K)
-onboarding.slide4_item1_desc: 通过模糊搜索快速跳转会话、执行命令或配置设置。
-onboarding.slide4_item2_title: 快速任务切换 (Cmd/Ctrl + T / Ctrl + Tab)
-onboarding.slide4_item2_desc: 在活跃的智能体对话与后台任务之间瞬间切换。
-onboarding.slide4_item3_title: 100% 本地优先
-onboarding.slide4_item3_desc: 所有项目、转录记录与配置均保存在本地 ~/.padu，无需任何外部账户。
 

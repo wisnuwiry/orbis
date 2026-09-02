@@ -74,6 +74,13 @@ function ConnectedSettings({
         to: '/',
         search: { session: sessionId },
       })}
+      onOpenOnboarding={() => {
+        try { localStorage.setItem('padu.open-onboarding', '1') } catch { /* noop */ }
+        void navigate({
+          to: '/',
+          search: { session: sessionId },
+        })
+      }}
       onPageChange={(next) => void navigate({
         to: '/settings/$page',
         params: { page: next },

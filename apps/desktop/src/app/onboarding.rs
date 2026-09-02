@@ -16,7 +16,7 @@ actions!(
 );
 
 pub const ONBOARDING_CONTEXT: &str = "OnboardingModal";
-pub const TOTAL_ONBOARDING_STEPS: usize = 4;
+pub const TOTAL_ONBOARDING_STEPS: usize = 3;
 const MODAL_WIDTH: f32 = 540.0;
 
 pub fn init(cx: &mut App) {
@@ -127,7 +127,7 @@ impl Padu {
         let theme = Theme::current(cx);
         let step = self.onboarding.current_step;
 
-        // Slide Data
+        // Slide Data: 3 focused, simplified steps
         let (badge, title, desc, _icon_path, items) = match step {
             0 => (
                 tr!("onboarding.slide1_badge"),
@@ -136,17 +136,17 @@ impl Padu {
                 "icons/bot.svg",
                 [
                     (
-                        "icons/sparkle.svg",
+                        "icons/bot.svg",
                         tr!("onboarding.slide1_item1_title"),
                         tr!("onboarding.slide1_item1_desc"),
                     ),
                     (
-                        "icons/wrench.svg",
+                        "icons/zap.svg",
                         tr!("onboarding.slide1_item2_title"),
                         tr!("onboarding.slide1_item2_desc"),
                     ),
                     (
-                        "icons/zap.svg",
+                        "icons/lock.svg",
                         tr!("onboarding.slide1_item3_title"),
                         tr!("onboarding.slide1_item3_desc"),
                     ),
@@ -156,7 +156,7 @@ impl Padu {
                 tr!("onboarding.slide2_badge"),
                 tr!("onboarding.slide2_title"),
                 tr!("onboarding.slide2_desc"),
-                "icons/compose.svg",
+                "icons/queue.svg",
                 [
                     (
                         "icons/queue.svg",
@@ -164,60 +164,37 @@ impl Padu {
                         tr!("onboarding.slide2_item1_desc"),
                     ),
                     (
-                        "icons/target.svg",
+                        "icons/file-diff.svg",
                         tr!("onboarding.slide2_item2_title"),
                         tr!("onboarding.slide2_item2_desc"),
                     ),
                     (
-                        "icons/gauge.svg",
+                        "icons/command.svg",
                         tr!("onboarding.slide2_item3_title"),
                         tr!("onboarding.slide2_item3_desc"),
                     ),
                 ],
             ),
-            2 => (
+            _ => (
                 tr!("onboarding.slide3_badge"),
                 tr!("onboarding.slide3_title"),
                 tr!("onboarding.slide3_desc"),
-                "icons/file-diff.svg",
+                "icons/folder.svg",
                 [
                     (
-                        "icons/panel-right.svg",
+                        "icons/folder.svg",
                         tr!("onboarding.slide3_item1_title"),
                         tr!("onboarding.slide3_item1_desc"),
                     ),
                     (
-                        "icons/rewind.svg",
+                        "icons/sparkle.svg",
                         tr!("onboarding.slide3_item2_title"),
                         tr!("onboarding.slide3_item2_desc"),
                     ),
                     (
-                        "icons/terminal.svg",
+                        "icons/target.svg",
                         tr!("onboarding.slide3_item3_title"),
                         tr!("onboarding.slide3_item3_desc"),
-                    ),
-                ],
-            ),
-            _ => (
-                tr!("onboarding.slide4_badge"),
-                tr!("onboarding.slide4_title"),
-                tr!("onboarding.slide4_desc"),
-                "icons/command.svg",
-                [
-                    (
-                        "icons/search.svg",
-                        tr!("onboarding.slide4_item1_title"),
-                        tr!("onboarding.slide4_item1_desc"),
-                    ),
-                    (
-                        "icons/corner-down-right.svg",
-                        tr!("onboarding.slide4_item2_title"),
-                        tr!("onboarding.slide4_item2_desc"),
-                    ),
-                    (
-                        "icons/lock.svg",
-                        tr!("onboarding.slide4_item3_title"),
-                        tr!("onboarding.slide4_item3_desc"),
                     ),
                 ],
             ),
@@ -227,7 +204,7 @@ impl Padu {
         let mut step_pills = div().flex().items_center().gap(px(5.0));
         for i in 0..TOTAL_ONBOARDING_STEPS {
             let is_active = i == step;
-            let width = if is_active { px(22.0) } else { px(6.0) };
+            let width = if is_active { px(24.0) } else { px(7.0) };
             let color = if is_active {
                 theme.accent
             } else {
@@ -274,22 +251,28 @@ impl Padu {
                     }),
             );
 
-        // Hero Typography Section with generous whitespace
+        // Hero Typography Section with category badge chip
+        let badge_chip = div()
+            .flex()
+            .items_center()
+            .px(px(8.0))
+            .py(px(2.5))
+            .rounded_full()
+            .bg(theme.accent.opacity(0.12))
+            .text_size(sp(11.0))
+            .font_weight(FontWeight::SEMIBOLD)
+            .text_color(theme.accent)
+            .child(badge);
+
         let hero_section = div()
             .flex()
             .flex_col()
-            .mt(px(20.0))
-            .mb(px(24.0))
+            .mt(px(18.0))
+            .mb(px(22.0))
+            .child(div().flex().child(badge_chip))
             .child(
                 div()
-                    .text_size(sp(11.0))
-                    .font_weight(FontWeight::SEMIBOLD)
-                    .text_color(theme.accent)
-                    .child(badge),
-            )
-            .child(
-                div()
-                    .mt(px(4.0))
+                    .mt(px(8.0))
                     .text_size(sp(20.0))
                     .font_weight(FontWeight::BOLD)
                     .text_color(theme.text)
@@ -297,25 +280,33 @@ impl Padu {
             )
             .child(
                 div()
-                    .mt(px(8.0))
+                    .mt(px(6.0))
                     .text_size(sp(13.0))
                     .line_height(sp(19.0))
                     .text_color(theme.text_secondary)
                     .child(desc),
             );
 
-        // Feature items: clean, borderless list with airy spacing
-        let mut items_col = div().flex().flex_col().gap(px(16.0)).w_full();
+        // Feature items: structured list with polished icon containers
+        let mut items_col = div().flex().flex_col().gap(px(14.0)).w_full();
         for (item_icon, item_title, item_desc) in items {
             let row = div()
                 .flex()
                 .items_start()
-                .gap(px(13.0))
-                .child(div().pt(px(2.0)).flex_none().child(icon(
-                    item_icon,
-                    15.0,
-                    theme.text_secondary,
-                )))
+                .gap(px(12.0))
+                .child(
+                    div()
+                        .size(px(28.0))
+                        .rounded(px(7.0))
+                        .bg(theme.raised)
+                        .border_1()
+                        .border_color(theme.border_strong)
+                        .flex_none()
+                        .flex()
+                        .items_center()
+                        .justify_center()
+                        .child(icon(item_icon, 13.5, theme.text_secondary)),
+                )
                 .child(
                     div()
                         .flex()
@@ -423,7 +414,7 @@ impl Padu {
             .items_center()
             .justify_between()
             .w_full()
-            .mt(px(28.0))
+            .mt(px(26.0))
             .child(skip_btn)
             .child(
                 div()
@@ -457,9 +448,9 @@ impl Padu {
             .bg(theme.surface)
             .border_1()
             .border_color(theme.border_strong)
-            .rounded(px(18.0))
+            .rounded(px(16.0))
             .shadow_xl()
-            .p(px(32.0))
+            .p(px(28.0))
             .flex()
             .flex_col()
             .on_mouse_down(MouseButton::Left, |_, _, cx| {
