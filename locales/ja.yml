@@ -199,6 +199,29 @@ daemon.settings_applied: デーモンのアクセス設定を更新しました
 daemon.restart_failed: デーモンを再起動できませんでした：%{error}
 daemon.url_copied: WebSocket URL をコピーしました
 daemon.token_copied: デーモントークンをコピーしました
+host.hosts: ホスト
+host.local: ローカル
+host.add_host: ホストを追加…
+host.edit_host: ホストを編集
+host.remove_host: ホストを削除
+host.name: 名前
+host.name_placeholder: 例：開発サーバー
+host.address: アドレス
+host.address_placeholder: 例：192.168.1.100:34123
+host.token: トークン
+host.token_placeholder: デーモン認証トークン（省略可）
+host.save_and_connect: 保存して接続
+host.save: 保存
+host.settings: ホスト設定…
+host.connection_failed: "接続に失敗しました：%{error}"
+host.confirm_remove: "ホスト \"%{name}\" を削除しますか？"
+host.connecting: 接続中…
+host.remote_hosts: リモートホスト
+host.no_remote_hosts: リモートホストは設定されていません
+host.last_connected: "最終接続 %{time}"
+host.never_connected: 未接続
+host.switch_host: ホストを切り替え
+host.connect: 接続
 web.connect_title: Padu デーモンに接続
 web.connect_description: デスクトップアプリの「設定 → デーモン」に表示されるリモートリスナー URL とトークンを入力してください。
 web.token_placeholder: デーモンアクセストークン
@@ -359,6 +382,7 @@ common.copy_selection: 選択範囲をコピー
 common.copy_to_composer: 入力欄にコピー
 common.copy_code: コードをコピー
 common.cancel: キャンセル
+common.edit: 編集
 common.send: 送信
 
 session.fork_task: タスクをフォーク

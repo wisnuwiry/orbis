@@ -195,6 +195,29 @@ daemon.settings_applied: 守护进程访问设置已更新
 daemon.restart_failed: 无法重启守护进程：%{error}
 daemon.url_copied: 已复制 WebSocket 地址
 daemon.token_copied: 已复制守护进程令牌
+host.hosts: 主机
+host.local: 本地
+host.add_host: 添加主机…
+host.edit_host: 编辑主机
+host.remove_host: 删除主机
+host.name: 名称
+host.name_placeholder: 例如：开发服务器
+host.address: 地址
+host.address_placeholder: 例如：192.168.1.100:34123
+host.token: 令牌
+host.token_placeholder: 守护进程认证令牌（可选）
+host.save_and_connect: 保存并连接
+host.save: 保存
+host.settings: 主机设置…
+host.connection_failed: "连接失败：%{error}"
+host.confirm_remove: "确定删除主机 \"%{name}\"？"
+host.connecting: 正在连接…
+host.remote_hosts: 远程主机
+host.no_remote_hosts: 未配置远程主机
+host.last_connected: "上次连接于 %{time}"
+host.never_connected: 从未连接
+host.switch_host: 切换主机
+host.connect: 连接
 web.connect_title: 连接 Padu 守护进程
 web.connect_description: 输入桌面应用“设置 → 守护进程”中显示的远程监听地址和令牌。
 web.token_placeholder: 守护进程访问令牌
@@ -344,6 +367,7 @@ common.copy_selection: 复制所选内容
 common.copy_to_composer: 复制到输入框
 common.copy_code: 复制代码
 common.cancel: 取消
+common.edit: 编辑
 common.send: 发送
 session.fork_task: 从此处派生任务
 session.fork_task_title: 从此处派生任务

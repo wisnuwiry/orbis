@@ -26,7 +26,7 @@ use padu_protocol::theme::ThemePreference;
 
 pub use padu_protocol::persistence::{
     ComposerDraft, ComposerDraftAttachment, ComposerDraftChange, ComposerDraftKey,
-    ComposerDraftTarget, ComposerDrafts, SessionMessageMatch,
+    ComposerDraftTarget, ComposerDrafts, HostProfile, SessionMessageMatch,
 };
 
 const STATE_VERSION: u32 = 5;
@@ -257,6 +257,12 @@ pub struct AppSettings {
     /// catalog id. `None` — and an id no longer installed — fall back to the
     /// platform file manager.
     pub open_in_app: Option<String>,
+    /// Saved remote daemon endpoints. Order is display order in the host menu.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub hosts: Vec<HostProfile>,
+    /// `None` -> local daemon (default). `Some(id)` -> remote profile.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub active_host_id: Option<String>,
 }
 
 impl Default for AppSettings {
@@ -270,8 +276,57 @@ impl Default for AppSettings {
             code_font_size: DEFAULT_CODE_FONT_SIZE,
             daemon_exposure: DaemonExposureSettings::default(),
             open_in_app: None,
+            hosts: Vec::new(),
+            active_host_id: None,
         }
     }
+}
+
+pub fn normalize_daemon_address(value: &str) -> anyhow::Result<String> {
+    let mut address = value.trim().to_owned();
+    if address.is_empty() {
+        anyhow::bail!("enter the daemon address");
+    }
+
+    if address.starts_with("http://") {
+        address = format!("ws://{}", &address[7..]);
+    } else if address.starts_with("https://") {
+        address = format!("wss://{}", &address[8..]);
+    } else if !address.contains("://") {
+        address = format!("ws://{address}");
+    }
+
+    let mut parsed = url::Url::parse(&address)
+        .map_err(|_| anyhow::anyhow!("enter a valid ws:// or wss:// daemon address"))?;
+    if parsed.scheme() != "ws" && parsed.scheme() != "wss" {
+        anyhow::bail!("the daemon address must use ws:// or wss://");
+    }
+    if parsed.host_str().is_none() || !parsed.username().is_empty() || parsed.password().is_some() {
+        anyhow::bail!("the daemon address must contain a host and no credentials");
+    }
+
+    parsed.set_path("");
+    parsed.set_query(None);
+    parsed.set_fragment(None);
+    let mut normalized = parsed.to_string();
+    if normalized.ends_with('/') {
+        normalized.pop();
+    }
+    Ok(normalized)
+}
+
+pub fn display_host(address: &str) -> String {
+    if let Ok(normalized) = normalize_daemon_address(address) {
+        if let Ok(url) = url::Url::parse(&normalized) {
+            if let Some(host) = url.host_str() {
+                if let Some(port) = url.port() {
+                    return format!("{host}:{port}");
+                }
+                return host.to_string();
+            }
+        }
+    }
+    address.trim().to_string()
 }
 
 pub const DEFAULT_UI_FONT_SIZE: f32 = 14.0;
@@ -405,6 +460,10 @@ pub struct PersistedState {
     pub disabled_providers: Vec<ProviderKind>,
     #[serde(default)]
     pub provider_binary_overrides: HashMap<ProviderKind, String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub hosts: Vec<HostProfile>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub active_host_id: Option<String>,
     #[serde(skip)]
     daemon_settings_extra: BTreeMap<String, serde_json::Value>,
     #[serde(skip)]
@@ -450,6 +509,8 @@ impl PersistedState {
             code_font_size: DEFAULT_CODE_FONT_SIZE,
             daemon_exposure: DaemonExposureSettings::default(),
             open_in_app: None,
+            hosts: Vec::new(),
+            active_host_id: None,
             sidebar_visible: true,
             right_panel_visible: false,
             sidebar_width: DEFAULT_SIDEBAR_WIDTH,
@@ -564,7 +625,7 @@ impl PersistedState {
         self.daemon_settings_extra = settings.extra;
     }
 
-    fn app_settings(&self) -> AppSettings {
+    pub fn app_settings(&self) -> AppSettings {
         AppSettings {
             analytics_enabled: self.analytics_enabled,
             favorite_models: self.favorite_models.clone(),
@@ -574,6 +635,8 @@ impl PersistedState {
             code_font_size: self.code_font_size,
             daemon_exposure: self.daemon_exposure.clone(),
             open_in_app: self.open_in_app.clone(),
+            hosts: self.hosts.clone(),
+            active_host_id: self.active_host_id.clone(),
         }
     }
 
@@ -602,7 +665,7 @@ impl PersistedState {
         }
     }
 
-    fn apply_app_settings(&mut self, settings: AppSettings) {
+    pub fn apply_app_settings(&mut self, settings: AppSettings) {
         self.analytics_enabled = settings.analytics_enabled;
         self.favorite_models = settings.favorite_models;
         self.theme = settings.theme;
@@ -611,6 +674,54 @@ impl PersistedState {
         self.code_font_size = sanitized_code_font_size(settings.code_font_size);
         self.daemon_exposure = settings.daemon_exposure;
         self.open_in_app = settings.open_in_app;
+        self.hosts = settings.hosts;
+        self.active_host_id = settings.active_host_id;
+    }
+
+    pub fn active_host_profile(&self) -> Option<&HostProfile> {
+        let active_id = self.active_host_id.as_ref()?;
+        self.hosts.iter().find(|h| &h.id == active_id)
+    }
+
+    pub fn active_host_display_name(&self, local_hostname: &str) -> String {
+        if let Some(profile) = self.active_host_profile() {
+            if profile.name.trim().is_empty() {
+                display_host(&profile.address)
+            } else {
+                profile.name.trim().to_string()
+            }
+        } else if !local_hostname.trim().is_empty() {
+            local_hostname.trim().to_string()
+        } else {
+            "Local".to_string()
+        }
+    }
+
+    pub fn is_local_host(&self) -> bool {
+        self.active_host_id.is_none()
+    }
+
+    pub fn add_host_profile(&mut self, profile: HostProfile) {
+        self.hosts.push(profile);
+    }
+
+    pub fn update_host_profile(&mut self, profile: HostProfile) {
+        if let Some(existing) = self.hosts.iter_mut().find(|h| h.id == profile.id) {
+            *existing = profile;
+        } else {
+            self.hosts.push(profile);
+        }
+    }
+
+    pub fn remove_host_profile(&mut self, id: &str) {
+        self.hosts.retain(|h| h.id != id);
+        if self.active_host_id.as_deref() == Some(id) {
+            self.active_host_id = None;
+        }
+    }
+
+    pub fn set_active_host(&mut self, id: Option<String>) {
+        self.active_host_id = id;
     }
 
     fn apply_app_state(&mut self, app_state: AppState) {
@@ -1067,7 +1178,7 @@ impl StateStore {
             .transpose()
     }
 
-    fn write_app_settings(&self, settings: &AppSettings) -> io::Result<()> {
+    pub fn write_app_settings(&self, settings: &AppSettings) -> io::Result<()> {
         write_json_atomically(&self.app_settings_path, settings)
     }
 
@@ -1206,6 +1317,76 @@ mod tests {
         restore_task_state_skeletons(&mut sessions);
         assert!(!sessions[0].detail_loaded);
         assert!(sessions[0].has_started());
+    }
+
+    #[test]
+    fn daemon_address_normalization_and_display() {
+        assert_eq!(
+            normalize_daemon_address("127.0.0.1:34123").unwrap(),
+            "ws://127.0.0.1:34123"
+        );
+        assert_eq!(
+            normalize_daemon_address("http://192.168.1.50:34123/").unwrap(),
+            "ws://192.168.1.50:34123"
+        );
+        assert_eq!(
+            normalize_daemon_address("https://remote.server:443").unwrap(),
+            "wss://remote.server"
+        );
+        assert_eq!(
+            normalize_daemon_address("https://remote.server:8443").unwrap(),
+            "wss://remote.server:8443"
+        );
+        assert_eq!(
+            normalize_daemon_address("wss://remote.server:8443/v1/ws").unwrap(),
+            "wss://remote.server:8443"
+        );
+        assert!(normalize_daemon_address("").is_err());
+        assert!(normalize_daemon_address("ftp://invalid").is_err());
+
+        assert_eq!(display_host("ws://127.0.0.1:34123"), "127.0.0.1:34123");
+        assert_eq!(
+            display_host("https://my-host.internal:8443"),
+            "my-host.internal:8443"
+        );
+        assert_eq!(display_host("wss://my-host.internal"), "my-host.internal");
+    }
+
+    #[test]
+    fn persisted_state_host_profile_crud() {
+        let mut state = PersistedState::empty();
+        assert!(state.is_local_host());
+        assert_eq!(state.active_host_display_name("MacBook"), "MacBook");
+
+        let profile = HostProfile {
+            id: "host-1".into(),
+            name: "Dev Box".into(),
+            address: "ws://192.168.1.10:34123".into(),
+            token: Some("secret-token".into()),
+            created_at: 100,
+            updated_at: 100,
+            last_connected_at: None,
+        };
+        state.add_host_profile(profile.clone());
+        assert_eq!(state.hosts.len(), 1);
+
+        state.set_active_host(Some("host-1".into()));
+        assert!(!state.is_local_host());
+        assert_eq!(state.active_host_display_name("MacBook"), "Dev Box");
+        assert_eq!(
+            state.active_host_profile().unwrap().address,
+            "ws://192.168.1.10:34123"
+        );
+
+        let mut updated = profile.clone();
+        updated.name = "Production Box".into();
+        state.update_host_profile(updated);
+        assert_eq!(state.active_host_display_name("MacBook"), "Production Box");
+
+        state.remove_host_profile("host-1");
+        assert!(state.hosts.is_empty());
+        assert!(state.is_local_host());
+        assert_eq!(state.active_host_display_name("MacBook"), "MacBook");
     }
 }
 

@@ -394,6 +394,52 @@ daemon.url_copied:
   en: WebSocket URL copied
 daemon.token_copied:
   en: Daemon token copied
+host.hosts:
+  en: Hosts
+host.local:
+  en: Local
+host.add_host:
+  en: Add Host...
+host.edit_host:
+  en: Edit Host
+host.remove_host:
+  en: Remove Host
+host.name:
+  en: Name
+host.name_placeholder:
+  en: e.g. Dev Server
+host.address:
+  en: Address
+host.address_placeholder:
+  en: e.g. 192.168.1.100:34123
+host.token:
+  en: Token
+host.token_placeholder:
+  en: Daemon authentication token (optional)
+host.save_and_connect:
+  en: Save & Connect
+host.save:
+  en: Save
+host.settings:
+  en: Host Settings...
+host.connection_failed:
+  en: "Connection failed: %{error}"
+host.confirm_remove:
+  en: "Remove host \"%{name}\"?"
+host.connecting:
+  en: Connecting...
+host.remote_hosts:
+  en: Remote Hosts
+host.no_remote_hosts:
+  en: No remote hosts configured
+host.last_connected:
+  en: "Last connected %{time}"
+host.never_connected:
+  en: Never connected
+host.switch_host:
+  en: Switch Host
+host.connect:
+  en: Connect
 web.connect_title:
   en: Connect to Padu daemon
 web.connect_description:
@@ -703,6 +749,8 @@ common.copy_code:
   en: Copy Code
 common.cancel:
   en: Cancel
+common.edit:
+  en: Edit
 common.send:
   en: Send
 
