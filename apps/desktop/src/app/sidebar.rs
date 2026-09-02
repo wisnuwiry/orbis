@@ -1678,14 +1678,14 @@ impl Padu {
                 .unwrap_or_else(|| tr!("project.no_project_name")),
             SidebarGroup::Projectless => tr!("project.no_project_name"),
         };
-        let updated_chevron = matches!(group, SidebarGroup::Updated(_)).then(|| {
+        let group_chevron = Some(
             icon("icons/chevron-down.svg", 14.0, theme.text_secondary)
                 .when(collapsed, |icon| {
                     icon.with_transformation(gpui::Transformation::rotate(gpui::percentage(0.75)))
                 })
                 .invisible()
-                .group_hover(group_name.clone(), |icon| icon.visible())
-        });
+                .group_hover(group_name.clone(), |icon| icon.visible()),
+        );
 
         let header = session_group_header(&theme)
             .id(SharedString::from(format!(
@@ -1721,7 +1721,7 @@ impl Padu {
                             .items_center()
                             .gap(px(2.0))
                             .child(div().min_w_0().truncate().child(label))
-                            .when_some(updated_chevron, |element, chevron| element.child(chevron)),
+                            .when_some(group_chevron, |element, chevron| element.child(chevron)),
                     )
                     .child(div().flex_1()),
             )

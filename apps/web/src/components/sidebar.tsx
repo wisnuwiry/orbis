@@ -329,12 +329,10 @@ export function Sidebar({
                           />
                         )}
                         <span className="truncate">{label}</span>
-                        {!isProjectGroup && (
-                          <PaduIcon
-                            className="size-3 opacity-0 transition-opacity motion-reduce:transition-none group-hover:opacity-100 group-focus-visible:opacity-100"
-                            name={row.collapsed ? 'chevronRight' : 'chevronDown'}
-                          />
-                        )}
+                        <PaduIcon
+                          className="size-3 opacity-0 transition-opacity motion-reduce:transition-none group-hover:opacity-100 group-focus-visible:opacity-100"
+                          name={row.collapsed ? 'chevronRight' : 'chevronDown'}
+                        />
                       </button>
                       <div className="flex items-center gap-0.5">
                         {row.first && (
