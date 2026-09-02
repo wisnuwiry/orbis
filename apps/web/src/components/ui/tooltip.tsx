@@ -1,5 +1,6 @@
 import { Tooltip as TooltipPrimitive } from '@base-ui/react/tooltip'
 import type { ReactNode } from 'react'
+import { Kbd } from '@/components/ui/kbd'
 import { cn } from '@/lib/utils'
 
 export interface TooltipProps {
@@ -51,11 +52,7 @@ export function Tooltip({
               )}
             >
               <span>{content}</span>
-              {shortcut && (
-                <span className="rounded bg-[var(--inset)] px-1 py-0.5 text-[10.5px] font-medium text-[var(--text-tertiary)]">
-                  {shortcut}
-                </span>
-              )}
+              {shortcut && <Kbd size="xs">{shortcut}</Kbd>}
             </TooltipPrimitive.Popup>
           </TooltipPrimitive.Positioner>
         </TooltipPrimitive.Portal>

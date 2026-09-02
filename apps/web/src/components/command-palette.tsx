@@ -2,6 +2,7 @@ import type { AgentSession, ProviderKind, ProviderSessionSummary, SessionMessage
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { ProviderIcon, PROVIDERS, providerMeta, PaduIcon, type PaduIconName } from '@/components/padu-icon'
+import { Kbd } from '@/components/ui/kbd'
 import type { SettingsPageId } from '@/components/settings-view'
 import { SETTINGS_PAGES } from '@/components/settings-view'
 import {
@@ -477,22 +478,22 @@ export function CommandPalette({
         </div>
         <div className="flex h-9 shrink-0 items-center gap-4 border-t bg-[var(--card)]/90 px-4 py-1 text-[11px] text-[var(--text-tertiary)]">
           <span className="flex items-center gap-1.5">
-            <kbd className="flex h-5 min-w-6 shrink-0 items-center justify-center rounded-md bg-[color:var(--foreground)]/[0.07] px-1 font-sans text-[var(--text-tertiary)]">
+            <Kbd variant="subtle" size="sm" className="px-1">
               <PaduIcon className="size-2.5" name="arrowUp" />
-            </kbd>
-            <kbd className="flex h-5 min-w-6 shrink-0 items-center justify-center rounded-md bg-[color:var(--foreground)]/[0.07] px-1 font-sans text-[var(--text-tertiary)]">
+            </Kbd>
+            <Kbd variant="subtle" size="sm" className="px-1">
               <PaduIcon className="size-2.5" name="arrowDown" />
-            </kbd>
+            </Kbd>
             Navigate
           </span>
           <span className="flex items-center gap-1.5">
-            <kbd className="flex h-5 min-w-6 shrink-0 items-center justify-center rounded-md bg-[color:var(--foreground)]/[0.07] px-1.5 font-sans text-[var(--text-tertiary)]">
+            <Kbd variant="subtle" size="sm" className="px-1.5">
               <PaduIcon className="size-3" name="cornerDownRight" />
-            </kbd>
+            </Kbd>
             Select
           </span>
           <span className="flex items-center gap-1.5">
-            <kbd className="flex h-5 min-w-6 shrink-0 items-center justify-center rounded-md bg-[color:var(--foreground)]/[0.07] px-1.5 font-sans text-[11px] text-[var(--text-tertiary)]">Esc</kbd>
+            <Kbd variant="subtle" size="sm">Esc</Kbd>
             Close
           </span>
         </div>
@@ -560,9 +561,9 @@ function PaletteRows({
             )}
           </span>
           {item.shortcut && (
-            <kbd className="flex h-5 min-w-6 shrink-0 items-center justify-center rounded-md bg-[color:var(--foreground)]/[0.07] px-1.5 font-sans text-[11px] text-[var(--text-tertiary)]">
+            <Kbd variant="subtle" size="sm">
               {item.shortcut}
-            </kbd>
+            </Kbd>
           )}
         </button>
       </div>

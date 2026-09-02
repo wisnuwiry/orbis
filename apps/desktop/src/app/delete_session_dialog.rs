@@ -101,6 +101,7 @@ impl Padu {
             .flex()
             .items_center()
             .justify_center()
+            .gap(px(6.0))
             .cursor_pointer()
             .text_size(sp(13.0))
             .font_weight(FontWeight::MEDIUM)
@@ -109,6 +110,7 @@ impl Padu {
             .active(|s| s.bg(theme.overlay_strong))
             .focus_visible(|s| s.border_1().border_color(theme.accent))
             .child(tr!("common.cancel"))
+            .child(kbd_badge("Esc", &theme))
             .on_click(cx.listener(|padu, _, window, cx| {
                 padu.close_delete_session_dialog(window, cx);
             }))
@@ -141,6 +143,7 @@ impl Padu {
             .flex()
             .items_center()
             .justify_center()
+            .gap(px(6.0))
             .cursor_pointer()
             .text_size(sp(13.0))
             .font_weight(FontWeight::MEDIUM)
@@ -149,6 +152,7 @@ impl Padu {
             .hover(|s| s.bg(theme.danger_soft))
             .focus_visible(|s| s.border_1().border_color(rgb(0xFFFFFF)))
             .child(tr!("session.delete_confirm"))
+            .child(kbd_badge("↵", &theme))
             .on_click(cx.listener(|padu, _, window, cx| {
                 padu.execute_delete_session_dialog(window, cx);
             }))

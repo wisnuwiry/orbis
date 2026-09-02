@@ -50,6 +50,26 @@ pub(super) fn working_wave_dots(color: Hsla) -> AnyElement {
     .into_any_element()
 }
 
+pub(super) fn kbd_badge(label: impl Into<SharedString>, theme: &Theme) -> AnyElement {
+    div()
+        .h(px(20.0))
+        .min_w(px(20.0))
+        .px(px(5.0))
+        .rounded(px(5.0))
+        .flex_none()
+        .flex()
+        .items_center()
+        .justify_center()
+        .bg(theme.overlay_strong)
+        .border_1()
+        .border_color(theme.border)
+        .text_size(sp(11.0))
+        .font_weight(FontWeight::MEDIUM)
+        .text_color(theme.text_tertiary)
+        .child(label.into())
+        .into_any_element()
+}
+
 pub(super) fn format_message_time(created_at: u64) -> String {
     format_message_time_at(created_at, Local::now())
 }

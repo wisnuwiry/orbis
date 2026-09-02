@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { ControlMenu, type ControlMenuItem } from '@/components/control-menu'
 import { HostDialog } from '@/components/host-dialog'
 import { Input } from '@/components/ui/input'
+import { Kbd } from '@/components/ui/kbd'
 import { Tooltip } from '@/components/ui/tooltip'
 import { PanelResizeHandle } from '@/components/panel-resize-handle'
 import { PaduIcon } from '@/components/padu-icon'
@@ -569,11 +570,7 @@ function SidebarAction({
     >
       <span className="grid size-5 place-items-center [&>svg]:size-4">{icon}</span>
       <span className="min-w-0 flex-1 truncate">{label}</span>
-      {shortcut && (
-        <span className="flex h-5 min-w-6 flex-none items-center justify-center rounded-[5px] bg-[var(--inset)] px-1.5 text-[11px] font-medium text-[var(--text-tertiary)]">
-          {shortcut}
-        </span>
-      )}
+      {shortcut && <Kbd size="sm">{shortcut}</Kbd>}
     </button>
   )
 }

@@ -1,4 +1,5 @@
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
+import type { HTMLAttributes } from 'react'
 import { PaduIcon } from '@/components/padu-icon'
 import { useI18n } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
@@ -7,11 +8,20 @@ function Dialog(props: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
 }
 
+function DialogTrigger(props: DialogPrimitive.Trigger.Props) {
+  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
+}
+
+function DialogClose(props: DialogPrimitive.Close.Props) {
+  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
+}
+
 function DialogContent({
   className,
   children,
+  showCloseButton = true,
   ...props
-}: DialogPrimitive.Popup.Props) {
+}: DialogPrimitive.Popup.Props & { showCloseButton?: boolean }) {
   const { t } = useI18n()
   return (
     <DialogPrimitive.Portal>
@@ -26,16 +36,38 @@ function DialogContent({
           {...props}
         >
           {children}
-          <DialogPrimitive.Close
-            aria-label={t('common.close')}
-            className="absolute right-3 top-3 grid size-8 place-items-center rounded-md text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/40"
-            type="button"
-          >
-            <PaduIcon name="x" />
-          </DialogPrimitive.Close>
+          {showCloseButton && (
+            <DialogPrimitive.Close
+              aria-label={t('common.close')}
+              className="absolute right-3 top-3 grid size-8 place-items-center rounded-md text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/40"
+              type="button"
+            >
+              <PaduIcon name="x" />
+            </DialogPrimitive.Close>
+          )}
         </DialogPrimitive.Popup>
       </DialogPrimitive.Viewport>
     </DialogPrimitive.Portal>
+  )
+}
+
+function DialogHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      data-slot="dialog-header"
+      className={cn('flex flex-col space-y-1.5 text-left', className)}
+      {...props}
+    />
+  )
+}
+
+function DialogFooter({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      data-slot="dialog-footer"
+      className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)}
+      {...props}
+    />
   )
 }
 
@@ -60,4 +92,13 @@ function DialogDescription({
   )
 }
 
-export { Dialog, DialogContent, DialogDescription, DialogTitle }
+export {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+}
