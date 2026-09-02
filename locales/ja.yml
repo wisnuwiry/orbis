@@ -1221,43 +1221,32 @@ onboarding.get_started: はじめる
 onboarding.command_title: ようこそツアーとオンボーディング
 onboarding.replay_button: オンボーディングツアーを再生
 
-onboarding.slide1_badge: マルチエージェントハブ
-onboarding.slide1_title: ネイティブ・マルチエージェント・コントロールプレーン
-onboarding.slide1_desc: Padu は、構造化プロトコルストリーミングによってローカルエージェント CLI に直接接続し、クラウドを介さず動作します。
-onboarding.slide1_item1_title: 幅広い CLI サポート
-onboarding.slide1_item1_desc: Claude Code、Codex CLI、Cursor CLI、Amp、OpenCode、Grok、Kimi、Pi、Fx をシームレスに利用可能。
-onboarding.slide1_item2_title: 自動検出
-onboarding.slide1_item2_desc: インストール済みのエージェント CLI を自動検出し、認証とセッション状態を管理します。
-onboarding.slide1_item3_title: 高性能ネイティブ GUI
-onboarding.slide1_item3_desc: Rust と GPUI で構築され、滑らかな 120Hz 描画と最小限のリソース消費を実現。
+onboarding.slide1_badge: ようこそ
+onboarding.slide1_title: Padu へようこそ
+onboarding.slide1_desc: お気に入りのローカル AI コーディングエージェントに直接接続する高速ネイティブコントロールプレーン。
+onboarding.slide1_item1_title: マルチエージェント対応
+onboarding.slide1_item1_desc: Claude Code、Codex、Cursor、OpenCode などクラウドを介さずシームレスに利用可能。
+onboarding.slide1_item2_title: 圧倒的な速度と滑らかさ
+onboarding.slide1_item2_desc: Rust と GPUI で構築され、瞬時の応答と滑らかな 120 FPS 描画を実現。
+onboarding.slide1_item3_title: 100% ローカル＆プライベート
+onboarding.slide1_item3_desc: コード、会話ログ、認証情報はすべてローカルマシンに安全に保持されます。
 
-onboarding.slide2_badge: ワークスペースと制御
-onboarding.slide2_title: マルチセッションワークスペースとライブステアリング
-onboarding.slide2_desc: プロジェクトを快適に整理しながら、エージェントの実行をリアルタイムでコントロールできます。
+onboarding.slide2_badge: ワークフロー
+onboarding.slide2_title: リアルタイムな誘導・検査・制御
+onboarding.slide2_desc: インタラクティブなツールとリアルタイムのフィードバックで、エージェントを常に掌握。
 onboarding.slide2_item1_title: ライブステアリングとメッセージキュー
-onboarding.slide2_item1_desc: 実行中のターンを中断することなく、後続の指示をキューに入れたり途中で方向修正したりできます。
-onboarding.slide2_item2_title: スレッド目標とスラッシュコマンド
-onboarding.slide2_item2_desc: /goal で高レベルの目標を設定し、組み込みのスラッシュワークフローを実行。
-onboarding.slide2_item3_title: 柔軟なモデル選択
-onboarding.slide2_item3_desc: 推論の強度を調整し、プロバイダーのモデルやサービスクラスを自在に切り替えられます。
+onboarding.slide2_item1_desc: 実行中のターンを中断することなく、後続の指示をキューに入れたり途中で方向修正可能。
+onboarding.slide2_item2_title: リアルタイム差分とチェックポイント
+onboarding.slide2_item2_desc: 横並びでリアルタイムに変更点を確認し、いつでも過去のチェックポイントへ巻き戻し可能。
+onboarding.slide2_item3_title: コマンドパレット (Cmd/Ctrl + K)
+onboarding.slide2_item3_desc: キーボード検索で素早くタスクを切り替え、アクションを実行、設定を検索。
 
-onboarding.slide3_badge: 差分とチェックポイント
-onboarding.slide3_title: 変更の確認と即時 Git 巻き戻し
-onboarding.slide3_desc: ビジュアルな差分表示と会話チェックポイントにより、安心してコード修正を任せられます。
-onboarding.slide3_item1_title: 折りたたみ可能な右パネル (Cmd/Ctrl + B)
-onboarding.slide3_item1_desc: エージェントがファイルを編集する際、横並びまたはインラインでリアルタイムに差分を確認。
-onboarding.slide3_item2_title: 会話対応チェックポイント
-onboarding.slide3_item2_desc: 過去のメッセージ時点へ作業ディレクトリを巻き戻したり、新しいセッションブランチを作成可能。
-onboarding.slide3_item3_title: 組み込みターミナルとプレビュー
-onboarding.slide3_item3_desc: Padu を離れることなく、Markdown プレビューや統合ターミナルセッションを利用できます。
-
-onboarding.slide4_badge: 生産性とプライバシー
-onboarding.slide4_title: キーボードで素早く操作、100% ローカル完結
-onboarding.slide4_desc: Padu はキーボード中心の設計であり、大切なコードのプライバシーを完全に守ります。
-onboarding.slide4_item1_title: コマンドパレット (Cmd/Ctrl + K)
-onboarding.slide4_item1_desc: セッション、コマンド実行、設定検索をあいまい検索で素早く実行。
-onboarding.slide4_item2_title: タスクスイッチャー (Cmd/Ctrl + T / Ctrl + Tab)
-onboarding.slide4_item2_desc: アクティブなエージェント会話やバックグラウンドタスクを瞬時に切り替え。
-onboarding.slide4_item3_title: 100% ローカルファースト
-onboarding.slide4_item3_desc: すべてのプロジェクト、ログ、設定は ~/.padu にローカル保存され、外部アカウントは不要です。
-
+onboarding.slide3_badge: はじめる
+onboarding.slide3_title: 準備は完了しました
+onboarding.slide3_desc: すぐに使い始める準備が整いました。開始方法を選択してください：
+onboarding.slide3_item1_title: プロジェクトフォルダを開く
+onboarding.slide3_item1_desc: 既存の Git リポジトリやフォルダを追加して、エージェントとの協調作業を開始。
+onboarding.slide3_item2_title: クイックスクラッチパッド
+onboarding.slide3_item2_desc: プロジェクトを開かずに即座に開始し、素早い質問やスクリプト作成に活用。
+onboarding.slide3_item3_title: モデルの自在な切り替え
+onboarding.slide3_item3_desc: Cmd/Ctrl + / でいつでもモデルやプロバイダーを切り替え、推論強度を調整。

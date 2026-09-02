@@ -2394,78 +2394,60 @@ onboarding.replay_button:
   en: Replay Onboarding Tour
 
 onboarding.slide1_badge:
-  en: Multi-Agent Hub
+  en: Welcome
 onboarding.slide1_title:
-  en: Native Multi-Agent Control Plane
+  en: Welcome to Padu
 onboarding.slide1_desc:
-  en: Padu connects directly to your favorite local agent CLIs with structured protocol streaming and zero cloud middleman.
+  en: A fast, native control plane connecting directly to your favorite local AI coding agents.
 onboarding.slide1_item1_title:
-  en: Broad CLI Support
+  en: Multi-Agent Support
 onboarding.slide1_item1_desc:
-  en: Seamlessly run Claude Code, Codex CLI, Cursor CLI, Amp, OpenCode, Grok, Kimi, Pi, and Fx.
+  en: Run Claude Code, Codex, Cursor, OpenCode, and more with zero cloud middleman.
 onboarding.slide1_item2_title:
-  en: Automatic Detection
+  en: Native Speed & Fluidity
 onboarding.slide1_item2_desc:
-  en: Discovers installed agent CLIs automatically and manages authentication and session state.
+  en: Built in Rust with GPUI for instant responsiveness and fluid 120 FPS rendering.
 onboarding.slide1_item3_title:
-  en: High-Performance Native GUI
+  en: 100% Local & Private
 onboarding.slide1_item3_desc:
-  en: Built in Rust with GPUI for fluid, low-latency 120Hz rendering and minimal resource consumption.
+  en: Your code, transcripts, and credentials stay securely on your machine.
 
 onboarding.slide2_badge:
-  en: Workspace & Control
+  en: Workflows
 onboarding.slide2_title:
-  en: Multi-Session Workspace & Live Steering
+  en: Steer, Inspect & Control
 onboarding.slide2_desc:
-  en: Manage projects effortlessly while keeping continuous control over your agent's execution.
+  en: Stay in the driver's seat with interactive tools and real-time feedback.
 onboarding.slide2_item1_title:
-  en: Live Steering & Follow-up Queue
+  en: Live Steering & Message Queue
 onboarding.slide2_item1_desc:
-  en: Queue follow-up instructions or adjust agent direction midway without breaking conversation context.
+  en: Queue follow-up prompts or guide agent direction mid-turn without breaking context.
 onboarding.slide2_item2_title:
-  en: Thread Goals & Slash Commands
+  en: Real-Time Diffs & Checkpoints
 onboarding.slide2_item2_desc:
-  en: Define high-level objectives using /goal and trigger built-in agent workflow commands.
+  en: Inspect file modifications side-by-side and rewind working directory changes anytime.
 onboarding.slide2_item3_title:
-  en: Flexible Model Selection
+  en: Command Palette (Cmd/Ctrl + K)
 onboarding.slide2_item3_desc:
-  en: Tune reasoning effort, switch provider models, and select service tiers on the fly.
+  en: Jump between tasks, trigger actions, and search settings with instant keyboard search.
 
 onboarding.slide3_badge:
-  en: Diffs & Checkpoints
+  en: Get Started
 onboarding.slide3_title:
-  en: Inspect Changes & Instant Git Rewind
+  en: Ready to Build Something Great?
 onboarding.slide3_desc:
-  en: Review code modifications with confidence through visual diffs and conversation checkpoints.
+  en: "Everything is ready to go. Choose how you would like to start:"
 onboarding.slide3_item1_title:
-  en: Collapsible Right Panel (Cmd/Ctrl + B)
+  en: Open a Project Folder
 onboarding.slide3_item1_desc:
-  en: Review side-by-side or inline code diffs in real time as the agent modifies files.
+  en: Add your existing Git repository or workspace folder to begin collaborating.
 onboarding.slide3_item2_title:
-  en: Conversation-Aware Checkpoints
+  en: Quick Scratchpad
 onboarding.slide3_item2_desc:
-  en: Rewind working directory changes back to any earlier message or create new session branches.
+  en: Start immediately without a project for quick questions, scripts, and prototyping.
 onboarding.slide3_item3_title:
-  en: Built-in Terminal & Preview
+  en: Switch Models On the Fly
 onboarding.slide3_item3_desc:
-  en: Render markdown previews and access integrated terminal sessions without leaving Padu.
+  en: Choose models, tune reasoning effort, and switch providers anytime with Cmd/Ctrl + /.
 
-onboarding.slide4_badge:
-  en: Productivity & Privacy
-onboarding.slide4_title:
-  en: Speed at Your Fingertips, 100% Local
-onboarding.slide4_desc:
-  en: Padu is built keyboard-first with absolute privacy for your proprietary codebase.
-onboarding.slide4_item1_title:
-  en: Command Palette (Cmd/Ctrl + K)
-onboarding.slide4_item1_desc:
-  en: Jump across sessions, execute commands, and search settings with fuzzy matching.
-onboarding.slide4_item2_title:
-  en: Quick Task Switcher (Cmd/Ctrl + T / Ctrl + Tab)
-onboarding.slide4_item2_desc:
-  en: Rapidly toggle between active agent conversations and background tasks.
-onboarding.slide4_item3_title:
-  en: 100% Local-First Storage
-onboarding.slide4_item3_desc:
-  en: All projects, transcripts, and settings reside locally in ~/.padu with no external accounts needed.
 
