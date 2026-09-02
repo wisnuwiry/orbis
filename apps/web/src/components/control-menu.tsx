@@ -73,7 +73,7 @@ export function ControlMenu({
         {caret && (
           <PaduIcon
             className={cn(
-              'size-2.5 text-[var(--text-ghost)] transition-transform duration-150',
+              'size-2.5 text-[var(--text-ghost)] transition-transform duration-150 motion-reduce:transition-none',
               open && 'rotate-180',
             )}
             name="chevronDown"
