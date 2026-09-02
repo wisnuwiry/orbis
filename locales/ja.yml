@@ -217,6 +217,10 @@ host.connection_failed: "接続に失敗しました：%{error}"
 host.confirm_remove: "ホスト \"%{name}\" を削除しますか？"
 host.connecting: 接続中…
 host.remote_hosts: リモートホスト
+host.remote_hosts_description: リモートサーバーやワークステーションで実行されている Padu デーモンインスタンスに接続します。
+host.active: アクティブ
+host.authenticated: 認証済み
+host.no_auth: トークンなし
 host.no_remote_hosts: リモートホストは設定されていません
 host.last_connected: "最終接続 %{time}"
 host.never_connected: 未接続

@@ -430,6 +430,14 @@ host.connecting:
   en: Connecting...
 host.remote_hosts:
   en: Remote Hosts
+host.remote_hosts_description:
+  en: Connect to Padu daemon instances running on remote servers or workstations.
+host.active:
+  en: Active
+host.authenticated:
+  en: Authenticated
+host.no_auth:
+  en: No Token
 host.no_remote_hosts:
   en: No remote hosts configured
 host.last_connected:

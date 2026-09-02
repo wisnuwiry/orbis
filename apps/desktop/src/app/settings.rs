@@ -631,7 +631,7 @@ impl Padu {
 
         div()
             .px(px(20.0))
-            .py(px(15.0))
+            .py(px(16.0))
             .rounded(px(13.0))
             .bg(theme.raised)
             .child(
@@ -639,28 +639,42 @@ impl Padu {
                     .flex()
                     .items_center()
                     .justify_between()
+                    .gap(px(12.0))
                     .child(
                         div()
-                            .text_size(sp(13.5))
-                            .font_weight(FontWeight::MEDIUM)
-                            .text_color(theme.text)
-                            .child(tr!("host.remote_hosts")),
+                            .flex_1()
+                            .min_w_0()
+                            .child(
+                                div()
+                                    .text_size(sp(13.5))
+                                    .font_weight(FontWeight::MEDIUM)
+                                    .text_color(theme.text)
+                                    .child(tr!("host.remote_hosts")),
+                            )
+                            .child(
+                                div()
+                                    .mt(px(4.0))
+                                    .text_size(sp(12.5))
+                                    .line_height(sp(18.0))
+                                    .text_color(theme.text_secondary)
+                                    .child(tr!("host.remote_hosts_description")),
+                            ),
                     )
                     .child(
                         div()
                             .id("add-remote-host-btn")
                             .tab_index(0)
-                            .h(px(27.0))
-                            .px(px(9.0))
-                            .rounded(px(6.0))
+                            .h(px(28.0))
+                            .px(px(11.0))
+                            .rounded(px(7.0))
                             .border_1()
                             .border_color(theme.border_strong)
                             .flex()
                             .items_center()
-                            .gap(px(4.0))
+                            .gap(px(5.0))
                             .cursor_pointer()
                             .text_size(sp(12.5))
-                            .text_color(theme.text_secondary)
+                            .text_color(theme.text)
                             .hover(|e| e.bg(theme.overlay))
                             .focus_visible(|style| style.border_color(theme.accent))
                             .child(icon("icons/plus.svg", 12.0, theme.text_secondary))
@@ -680,26 +694,55 @@ impl Padu {
             )
             .child(if hosts.is_empty() {
                 div()
-                    .mt(px(10.0))
-                    .text_size(sp(12.5))
-                    .text_color(theme.text_tertiary)
-                    .child(tr!("host.no_remote_hosts"))
-            } else {
-                div()
-                    .mt(px(10.0))
+                    .mt(px(14.0))
+                    .py(px(24.0))
+                    .px(px(16.0))
+                    .rounded(px(10.0))
+                    .border_1()
+                    .border_color(theme.border)
+                    .bg(theme.overlay.opacity(0.4))
                     .flex()
                     .flex_col()
+                    .items_center()
+                    .justify_center()
                     .gap(px(8.0))
+                    .child(
+                        div()
+                            .w(px(38.0))
+                            .h(px(38.0))
+                            .rounded_full()
+                            .bg(theme.overlay)
+                            .flex()
+                            .items_center()
+                            .justify_center()
+                            .child(icon("icons/server.svg", 18.0, theme.text_tertiary)),
+                    )
+                    .child(
+                        div()
+                            .text_size(sp(13.0))
+                            .font_weight(FontWeight::MEDIUM)
+                            .text_color(theme.text_secondary)
+                            .child(tr!("host.no_remote_hosts")),
+                    )
+            } else {
+                div()
+                    .mt(px(14.0))
+                    .flex()
+                    .flex_col()
+                    .gap(px(10.0))
                     .children(hosts.iter().map(|host| {
                         let host_id = host.id.clone();
                         let is_active = active_host_id == Some(&host.id);
                         let edit_id = host_id.clone();
                         let switch_id = host_id.clone();
+                        let has_token = host.token.as_ref().is_some_and(|t| !t.trim().is_empty());
+                        let last_conn_label = host_last_connected_label(host.last_connected_at);
+
                         div()
                             .id(SharedString::from(format!("remote-host-{}", host.id)))
-                            .h(px(44.0))
-                            .px(px(12.0))
-                            .rounded(px(8.0))
+                            .px(px(14.0))
+                            .py(px(12.0))
+                            .rounded(px(10.0))
                             .bg(theme.surface)
                             .border_1()
                             .border_color(if is_active {
@@ -707,44 +750,128 @@ impl Padu {
                             } else {
                                 theme.border
                             })
+                            .hover(|e| {
+                                if !is_active {
+                                    e.border_color(theme.border_strong)
+                                } else {
+                                    e
+                                }
+                            })
                             .flex()
                             .items_center()
                             .justify_between()
+                            .gap(px(12.0))
                             .child(
                                 div()
                                     .flex()
                                     .items_center()
-                                    .gap(px(8.0))
+                                    .gap(px(12.0))
                                     .min_w_0()
                                     .flex_1()
-                                    .child(icon(
-                                        "icons/server.svg",
-                                        14.0,
-                                        if is_active {
-                                            theme.accent
-                                        } else {
-                                            theme.text_secondary
-                                        },
-                                    ))
+                                    .child(
+                                        div()
+                                            .relative()
+                                            .w(px(36.0))
+                                            .h(px(36.0))
+                                            .flex_none()
+                                            .rounded(px(8.0))
+                                            .bg(theme.overlay)
+                                            .flex()
+                                            .items_center()
+                                            .justify_center()
+                                            .child(icon(
+                                                "icons/server.svg",
+                                                16.0,
+                                                if is_active {
+                                                    theme.accent
+                                                } else {
+                                                    theme.text_secondary
+                                                },
+                                            ))
+                                            .child(
+                                                div()
+                                                    .absolute()
+                                                    .bottom(px(-2.0))
+                                                    .right(px(-2.0))
+                                                    .w(px(10.0))
+                                                    .h(px(10.0))
+                                                    .rounded_full()
+                                                    .border_2()
+                                                    .border_color(theme.surface)
+                                                    .bg(if is_active {
+                                                        theme.success
+                                                    } else {
+                                                        theme.text_ghost
+                                                    }),
+                                            ),
+                                    )
                                     .child(
                                         div()
                                             .min_w_0()
+                                            .flex_1()
                                             .flex()
                                             .flex_col()
+                                            .gap(px(2.0))
                                             .child(
                                                 div()
-                                                    .text_size(sp(13.0))
-                                                    .font_weight(FontWeight::MEDIUM)
-                                                    .text_color(theme.text)
-                                                    .truncate()
-                                                    .child(host.display_name().to_string()),
+                                                    .flex()
+                                                    .items_center()
+                                                    .gap(px(8.0))
+                                                    .child(
+                                                        div()
+                                                            .text_size(sp(13.5))
+                                                            .font_weight(FontWeight::MEDIUM)
+                                                            .text_color(theme.text)
+                                                            .truncate()
+                                                            .child(host.display_name().to_string()),
+                                                    )
+                                                    .when(is_active, |row| {
+                                                        row.child(
+                                                            div()
+                                                                .px(px(6.0))
+                                                                .py(px(1.5))
+                                                                .rounded(px(4.0))
+                                                                .bg(theme.success.opacity(0.15))
+                                                                .text_size(sp(11.0))
+                                                                .font_weight(FontWeight::MEDIUM)
+                                                                .text_color(theme.success)
+                                                                .child(tr!("host.active")),
+                                                        )
+                                                    }),
                                             )
                                             .child(
                                                 div()
-                                                    .text_size(sp(11.5))
-                                                    .text_color(theme.text_tertiary)
+                                                    .font_family(crate::md::render::MONO_FAMILY)
+                                                    .text_size(sp(12.0))
+                                                    .text_color(theme.text_secondary)
                                                     .truncate()
                                                     .child(host.address.clone()),
+                                            )
+                                            .child(
+                                                div()
+                                                    .flex()
+                                                    .items_center()
+                                                    .gap(px(6.0))
+                                                    .text_size(sp(11.5))
+                                                    .text_color(theme.text_tertiary)
+                                                    .child(
+                                                        div()
+                                                            .flex()
+                                                            .items_center()
+                                                            .gap(px(3.5))
+                                                            .child(icon(
+                                                                "icons/lock.svg",
+                                                                10.5,
+                                                                theme.text_tertiary,
+                                                            ))
+                                                            .child(if has_token {
+                                                                tr!("host.authenticated")
+                                                            } else {
+                                                                tr!("host.no_auth")
+                                                            }),
+                                                    )
+                                                    .child(SharedString::from("·"))
+                                                    .child(last_conn_label),
                                             ),
                                     ),
                             )
@@ -752,7 +879,7 @@ impl Padu {
                                 div()
                                     .flex()
                                     .items_center()
-                                    .gap(px(6.0))
+                                    .gap(px(8.0))
                                     .when(!is_active, |row| {
                                         let switch_id = switch_id.clone();
                                         row.child(
@@ -762,17 +889,20 @@ impl Padu {
                                                     switch_id
                                                 )))
                                                 .tab_index(0)
-                                                .h(px(26.0))
-                                                .px(px(8.0))
-                                                .rounded(px(5.0))
-                                                .border_1()
-                                                .border_color(theme.border_strong)
+                                                .h(px(28.0))
+                                                .px(px(11.0))
+                                                .rounded(px(6.0))
+                                                .bg(theme.inverse)
+                                                .text_color(theme.on_inverse)
+                                                .font_weight(FontWeight::MEDIUM)
                                                 .flex()
                                                 .items_center()
                                                 .cursor_pointer()
                                                 .text_size(sp(12.0))
-                                                .text_color(theme.text_secondary)
-                                                .hover(|e| e.bg(theme.overlay))
+                                                .hover(|e| e.opacity(0.9))
+                                                .focus_visible(|style| {
+                                                    style.border_color(theme.accent)
+                                                })
                                                 .child(tr!("host.connect"))
                                                 .on_click(cx.listener(move |this, _, _, cx| {
                                                     this.switch_to_host(
@@ -789,17 +919,24 @@ impl Padu {
                                                 edit_id
                                             )))
                                             .tab_index(0)
-                                            .h(px(26.0))
-                                            .px(px(8.0))
-                                            .rounded(px(5.0))
+                                            .h(px(28.0))
+                                            .px(px(10.0))
+                                            .rounded(px(6.0))
                                             .border_1()
                                             .border_color(theme.border_strong)
                                             .flex()
                                             .items_center()
+                                            .gap(px(4.0))
                                             .cursor_pointer()
                                             .text_size(sp(12.0))
                                             .text_color(theme.text_secondary)
-                                            .hover(|e| e.bg(theme.overlay))
+                                            .hover(|e| e.bg(theme.overlay).text_color(theme.text))
+                                            .focus_visible(|style| style.border_color(theme.accent))
+                                            .child(icon(
+                                                "icons/pencil.svg",
+                                                11.0,
+                                                theme.text_tertiary,
+                                            ))
                                             .child(tr!("common.edit"))
                                             .on_click(cx.listener(move |this, _, _, cx| {
                                                 this.request_host_dialog(Some(edit_id.clone()), cx);
@@ -3025,6 +3162,27 @@ fn detection_checked_label(elapsed: Duration) -> String {
     } else {
         tr!("providers.checked_hours_ago", count = seconds / 3600)
     }
+}
+
+fn host_last_connected_label(last_connected: Option<u64>) -> String {
+    let Some(timestamp) = last_connected else {
+        return tr!("host.never_connected");
+    };
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0);
+    let seconds = now.saturating_sub(timestamp);
+    let time_str = if seconds < 90 {
+        tr!("providers.checked_just_now")
+    } else if seconds < 3600 {
+        tr!("providers.checked_minutes_ago", count = seconds / 60)
+    } else if seconds < 86400 {
+        tr!("providers.checked_hours_ago", count = seconds / 3600)
+    } else {
+        format!("{}d ago", seconds / 86400)
+    };
+    tr!("host.last_connected", time = time_str)
 }
 
 /// Keep the full binary path, abbreviating only the user's home directory.

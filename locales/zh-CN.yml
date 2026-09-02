@@ -213,6 +213,10 @@ host.connection_failed: "连接失败：%{error}"
 host.confirm_remove: "确定删除主机 \"%{name}\"？"
 host.connecting: 正在连接…
 host.remote_hosts: 远程主机
+host.remote_hosts_description: 连接到在远程服务器或工作站上运行的 Padu 守护进程实例。
+host.active: 当前活跃
+host.authenticated: 已配置凭据
+host.no_auth: 无令牌
 host.no_remote_hosts: 未配置远程主机
 host.last_connected: "上次连接于 %{time}"
 host.never_connected: 从未连接
