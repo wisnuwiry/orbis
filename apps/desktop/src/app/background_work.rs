@@ -725,12 +725,14 @@ impl Padu {
                     .collect::<Vec<_>>()
             })
             .unwrap_or_default();
-        let workspace_path = session
-            .and_then(|session| self.workspace_path_for_session(session))
-            .or_else(|| {
-                self.selected_project()
-                    .map(|project| project.path.as_path())
-            });
+        let has_project = self.active_project().is_some();
+        let workspace_path = if has_project {
+            session
+                .and_then(|session| self.workspace_path_for_session(session))
+                .or_else(|| self.active_project().map(|project| project.path.as_path()))
+        } else {
+            None
+        };
         let snapshot = workspace_path.and_then(|path| {
             self.visible_branch_snapshot
                 .as_ref()
@@ -740,11 +742,15 @@ impl Padu {
         let change_counts = snapshot
             .map(|snapshot| (snapshot.additions, snapshot.deletions))
             .filter(|(additions, deletions)| *additions > 0 || *deletions > 0);
-        let environment = Some(EnvironmentSummary {
-            commit_status: self.commit_operation_status_label(),
-            commit_focus: self.transcript_control_focus("environment-summary-commit", cx),
-            compare_focus: self.transcript_control_focus("environment-summary-compare", cx),
-        });
+        let environment = if has_project {
+            Some(EnvironmentSummary {
+                commit_status: self.commit_operation_status_label(),
+                commit_focus: self.transcript_control_focus("environment-summary-commit", cx),
+                compare_focus: self.transcript_control_focus("environment-summary-compare", cx),
+            })
+        } else {
+            None
+        };
         let (processes, agents) = session_id
             .map(|session_id| self.background_work_counts(session_id))
             .unwrap_or_default();
