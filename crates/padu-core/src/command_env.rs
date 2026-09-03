@@ -1055,8 +1055,10 @@ mod tests {
             .stdout(Stdio::null())
             .stderr(Stdio::null());
         let mut child = spawn(&mut command).expect("spawn PowerShell probe");
+        // Cold-starting PowerShell (.NET CLR) on Windows runners under heavy parallel
+        // test concurrency can exceed 10s. Use a generous timeout to avoid CI flakiness.
         assert!(
-            wait_for_child(&mut child, Duration::from_secs(10)),
+            wait_for_child(&mut child, Duration::from_secs(45)),
             "PowerShell probe did not finish in time"
         );
         let environment =
