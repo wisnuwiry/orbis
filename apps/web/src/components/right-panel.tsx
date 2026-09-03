@@ -34,7 +34,7 @@ import {
 import { useDaemon } from '@/lib/daemon-context'
 import { useI18n } from '@/lib/i18n'
 import { usePrimaryShortcut } from '@/lib/platform'
-import { projectDisplayName } from '@/lib/project-presentation'
+import { isProjectlessProject, projectDisplayName } from '@/lib/project-presentation'
 import {
   latestReviewTurnSource,
   reviewDiffSourceLabel,
@@ -123,6 +123,7 @@ export function RightPanel({
   const maxPanelWidth = Math.max(280, Math.min(1_000, viewportWidth - sidebarWidth - 360))
   const fittedPanelWidth = clamp(panelWidth, 280, maxPanelWidth)
   const bufferRoot = session && project ? sessionCwd(session, project) : undefined
+  const hasProject = Boolean(project && !isProjectlessProject(project))
 
   useEffect(() => {
     setFileBuffers({})
@@ -359,7 +360,7 @@ export function RightPanel({
                 icon: 'terminal',
                 onSelect: () => openSurface('terminal'),
               },
-              ...(project
+              ...(hasProject
                 ? [
                     {
                       id: 'files',
@@ -389,7 +390,7 @@ export function RightPanel({
         </Tooltip>
       </header>
 
-      {!activeTab && <PanelChooser hasProject={Boolean(project)} onSelect={openSurface} />}
+      {!activeTab && <PanelChooser hasProject={hasProject} onSelect={openSurface} />}
       {tabs.map((tab) => (
         <div
           aria-labelledby={panelTabId(tab.id)}

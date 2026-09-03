@@ -486,7 +486,7 @@ export function PaduApp() {
         return
       }
       if (key === 'e' && event.shiftKey) {
-        if (!activeProject) return
+        if (!activeProject || isProjectlessProject(activeProject)) return
         event.preventDefault()
         if (rightPanelVisible && requestedPanel === 'files') {
           toggleRightPanel()
@@ -496,7 +496,7 @@ export function PaduApp() {
         return
       }
       if (key === 'd') {
-        if (!activeProject) return
+        if (!activeProject || isProjectlessProject(activeProject)) return
         event.preventDefault()
         if (rightPanelVisible && requestedPanel === 'changes') {
           toggleRightPanel()
