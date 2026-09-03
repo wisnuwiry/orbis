@@ -59,6 +59,9 @@ if [ "$profile" = "debug" ] && [ "$codesign_identity_from_environment" = "0" ] &
   printf '%s\n' "$codesign_identity" > "$debug_identity_cache"
 fi
 debug_adhoc_requirement="=designated => identifier \"$bundle_identifier\""
+if [ -z "${RUSTC_WRAPPER:-}" ] && command -v sccache >/dev/null 2>&1; then
+  export RUSTC_WRAPPER="sccache"
+fi
 if [ "${PADU_SKIP_CARGO_BUILD:-0}" != "1" ]; then
   if [ "$profile" = "release" ]; then
     cargo build --release --package padu --bin padu --bin padu_js_repl --package padu-daemon --bin padu-daemon

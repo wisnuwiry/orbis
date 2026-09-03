@@ -123,6 +123,10 @@ const installer = join(
   `Padu-${version}-${architecture}-Setup.exe`,
 );
 
+if (!process.env.RUSTC_WRAPPER && Bun.which("sccache")) {
+  process.env.RUSTC_WRAPPER = "sccache";
+}
+
 await $`cargo build --locked --release --package padu --bin padu --package padu-daemon --bin padu-daemon`;
 
 const staging = await mkdtemp(join(tmpdir(), "padu-bundle-"));

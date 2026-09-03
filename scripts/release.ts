@@ -206,6 +206,10 @@ if (publishing) {
 
 process.chdir(projectRoot);
 
+if (!process.env.RUSTC_WRAPPER && Bun.which("sccache")) {
+  process.env.RUSTC_WRAPPER = "sccache";
+}
+
 const metadata = JSON.parse(
   await $`cargo metadata --no-deps --format-version 1`.quiet().text(),
 ) as CargoMetadata;

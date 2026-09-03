@@ -108,27 +108,33 @@ jobs:
             pkg-config \
             xdg-desktop-portal
 
+      - name: Run sccache-action
+        uses: mozilla/sccache-action@v0.0.9
+
       - uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target
           key: ${{ matrix.runs-on }}-rust-1.96.0-release-${{ hashFiles('Cargo.lock') }}
           restore-keys: |
             ${{ matrix.runs-on }}-rust-1.96.0-release-
 
-      # `target/` is restored from the release cache, so the previous
-      # release's bundles are still sitting in `target/release` when this one
-      # starts. Cargo does not own them, so nothing else clears them.
+      # Clear stale bundles if any exist
       - name: Clear stale bundles
         run: rm -f target/release/padu-*.tar.gz
 
       - name: Bundle
         env:
+          SCCACHE_GHA_ENABLED: "true"
+          RUSTC_WRAPPER: "sccache"
           PADU_ANALYTICS_ENDPOINT: ${{ secrets.PADU_ANALYTICS_ENDPOINT }}
           PADU_ANALYTICS_WEBSITE_ID: ${{ secrets.PADU_ANALYTICS_WEBSITE_ID }}
         run: ./scripts/bundle-linux.sh
+
+      - name: Show sccache statistics
+        if: always()
+        run: sccache --show-stats
 
       - uses: actions/upload-artifact@v7
         with:
@@ -173,29 +179,35 @@ jobs:
       - name: Install Inno Setup
         run: choco install innosetup --yes --no-progress
 
+      - name: Run sccache-action
+        uses: mozilla/sccache-action@v0.0.9
+
       - uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target
           key: ${{ matrix.runs-on }}-rust-1.96.0-release-${{ hashFiles('Cargo.lock') }}
           restore-keys: |
             ${{ matrix.runs-on }}-rust-1.96.0-release-
 
-      # `target/` is restored from the release cache, so the previous
-      # release's bundles are still sitting in `target/release` when this one
-      # starts. Cargo does not own them, so nothing else clears them.
+      # Clear stale bundles if any exist
       - name: Clear stale bundles
         run: Remove-Item -Force -ErrorAction SilentlyContinue target/release/padu-*.zip, target/release/Padu-*-Setup.exe
 
       - name: Bundle
         env:
+          SCCACHE_GHA_ENABLED: "true"
+          RUSTC_WRAPPER: "sccache"
           PADU_ANALYTICS_ENDPOINT: ${{ secrets.PADU_ANALYTICS_ENDPOINT }}
           PADU_ANALYTICS_WEBSITE_ID: ${{ secrets.PADU_ANALYTICS_WEBSITE_ID }}
           WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
           WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
         run: bun scripts/bundle-windows.ts
+
+      - name: Show sccache statistics
+        if: always()
+        run: sccache --show-stats
 
       - uses: actions/upload-artifact@v7
         with:
@@ -224,12 +236,14 @@ jobs:
       - name: Install create-dmg
         run: brew install create-dmg
 
+      - name: Run sccache-action
+        uses: mozilla/sccache-action@v0.0.9
+
       - uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target
           key: macos-latest-rust-1.96.0-release-${{ hashFiles('Cargo.lock') }}
           restore-keys: |
             macos-latest-rust-1.96.0-release-
@@ -240,10 +254,16 @@ jobs:
       # EdDSA key.
       - name: Release (ad-hoc)
         env:
+          SCCACHE_GHA_ENABLED: "true"
+          RUSTC_WRAPPER: "sccache"
           PADU_ANALYTICS_ENDPOINT: ${{ secrets.PADU_ANALYTICS_ENDPOINT }}
           PADU_ANALYTICS_WEBSITE_ID: ${{ secrets.PADU_ANALYTICS_WEBSITE_ID }}
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: bun run release --adhoc
+
+      - name: Show sccache statistics
+        if: always()
+        run: sccache --show-stats
 
       - uses: actions/upload-artifact@v7
         with:

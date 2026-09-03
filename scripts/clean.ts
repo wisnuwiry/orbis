@@ -36,6 +36,7 @@ Mobile Expo caches, Padu local development caches, and workspace bundler caches.
 Options:
   -a, --all, --deep     Deep clean: also removes all node_modules and clears Bun PM cache
   -c, --cargo, --rust   Clean only Cargo build artifacts (cargo clean & target/)
+      --sccache         Zero sccache statistics and stop local daemon
       --desktop         Clean Desktop app and local Padu caches
   -w, --web             Clean only Web app caches (apps/web)
   -l, --landing         Clean only Landing app caches (apps/landing)
@@ -49,6 +50,7 @@ Examples:
   bun run clean                  # Clean all project and app caches
   bun run clean --dry-run        # Preview what will be cleaned
   bun run clean --cargo          # Clean only Cargo target cache
+  bun run clean --sccache        # Reset sccache stats and daemon
   bun run clean --web            # Clean only Web app cache
   bun run clean --all            # Deep clean including node_modules
 `;
@@ -60,6 +62,7 @@ const { values } = parseArgs({
     deep: { type: "boolean", default: false },
     cargo: { type: "boolean", short: "c", default: false },
     rust: { type: "boolean", default: false },
+    sccache: { type: "boolean", default: false },
     desktop: { type: "boolean", default: false },
     web: { type: "boolean", short: "w", default: false },
     landing: { type: "boolean", short: "l", default: false },
@@ -85,6 +88,7 @@ const isPmCacheRequested = Boolean(values["pm-cache"]);
 const hasSelectiveFilter = Boolean(
   values.cargo ||
     values.rust ||
+    values.sccache ||
     values.desktop ||
     values.web ||
     values.landing ||
@@ -250,6 +254,36 @@ if (shouldCleanCargo) {
       },
     ],
   });
+}
+
+// 1b. Sccache
+if (values.sccache) {
+  const sccacheBin = Bun.which("sccache");
+  if (sccacheBin) {
+    sections.push({
+      title: "Sccache Compiler Cache",
+      items: [
+        {
+          label: "sccache (stop daemon & zero stats)",
+          path: sccacheBin,
+          action: async () => {
+            const stopProc = Bun.spawn(["sccache", "--stop-server"], {
+              stdout: "ignore",
+              stderr: "ignore",
+            });
+            await stopProc.exited;
+            const zeroProc = Bun.spawn(["sccache", "--zero-stats"], {
+              stdout: "ignore",
+              stderr: "ignore",
+            });
+            await zeroProc.exited;
+          },
+        },
+      ],
+    });
+  } else {
+    console.warn("[clean] sccache binary not found on PATH; skipping sccache clean.");
+  }
 }
 
 // 2. Web App

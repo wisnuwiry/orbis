@@ -13,6 +13,10 @@ archive="$target_dir/release/$package.tar.gz"
 staging="$(mktemp -d)"
 trap 'rm -rf -- "$staging"' EXIT
 
+if [ -z "${RUSTC_WRAPPER:-}" ] && command -v sccache >/dev/null 2>&1; then
+  export RUSTC_WRAPPER="sccache"
+fi
+
 cargo build --locked --release \
   --package padu --bin padu --bin padu-updater \
   --package padu-daemon --bin padu-daemon

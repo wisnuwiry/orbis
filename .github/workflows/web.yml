@@ -63,13 +63,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-bun-
 
-      - name: Cache Cargo
+      - name: Run sccache-action
+        uses: mozilla/sccache-action@v0.0.9
+
+      - name: Cache Cargo registry and git
         uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target
           key: protocol-rust-1.96.0-cargo-${{ hashFiles('Cargo.lock') }}
           restore-keys: |
             protocol-rust-1.96.0-cargo-
@@ -78,6 +80,9 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Check wire protocol synchronization
+        env:
+          SCCACHE_GHA_ENABLED: "true"
+          RUSTC_WRAPPER: "sccache"
         run: bun run protocol:check
 
       - name: Check theme synchronization
