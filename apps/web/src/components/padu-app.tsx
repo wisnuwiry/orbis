@@ -476,6 +476,33 @@ export function PaduApp() {
         toggleRightPanel()
         return
       }
+      if (key === 't') {
+        event.preventDefault()
+        if (rightPanelVisible && requestedPanel === 'terminal') {
+          toggleRightPanel()
+        } else {
+          openPanel('terminal')
+        }
+        return
+      }
+      if (key === 'e' && event.shiftKey) {
+        event.preventDefault()
+        if (rightPanelVisible && requestedPanel === 'files') {
+          toggleRightPanel()
+        } else {
+          openPanel('files')
+        }
+        return
+      }
+      if (key === 'd') {
+        event.preventDefault()
+        if (rightPanelVisible && requestedPanel === 'changes') {
+          toggleRightPanel()
+        } else {
+          openPanel('changes')
+        }
+        return
+      }
       if (key === 'b') {
         event.preventDefault()
         setSidebarVisible((value) => !value)
