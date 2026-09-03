@@ -92,14 +92,15 @@ Start-Process $env:TEMP\Padu-Setup.exe
 Padu works with:
 
 - [Amp](https://ampcode.com/)
-- Claude Code
-- Codex CLI
-- Cursor CLI
+- [Claude Code](https://claude.ai/code)
+- [Codex CLI](https://github.com/openai/codex)
+- [Cursor CLI](https://cursor.com/)
 - [Fx](https://fx.sh/)
-- Grok Build
-- Kimi Code
-- OpenCode
-- Pi
+- [Grok Build](https://x.ai/)
+- [Kimi Code](https://kimi.ai/)
+- [OpenCode](https://opencode.ai/)
+- [Pi](https://github.com/badlogic/pi-mono)
+- and [more...](https://padu.dev/agents)
 
 Install and authenticate at least one supported agent CLI before starting Padu.
 Padu detects available CLIs automatically and uses each provider's native
