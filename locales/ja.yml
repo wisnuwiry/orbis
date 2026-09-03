@@ -18,6 +18,10 @@ menu.view: 表示
 menu.command_palette: コマンドパレット…
 menu.toggle_sidebar: サイドバーの表示を切り替える
 menu.toggle_right_panel: 右パネルの表示を切り替える
+menu.open_browser: ブラウザを開く
+menu.open_terminal: ターミナルを開く
+menu.open_files: ファイルを開く
+menu.open_review: レビューを開く
 menu.focus_composer: 入力欄にフォーカスを移動
 menu.toggle_model_picker: モデル選択の表示を切り替える
 menu.toggle_usage_panel: 使用状況パネルの表示を切り替える
@@ -57,6 +61,10 @@ command_palette.show_sidebar: サイドバーを表示
 command_palette.hide_sidebar: サイドバーを隠す
 command_palette.show_right_panel: 右パネルを表示
 command_palette.hide_right_panel: 右パネルを隠す
+command_palette.open_browser: ブラウザを開く
+command_palette.open_terminal: ターミナルを開く
+command_palette.open_files: ファイルを開く
+command_palette.open_review: レビューを開く
 command_palette.current: 現在
 command_palette.you: あなた
 command_palette.agent: エージェント
@@ -111,6 +119,14 @@ keybindings.toggle_sidebar: サイドバーの切り替え
 keybindings.toggle_sidebar_desc: 左側のサイドバーを表示/非表示
 keybindings.toggle_right_panel: 右パネルの切り替え
 keybindings.toggle_right_panel_desc: ツール、差分、ファイルパネルを表示/非表示
+keybindings.open_browser: ブラウザを開く
+keybindings.open_browser_desc: 右パネルでブラウザを表示/非表示
+keybindings.open_terminal: ターミナルを開く
+keybindings.open_terminal_desc: 右パネルでターミナルを表示/非表示
+keybindings.open_files: ファイルを開く
+keybindings.open_files_desc: 右パネルでファイルエクスプローラーを表示/非表示
+keybindings.open_review: レビューを開く
+keybindings.open_review_desc: 右パネルでコード差分レビューを表示/非表示
 keybindings.toggle_usage_panel: 使用状況パネルの切り替え
 keybindings.toggle_usage_panel_desc: トークンと費用の使用状況を表示/非表示
 keybindings.toggle_fps: FPS 表示の切り替え
