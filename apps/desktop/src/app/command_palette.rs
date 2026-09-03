@@ -841,7 +841,7 @@ impl Padu {
             ),
         ]);
 
-        if self.selected_project().is_some() {
+        if self.active_project().is_some() {
             commands.extend([
                 CommandPaletteItem::command(
                     PaletteSection::Commands,

@@ -1212,6 +1212,22 @@ impl Padu {
         self.state.projects.iter().find(|project| project.id == id)
     }
 
+    pub(super) fn active_project(&self) -> Option<&Project> {
+        let project = if let Some(session) = self.selected_session() {
+            self.state
+                .projects
+                .iter()
+                .find(|project| project.id == session.project_id)?
+        } else {
+            self.selected_project()?
+        };
+        if project.is_projectless() || project.name == Project::PROJECTLESS_NAME {
+            None
+        } else {
+            Some(project)
+        }
+    }
+
     pub(super) fn selected_session(&self) -> Option<&AgentSession> {
         let id = self.state.selected_session?;
         self.state.sessions.iter().find(|session| session.id == id)

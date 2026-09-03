@@ -2105,7 +2105,7 @@ impl Padu {
     }
 
     pub(super) fn toggle_or_open_files_surface(&mut self, cx: &mut Context<Self>) {
-        if self.selected_project().is_none() {
+        if self.active_project().is_none() {
             return;
         }
         if let Some((index, _)) =
@@ -2134,7 +2134,7 @@ impl Padu {
     }
 
     pub(super) fn toggle_or_open_review_surface(&mut self, cx: &mut Context<Self>) {
-        if self.selected_project().is_none() {
+        if self.active_project().is_none() {
             return;
         }
         if let Some((index, _)) = self
@@ -2698,7 +2698,7 @@ impl Padu {
         if !self.right_panel_surfaces.is_empty() {
             let weak = cx.entity().downgrade();
             let existing_surfaces = self.right_panel_surfaces.clone();
-            let has_project = self.selected_project().is_some();
+            let has_project = self.active_project().is_some();
             let mut options = vec![
                 RightPanelSurface::new_browser(),
                 RightPanelSurface::new_terminal(),
@@ -2757,7 +2757,7 @@ impl Padu {
 
     fn render_right_panel_chooser(&self, cx: &mut Context<Self>) -> Stateful<Div> {
         let theme = Theme::current(cx);
-        let has_project = self.selected_project().is_some();
+        let has_project = self.active_project().is_some();
         div()
             .id("right-panel-chooser")
             .flex_1()
@@ -2910,7 +2910,7 @@ impl Padu {
         cx: &mut Context<Self>,
     ) -> Div {
         let theme = Theme::current(cx);
-        let Some(project) = self.selected_project() else {
+        let Some(project) = self.active_project() else {
             return self.render_right_panel_empty_message(
                 tr!("files.no_project_open"),
                 tr!("files.no_project_open_description"),
