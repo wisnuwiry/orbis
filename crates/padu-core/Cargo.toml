@@ -10,7 +10,7 @@ readme = "README.md"
 agent-client-protocol = "2.0.0"
 alacritty_terminal = { version = "0.26", default-features = false }
 anyhow = "1.0"
-base64 = "0.22"
+base64 = "0.23"
 chrono = { version = "0.4", features = ["serde"] }
 crossbeam-channel = "0.5"
 dirs = "6.0"
