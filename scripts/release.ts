@@ -180,8 +180,8 @@ if (!Number.isSafeInteger(historyCount) || historyCount < 0) {
   throw new Error("PADU_HISTORY_COUNT must be a non-negative integer.");
 }
 if (!values["skip-build"] && (!analyticsEndpoint || !analyticsWebsiteId)) {
-  throw new Error(
-    "Set PADU_ANALYTICS_ENDPOINT and PADU_ANALYTICS_WEBSITE_ID before building a release.",
+  console.warn(
+    "Notice: PADU_ANALYTICS_ENDPOINT or PADU_ANALYTICS_WEBSITE_ID is not set. Analytics will be disabled in this build.",
   );
 }
 
