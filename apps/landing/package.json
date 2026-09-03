@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "deploy": "bun run build && wrangler deploy",
+    "deploy": "bun run build && wrangler pages deploy dist/client --project-name padu-website --branch main",
     "clean": "bun ../../scripts/clean.ts --landing"
   },
   "dependencies": {

@@ -90,6 +90,9 @@ export default defineConfig((): UserConfig => {
           quoteStyle: "double",
           semicolons: true,
         },
+        prerender: {
+          enabled: true,
+        },
         pages: sitemapPages,
         sitemap: {
           host: siteHost,

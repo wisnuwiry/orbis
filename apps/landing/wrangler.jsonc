@@ -2,6 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "padu-website",
   "compatibility_date": "2026-08-01",
+  "pages_build_output_dir": "dist/client",
   "compatibility_flags": ["nodejs_compat"],
   "main": "./src/server-entry.ts",
   "observability": {
