@@ -107,6 +107,29 @@ without those the script packages unsigned binaries and says so.
   preserving provider-native event order and session semantics.
 - Add or update tests for behavior that can be verified without the UI.
 
+## Cleaning caches and build artifacts
+
+To clean all build caches, `cargo clean`, and app/package caches across the entire workspace in a single command:
+
+```sh
+bun run clean
+```
+
+Or preview what will be cleaned without deleting anything:
+
+```sh
+bun run clean --dry-run
+```
+
+For targeted or deep cleanup:
+
+- `bun run clean:cargo` — Cargo target and Rust build cache only
+- `bun run web:clean` — Web client cache (`dist`, `.wrangler`, `.vite`)
+- `bun run mobile:clean` — Mobile Expo cache (`.expo`, `dist`)
+- `bun run landing:clean` — Landing page cache (`dist`, `.wrangler`, `.vite`)
+- `bun run desktop:clean` — Desktop Cargo and local Padu caches
+- `bun run clean:all` — Deep clean including workspace `node_modules` and Bun PM cache
+
 ## Checks
 
 Run the focused checks relevant to your change, then run the full baseline
