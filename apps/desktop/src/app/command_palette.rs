@@ -160,6 +160,10 @@ enum PaletteAction {
     CollapseSidebarGroups,
     ToggleSidebar,
     ToggleRightPanel,
+    OpenBrowser,
+    OpenTerminal,
+    OpenFiles,
+    OpenReview,
     OpenSettings(SettingsPage),
     OpenOnboarding,
     SelectTask(Uuid),
@@ -817,7 +821,48 @@ impl Padu {
                 "toggle show hide right panel files diff terminal browser",
                 next(),
             ),
+            CommandPaletteItem::command(
+                PaletteSection::Commands,
+                tr!("command_palette.open_browser"),
+                "icons/globe.svg",
+                Some(crate::platform::primary_shortcut("⌥⌘B", "Ctrl+Alt+B")),
+                PaletteAction::OpenBrowser,
+                "browser web webview open right panel",
+                next(),
+            ),
+            CommandPaletteItem::command(
+                PaletteSection::Commands,
+                tr!("command_palette.open_terminal"),
+                "icons/terminal.svg",
+                Some(crate::platform::primary_shortcut("⌘T", "Ctrl+T")),
+                PaletteAction::OpenTerminal,
+                "terminal shell console bash zsh open right panel",
+                next(),
+            ),
         ]);
+
+        if self.active_project().is_some() {
+            commands.extend([
+                CommandPaletteItem::command(
+                    PaletteSection::Commands,
+                    tr!("command_palette.open_files"),
+                    "icons/folder.svg",
+                    Some(crate::platform::primary_shortcut("⇧⌘E", "Ctrl+Shift+E")),
+                    PaletteAction::OpenFiles,
+                    "files explorer tree workspace open right panel",
+                    next(),
+                ),
+                CommandPaletteItem::command(
+                    PaletteSection::Commands,
+                    tr!("command_palette.open_review"),
+                    "icons/file-diff.svg",
+                    Some(crate::platform::primary_shortcut("⌘D", "Ctrl+D")),
+                    PaletteAction::OpenReview,
+                    "review diff changes git open right panel",
+                    next(),
+                ),
+            ]);
+        }
 
         for (page, label_key, icon, keywords) in [
             (
@@ -1603,6 +1648,10 @@ impl Padu {
             PaletteAction::ToggleRightPanel => {
                 self.toggle_right_panel_action(&ToggleRightPanel, window, cx)
             }
+            PaletteAction::OpenBrowser => self.open_browser_action(&OpenBrowser, window, cx),
+            PaletteAction::OpenTerminal => self.open_terminal_action(&OpenTerminal, window, cx),
+            PaletteAction::OpenFiles => self.open_files_action(&OpenFiles, window, cx),
+            PaletteAction::OpenReview => self.open_review_action(&OpenReview, window, cx),
             PaletteAction::OpenSettings(page) => {
                 self.open_settings_action(&OpenSettings, window, cx);
                 self.open_settings_page(page, cx);

@@ -36,6 +36,14 @@ menu.toggle_sidebar:
   en: Toggle Sidebar
 menu.toggle_right_panel:
   en: Toggle Right Panel
+menu.open_browser:
+  en: Open Browser
+menu.open_terminal:
+  en: Open Terminal
+menu.open_files:
+  en: Open Files
+menu.open_review:
+  en: Open Review
 menu.focus_composer:
   en: Focus Composer
 menu.toggle_model_picker:
@@ -112,6 +120,14 @@ command_palette.show_right_panel:
   en: Show right panel
 command_palette.hide_right_panel:
   en: Hide right panel
+command_palette.open_browser:
+  en: Open browser
+command_palette.open_terminal:
+  en: Open terminal
+command_palette.open_files:
+  en: Open files
+command_palette.open_review:
+  en: Open review
 command_palette.current:
   en: Current
 command_palette.you:
@@ -218,6 +234,22 @@ keybindings.toggle_right_panel:
   en: Toggle Right Panel
 keybindings.toggle_right_panel_desc:
   en: Show or hide the tools, diff, and files panel
+keybindings.open_browser:
+  en: Open Browser
+keybindings.open_browser_desc:
+  en: Show or hide the browser in the right panel
+keybindings.open_terminal:
+  en: Open Terminal
+keybindings.open_terminal_desc:
+  en: Show or hide the terminal in the right panel
+keybindings.open_files:
+  en: Open Files
+keybindings.open_files_desc:
+  en: Show or hide the files explorer in the right panel
+keybindings.open_review:
+  en: Open Review
+keybindings.open_review_desc:
+  en: Show or hide the diff review in the right panel
 keybindings.toggle_usage_panel:
   en: Toggle Usage Panel
 keybindings.toggle_usage_panel_desc:

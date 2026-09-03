@@ -34,7 +34,7 @@ import {
 import { useDaemon } from '@/lib/daemon-context'
 import { useI18n } from '@/lib/i18n'
 import { usePrimaryShortcut } from '@/lib/platform'
-import { projectDisplayName } from '@/lib/project-presentation'
+import { isProjectlessProject, projectDisplayName } from '@/lib/project-presentation'
 import {
   latestReviewTurnSource,
   reviewDiffSourceLabel,
@@ -123,6 +123,7 @@ export function RightPanel({
   const maxPanelWidth = Math.max(280, Math.min(1_000, viewportWidth - sidebarWidth - 360))
   const fittedPanelWidth = clamp(panelWidth, 280, maxPanelWidth)
   const bufferRoot = session && project ? sessionCwd(session, project) : undefined
+  const hasProject = Boolean(project && !isProjectlessProject(project))
 
   useEffect(() => {
     setFileBuffers({})
@@ -359,20 +360,24 @@ export function RightPanel({
                 icon: 'terminal',
                 onSelect: () => openSurface('terminal'),
               },
-              {
-                id: 'files',
-                label: t('right_panel.files'),
-                icon: 'folder',
-                selected: tabs.some((tab) => tab.surface === 'files'),
-                onSelect: () => openSurface('files'),
-              },
-              {
-                id: 'changes',
-                label: t('right_panel.diff'),
-                icon: 'fileDiff',
-                selected: tabs.some((tab) => tab.surface === 'changes'),
-                onSelect: () => openSurface('changes'),
-              },
+              ...(hasProject
+                ? [
+                    {
+                      id: 'files',
+                      label: t('right_panel.files'),
+                      icon: 'folder' as const,
+                      selected: tabs.some((tab) => tab.surface === 'files'),
+                      onSelect: () => openSurface('files'),
+                    },
+                    {
+                      id: 'changes',
+                      label: t('right_panel.diff'),
+                      icon: 'fileDiff' as const,
+                      selected: tabs.some((tab) => tab.surface === 'changes'),
+                      onSelect: () => openSurface('changes'),
+                    },
+                  ]
+                : []),
             ]}
           >
             <PaduIcon className="size-3.5" name="plus" />
@@ -385,7 +390,7 @@ export function RightPanel({
         </Tooltip>
       </header>
 
-      {!activeTab && <PanelChooser onSelect={openSurface} />}
+      {!activeTab && <PanelChooser hasProject={hasProject} onSelect={openSurface} />}
       {tabs.map((tab) => (
         <div
           aria-labelledby={panelTabId(tab.id)}
@@ -524,17 +529,48 @@ function PanelTabButton({
   )
 }
 
-function PanelChooser({ onSelect }: { onSelect: (surface: PanelSurface) => void }) {
+function PanelChooser({
+  onSelect,
+  hasProject = false,
+}: {
+  onSelect: (surface: PanelSurface) => void
+  hasProject?: boolean
+}) {
   const { t } = useI18n()
+  const terminalShortcut = usePrimaryShortcut('⌘T', 'Ctrl+T')
+  const filesShortcut = usePrimaryShortcut('⇧⌘E', 'Ctrl+Shift+E')
+  const diffShortcut = usePrimaryShortcut('⌘D', 'Ctrl+D')
   return (
     <div className="flex min-h-0 flex-1 items-center justify-center px-5 pb-8">
       <div className="w-full max-w-[420px] text-center">
         <h3 className="text-[13px] font-medium">{t('right_panel.open_surface')}</h3>
         <p className="mt-[5px] text-[11px] text-[var(--text-tertiary)]">{t('right_panel.choose_surface')}</p>
-        <div className="mt-5 grid grid-cols-2 gap-2 text-left">
-          <PanelCard icon={<PaduIcon className="size-[18px]" name="terminal" />} label={t('right_panel.terminal')} description={t('right_panel.terminal_description')} onClick={() => onSelect('terminal')} />
-          <PanelCard icon={<PaduIcon className="size-[18px]" name="folder" />} label={t('right_panel.files')} description={t('right_panel.files_description')} onClick={() => onSelect('files')} />
-          <PanelCard icon={<PaduIcon className="size-[18px]" name="fileDiff" />} label={t('right_panel.diff')} description={t('right_panel.diff_description')} onClick={() => onSelect('changes')} />
+        <div className={cn('mt-5 grid gap-2 text-left', hasProject ? 'grid-cols-2' : 'grid-cols-1')}>
+          <PanelCard
+            icon={<PaduIcon className="size-[18px]" name="terminal" />}
+            label={t('right_panel.terminal')}
+            description={t('right_panel.terminal_description')}
+            shortcut={terminalShortcut}
+            onClick={() => onSelect('terminal')}
+          />
+          {hasProject && (
+            <>
+              <PanelCard
+                icon={<PaduIcon className="size-[18px]" name="folder" />}
+                label={t('right_panel.files')}
+                description={t('right_panel.files_description')}
+                shortcut={filesShortcut}
+                onClick={() => onSelect('files')}
+              />
+              <PanelCard
+                icon={<PaduIcon className="size-[18px]" name="fileDiff" />}
+                label={t('right_panel.diff')}
+                description={t('right_panel.diff_description')}
+                shortcut={diffShortcut}
+                onClick={() => onSelect('changes')}
+              />
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -545,11 +581,13 @@ function PanelCard({
   icon,
   label,
   description,
+  shortcut,
   onClick,
 }: {
   icon: ReactNode
   label: string
   description: string
+  shortcut?: string
   onClick?: () => void
 }) {
   return (
@@ -558,7 +596,14 @@ function PanelCard({
       type="button"
       onClick={onClick}
     >
-      <span className="text-[var(--text-tertiary)]">{icon}</span>
+      <div className="flex w-full items-center justify-between">
+        <span className="text-[var(--text-tertiary)]">{icon}</span>
+        {shortcut && (
+          <kbd className="inline-flex h-5 min-w-5 items-center justify-center rounded border border-[var(--border)] bg-[var(--overlay-strong)] px-1.5 text-[11px] font-medium text-[var(--text-tertiary)]">
+            {shortcut}
+          </kbd>
+        )}
+      </div>
       <span className="mt-3 text-[12.5px] font-medium">{label}</span>
       <span className="mt-1 text-[10.5px] leading-4 text-[var(--text-tertiary)]">{description}</span>
     </button>

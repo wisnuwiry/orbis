@@ -911,6 +911,16 @@ impl RightPanelSurface {
             Self::File(path) => file_icon_for_path(path),
         }
     }
+
+    pub(super) fn shortcut(&self) -> Option<&'static str> {
+        match self {
+            Self::Browser(_) => Some(crate::platform::primary_shortcut("⌥⌘B", "Ctrl+Alt+B")),
+            Self::Terminal(_) => Some(crate::platform::primary_shortcut("⌘T", "Ctrl+T")),
+            Self::Files => Some(crate::platform::primary_shortcut("⇧⌘E", "Ctrl+Shift+E")),
+            Self::Diff => Some(crate::platform::primary_shortcut("⌘D", "Ctrl+D")),
+            _ => None,
+        }
+    }
 }
 
 fn right_panel_tab_label(surface: &RightPanelSurface, files_selected_path: Option<&str>) -> String {
@@ -1661,6 +1671,30 @@ mod tests {
     }
 
     #[test]
+    fn right_panel_surface_shortcuts() {
+        assert_eq!(
+            RightPanelSurface::new_browser().shortcut(),
+            Some(crate::platform::primary_shortcut("⌥⌘B", "Ctrl+Alt+B"))
+        );
+        assert_eq!(
+            RightPanelSurface::new_terminal().shortcut(),
+            Some(crate::platform::primary_shortcut("⌘T", "Ctrl+T"))
+        );
+        assert_eq!(
+            RightPanelSurface::Files.shortcut(),
+            Some(crate::platform::primary_shortcut("⇧⌘E", "Ctrl+Shift+E"))
+        );
+        assert_eq!(
+            RightPanelSurface::Diff.shortcut(),
+            Some(crate::platform::primary_shortcut("⌘D", "Ctrl+D"))
+        );
+        assert_eq!(
+            RightPanelSurface::File("src/main.rs".into()).shortcut(),
+            None
+        );
+    }
+
+    #[test]
     fn right_panel_state_isolated_by_session() {
         let session_with_terminal = Uuid::new_v4();
         let other_session = Uuid::new_v4();
@@ -1987,6 +2021,140 @@ impl Padu {
         self.request_active_browser_focus();
         self.set_right_panel_visible(true, cx);
         cx.notify();
+    }
+
+    pub(super) fn open_browser_action(
+        &mut self,
+        _: &OpenBrowser,
+        _: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        self.toggle_or_open_browser_surface(cx);
+    }
+
+    pub(super) fn open_terminal_action(
+        &mut self,
+        _: &OpenTerminal,
+        _: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        self.toggle_or_open_terminal_surface(cx);
+    }
+
+    pub(super) fn open_files_action(
+        &mut self,
+        _: &OpenFiles,
+        _: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        self.toggle_or_open_files_surface(cx);
+    }
+
+    pub(super) fn open_review_action(
+        &mut self,
+        _: &OpenReview,
+        _: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        self.toggle_or_open_review_surface(cx);
+    }
+
+    pub(super) fn toggle_or_open_browser_surface(&mut self, cx: &mut Context<Self>) {
+        if let Some((index, _)) = self
+            .right_panel_surfaces
+            .iter()
+            .enumerate()
+            .find(|(_, surface)| matches!(surface, RightPanelSurface::Browser(_)))
+        {
+            if self.right_panel_visible && self.right_panel_active_surface == Some(index) {
+                self.set_right_panel_visible(false, cx);
+            } else {
+                self.right_panel_active_surface = Some(index);
+                self.reveal_right_panel_tab(index);
+                self.request_active_browser_focus();
+                self.set_right_panel_visible(true, cx);
+                cx.notify();
+            }
+        } else {
+            self.open_right_panel_surface(RightPanelSurface::new_browser(), cx);
+        }
+    }
+
+    pub(super) fn toggle_or_open_terminal_surface(&mut self, cx: &mut Context<Self>) {
+        if let Some((index, surface)) = self
+            .right_panel_surfaces
+            .iter()
+            .enumerate()
+            .find(|(_, surface)| matches!(surface, RightPanelSurface::Terminal(_)))
+        {
+            if self.right_panel_visible && self.right_panel_active_surface == Some(index) {
+                self.set_right_panel_visible(false, cx);
+            } else {
+                if let Some(terminal_id) = surface.terminal_id() {
+                    self.ensure_right_panel_terminal(terminal_id, cx);
+                }
+                self.right_panel_active_surface = Some(index);
+                self.reveal_right_panel_tab(index);
+                self.request_active_terminal_focus();
+                self.set_right_panel_visible(true, cx);
+                cx.notify();
+            }
+        } else {
+            self.open_right_panel_surface(RightPanelSurface::new_terminal(), cx);
+        }
+    }
+
+    pub(super) fn toggle_or_open_files_surface(&mut self, cx: &mut Context<Self>) {
+        if self.active_project().is_none() {
+            return;
+        }
+        if let Some((index, _)) =
+            self.right_panel_surfaces
+                .iter()
+                .enumerate()
+                .find(|(_, surface)| {
+                    matches!(
+                        surface,
+                        RightPanelSurface::Files | RightPanelSurface::File(_)
+                    )
+                })
+        {
+            if self.right_panel_visible && self.right_panel_active_surface == Some(index) {
+                self.set_right_panel_visible(false, cx);
+            } else {
+                self.refresh_right_panel_working_tree(cx);
+                self.right_panel_active_surface = Some(index);
+                self.reveal_right_panel_tab(index);
+                self.set_right_panel_visible(true, cx);
+                cx.notify();
+            }
+        } else {
+            self.open_right_panel_surface(RightPanelSurface::Files, cx);
+        }
+    }
+
+    pub(super) fn toggle_or_open_review_surface(&mut self, cx: &mut Context<Self>) {
+        if self.active_project().is_none() {
+            return;
+        }
+        if let Some((index, _)) = self
+            .right_panel_surfaces
+            .iter()
+            .enumerate()
+            .find(|(_, surface)| matches!(surface, RightPanelSurface::Diff))
+        {
+            if self.right_panel_visible && self.right_panel_active_surface == Some(index) {
+                self.set_right_panel_visible(false, cx);
+            } else {
+                self.refresh_right_panel_diff(cx);
+                self.right_panel_active_surface = Some(index);
+                self.reveal_right_panel_tab(index);
+                self.set_right_panel_visible(true, cx);
+                cx.notify();
+            }
+        } else {
+            self.open_right_panel_surface(RightPanelSurface::Diff, cx);
+        }
     }
 
     pub(super) fn open_turn_diff(&mut self, turn_id: Uuid, cx: &mut Context<Self>) {
@@ -2530,12 +2698,15 @@ impl Padu {
         if !self.right_panel_surfaces.is_empty() {
             let weak = cx.entity().downgrade();
             let existing_surfaces = self.right_panel_surfaces.clone();
-            let options = [
+            let has_project = self.active_project().is_some();
+            let mut options = vec![
                 RightPanelSurface::new_browser(),
                 RightPanelSurface::new_terminal(),
-                RightPanelSurface::Files,
-                RightPanelSurface::Diff,
             ];
+            if has_project {
+                options.push(RightPanelSurface::Files);
+                options.push(RightPanelSurface::Diff);
+            }
             let handle = self.menu_handle("add-right-panel-surface", cx);
             header = header.child(
                 div()
@@ -2586,6 +2757,7 @@ impl Padu {
 
     fn render_right_panel_chooser(&self, cx: &mut Context<Self>) -> Stateful<Div> {
         let theme = Theme::current(cx);
+        let has_project = self.active_project().is_some();
         div()
             .id("right-panel-chooser")
             .flex_1()
@@ -2633,23 +2805,25 @@ impl Padu {
                                 cx,
                             )),
                     )
-                    .child(
-                        div()
-                            .mt(px(8.0))
-                            .w_full()
-                            .flex()
-                            .gap(px(8.0))
-                            .child(self.render_right_panel_card(
-                                RightPanelSurface::Files,
-                                tr!("right_panel.files_description"),
-                                cx,
-                            ))
-                            .child(self.render_right_panel_card(
-                                RightPanelSurface::Diff,
-                                tr!("right_panel.diff_description"),
-                                cx,
-                            )),
-                    ),
+                    .when(has_project, |chooser| {
+                        chooser.child(
+                            div()
+                                .mt(px(8.0))
+                                .w_full()
+                                .flex()
+                                .gap(px(8.0))
+                                .child(self.render_right_panel_card(
+                                    RightPanelSurface::Files,
+                                    tr!("right_panel.files_description"),
+                                    cx,
+                                ))
+                                .child(self.render_right_panel_card(
+                                    RightPanelSurface::Diff,
+                                    tr!("right_panel.diff_description"),
+                                    cx,
+                                )),
+                        )
+                    }),
             )
     }
 
@@ -2662,12 +2836,13 @@ impl Padu {
         let theme = Theme::current(cx);
         let icon_path = surface.icon_path();
         let label = surface.label();
+        let shortcut = surface.shortcut();
         div()
             .id(SharedString::from(format!(
                 "right-panel-card-{}",
                 label.to_lowercase()
             )))
-            .h(px(112.0))
+            .h(px(114.0))
             .flex_1()
             .min_w_0()
             .p(px(14.0))
@@ -2681,7 +2856,17 @@ impl Padu {
             .cursor_pointer()
             .hover(|element| element.bg(theme.raised).border_color(theme.text_ghost))
             .active(|element| element.bg(theme.overlay_strong))
-            .child(icon(icon_path, 18.0, theme.text_secondary))
+            .child(
+                div()
+                    .w_full()
+                    .flex()
+                    .items_center()
+                    .justify_between()
+                    .child(icon(icon_path, 18.0, theme.text_secondary))
+                    .when_some(shortcut, |row, shortcut| {
+                        row.child(kbd_badge(shortcut, &theme))
+                    }),
+            )
             .child(
                 div()
                     .mt(px(12.0))
@@ -2725,7 +2910,7 @@ impl Padu {
         cx: &mut Context<Self>,
     ) -> Div {
         let theme = Theme::current(cx);
-        let Some(project) = self.selected_project() else {
+        let Some(project) = self.active_project() else {
             return self.render_right_panel_empty_message(
                 tr!("files.no_project_open"),
                 tr!("files.no_project_open_description"),

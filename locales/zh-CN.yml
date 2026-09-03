@@ -18,6 +18,10 @@ menu.view: 显示
 menu.command_palette: 命令面板…
 menu.toggle_sidebar: 显示或隐藏侧边栏
 menu.toggle_right_panel: 显示或隐藏右侧面板
+menu.open_browser: 打开浏览器
+menu.open_terminal: 打开终端
+menu.open_files: 打开文件
+menu.open_review: 打开审阅
 menu.focus_composer: 将焦点移到输入框
 menu.toggle_model_picker: 打开或关闭模型选择器
 menu.toggle_usage_panel: 打开或关闭用量面板
@@ -55,6 +59,10 @@ command_palette.show_sidebar: 显示侧边栏
 command_palette.hide_sidebar: 隐藏侧边栏
 command_palette.show_right_panel: 显示右侧面板
 command_palette.hide_right_panel: 隐藏右侧面板
+command_palette.open_browser: 打开浏览器
+command_palette.open_terminal: 打开终端
+command_palette.open_files: 打开文件
+command_palette.open_review: 打开审阅
 command_palette.current: 当前
 command_palette.you: 你
 command_palette.agent: 智能体
@@ -107,6 +115,14 @@ keybindings.toggle_sidebar: 切换侧边栏
 keybindings.toggle_sidebar_desc: 显示或隐藏左侧项目与任务列表
 keybindings.toggle_right_panel: 切换右侧面板
 keybindings.toggle_right_panel_desc: 显示或隐藏工具、差分与文件面板
+keybindings.open_browser: 打开浏览器
+keybindings.open_browser_desc: 在右侧面板中显示或隐藏浏览器
+keybindings.open_terminal: 打开终端
+keybindings.open_terminal_desc: 在右侧面板中显示或隐藏终端
+keybindings.open_files: 打开文件
+keybindings.open_files_desc: 在右侧面板中显示或隐藏文件浏览器
+keybindings.open_review: 打开审阅
+keybindings.open_review_desc: 在右侧面板中显示或隐藏代码审阅差分
 keybindings.toggle_usage_panel: 切换用量面板
 keybindings.toggle_usage_panel_desc: 显示或隐藏用量与费用统计
 keybindings.toggle_fps: 切换帧率显示
