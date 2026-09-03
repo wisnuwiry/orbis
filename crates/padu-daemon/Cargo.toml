@@ -18,9 +18,16 @@ name = "padu-debug-daemon"
 path = "src/bin/padu-debug-daemon.rs"
 required-features = ["dev-binary"]
 
+[[bin]]
+name = "padu-provider-test"
+path = "src/bin/provider_test.rs"
+
 [dependencies]
 anyhow = "1.0"
+crossbeam-channel = "0.5"
+serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+smol = "2"
 padu-core = { path = "../padu-core" }
 padu-protocol = { path = "../padu-protocol" }
 

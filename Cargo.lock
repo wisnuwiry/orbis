@@ -5223,10 +5223,13 @@ name = "padu-daemon"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "crossbeam-channel",
  "libc",
  "padu-core",
  "padu-protocol",
+ "serde",
  "serde_json",
+ "smol",
  "windows-sys 0.61.2",
 ]
 
