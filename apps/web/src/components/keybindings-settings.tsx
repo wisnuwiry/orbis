@@ -97,6 +97,18 @@ export const KEYBINDING_SECTIONS: KeybindingSection[] = [
         other: 'Ctrl+]',
       },
       {
+        titleKey: 'keybindings.previous_session',
+        descKey: 'keybindings.previous_session_desc',
+        mac: '⌥⌘↑',
+        other: 'Ctrl+Alt+Up',
+      },
+      {
+        titleKey: 'keybindings.next_session',
+        descKey: 'keybindings.next_session_desc',
+        mac: '⌥⌘↓',
+        other: 'Ctrl+Alt+Down',
+      },
+      {
         titleKey: 'keybindings.next_task',
         descKey: 'keybindings.next_task_desc',
         mac: 'Ctrl+Tab',

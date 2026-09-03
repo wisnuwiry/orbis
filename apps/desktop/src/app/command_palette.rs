@@ -167,6 +167,8 @@ enum PaletteAction {
     OpenSettings(SettingsPage),
     OpenOnboarding,
     SelectTask(Uuid),
+    SelectPreviousTask,
+    SelectNextTask,
 }
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
@@ -828,6 +830,24 @@ impl Padu {
                 Some(crate::platform::primary_shortcut("⌥⌘B", "Ctrl+Alt+B")),
                 PaletteAction::OpenBrowser,
                 "browser web webview open right panel",
+                next(),
+            ),
+            CommandPaletteItem::command(
+                PaletteSection::Commands,
+                tr!("command_palette.previous_session"),
+                "icons/arrow-up.svg",
+                Some(crate::platform::primary_shortcut("⌥⌘↑", "Ctrl+Alt+Up")),
+                PaletteAction::SelectPreviousTask,
+                "previous conversation topic session switch navigate prev prior chat",
+                next(),
+            ),
+            CommandPaletteItem::command(
+                PaletteSection::Commands,
+                tr!("command_palette.next_session"),
+                "icons/arrow-down.svg",
+                Some(crate::platform::primary_shortcut("⌥⌘↓", "Ctrl+Alt+Down")),
+                PaletteAction::SelectNextTask,
+                "next conversation topic session switch navigate forward chat",
                 next(),
             ),
             CommandPaletteItem::command(
@@ -1663,6 +1683,18 @@ impl Padu {
             PaletteAction::SelectTask(session_id) => {
                 self.settings_page = None;
                 self.select_session(session_id, cx);
+                let focus = self.composer_focus(cx);
+                window.focus(&focus, cx);
+            }
+            PaletteAction::SelectPreviousTask => {
+                self.settings_page = None;
+                self.select_adjacent_sidebar_session(self.state.selected_session, -1, cx);
+                let focus = self.composer_focus(cx);
+                window.focus(&focus, cx);
+            }
+            PaletteAction::SelectNextTask => {
+                self.settings_page = None;
+                self.select_adjacent_sidebar_session(self.state.selected_session, 1, cx);
                 let focus = self.composer_focus(cx);
                 window.focus(&focus, cx);
             }

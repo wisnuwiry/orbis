@@ -269,7 +269,6 @@ export function Sidebar({
               if (row.kind === 'showMore') {
                 return (
                   <div className="relative px-2.5 pb-1">
-                    <div className="pointer-events-none absolute left-[15px] top-0 h-[14px] w-[8px] rounded-bl-[4px] border-b border-l border-border/40" />
                     <div className="pl-5 pr-2">
                       <button
                         className="flex h-7 items-center justify-start rounded-[5px] px-2 text-[12px] font-medium text-[var(--text-tertiary)] hover:bg-sidebar-accent hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
@@ -298,15 +297,11 @@ export function Sidebar({
               }
               if (row.kind === 'group') {
                 const isProjectGroup = row.group.kind === 'project' || row.group.kind === 'projectless'
-                const hasExpandedChildren = !row.collapsed && row.group.sessions.length > 0
                 const label = row.group.kind === 'updated' && row.group.dateGroup
                   ? t(GROUP_TRANSLATION_KEYS[row.group.dateGroup])
                   : row.group.label
                 return (
                   <div className="relative px-2.5">
-                    {isProjectGroup && hasExpandedChildren && (
-                      <div className="pointer-events-none absolute bottom-0 left-[15px] top-[22px] w-px bg-border/40" />
-                    )}
                     <div className="group/header flex h-7 items-center justify-between px-1.5">
                       <button
                         aria-expanded={!row.collapsed}
@@ -426,9 +421,6 @@ export function Sidebar({
               }
               return (
                 <div className="relative px-2.5 pb-px">
-                  {grouping === 'project' && (
-                    <div className="pointer-events-none absolute bottom-0 left-[15px] top-0 w-px bg-border/40" />
-                  )}
                   <SessionRow
                     groupedByProject={grouping === 'project'}
                     item={row.item}
@@ -646,13 +638,16 @@ function SessionRow({
           <div
             className={cn(
               'flex w-full min-w-0 flex-col rounded-[7px]',
-              groupedByProject ? 'h-[36px] justify-center pl-5 pr-2 py-1' : 'h-[51px] gap-1 px-2 py-[7px]',
+              groupedByProject ? 'h-[36px] justify-center pl-1.5 pr-2 py-1' : 'h-[51px] gap-1 px-1.5 py-[7px]',
             )}
           >
-            <span className="flex min-w-0 w-full items-center gap-1.5 leading-[18px]">
+            <span className="flex min-w-0 w-full items-center gap-[5px] leading-[18px]">
+              <span className="grid size-3.5 shrink-0 place-items-center">
+                <span className="size-1.5 rounded-full bg-primary" />
+              </span>
               <Input
                 autoFocus
-                className="h-[22px] min-w-0 flex-1 rounded border-ring bg-[var(--inset)] px-1 text-[13px]"
+                className="h-[22px] min-w-0 flex-1 rounded border-0 border-none bg-[var(--inset)] px-1 text-[13px] shadow-none outline-none focus-visible:border-0 focus-visible:border-none focus-visible:ring-0 focus-visible:outline-none"
                 value={title}
                 onBlur={() => void commitRename()}
                 onChange={(event) => setTitle(event.target.value)}
@@ -677,7 +672,7 @@ function SessionRow({
           <button
             aria-current={selected ? 'page' : undefined}
             aria-haspopup="menu"
-            className="flex h-[34px] w-full min-w-0 items-center justify-between gap-2 rounded-[6px] pl-5 pr-2 text-left outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
+            className="flex h-[34px] w-full min-w-0 items-center justify-between gap-2 rounded-[6px] pl-1.5 pr-2 text-left outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
             ref={rowButton}
             type="button"
             onClick={() => onSelect(item.session.id)}
@@ -710,7 +705,15 @@ function SessionRow({
               }
             }}
           >
-            <span className="flex min-w-0 flex-1 items-center gap-1.5">
+            <span className="flex min-w-0 flex-1 items-center gap-[5px]">
+              <span className="grid size-3.5 shrink-0 place-items-center">
+                <span
+                  className={cn(
+                    'size-1.5 rounded-full',
+                    selected ? 'bg-primary' : 'bg-[var(--text-tertiary)]',
+                  )}
+                />
+              </span>
               <span
                 className={cn(
                   'min-w-0 flex-1 truncate text-[13px] leading-tight text-[var(--text-secondary)] group-hover:text-foreground',
@@ -737,7 +740,7 @@ function SessionRow({
           <button
             aria-current={selected ? 'page' : undefined}
             aria-haspopup="menu"
-            className="flex h-[51px] w-full min-w-0 flex-col gap-1 rounded-[7px] px-2 py-[7px] text-left outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
+            className="flex h-[51px] w-full min-w-0 flex-col gap-1 rounded-[7px] px-1.5 py-[7px] text-left outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
             ref={rowButton}
             type="button"
             onClick={() => onSelect(item.session.id)}
@@ -770,7 +773,15 @@ function SessionRow({
               }
             }}
           >
-            <span className="flex min-w-0 w-full items-center gap-1.5 leading-[18px]">
+            <span className="flex min-w-0 w-full items-center gap-[5px] leading-[18px]">
+              <span className="grid size-3.5 shrink-0 place-items-center">
+                <span
+                  className={cn(
+                    'size-1.5 rounded-full',
+                    selected ? 'bg-primary' : 'bg-[var(--text-tertiary)]',
+                  )}
+                />
+              </span>
               <span
                 className={cn(
                   'min-w-0 flex-1 truncate text-[13.5px] text-foreground',
@@ -832,8 +843,10 @@ function SessionMetadata({
 }) {
   const timeLabel = sessionTimeLabel(item.session, nowSeconds, t)
   return (
-    <span className="flex w-full min-w-0 items-center gap-1.5 text-[11.5px] leading-[15px] text-[var(--text-tertiary)]">
-      <PaduIcon className="size-[11px] shrink-0" name="folder" />
+    <span className="flex w-full min-w-0 items-center gap-[5px] text-[11.5px] leading-[15px] text-[var(--text-tertiary)]">
+      <span className="grid size-3.5 shrink-0 place-items-center">
+        <PaduIcon className="size-[12px] shrink-0" name="folder" />
+      </span>
       <span className="min-w-0 flex-1 truncate">{item.projectName}</span>
       {timeLabel && (
         <span

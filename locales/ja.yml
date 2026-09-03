@@ -25,6 +25,8 @@ menu.open_review: レビューを開く
 menu.focus_composer: 入力欄にフォーカスを移動
 menu.toggle_model_picker: モデル選択の表示を切り替える
 menu.toggle_usage_panel: 使用状況パネルの表示を切り替える
+menu.previous_session: 前の会話
+menu.next_session: 次の会話
 menu.window: ウインドウ
 menu.toggle_fps_counter: FPS カウンターの表示を切り替える
 menu.close_window: ウインドウを閉じる
@@ -65,6 +67,8 @@ command_palette.open_browser: ブラウザを開く
 command_palette.open_terminal: ターミナルを開く
 command_palette.open_files: ファイルを開く
 command_palette.open_review: レビューを開く
+command_palette.previous_session: 前の会話
+command_palette.next_session: 次の会話
 command_palette.current: 現在
 command_palette.you: あなた
 command_palette.agent: エージェント
@@ -135,6 +139,10 @@ keybindings.navigate_back: 戻る
 keybindings.navigate_back_desc: セッション履歴を戻る
 keybindings.navigate_forward: 進む
 keybindings.navigate_forward_desc: セッション履歴を進む
+keybindings.previous_session: 前の会話
+keybindings.previous_session_desc: サイドバーで前の会話に切り替える
+keybindings.next_session: 次の会話
+keybindings.next_session_desc: サイドバーで次の会話に切り替える
 keybindings.next_task: 次のタスク
 keybindings.next_task_desc: タスクスイッチャーで次のタスクへ切り替え
 keybindings.prev_task: 前のタスク

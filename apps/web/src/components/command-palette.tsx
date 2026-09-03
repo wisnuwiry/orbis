@@ -52,6 +52,8 @@ export interface CommandPaletteActions {
   openSettings: (page: SettingsPageId) => void
   openOnboarding?: () => void
   selectTask: (sessionId: string) => void
+  selectPreviousTask?: () => void
+  selectNextTask?: () => void
   resumeProviderSession: (summary: ProviderSessionSummary) => Promise<void>
 }
 
@@ -628,6 +630,8 @@ function buildItems({
       commands.push(command('open-onboarding', 'commands', t('onboarding.command_title'), 'sparkle', undefined, `onboarding tour welcome guide get started ${t('onboarding.command_title')}`, actions.openOnboarding))
     }
     commands.push(
+      command('previous-session', 'commands', t('command_palette.previous_session'), 'arrowUp', shortcut('⌥⌘↑', 'Ctrl+Alt+Up'), `previous conversation topic session switch navigate prev prior chat ${t('command_palette.previous_session')}`, () => actions.selectPreviousTask?.()),
+      command('next-session', 'commands', t('command_palette.next_session'), 'arrowDown', shortcut('⌥⌘↓', 'Ctrl+Alt+Down'), `next conversation topic session switch navigate forward chat ${t('command_palette.next_session')}`, () => actions.selectNextTask?.()),
       command('toggle-sidebar', 'commands', t(sidebarVisible ? 'command_palette.hide_sidebar' : 'command_palette.show_sidebar'), 'panelLeft', shortcut('⌘B', 'Ctrl+B'), 'toggle show hide left sidebar history tasks', actions.toggleSidebar),
       command('toggle-right-panel', 'commands', t(rightPanelVisible ? 'command_palette.hide_right_panel' : 'command_palette.show_right_panel'), 'panelRight', shortcut('⇧⌘B', 'Ctrl+Shift+B'), 'toggle show hide right panel files review diff terminal', actions.toggleRightPanel),
     )

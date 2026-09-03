@@ -50,6 +50,10 @@ menu.toggle_model_picker:
   en: Toggle Model Picker
 menu.toggle_usage_panel:
   en: Toggle Usage Panel
+menu.previous_session:
+  en: Previous Conversation
+menu.next_session:
+  en: Next Conversation
 menu.window:
   en: Window
 menu.toggle_fps_counter:
@@ -128,6 +132,10 @@ command_palette.open_files:
   en: Open files
 command_palette.open_review:
   en: Open review
+command_palette.previous_session:
+  en: Previous Conversation
+command_palette.next_session:
+  en: Next Conversation
 command_palette.current:
   en: Current
 command_palette.you:
@@ -266,6 +274,14 @@ keybindings.navigate_forward:
   en: Navigate Forward
 keybindings.navigate_forward_desc:
   en: Go forward in session navigation history
+keybindings.previous_session:
+  en: Previous Conversation
+keybindings.previous_session_desc:
+  en: Switch to the previous conversation in the sidebar
+keybindings.next_session:
+  en: Next Conversation
+keybindings.next_session_desc:
+  en: Switch to the next conversation in the sidebar
 keybindings.next_task:
   en: Next Task
 keybindings.next_task_desc:

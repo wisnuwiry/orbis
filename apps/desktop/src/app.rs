@@ -69,10 +69,10 @@ use crate::{
     CancelTaskSwitch, CancelTurn, CloseFind, CloseWindow, ConfirmTaskSwitch, CopySelection,
     FindNext, FindPrevious, FocusComposer, NavigateBack, NavigateForward, NewProject, NewSession,
     OpenBrowser, OpenFiles, OpenFind, OpenFindReplace, OpenResumePicker, OpenReview, OpenSettings,
-    OpenTerminal, ReplaceAllMatches, SaveFile, SelectFirstTask, SelectLastTask, SwitchTaskBackward,
-    SwitchTaskForward, ToggleCommandPalette, ToggleFindCaseSensitive, ToggleFindRegex,
-    ToggleFindWholeWord, ToggleFpsCounter, ToggleModelPicker, ToggleRightPanel, ToggleSidebar,
-    ToggleUsagePanel,
+    OpenTerminal, ReplaceAllMatches, SaveFile, SelectFirstTask, SelectLastTask, SelectNextSession,
+    SelectPreviousSession, SwitchTaskBackward, SwitchTaskForward, ToggleCommandPalette,
+    ToggleFindCaseSensitive, ToggleFindRegex, ToggleFindWholeWord, ToggleFpsCounter,
+    ToggleModelPicker, ToggleRightPanel, ToggleSidebar, ToggleUsagePanel,
 };
 
 #[cfg(target_os = "macos")]
