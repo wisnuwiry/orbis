@@ -359,20 +359,24 @@ export function RightPanel({
                 icon: 'terminal',
                 onSelect: () => openSurface('terminal'),
               },
-              {
-                id: 'files',
-                label: t('right_panel.files'),
-                icon: 'folder',
-                selected: tabs.some((tab) => tab.surface === 'files'),
-                onSelect: () => openSurface('files'),
-              },
-              {
-                id: 'changes',
-                label: t('right_panel.diff'),
-                icon: 'fileDiff',
-                selected: tabs.some((tab) => tab.surface === 'changes'),
-                onSelect: () => openSurface('changes'),
-              },
+              ...(project
+                ? [
+                    {
+                      id: 'files',
+                      label: t('right_panel.files'),
+                      icon: 'folder' as const,
+                      selected: tabs.some((tab) => tab.surface === 'files'),
+                      onSelect: () => openSurface('files'),
+                    },
+                    {
+                      id: 'changes',
+                      label: t('right_panel.diff'),
+                      icon: 'fileDiff' as const,
+                      selected: tabs.some((tab) => tab.surface === 'changes'),
+                      onSelect: () => openSurface('changes'),
+                    },
+                  ]
+                : []),
             ]}
           >
             <PaduIcon className="size-3.5" name="plus" />
@@ -385,7 +389,7 @@ export function RightPanel({
         </Tooltip>
       </header>
 
-      {!activeTab && <PanelChooser onSelect={openSurface} />}
+      {!activeTab && <PanelChooser hasProject={Boolean(project)} onSelect={openSurface} />}
       {tabs.map((tab) => (
         <div
           aria-labelledby={panelTabId(tab.id)}
@@ -524,7 +528,13 @@ function PanelTabButton({
   )
 }
 
-function PanelChooser({ onSelect }: { onSelect: (surface: PanelSurface) => void }) {
+function PanelChooser({
+  onSelect,
+  hasProject = false,
+}: {
+  onSelect: (surface: PanelSurface) => void
+  hasProject?: boolean
+}) {
   const { t } = useI18n()
   const terminalShortcut = usePrimaryShortcut('⌘T', 'Ctrl+T')
   const filesShortcut = usePrimaryShortcut('⇧⌘E', 'Ctrl+Shift+E')
@@ -534,7 +544,7 @@ function PanelChooser({ onSelect }: { onSelect: (surface: PanelSurface) => void 
       <div className="w-full max-w-[420px] text-center">
         <h3 className="text-[13px] font-medium">{t('right_panel.open_surface')}</h3>
         <p className="mt-[5px] text-[11px] text-[var(--text-tertiary)]">{t('right_panel.choose_surface')}</p>
-        <div className="mt-5 grid grid-cols-2 gap-2 text-left">
+        <div className={cn('mt-5 grid gap-2 text-left', hasProject ? 'grid-cols-2' : 'grid-cols-1')}>
           <PanelCard
             icon={<PaduIcon className="size-[18px]" name="terminal" />}
             label={t('right_panel.terminal')}
@@ -542,20 +552,24 @@ function PanelChooser({ onSelect }: { onSelect: (surface: PanelSurface) => void 
             shortcut={terminalShortcut}
             onClick={() => onSelect('terminal')}
           />
-          <PanelCard
-            icon={<PaduIcon className="size-[18px]" name="folder" />}
-            label={t('right_panel.files')}
-            description={t('right_panel.files_description')}
-            shortcut={filesShortcut}
-            onClick={() => onSelect('files')}
-          />
-          <PanelCard
-            icon={<PaduIcon className="size-[18px]" name="fileDiff" />}
-            label={t('right_panel.diff')}
-            description={t('right_panel.diff_description')}
-            shortcut={diffShortcut}
-            onClick={() => onSelect('changes')}
-          />
+          {hasProject && (
+            <>
+              <PanelCard
+                icon={<PaduIcon className="size-[18px]" name="folder" />}
+                label={t('right_panel.files')}
+                description={t('right_panel.files_description')}
+                shortcut={filesShortcut}
+                onClick={() => onSelect('files')}
+              />
+              <PanelCard
+                icon={<PaduIcon className="size-[18px]" name="fileDiff" />}
+                label={t('right_panel.diff')}
+                description={t('right_panel.diff_description')}
+                shortcut={diffShortcut}
+                onClick={() => onSelect('changes')}
+              />
+            </>
+          )}
         </div>
       </div>
     </div>
