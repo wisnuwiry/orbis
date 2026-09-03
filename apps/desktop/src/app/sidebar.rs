@@ -217,8 +217,7 @@ const SIDEBAR_GROUP_HEADER_HEIGHT: f32 = 28.0;
 const SIDEBAR_GROUP_HEADER_BOTTOM_GAP: f32 = 2.0;
 const SIDEBAR_SHOW_MORE_ROW_HEIGHT: f32 = 30.0;
 const SIDEBAR_GROUP_SPACER_HEIGHT: f32 = 10.0;
-const SIDEBAR_GROUP_GUIDE_X: f32 = 13.0;
-const SIDEBAR_GROUP_CHILD_PADDING: f32 = 24.0;
+const SIDEBAR_GROUP_CHILD_PADDING: f32 = 25.0;
 const SIDEBAR_PROJECT_RECENT_WINDOW_SECONDS: u64 = 3 * 24 * 60 * 60;
 const SIDEBAR_PROJECT_REVEAL_BATCH: usize = 30;
 
@@ -1623,13 +1622,9 @@ impl Padu {
         };
         match *row {
             SidebarRow::Search => self.render_sidebar_search(cx).into_any_element(),
-            SidebarRow::Header(group) => {
-                let has_expanded_children = rows.get(index + 1).is_some_and(|row| {
-                    matches!(row, SidebarRow::Session(_) | SidebarRow::ShowMore(_))
-                });
-                self.render_sidebar_group_header(group, index == 1, has_expanded_children, cx)
-                    .into_any_element()
-            }
+            SidebarRow::Header(group) => self
+                .render_sidebar_group_header(group, index == 1, cx)
+                .into_any_element(),
             SidebarRow::Session(session_id) => self
                 .render_sidebar_session_item(session_id, cx)
                 .into_any_element(),
@@ -1647,7 +1642,6 @@ impl Padu {
         &self,
         group: SidebarGroup,
         first: bool,
-        has_expanded_children: bool,
         cx: &mut Context<Self>,
     ) -> Div {
         let theme = Theme::current(cx);
@@ -1728,17 +1722,6 @@ impl Padu {
             .when(first, |element| {
                 element.child(self.render_sidebar_header_actions(cx))
             })
-            .when(show_folder_icon && has_expanded_children, |element| {
-                element.child(
-                    div()
-                        .absolute()
-                        .left(px(SIDEBAR_GROUP_GUIDE_X))
-                        .top(px(19.0))
-                        .bottom(px(-2.0))
-                        .w(px(1.0))
-                        .bg(theme.border),
-                )
-            })
             .on_click(cx.listener(move |this, _, _, cx| {
                 this.toggle_sidebar_group(group, cx);
             }))
@@ -1809,20 +1792,6 @@ impl Padu {
             .flex()
             .items_center()
             .child(button)
-            .child(
-                div()
-                    .absolute()
-                    .left(px(SIDEBAR_GROUP_GUIDE_X))
-                    .top_0()
-                    .w(px(SIDEBAR_GROUP_CHILD_PADDING
-                        - SIDEBAR_GROUP_GUIDE_X
-                        - 4.0))
-                    .h(px(15.0))
-                    .border_l_1()
-                    .border_b_1()
-                    .rounded_bl(px(4.0))
-                    .border_color(theme.border),
-            )
     }
 
     fn show_more_project_sessions(&mut self, group: SidebarGroup, cx: &mut Context<Self>) {
@@ -2121,11 +2090,7 @@ impl Padu {
             .iter()
             .find(|project| project.id == session.project_id);
         let grouped_by_project = self.state.sidebar_grouping == SidebarGrouping::Project;
-        let left_padding = if grouped_by_project {
-            SIDEBAR_GROUP_CHILD_PADDING
-        } else {
-            8.0
-        };
+        let left_padding = 6.0;
         let row_height = if grouped_by_project {
             SIDEBAR_PROJECT_SESSION_CARD_HEIGHT
         } else {
@@ -2150,8 +2115,6 @@ impl Padu {
                 .min_w_0()
                 .px(px(4.0))
                 .rounded(px(4.0))
-                .border_1()
-                .border_color(theme.accent)
                 .bg(theme.inset)
                 .flex()
                 .items_center()
@@ -2177,6 +2140,18 @@ impl Padu {
         };
 
         let time_label = session_time_label(session, unix_time()).map(SharedString::from);
+        let dot = div()
+            .w(px(14.0))
+            .h(px(14.0))
+            .flex_none()
+            .flex()
+            .items_center()
+            .justify_center()
+            .child(div().w(px(6.0)).h(px(6.0)).rounded_full().bg(if selected {
+                theme.accent
+            } else {
+                theme.text_tertiary
+            }));
         let row_content = if grouped_by_project {
             div()
                 .flex_1()
@@ -2191,7 +2166,8 @@ impl Padu {
                         .min_w_0()
                         .flex()
                         .items_center()
-                        .gap(px(6.0))
+                        .gap(px(5.0))
+                        .child(dot)
                         .child(title)
                         .when(working, |element| {
                             element.child(motion::spin_slow(icon(
@@ -2244,9 +2220,10 @@ impl Padu {
                     div()
                         .flex()
                         .items_center()
-                        .gap(px(6.0))
+                        .gap(px(5.0))
                         .overflow_hidden()
                         .line_height(sp(18.0))
+                        .child(dot)
                         .child(title)
                         .when(working, |element| {
                             element.child(motion::spin_slow(icon(
@@ -2279,7 +2256,16 @@ impl Padu {
                         .line_height(sp(15.0))
                         .when_some(detail_label, |element, label| {
                             element
-                                .child(icon("icons/folder.svg", 12.5, theme.text_tertiary))
+                                .child(
+                                    div()
+                                        .w(px(14.0))
+                                        .h(px(14.0))
+                                        .flex_none()
+                                        .flex()
+                                        .items_center()
+                                        .justify_center()
+                                        .child(icon("icons/folder.svg", 12.5, theme.text_tertiary)),
+                                )
                                 .child(
                                     div()
                                         .flex_1()
@@ -2410,17 +2396,6 @@ impl Padu {
             .w_full()
             .pb(px(SIDEBAR_SESSION_ROW_GAP))
             .child(row)
-            .when(grouped_by_project, |element| {
-                element.child(
-                    div()
-                        .absolute()
-                        .left(px(SIDEBAR_GROUP_GUIDE_X))
-                        .top_0()
-                        .bottom_0()
-                        .w(px(1.0))
-                        .bg(theme.border),
-                )
-            })
             .into_any_element()
     }
 
@@ -2885,12 +2860,22 @@ mod tests {
     }
 
     #[test]
-    fn sidebar_group_tree_guide_and_child_padding_geometry() {
-        assert!(SIDEBAR_GROUP_CHILD_PADDING > SIDEBAR_GROUP_GUIDE_X);
-        let hook_width = SIDEBAR_GROUP_CHILD_PADDING - SIDEBAR_GROUP_GUIDE_X - 4.0;
-        assert!(hook_width >= 5.0 && hook_width <= 10.0);
-        assert_eq!(SIDEBAR_GROUP_GUIDE_X, 13.0);
-        assert_eq!(SIDEBAR_GROUP_CHILD_PADDING, 24.0);
+    fn sidebar_group_item_dot_and_header_geometry() {
+        assert_eq!(SIDEBAR_GROUP_CHILD_PADDING, 25.0);
+
+        // Header icon center (14px icon at px 6.0) is at 13.0px.
+        let header_icon_center = 6.0 + 14.0 / 2.0;
+        // Session dot center (14px container at pl 6.0) is at 13.0px.
+        let session_dot_center = 6.0 + 14.0 / 2.0;
+        assert_eq!(header_icon_center, 13.0);
+        assert_eq!(session_dot_center, 13.0);
+
+        // Header label starts at 25.0px (6 + 14 + 5 gap).
+        let header_text_x = 6.0 + 14.0 + 5.0;
+        // Session title starts at 25.0px (6 + 14 + 5 gap).
+        let session_text_x = 6.0 + 14.0 + 5.0;
+        assert_eq!(header_text_x, SIDEBAR_GROUP_CHILD_PADDING);
+        assert_eq!(session_text_x, SIDEBAR_GROUP_CHILD_PADDING);
     }
 
     #[test]
