@@ -48,6 +48,24 @@ Windows needs the MSVC toolchain (Visual Studio Build Tools with the C++
 workload and the Windows SDK) so Cargo can link and so the resource compiler
 is available for the executable's icon and version block.
 
+### Faster builds with sccache
+
+Compiling Padu's dependencies (GPUI, QuickJS, Wry, Alacritty) from scratch can take several minutes. You can dramatically accelerate clean rebuilds, branch switches, and local tests by installing [sccache](https://github.com/mozilla/sccache):
+
+- **macOS**: `brew install sccache`
+- **Linux**: `cargo install sccache --locked` (or your package manager)
+- **Windows**: `winget install Mozilla.sccache` (or `cargo install sccache --locked`)
+
+Padu's dev and build scripts (`bun run dev`, `./scripts/bundle.sh`, `scripts/bundle-linux.sh`, etc.) automatically detect `sccache` on your `PATH` and enable compiler caching without extra configuration.
+
+To also enable sccache when running raw `cargo build`, `cargo check`, or `cargo test` directly in your terminal:
+
+```sh
+cp .cargo/config.toml.example .cargo/config.toml
+```
+
+You can view compiler cache statistics at any time with `sccache --show-stats`, or reset stats and daemon with `bun run clean --sccache`.
+
 ## Linux bundle
 
 To produce a distro-compatible release archive with the desktop and daemon

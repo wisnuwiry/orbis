@@ -3,6 +3,7 @@ target
 .DS_Store
 *.log
 .env
+.cargo/config.toml
 
 /dist
 node_modules

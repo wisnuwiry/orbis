@@ -1,0 +1,18 @@
+# Example Cargo configuration for Padu developers.
+#
+# Padu's build scripts (`bun run dev`, `bundle.sh`, etc.) automatically detect and
+# enable sccache if installed on your PATH.
+#
+# If you also want sccache active for raw `cargo build` / `cargo check` / `cargo test`
+# commands in your terminal, copy this file to `.cargo/config.toml` (or place in `~/.cargo/config.toml`):
+#
+#   cp .cargo/config.toml.example .cargo/config.toml
+#
+
+[build]
+rustc-wrapper = "sccache"
+
+# Optional: On Linux, mold dramatically reduces link times for debug builds:
+# [target.x86_64-unknown-linux-gnu]
+# linker = "clang"
+# rustflags = ["-C", "link-arg=-fuse-ld=mold"]
