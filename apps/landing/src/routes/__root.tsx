@@ -46,9 +46,9 @@ export const Route = createRootRoute({
       { name: "theme-color", content: "#0d0f14" },
       { property: "og:site_name", content: "Padu" },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "https://padu.dev/og-image.png" },
+      { property: "og:image", content: "https://padu.dev/preview-dark.webp" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "https://padu.dev/og-image.png" },
+      { name: "twitter:image", content: "https://padu.dev/preview-dark.webp" },
     ],
     links: [
       { rel: "icon", href: "/favicon.ico", sizes: "48x48" },

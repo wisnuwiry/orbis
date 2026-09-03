@@ -40,8 +40,8 @@ in Rust with [GPUI](https://github.com/zed-industries/zed/tree/main/crates/gpui)
 it keeps projects, sessions, and transcripts entirely on your machine.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="apps/landing/public/app-screenshot-dark.png">
-  <img alt="Padu app preview" src="apps/landing/public/app-screenshot-light.png" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="apps/landing/public/preview-dark.webp">
+  <img alt="Padu app preview" src="apps/landing/public/preview-light.webp" width="100%">
 </picture>
 
 ## Install

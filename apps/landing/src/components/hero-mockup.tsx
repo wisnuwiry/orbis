@@ -5,7 +5,7 @@ export function HeroMockup() {
   return (
     <div className="overflow-hidden rounded-2xl border border-white/10 ring-1 ring-white/5 shadow-2xl shadow-black/90 bg-[#0c0c0e]">
       <img
-        src="/hero-mockup.png"
+        src="/preview-dark.webp"
         alt={ALT}
         width={2266}
         height={1752}
