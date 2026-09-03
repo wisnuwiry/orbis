@@ -25,6 +25,8 @@ menu.open_review: 打开审阅
 menu.focus_composer: 将焦点移到输入框
 menu.toggle_model_picker: 打开或关闭模型选择器
 menu.toggle_usage_panel: 打开或关闭用量面板
+menu.previous_session: 上一个会话
+menu.next_session: 下一个会话
 menu.window: 窗口
 menu.toggle_fps_counter: 显示或隐藏帧率
 menu.close_window: 关闭窗口
@@ -63,6 +65,8 @@ command_palette.open_browser: 打开浏览器
 command_palette.open_terminal: 打开终端
 command_palette.open_files: 打开文件
 command_palette.open_review: 打开审阅
+command_palette.previous_session: 上一个会话
+command_palette.next_session: 下一个会话
 command_palette.current: 当前
 command_palette.you: 你
 command_palette.agent: 智能体
@@ -131,6 +135,10 @@ keybindings.navigate_back: 后退
 keybindings.navigate_back_desc: 返回上一个会话页面
 keybindings.navigate_forward: 前进
 keybindings.navigate_forward_desc: 前进到下一个会话页面
+keybindings.previous_session: 上一个会话
+keybindings.previous_session_desc: 切换到侧边栏中的上一个会话
+keybindings.next_session: 下一个会话
+keybindings.next_session_desc: 切换到侧边栏中的下一个会话
 keybindings.next_task: 下一个任务
 keybindings.next_task_desc: 在任务切换器中向后切换
 keybindings.prev_task: 上一个任务
