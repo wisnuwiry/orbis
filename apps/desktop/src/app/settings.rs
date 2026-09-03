@@ -107,6 +107,10 @@ impl Padu {
             .on_action(cx.listener(Self::open_settings_action))
             .on_action(cx.listener(Self::toggle_sidebar_action))
             .on_action(cx.listener(Self::toggle_right_panel_action))
+            .on_action(cx.listener(Self::open_browser_action))
+            .on_action(cx.listener(Self::open_terminal_action))
+            .on_action(cx.listener(Self::open_files_action))
+            .on_action(cx.listener(Self::open_review_action))
             .on_action(cx.listener(Self::toggle_command_palette_action))
             .on_action(cx.listener(Self::toggle_fps_counter_action))
             .on_action(cx.listener(Self::navigate_back_action))
@@ -2148,6 +2152,26 @@ impl Padu {
                         "keybindings.toggle_right_panel",
                         "keybindings.toggle_right_panel_desc",
                         crate::platform::primary_shortcut("⇧⌘B", "Ctrl+Shift+B"),
+                    ),
+                    (
+                        "keybindings.open_browser",
+                        "keybindings.open_browser_desc",
+                        crate::platform::primary_shortcut("⌥⌘B", "Ctrl+Alt+B"),
+                    ),
+                    (
+                        "keybindings.open_terminal",
+                        "keybindings.open_terminal_desc",
+                        crate::platform::primary_shortcut("⌘T", "Ctrl+T"),
+                    ),
+                    (
+                        "keybindings.open_files",
+                        "keybindings.open_files_desc",
+                        crate::platform::primary_shortcut("⇧⌘E", "Ctrl+Shift+E"),
+                    ),
+                    (
+                        "keybindings.open_review",
+                        "keybindings.open_review_desc",
+                        crate::platform::primary_shortcut("⌘D", "Ctrl+D"),
                     ),
                     (
                         "keybindings.toggle_usage_panel",
