@@ -2105,6 +2105,9 @@ impl Padu {
     }
 
     pub(super) fn toggle_or_open_files_surface(&mut self, cx: &mut Context<Self>) {
+        if self.selected_project().is_none() {
+            return;
+        }
         if let Some((index, _)) =
             self.right_panel_surfaces
                 .iter()
@@ -2131,6 +2134,9 @@ impl Padu {
     }
 
     pub(super) fn toggle_or_open_review_surface(&mut self, cx: &mut Context<Self>) {
+        if self.selected_project().is_none() {
+            return;
+        }
         if let Some((index, _)) = self
             .right_panel_surfaces
             .iter()
@@ -2692,12 +2698,15 @@ impl Padu {
         if !self.right_panel_surfaces.is_empty() {
             let weak = cx.entity().downgrade();
             let existing_surfaces = self.right_panel_surfaces.clone();
-            let options = [
+            let has_project = self.selected_project().is_some();
+            let mut options = vec![
                 RightPanelSurface::new_browser(),
                 RightPanelSurface::new_terminal(),
-                RightPanelSurface::Files,
-                RightPanelSurface::Diff,
             ];
+            if has_project {
+                options.push(RightPanelSurface::Files);
+                options.push(RightPanelSurface::Diff);
+            }
             let handle = self.menu_handle("add-right-panel-surface", cx);
             header = header.child(
                 div()
@@ -2748,6 +2757,7 @@ impl Padu {
 
     fn render_right_panel_chooser(&self, cx: &mut Context<Self>) -> Stateful<Div> {
         let theme = Theme::current(cx);
+        let has_project = self.selected_project().is_some();
         div()
             .id("right-panel-chooser")
             .flex_1()
@@ -2795,23 +2805,25 @@ impl Padu {
                                 cx,
                             )),
                     )
-                    .child(
-                        div()
-                            .mt(px(8.0))
-                            .w_full()
-                            .flex()
-                            .gap(px(8.0))
-                            .child(self.render_right_panel_card(
-                                RightPanelSurface::Files,
-                                tr!("right_panel.files_description"),
-                                cx,
-                            ))
-                            .child(self.render_right_panel_card(
-                                RightPanelSurface::Diff,
-                                tr!("right_panel.diff_description"),
-                                cx,
-                            )),
-                    ),
+                    .when(has_project, |chooser| {
+                        chooser.child(
+                            div()
+                                .mt(px(8.0))
+                                .w_full()
+                                .flex()
+                                .gap(px(8.0))
+                                .child(self.render_right_panel_card(
+                                    RightPanelSurface::Files,
+                                    tr!("right_panel.files_description"),
+                                    cx,
+                                ))
+                                .child(self.render_right_panel_card(
+                                    RightPanelSurface::Diff,
+                                    tr!("right_panel.diff_description"),
+                                    cx,
+                                )),
+                        )
+                    }),
             )
     }
 

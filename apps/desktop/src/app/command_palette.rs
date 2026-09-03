@@ -839,25 +839,30 @@ impl Padu {
                 "terminal shell console bash zsh open right panel",
                 next(),
             ),
-            CommandPaletteItem::command(
-                PaletteSection::Commands,
-                tr!("command_palette.open_files"),
-                "icons/folder.svg",
-                Some(crate::platform::primary_shortcut("⇧⌘E", "Ctrl+Shift+E")),
-                PaletteAction::OpenFiles,
-                "files explorer tree workspace open right panel",
-                next(),
-            ),
-            CommandPaletteItem::command(
-                PaletteSection::Commands,
-                tr!("command_palette.open_review"),
-                "icons/file-diff.svg",
-                Some(crate::platform::primary_shortcut("⌘D", "Ctrl+D")),
-                PaletteAction::OpenReview,
-                "review diff changes git open right panel",
-                next(),
-            ),
         ]);
+
+        if self.selected_project().is_some() {
+            commands.extend([
+                CommandPaletteItem::command(
+                    PaletteSection::Commands,
+                    tr!("command_palette.open_files"),
+                    "icons/folder.svg",
+                    Some(crate::platform::primary_shortcut("⇧⌘E", "Ctrl+Shift+E")),
+                    PaletteAction::OpenFiles,
+                    "files explorer tree workspace open right panel",
+                    next(),
+                ),
+                CommandPaletteItem::command(
+                    PaletteSection::Commands,
+                    tr!("command_palette.open_review"),
+                    "icons/file-diff.svg",
+                    Some(crate::platform::primary_shortcut("⌘D", "Ctrl+D")),
+                    PaletteAction::OpenReview,
+                    "review diff changes git open right panel",
+                    next(),
+                ),
+            ]);
+        }
 
         for (page, label_key, icon, keywords) in [
             (
