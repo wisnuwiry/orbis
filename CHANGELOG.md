@@ -16,11 +16,14 @@ the original feature bullet instead of adding separate entries for them.
 
 ## [unreleased]
 
-## 0.1.0
+## 0.1.0 - 2026-09-03
 
-- Initial release of Padu: a fast, native control plane for local coding agents
-- Support for multiple local agent CLIs (Claude Code, Codex CLI, Cursor CLI, Amp, OpenCode, Grok Build, Pi, Kimi Code, Fx)
-- GPU-accelerated desktop interface built with GPUI
-- Standalone headless daemon and web client
-- Multi-session workspace, checkpoints, branching, and context diff review
-- Conversation steering, follow-up queueing, and slash commands
+### Highlights
+Padu is a fast, GPU-accelerated native control plane for local coding agents. Built in Rust with GPUI, it keeps your projects, sessions, and transcripts local on your machine with seamless multi-platform support across macOS, Linux, and Windows.
+
+### Key Features
+- **Local Agent Integrations**: First-class support for multiple coding agent CLIs, including Claude Code, Codex CLI, Cursor CLI, Amp, OpenCode, Grok Build, Pi, Kimi Code, and Fx.
+- **Native GPUI Desktop Client**: Sub-millisecond input response, smooth 120Hz scrolling, native macOS/Linux/Windows window styling, and customizable dark/light theme support.
+- **Standalone Daemon & Browser Client**: Run headlessly with `padu-daemon` and access your workspace remotely or locally using the companion `@padu/web` client.
+- **Multi-Host Profile Support**: Seamlessly configure and switch between local and remote daemons directly from the sidebar.
+- **Multi-Session Workspace & Branching**: Manage concurrent coding sessions, track session checkpoints, inspect git diff reviews, and switch branches without leaving the app.
