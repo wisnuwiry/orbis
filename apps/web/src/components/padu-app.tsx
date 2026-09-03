@@ -78,6 +78,7 @@ import {
   type RememberedNavigation,
 } from '@/lib/navigation-memory'
 import { transcriptLinkRoute } from '@/lib/transcript-links'
+import { sessionHasStarted, sortSidebarSessions } from '@/lib/sidebar-presentation'
 import { shouldShowInitialDestination } from '@/lib/workspace-presentation'
 import { usePrimaryShortcut } from '@/lib/platform'
 import { agentPresetIdLabel } from '@/lib/agent-preset-presentation'
@@ -471,6 +472,16 @@ export function PaduApp() {
         openSettings('general')
         return
       }
+      if (event.altKey && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+        event.preventDefault()
+        selectAdjacentSession(event.key === 'ArrowDown' ? 1 : -1)
+        return
+      }
+      if (event.shiftKey && (event.key === '[' || event.key === ']')) {
+        event.preventDefault()
+        selectAdjacentSession(event.key === ']' ? 1 : -1)
+        return
+      }
       if (key === 'b' && event.shiftKey) {
         event.preventDefault()
         toggleRightPanel()
@@ -698,6 +709,26 @@ export function PaduApp() {
     }
     rememberNavigation({ kind: 'session', sessionId })
     void navigate({ search: { session: sessionId } })
+  }
+
+  function selectAdjacentSession(delta: number) {
+    if (!taskState.data) return
+    const started = sortSidebarSessions(taskState.data.sessions.filter(sessionHasStarted), 'newest')
+    if (!started.length) return
+    const currentId = search.session
+    const currentIndex = currentId ? started.findIndex((s) => s.id === currentId) : -1
+    let nextIndex: number
+    if (currentIndex >= 0) {
+      nextIndex = delta > 0
+        ? Math.min(currentIndex + 1, started.length - 1)
+        : Math.max(currentIndex - 1, 0)
+    } else {
+      nextIndex = delta > 0 ? 0 : started.length - 1
+    }
+    const nextSession = started[nextIndex]
+    if (nextSession) {
+      selectSession(nextSession.id)
+    }
   }
 
   async function resumeProviderSession(summary: ProviderSessionSummary) {
@@ -1020,6 +1051,8 @@ export function PaduApp() {
       pendingPaletteFocusSession.current = sessionId
       selectSession(sessionId)
     },
+    selectPreviousTask: () => selectAdjacentSession(-1),
+    selectNextTask: () => selectAdjacentSession(1),
     resumeProviderSession,
   }
 
