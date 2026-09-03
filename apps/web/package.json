@@ -10,7 +10,8 @@
     "deploy": "bun run build && wrangler deploy",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "clean": "bun ../../scripts/clean.ts --web"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
