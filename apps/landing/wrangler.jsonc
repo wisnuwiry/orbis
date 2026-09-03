@@ -3,15 +3,5 @@
   "name": "padu-website",
   "compatibility_date": "2026-08-01",
   "pages_build_output_dir": "dist/client",
-  "compatibility_flags": ["nodejs_compat"],
-  "main": "./src/server-entry.ts",
-  "observability": {
-    "enabled": true
-  },
-  "kv_namespaces": [
-    {
-      "binding": "WEBSITE_CACHE",
-      "id": "a9345362c8644ae486fce7031455e811"
-    }
-  ]
+  "compatibility_flags": ["nodejs_compat"]
 }
