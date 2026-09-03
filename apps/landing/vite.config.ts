@@ -3,7 +3,6 @@ import path from "node:path";
 import { defineConfig, type UserConfig } from "vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
-import { cloudflare } from "@cloudflare/vite-plugin";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
@@ -69,6 +68,25 @@ const sitemapPages = [
   path: routePath,
 }));
 
+function syncMarkdownDocs(): void {
+  const docsDir = path.join(repoRoot, "public-docs");
+  if (!fs.existsSync(docsDir)) return;
+  const publicDir = path.join(__dirname, "public");
+  const targetDocsDir = path.join(publicDir, "docs");
+  fs.mkdirSync(targetDocsDir, { recursive: true });
+  for (const entry of fs.readdirSync(docsDir, { withFileTypes: true })) {
+    if (!entry.name.endsWith(".md")) continue;
+    const src = path.join(docsDir, entry.name);
+    if (entry.name === "index.md") {
+      fs.copyFileSync(src, path.join(publicDir, "docs.md"));
+    } else {
+      fs.copyFileSync(src, path.join(targetDocsDir, entry.name));
+    }
+  }
+}
+
+syncMarkdownDocs();
+
 export default defineConfig((): UserConfig => {
   return {
     server: {
@@ -83,7 +101,6 @@ export default defineConfig((): UserConfig => {
       },
     },
     plugins: [
-      cloudflare({ viteEnvironment: { name: "ssr" } }),
       tsConfigPaths(),
       tanstackStart({
         router: {

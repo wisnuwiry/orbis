@@ -5,3 +5,5 @@ dist
 .DS_Store
 .env
 worker-configuration.d.ts
+public/docs.md
+public/docs
