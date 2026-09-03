@@ -207,7 +207,7 @@ pub struct SessionOptions {
     pub context_window: Option<String>,
 }
 
-pub(crate) fn start_local(
+pub fn start_local(
     provider: ProviderKind,
     options: DriverStartOptions,
     events: DriverEventSender,
