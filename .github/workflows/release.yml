@@ -26,7 +26,7 @@ jobs:
       tag: ${{ steps.resolve.outputs.tag }}
       published: ${{ steps.published.outputs.published }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Resolve version from apps/desktop/Cargo.toml
         id: resolve
@@ -87,7 +87,7 @@ jobs:
     runs-on: ${{ matrix.runs-on }}
     timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Install Rust
         run: |
@@ -160,7 +160,7 @@ jobs:
     runs-on: ${{ matrix.runs-on }}
     timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Install Rust
         run: |
@@ -212,7 +212,7 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Install Rust
         run: |
@@ -268,7 +268,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: oven-sh/setup-bun@v2
 
