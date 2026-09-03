@@ -1832,20 +1832,58 @@ impl Padu {
         cx.notify();
     }
 
-    fn select_adjacent_sidebar_session(
+    pub(super) fn select_previous_session_action(
+        &mut self,
+        _: &SelectPreviousSession,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        if self.settings_page.take().is_some() {
+            let focus_handle = self.composer_focus(cx);
+            window.focus(&focus_handle, cx);
+            cx.notify();
+        }
+        self.select_adjacent_sidebar_session(self.state.selected_session, -1, cx);
+    }
+
+    pub(super) fn select_next_session_action(
+        &mut self,
+        _: &SelectNextSession,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        if self.settings_page.take().is_some() {
+            let focus_handle = self.composer_focus(cx);
+            window.focus(&focus_handle, cx);
+            cx.notify();
+        }
+        self.select_adjacent_sidebar_session(self.state.selected_session, 1, cx);
+    }
+
+    pub(super) fn select_adjacent_sidebar_session(
         &mut self,
         current_session: Option<Uuid>,
         delta: isize,
         cx: &mut Context<Self>,
     ) {
         let rows = self.sidebar_rows_cached(Local::now().date_naive(), unix_time());
-        let sessions = rows
+        let mut sessions = rows
             .iter()
             .filter_map(|r| match r {
                 SidebarRow::Session(id) => Some(*id),
                 _ => None,
             })
             .collect::<Vec<_>>();
+        if sessions.is_empty() {
+            let mut sorted_sessions = self
+                .state
+                .sessions
+                .iter()
+                .filter(|session| session.has_started())
+                .collect::<Vec<_>>();
+            sort_sidebar_sessions(&mut sorted_sessions, self.state.sidebar_ordering);
+            sessions = sorted_sessions.iter().map(|s| s.id).collect();
+        }
         if sessions.is_empty() {
             return;
         }
@@ -1867,6 +1905,33 @@ impl Padu {
                     }
                 }
             };
+        if let Some(target_session) = self.state.sessions.iter().find(|s| s.id == next_session) {
+            let group = match self.state.sidebar_grouping {
+                SidebarGrouping::Updated => SidebarGroup::Updated(session_date_group(
+                    sidebar_session_timestamp(target_session),
+                    Local::now().date_naive(),
+                )),
+                SidebarGrouping::Project => {
+                    let projectless_root = crate::projectless::workspace_root();
+                    let is_projectless = self
+                        .state
+                        .projects
+                        .iter()
+                        .find(|p| p.id == target_session.project_id)
+                        .is_some_and(|p| {
+                            sidebar_project_is_projectless(p, projectless_root.as_deref())
+                        });
+                    if is_projectless {
+                        SidebarGroup::Projectless
+                    } else {
+                        SidebarGroup::Project(target_session.project_id)
+                    }
+                }
+            };
+            if self.sidebar_collapsed_groups.remove(&group) {
+                self.sidebar_rows_fingerprint.set(None);
+            }
+        }
         self.select_session(next_session, cx);
         self.reveal_sidebar_session(next_session);
     }

@@ -2194,6 +2194,16 @@ impl Padu {
                         crate::platform::primary_shortcut("⌘]", "Ctrl+]"),
                     ),
                     (
+                        "keybindings.previous_session",
+                        "keybindings.previous_session_desc",
+                        crate::platform::primary_shortcut("⌥⌘↑", "Ctrl+Alt+Up"),
+                    ),
+                    (
+                        "keybindings.next_session",
+                        "keybindings.next_session_desc",
+                        crate::platform::primary_shortcut("⌥⌘↓", "Ctrl+Alt+Down"),
+                    ),
+                    (
                         "keybindings.next_task",
                         "keybindings.next_task_desc",
                         "Ctrl+Tab",
