@@ -128,7 +128,7 @@ raw-window-handle = "0.6"
 [target.'cfg(target_os = "linux")'.dependencies]
 # Linux verifies the release archive with the same key as Sparkle and unpacks
 # it into a sibling staging prefix before the handoff helper swaps it in.
-ed25519-dalek = "2"
+ed25519-dalek = "3"
 flate2 = "1"
 # Matches the version GPUI exposes through `WindowOptions::icon`.
 image = { version = "0.25", default-features = false, features = ["png"] }
@@ -166,4 +166,4 @@ windows-sys = { version = "0.61", features = [
 ] }
 # Verifies the EdDSA signatures `generate_appcast` writes, so the Windows
 # updater trusts the same key Sparkle does on macOS.
-ed25519-dalek = "2"
+ed25519-dalek = "3"
