@@ -38,6 +38,14 @@ type HyprlandContext = {
 
 $.cwd(root);
 
+if (!process.env.RUSTC_WRAPPER) {
+  const sccache = Bun.which("sccache");
+  if (sccache) {
+    process.env.RUSTC_WRAPPER = sccache;
+    console.log("[padu-dev] sccache detected; compiler cache enabled.");
+  }
+}
+
 let app: ReturnType<typeof Bun.spawn> | undefined;
 let stopping = false;
 let building = false;
