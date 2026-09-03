@@ -25,6 +25,7 @@
     "web:preview": "bun run --filter @padu/web preview",
     "web:typecheck": "bun run --filter @padu/web typecheck",
     "web:test": "bun run --filter @padu/web test",
+    "web:deploy": "bun run --filter @padu/web deploy",
     "web:clean": "bun ./scripts/clean.ts --web",
     "landing:dev": "bun run --filter @padu/landing dev",
     "landing:build": "bun run --filter @padu/landing build",
