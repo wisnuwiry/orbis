@@ -82,3 +82,17 @@ export function PiIcon(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function OhMyPiIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 64 64"
+      fill="currentColor"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M10 14h44v9H43v33h-9V23h-9v22h-9V23H10z" />
+    </svg>
+  );
+}
+

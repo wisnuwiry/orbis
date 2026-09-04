@@ -135,64 +135,16 @@ export const AGENT_PAGES = [
       "Open source app for DeepSeek and CodeWhale. Launch coding sessions on your machine, monitor progress, ship from anywhere.",
   },
   {
-    slug: "copilot",
-    name: "GitHub Copilot",
-    category: "acp",
-    badge: "ACP",
-    title: "Open source desktop app for GitHub Copilot CLI",
+    slug: "ohmypi",
+    name: "Oh My Pi",
+    category: "native",
+    badge: "Native",
+    title: "Open source desktop app for Oh My Pi",
     subtitle:
-      "Drive GitHub Copilot CLI via ACP. Prompt queueing, live terminal logs, and checkpoint rewinds.",
-    metaTitle: "GitHub Copilot CLI Desktop & Web App, Open Source",
+      "Run Oh My Pi agent with native permission approvals, multi-turn reasoning, and local checkpoints.",
+    metaTitle: "Oh My Pi Desktop & Web App, Open Source",
     metaDescription:
-      "Open source app for GitHub Copilot CLI. Launch sessions on your machine, monitor progress, merge from anywhere.",
-  },
-  {
-    slug: "gemini",
-    name: "Gemini CLI",
-    category: "acp",
-    badge: "ACP",
-    title: "Open source desktop app for Gemini CLI",
-    subtitle:
-      "Run Google's Gemini CLI on your machine with full workspace context and real-time diff preview.",
-    metaTitle: "Gemini CLI Desktop & Web App, Open Source",
-    metaDescription:
-      "Open source app for Google's Gemini CLI. Launch agents on your machine, monitor progress, and ship from anywhere.",
-  },
-  {
-    slug: "cline",
-    name: "Cline",
-    category: "acp",
-    badge: "ACP",
-    title: "Open source desktop app for Cline",
-    subtitle:
-      "Autonomous coding agent integrated via ACP. Watch it work, jump in when needed, and review checkpoints.",
-    metaTitle: "Cline Desktop & Web App, Open Source",
-    metaDescription:
-      "Open source app for Cline, the autonomous coding agent. Launch tasks, monitor output, review diffs from anywhere.",
-  },
-  {
-    slug: "goose",
-    name: "Goose",
-    category: "acp",
-    badge: "ACP",
-    title: "Open source desktop app for Goose",
-    subtitle:
-      "Run Block's open-source Goose coding agent on your machine. Extensible, local-first, and tool-ready.",
-    metaTitle: "Goose Agent Desktop & Web App, Open Source",
-    metaDescription:
-      "Open source app for Block's goose, the local open-source AI agent. Launch tasks on your machine, ship from anywhere.",
-  },
-  {
-    slug: "mistral-vibe",
-    name: "Mistral Vibe",
-    category: "acp",
-    badge: "ACP",
-    title: "Open source desktop app for Mistral Vibe",
-    subtitle:
-      "Run Mistral's open-source Vibe coding assistant locally on your machine with unified session management.",
-    metaTitle: "Mistral Vibe Desktop & Web App, Open Source",
-    metaDescription:
-      "Open source app for Mistral's Vibe coding assistant. Launch sessions on your machine, monitor progress, ship from anywhere.",
+      "Open source app for Oh My Pi coding agent. Launch sessions on your machine, monitor progress, ship from anywhere. Self-hosted.",
   },
 ] as const satisfies readonly AgentPage[];
 

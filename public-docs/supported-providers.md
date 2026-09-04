@@ -14,29 +14,23 @@ For an architectural overview, see [Providers overview](/docs/providers). To con
 
 ## Native Drivers
 
-These providers include first-class driver implementations with structured token streaming, checkpoint capture, and reasoning token demuxing:
+These providers include first-class native driver implementations with structured token streaming, checkpoint capture, and reasoning token demuxing:
 
 - **[Claude Code](/docs/claude-code)** — Anthropic's official coding agent CLI with tool streaming and deep reasoning.
 - **[OpenAI Codex](/docs/codex)** — OpenAI's workspace agent with sandbox execution and model switching.
 - **[OpenCode](https://opencode.ai/)** — Open-source terminal assistant with multi-provider model routing.
 - **[Pi Agent](https://pi.dev)** — Minimal, fast terminal coding agent with multi-provider support.
-- **[Cursor CLI](https://cursor.com)** — Cursor's autonomous terminal coding companion.
+- **Oh My Pi** — Pi coding agent with interactive approvals, multi-turn reasoning, and local checkpoints.
 - **[Amp](https://github.com/tao12345666333/amp-acp)** — Frontier coding agent with worktree capabilities.
-- **[DeepSeek TUI](https://deepseek.com)** — High-reasoning open model assistant.
+- **[DeepSeek TUI](https://deepseek.com)** — High-reasoning open model assistant and CodeWhale CLI.
+
+## ACP (Agent Client Protocol) Integrations
+
+These providers are integrated via the open [Agent Client Protocol (ACP)](https://agentclientprotocol.com):
+
+- **[Cursor CLI](https://cursor.com)** — Cursor's autonomous terminal coding companion.
+- **Fx** — Fast terminal coding assistant with live streaming and diffs.
 - **[Grok Build](https://docs.x.ai/build/overview)** — xAI's agentic coding CLI.
 - **[Kimi Code](https://github.com/MoonshotAI/kimi-code)** — Moonshot AI's long-context assistant.
-
-## ACP (Agent Client Protocol) Catalog
-
-Any agent speaking the [Agent Client Protocol (ACP)](https://agentclientprotocol.com) over standard I/O streams (`stdio`) is supported out of the box:
-
-- **Cline** — Autonomous coding agent with file and terminal tools.
-- **Gemini CLI** — Google's official Gemini developer CLI.
-- **GitHub Copilot CLI** — GitHub's AI pair programmer.
-- **Goose** — Block's local open-source AI agent.
-- **Mistral Vibe** — Mistral's open-source CLI assistant.
-- **Hermes Agent** — Nous Research's autonomous agent.
-- **Qwen Code** — Alibaba's Qwen coding assistant.
-- **Augment / Auggie CLI** — Context engine-powered assistant.
 
 View the full interactive catalog on [padu.dev/agents](/agents).
