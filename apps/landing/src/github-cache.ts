@@ -1,7 +1,12 @@
 export const GITHUB_CACHE_TTL_MS = 5 * 60 * 1000;
 
+export interface WebsiteKVNamespace {
+  get: (key: string, opts?: { cacheTtl?: number; type?: string }) => Promise<unknown>;
+  put: (key: string, value: string) => Promise<void>;
+}
+
 export interface WebsiteCacheContext {
-  cache: KVNamespace | null;
+  cache: WebsiteKVNamespace | null;
   waitUntil: (promise: Promise<unknown>) => void;
 }
 
@@ -19,7 +24,7 @@ function isCachedValue<T>(value: unknown, isValue: Validator<T>): value is Cache
 }
 
 async function readCachedValue<T>(
-  cache: KVNamespace | null,
+  cache: WebsiteKVNamespace | null,
   key: string,
   isValue: Validator<T>,
 ): Promise<CachedValue<T> | null> {
@@ -29,7 +34,7 @@ async function readCachedValue<T>(
 }
 
 async function writeCachedValue<T>(
-  cache: KVNamespace | null,
+  cache: WebsiteKVNamespace | null,
   key: string,
   value: T,
 ): Promise<void> {

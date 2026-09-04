@@ -6,7 +6,7 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
-import { AGENT_PAGES } from "./src/data/agent-pages.ts";
+import { AGENT_PAGES } from "./src/data/agent-pages";
 
 const repoRoot = path.resolve(import.meta.dirname, "../..");
 const siteHost = "https://padu.dev";
