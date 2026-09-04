@@ -14,19 +14,15 @@ import { Route as AgentsRouteImport } from "./routes/agents";
 import { Route as AmpRouteImport } from "./routes/amp";
 import { Route as ChangelogRouteImport } from "./routes/changelog";
 import { Route as ClaudeCodeRouteImport } from "./routes/claude-code";
-import { Route as ClineRouteImport } from "./routes/cline";
 import { Route as CodexRouteImport } from "./routes/codex";
-import { Route as CopilotRouteImport } from "./routes/copilot";
 import { Route as CursorRouteImport } from "./routes/cursor";
 import { Route as DeepseekTuiRouteImport } from "./routes/deepseek-tui";
 import { Route as DocsRouteImport } from "./routes/docs";
 import { Route as DownloadRouteImport } from "./routes/download";
 import { Route as FxRouteImport } from "./routes/fx";
-import { Route as GeminiRouteImport } from "./routes/gemini";
-import { Route as GooseRouteImport } from "./routes/goose";
 import { Route as GrokRouteImport } from "./routes/grok";
 import { Route as KimiRouteImport } from "./routes/kimi";
-import { Route as MistralVibeRouteImport } from "./routes/mistral-vibe";
+import { Route as OhmypiRouteImport } from "./routes/ohmypi";
 import { Route as OpencodeRouteImport } from "./routes/opencode";
 import { Route as PiRouteImport } from "./routes/pi";
 import { Route as PrivacyRouteImport } from "./routes/privacy";
@@ -59,19 +55,9 @@ const ClaudeCodeRoute = ClaudeCodeRouteImport.update({
   path: "/claude-code",
   getParentRoute: () => rootRouteImport,
 } as any);
-const ClineRoute = ClineRouteImport.update({
-  id: "/cline",
-  path: "/cline",
-  getParentRoute: () => rootRouteImport,
-} as any);
 const CodexRoute = CodexRouteImport.update({
   id: "/codex",
   path: "/codex",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const CopilotRoute = CopilotRouteImport.update({
-  id: "/copilot",
-  path: "/copilot",
   getParentRoute: () => rootRouteImport,
 } as any);
 const CursorRoute = CursorRouteImport.update({
@@ -99,16 +85,6 @@ const FxRoute = FxRouteImport.update({
   path: "/fx",
   getParentRoute: () => rootRouteImport,
 } as any);
-const GeminiRoute = GeminiRouteImport.update({
-  id: "/gemini",
-  path: "/gemini",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const GooseRoute = GooseRouteImport.update({
-  id: "/goose",
-  path: "/goose",
-  getParentRoute: () => rootRouteImport,
-} as any);
 const GrokRoute = GrokRouteImport.update({
   id: "/grok",
   path: "/grok",
@@ -119,9 +95,9 @@ const KimiRoute = KimiRouteImport.update({
   path: "/kimi",
   getParentRoute: () => rootRouteImport,
 } as any);
-const MistralVibeRoute = MistralVibeRouteImport.update({
-  id: "/mistral-vibe",
-  path: "/mistral-vibe",
+const OhmypiRoute = OhmypiRouteImport.update({
+  id: "/ohmypi",
+  path: "/ohmypi",
   getParentRoute: () => rootRouteImport,
 } as any);
 const OpencodeRoute = OpencodeRouteImport.update({
@@ -161,19 +137,15 @@ export interface FileRoutesByFullPath {
   "/amp": typeof AmpRoute;
   "/changelog": typeof ChangelogRoute;
   "/claude-code": typeof ClaudeCodeRoute;
-  "/cline": typeof ClineRoute;
   "/codex": typeof CodexRoute;
-  "/copilot": typeof CopilotRoute;
   "/cursor": typeof CursorRoute;
   "/deepseek-tui": typeof DeepseekTuiRoute;
   "/docs": typeof DocsRouteWithChildren;
   "/download": typeof DownloadRoute;
   "/fx": typeof FxRoute;
-  "/gemini": typeof GeminiRoute;
-  "/goose": typeof GooseRoute;
   "/grok": typeof GrokRoute;
   "/kimi": typeof KimiRoute;
-  "/mistral-vibe": typeof MistralVibeRoute;
+  "/ohmypi": typeof OhmypiRoute;
   "/opencode": typeof OpencodeRoute;
   "/pi": typeof PiRoute;
   "/privacy": typeof PrivacyRoute;
@@ -187,18 +159,14 @@ export interface FileRoutesByTo {
   "/amp": typeof AmpRoute;
   "/changelog": typeof ChangelogRoute;
   "/claude-code": typeof ClaudeCodeRoute;
-  "/cline": typeof ClineRoute;
   "/codex": typeof CodexRoute;
-  "/copilot": typeof CopilotRoute;
   "/cursor": typeof CursorRoute;
   "/deepseek-tui": typeof DeepseekTuiRoute;
   "/download": typeof DownloadRoute;
   "/fx": typeof FxRoute;
-  "/gemini": typeof GeminiRoute;
-  "/goose": typeof GooseRoute;
   "/grok": typeof GrokRoute;
   "/kimi": typeof KimiRoute;
-  "/mistral-vibe": typeof MistralVibeRoute;
+  "/ohmypi": typeof OhmypiRoute;
   "/opencode": typeof OpencodeRoute;
   "/pi": typeof PiRoute;
   "/privacy": typeof PrivacyRoute;
@@ -213,19 +181,15 @@ export interface FileRoutesById {
   "/amp": typeof AmpRoute;
   "/changelog": typeof ChangelogRoute;
   "/claude-code": typeof ClaudeCodeRoute;
-  "/cline": typeof ClineRoute;
   "/codex": typeof CodexRoute;
-  "/copilot": typeof CopilotRoute;
   "/cursor": typeof CursorRoute;
   "/deepseek-tui": typeof DeepseekTuiRoute;
   "/docs": typeof DocsRouteWithChildren;
   "/download": typeof DownloadRoute;
   "/fx": typeof FxRoute;
-  "/gemini": typeof GeminiRoute;
-  "/goose": typeof GooseRoute;
   "/grok": typeof GrokRoute;
   "/kimi": typeof KimiRoute;
-  "/mistral-vibe": typeof MistralVibeRoute;
+  "/ohmypi": typeof OhmypiRoute;
   "/opencode": typeof OpencodeRoute;
   "/pi": typeof PiRoute;
   "/privacy": typeof PrivacyRoute;
@@ -241,19 +205,15 @@ export interface FileRouteTypes {
     | "/amp"
     | "/changelog"
     | "/claude-code"
-    | "/cline"
     | "/codex"
-    | "/copilot"
     | "/cursor"
     | "/deepseek-tui"
     | "/docs"
     | "/download"
     | "/fx"
-    | "/gemini"
-    | "/goose"
     | "/grok"
     | "/kimi"
-    | "/mistral-vibe"
+    | "/ohmypi"
     | "/opencode"
     | "/pi"
     | "/privacy"
@@ -267,18 +227,14 @@ export interface FileRouteTypes {
     | "/amp"
     | "/changelog"
     | "/claude-code"
-    | "/cline"
     | "/codex"
-    | "/copilot"
     | "/cursor"
     | "/deepseek-tui"
     | "/download"
     | "/fx"
-    | "/gemini"
-    | "/goose"
     | "/grok"
     | "/kimi"
-    | "/mistral-vibe"
+    | "/ohmypi"
     | "/opencode"
     | "/pi"
     | "/privacy"
@@ -292,19 +248,15 @@ export interface FileRouteTypes {
     | "/amp"
     | "/changelog"
     | "/claude-code"
-    | "/cline"
     | "/codex"
-    | "/copilot"
     | "/cursor"
     | "/deepseek-tui"
     | "/docs"
     | "/download"
     | "/fx"
-    | "/gemini"
-    | "/goose"
     | "/grok"
     | "/kimi"
-    | "/mistral-vibe"
+    | "/ohmypi"
     | "/opencode"
     | "/pi"
     | "/privacy"
@@ -319,19 +271,15 @@ export interface RootRouteChildren {
   AmpRoute: typeof AmpRoute;
   ChangelogRoute: typeof ChangelogRoute;
   ClaudeCodeRoute: typeof ClaudeCodeRoute;
-  ClineRoute: typeof ClineRoute;
   CodexRoute: typeof CodexRoute;
-  CopilotRoute: typeof CopilotRoute;
   CursorRoute: typeof CursorRoute;
   DeepseekTuiRoute: typeof DeepseekTuiRoute;
   DocsRoute: typeof DocsRouteWithChildren;
   DownloadRoute: typeof DownloadRoute;
   FxRoute: typeof FxRoute;
-  GeminiRoute: typeof GeminiRoute;
-  GooseRoute: typeof GooseRoute;
   GrokRoute: typeof GrokRoute;
   KimiRoute: typeof KimiRoute;
-  MistralVibeRoute: typeof MistralVibeRoute;
+  OhmypiRoute: typeof OhmypiRoute;
   OpencodeRoute: typeof OpencodeRoute;
   PiRoute: typeof PiRoute;
   PrivacyRoute: typeof PrivacyRoute;
@@ -375,25 +323,11 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof ClaudeCodeRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/cline": {
-      id: "/cline";
-      path: "/cline";
-      fullPath: "/cline";
-      preLoaderRoute: typeof ClineRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
     "/codex": {
       id: "/codex";
       path: "/codex";
       fullPath: "/codex";
       preLoaderRoute: typeof CodexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/copilot": {
-      id: "/copilot";
-      path: "/copilot";
-      fullPath: "/copilot";
-      preLoaderRoute: typeof CopilotRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/cursor": {
@@ -431,20 +365,6 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof FxRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/gemini": {
-      id: "/gemini";
-      path: "/gemini";
-      fullPath: "/gemini";
-      preLoaderRoute: typeof GeminiRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/goose": {
-      id: "/goose";
-      path: "/goose";
-      fullPath: "/goose";
-      preLoaderRoute: typeof GooseRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
     "/grok": {
       id: "/grok";
       path: "/grok";
@@ -459,11 +379,11 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof KimiRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/mistral-vibe": {
-      id: "/mistral-vibe";
-      path: "/mistral-vibe";
-      fullPath: "/mistral-vibe";
-      preLoaderRoute: typeof MistralVibeRouteImport;
+    "/ohmypi": {
+      id: "/ohmypi";
+      path: "/ohmypi";
+      fullPath: "/ohmypi";
+      preLoaderRoute: typeof OhmypiRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/opencode": {
@@ -529,19 +449,15 @@ const rootRouteChildren: RootRouteChildren = {
   AmpRoute: AmpRoute,
   ChangelogRoute: ChangelogRoute,
   ClaudeCodeRoute: ClaudeCodeRoute,
-  ClineRoute: ClineRoute,
   CodexRoute: CodexRoute,
-  CopilotRoute: CopilotRoute,
   CursorRoute: CursorRoute,
   DeepseekTuiRoute: DeepseekTuiRoute,
   DocsRoute: DocsRouteWithChildren,
   DownloadRoute: DownloadRoute,
   FxRoute: FxRoute,
-  GeminiRoute: GeminiRoute,
-  GooseRoute: GooseRoute,
   GrokRoute: GrokRoute,
   KimiRoute: KimiRoute,
-  MistralVibeRoute: MistralVibeRoute,
+  OhmypiRoute: OhmypiRoute,
   OpencodeRoute: OpencodeRoute,
   PiRoute: PiRoute,
   PrivacyRoute: PrivacyRoute,

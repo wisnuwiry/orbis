@@ -1,26 +1,37 @@
 import * as React from "react";
 
-export function releaseBase(version: string) {
-  return `https://github.com/wisnuwiry/padu/releases/download/v${version}`;
+export const RELEASES_BASE = "https://releases.padu.dev";
+
+export function releaseBase(_version?: string) {
+  return RELEASES_BASE;
 }
 
 export interface ReleaseAssetInfo {
   version: string;
-  linuxAppImageAsset: string;
+  macDmgAsset?: string;
+  linuxX64Tarball?: string;
+  linuxArm64Tarball?: string | null;
   windowsX64Asset: string | null;
   windowsArm64Asset: string | null;
 }
 
 export function downloadUrls(release: ReleaseAssetInfo) {
-  const { version, linuxAppImageAsset, windowsX64Asset, windowsArm64Asset } = release;
-  const base = releaseBase(version);
+  const {
+    version,
+    macDmgAsset,
+    linuxX64Tarball,
+    linuxArm64Tarball,
+    windowsX64Asset,
+    windowsArm64Asset,
+  } = release;
+  const base = RELEASES_BASE;
   return {
-    macAppleSilicon: `${base}/Padu-${version}-arm64.dmg`,
-    macIntel: `${base}/Padu-${version}-x64.dmg`,
-    linuxAppImage: `${base}/${linuxAppImageAsset}`,
-    linuxDeb: `${base}/Padu-${version}-amd64.deb`,
-    linuxRpm: `${base}/Padu-${version}-x86_64.rpm`,
-    windowsExeX64: `${base}/${windowsX64Asset ?? `Padu-Setup-${version}.exe`}`,
+    macDmg: `${base}/${macDmgAsset || `Padu-${version}.dmg`}`,
+    linuxTarballX64: `${base}/${linuxX64Tarball || `padu-${version}-x86_64-unknown-linux-gnu.tar.gz`}`,
+    linuxTarballArm64: linuxArm64Tarball
+      ? `${base}/${linuxArm64Tarball}`
+      : `${base}/padu-${version}-aarch64-unknown-linux-gnu.tar.gz`,
+    windowsExeX64: `${base}/${windowsX64Asset ?? `Padu-${version}-x86_64-Setup.exe`}`,
     windowsExeArm64: windowsArm64Asset ? `${base}/${windowsArm64Asset}` : null,
     androidApk: `${base}/padu-v${version}-android.apk`,
   };
@@ -45,13 +56,13 @@ export function getDownloadOptions(release: ReleaseAssetInfo): DownloadOption[] 
     {
       platform: "mac-silicon",
       label: "Mac",
-      href: urls.macAppleSilicon,
+      href: urls.macDmg,
       icon: AppleIcon,
     },
     {
       platform: "mac-intel",
-      label: "Mac Intel",
-      href: urls.macIntel,
+      label: "Mac",
+      href: urls.macDmg,
       icon: AppleIcon,
     },
     {
@@ -63,7 +74,7 @@ export function getDownloadOptions(release: ReleaseAssetInfo): DownloadOption[] 
     {
       platform: "linux",
       label: "Linux",
-      href: urls.linuxAppImage,
+      href: urls.linuxTarballX64,
       icon: LinuxIcon,
     },
   ];

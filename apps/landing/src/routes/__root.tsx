@@ -12,7 +12,9 @@ interface StarsContext {
 const ReleaseCtx = createContext<ReleaseChannels>({
   stable: {
     version: "",
-    linuxAppImageAsset: "",
+    macDmgAsset: "",
+    linuxX64Tarball: "",
+    linuxArm64Tarball: null,
     windowsX64Asset: null,
     windowsArm64Asset: null,
   },
@@ -53,7 +55,6 @@ export const Route = createRootRoute({
     links: [
       { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
       { rel: "icon", href: "/padu.svg", type: "image/svg+xml" },
-      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
     ],
   }),

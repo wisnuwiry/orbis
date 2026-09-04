@@ -49,4 +49,4 @@ padu daemon set-password
 
 ## Vulnerability Reporting
 
-If you discover a potential security vulnerability in Padu, please review [SECURITY.md](https://github.com/wisnusaputra/padu/blob/main/SECURITY.md) on GitHub or contact the maintainers confidentially at [support@padu.dev](mailto:support@padu.dev).
+If you discover a potential security vulnerability in Padu, please review [SECURITY.md](https://github.com/wisnuwiry/padu/blob/main/SECURITY.md) on GitHub or contact the maintainers confidentially at [support@padu.dev](mailto:support@padu.dev).

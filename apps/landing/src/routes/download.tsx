@@ -86,8 +86,7 @@ function Download() {
         <div className="divide-y divide-white/10">
           <PlatformRow icon={AppleIcon} label="macOS">
             <PillGroup>
-              <DownloadPill href={urls.macAppleSilicon} label="Apple Silicon" />
-              <DownloadPill href={urls.macIntel} label="Intel" />
+              <DownloadPill href={urls.macDmg} label="Download DMG" />
             </PillGroup>
           </PlatformRow>
 
@@ -95,24 +94,30 @@ function Download() {
             <PillGroup>
               <DownloadPill
                 href={urls.windowsExeX64}
-                label={urls.windowsExeArm64 ? "Intel / x64" : "Download"}
+                label={urls.windowsExeArm64 ? "Intel / x64 (.exe)" : "Download (.exe)"}
               />
-              {urls.windowsExeArm64 && <DownloadPill href={urls.windowsExeArm64} label="ARM64" />}
+              {urls.windowsExeArm64 && (
+                <DownloadPill href={urls.windowsExeArm64} label="ARM64 (.exe)" />
+              )}
             </PillGroup>
           </PlatformRow>
 
           <PlatformRow icon={LinuxIcon} label="Linux">
-            <PillGroup>
-              <DownloadPill href={urls.linuxAppImage} label="AppImage" />
-              <DownloadPill href={urls.linuxDeb} label="DEB" />
-              <DownloadPill href={urls.linuxRpm} label="RPM" />
-            </PillGroup>
+            <div className="flex flex-col gap-3 sm:items-end">
+              <CodeBlock size="sm">curl -fsSL https://padu.dev/install.sh | sh</CodeBlock>
+              <PillGroup>
+                <DownloadPill href={urls.linuxTarballX64} label="x86_64 (.tar.gz)" />
+                {urls.linuxTarballArm64 && (
+                  <DownloadPill href={urls.linuxTarballArm64} label="ARM64 (.tar.gz)" />
+                )}
+              </PillGroup>
+            </div>
           </PlatformRow>
         </div>
       </section>
 
       {/* Server / Remote CLI */}
-      <section className="rounded-xl border border-white/10 bg-white/[0.02] p-6 md:p-8 mb-6">
+      {/*<section className="rounded-xl border border-white/10 bg-white/[0.02] p-6 md:p-8 mb-6">
         <div className="flex items-start justify-between mb-8">
           <div>
             <h2 className="text-2xl font-medium text-white">Remote Daemon / CLI</h2>
@@ -132,7 +137,7 @@ function Download() {
             </CodeBlock>
           </PlatformRow>
         </div>
-      </section>
+      </section>*/}
 
       {/* Web */}
       {!onBeta && (
@@ -172,7 +177,10 @@ function Download() {
         <div className="divide-y divide-white/10">
           <PlatformRow icon={AndroidIcon} label="Android">
             <PillGroup>
-              <DownloadPill href={urls.androidApk} label="Download APK" />
+              {/*<DownloadPill href={urls.androidApk} label="Download APK" />*/}
+              <span className="text-xs text-white/50 px-3 py-1.5 rounded-md bg-white/5 border border-white/10">
+                Coming Soon
+              </span>
             </PillGroup>
           </PlatformRow>
 

@@ -12,7 +12,7 @@ Padu is a high-performance, native desktop and web workspace for orchestrating l
 
 ## 1. Desktop App (Recommended)
 
-Download the native release for macOS, Linux, or Windows from [padu.dev/download](https://padu.dev/download) or the [GitHub releases page](https://github.com/wisnusaputra/padu/releases).
+Download the native release for macOS, Linux, or Windows from [padu.dev/download](https://padu.dev/download) or the [GitHub releases page](https://github.com/wisnuwiry/padu/releases).
 
 The desktop app bundles its own lightweight daemon and starts it automatically on loopback (`127.0.0.1:4789`). No separate server install or cloud account is required.
 
