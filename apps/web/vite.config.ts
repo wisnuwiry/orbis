@@ -1,9 +1,20 @@
-import { cloudflare } from '@cloudflare/vite-plugin'
 import babel from '@rolldown/plugin-babel'
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact, { reactCompilerPreset } from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
+
+const sitemapPages = [
+  '/',
+  '/settings',
+  '/settings/general',
+  '/settings/appearance',
+  '/settings/keybindings',
+  '/settings/providers',
+  '/settings/skills',
+  '/settings/usage',
+  '/settings/daemon',
+].map((routePath) => ({ path: routePath }))
 
 export default defineConfig({
   server: {
@@ -23,8 +34,12 @@ export default defineConfig({
   },
   plugins: [
     tailwindcss(),
-    cloudflare({ viteEnvironment: { name: 'ssr' } }),
-    tanstackStart(),
+    tanstackStart({
+      prerender: {
+        enabled: true,
+      },
+      pages: sitemapPages,
+    }),
     viteReact(),
     babel({ presets: [reactCompilerPreset()] }),
   ],

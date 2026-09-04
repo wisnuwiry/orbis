@@ -7,3 +7,4 @@ dist
 worker-configuration.d.ts
 public/docs.md
 public/docs
+public/llms.txt
