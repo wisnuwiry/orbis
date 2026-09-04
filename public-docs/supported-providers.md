@@ -25,13 +25,14 @@ These providers include first-class driver implementations with structured token
 - **[DeepSeek TUI](https://deepseek.com)** — High-reasoning open model assistant.
 - **[Grok Build](https://docs.x.ai/build/overview)** — xAI's agentic coding CLI.
 - **[Kimi Code](https://github.com/MoonshotAI/kimi-code)** — Moonshot AI's long-context assistant.
+- **[Gemini CLI](https://cloud.google.com/gemini-cli)** — Google's official Gemini developer CLI with ACP streaming and plan-mode support.
+- **[Elph](https://elph.dev)** — Multi-provider coding agent with full ACP session management and model routing.
 
 ## ACP (Agent Client Protocol) Catalog
 
 Any agent speaking the [Agent Client Protocol (ACP)](https://agentclientprotocol.com) over standard I/O streams (`stdio`) is supported out of the box:
 
 - **Cline** — Autonomous coding agent with file and terminal tools.
-- **Gemini CLI** — Google's official Gemini developer CLI.
 - **GitHub Copilot CLI** — GitHub's AI pair programmer.
 - **Goose** — Block's local open-source AI agent.
 - **Mistral Vibe** — Mistral's open-source CLI assistant.

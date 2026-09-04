@@ -510,7 +510,15 @@ impl Padu {
                     },
                 );
                 let previous_kinds = self.snapshot_selected_transcript_rows(session_id);
-                runtime.last_driver_error = None;
+                // Preserve the provider's terminal error as the assistant
+                // fallback instead of replacing useful details (for example,
+                // Gemini quota errors) with "stopped before response".
+                let failure_message = if success {
+                    runtime.last_driver_error.take();
+                    None
+                } else {
+                    runtime.last_driver_error.take()
+                };
                 // A settled turn moved the account's rate-limit needles; ask
                 // that provider's plan meter to refresh once its backoff
                 // allows.
@@ -570,7 +578,9 @@ impl Padu {
                                 if success {
                                     tr!("session.turn_completed")
                                 } else {
-                                    tr!("session.stopped_before_response")
+                                    failure_message
+                                        .clone()
+                                        .unwrap_or_else(|| tr!("session.stopped_before_response"))
                                 }
                             }),
                         );
@@ -637,20 +647,14 @@ impl Padu {
                     .find(|session| session.id == session_id)
                     .and_then(AgentSession::active_turn_id)
                     .is_some();
-                let should_append = has_active_turn
-                    && !self.turn_has_assistant_message(session_id)
-                    && self
-                        .state
-                        .sessions
-                        .iter()
-                        .find(|session| session.id == session_id)
-                        .is_some_and(|session| session.status != SessionStatus::Working);
+                let should_append = has_active_turn && !self.turn_has_assistant_message(session_id);
                 if let Some(session) = self.state.session_mut(session_id)
                     && has_active_turn
                 {
-                    if session.status != SessionStatus::Working {
-                        session.status = SessionStatus::Failed;
-                    }
+                    // Provider errors are terminal for the active turn. Mark
+                    // it failed now so the UI stops showing a spinner before
+                    // the transport's follow-up TurnFinished event arrives.
+                    session.status = SessionStatus::Failed;
                     if should_append {
                         session.push_message(MessageRole::Assistant, error);
                     }

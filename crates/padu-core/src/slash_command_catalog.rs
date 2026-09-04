@@ -43,6 +43,8 @@ pub(crate) fn discover(
         ProviderKind::Cursor
         | ProviderKind::DeepSeek
         | ProviderKind::Fx
+        | ProviderKind::Gemini
+        | ProviderKind::Elph
         | ProviderKind::Grok
         | ProviderKind::Kimi => None,
     }

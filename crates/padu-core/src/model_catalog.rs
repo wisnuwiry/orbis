@@ -84,10 +84,20 @@ pub fn fallback_models(provider: ProviderKind) -> Vec<ProviderModel> {
         // model the user configured. An invented fallback would offer a model
         // the CLI rejects, so discovery is authoritative.
         ProviderKind::Grok => Vec::new(),
-        // Pi, Oh My Pi, and Kimi Code all take their catalog from the user's
-        // configured LLM providers. A fabricated fallback would make
+        // Gemini's model is configured locally rather than exposed by a
+        // discovery command. The fallback is used until that configuration is
+        // read by `discover_gemini_models`.
+        ProviderKind::Gemini => vec![
+            ProviderModel::new("gemini-3.5-flash", "Gemini 3.5 Flash"),
+            ProviderModel::new("gemini-3.1-pro-preview", "Gemini 3.1 Pro Preview").default(),
+            ProviderModel::new("gemini-3-flash-preview", "Gemini 3 Flash Preview"),
+        ],
+        // Pi, Oh My Pi, Kimi Code, and Elph all take their catalog from the
+        // user's configured LLM providers. A fabricated fallback would make
         // unavailable models look selectable.
-        ProviderKind::Kimi | ProviderKind::OhMyPi | ProviderKind::Pi => Vec::new(),
+        ProviderKind::Kimi | ProviderKind::OhMyPi | ProviderKind::Pi | ProviderKind::Elph => {
+            Vec::new()
+        }
     }
 }
 
@@ -129,6 +139,12 @@ pub fn discover_catalog(
         ProviderKind::Kimi => (discover_kimi_models(binary), None),
         ProviderKind::Pi => (discover_pi_models(binary, PiDialect::Pi), None),
         ProviderKind::OhMyPi => (discover_pi_models(binary, PiDialect::OhMyPi), None),
+        // Gemini resolves its model from local settings/environment rather
+        // than exposing a model discovery command.
+        ProviderKind::Gemini => (discover_gemini_models(), None),
+        // Elph discovers its model catalog through an ACP session/new
+        // handshake, reading the Model-category config option.
+        ProviderKind::Elph => (discover_elph_models(binary), None),
     };
     let models = if discovered.is_empty() {
         // A failed or empty probe keeps the last successful discovery over
@@ -538,6 +554,43 @@ fn parse_opencode_models(output: &str) -> Vec<ProviderModel> {
         .collect()
 }
 
+fn discover_gemini_models() -> Vec<ProviderModel> {
+    // Gemini CLI's effective model is local configuration. `GEMINI_MODEL`
+    // takes precedence over settings files, followed by project settings and
+    // then the user's global settings. Padu does not pass `--model` when
+    // probing, so these are the local values that the CLI will use.
+    let model = std::env::var("GEMINI_MODEL")
+        .ok()
+        .filter(|model| !model.trim().is_empty())
+        .or_else(|| {
+            let project_settings = std::env::current_dir().ok()?.join(".gemini/settings.json");
+            read_gemini_model(&project_settings)
+        })
+        .or_else(|| {
+            dirs::home_dir().and_then(|home| read_gemini_model(&home.join(".gemini/settings.json")))
+        });
+
+    model
+        .map(|id| vec![ProviderModel::new(&id, display_name_from_slug(&id)).default()])
+        .unwrap_or_default()
+}
+
+fn read_gemini_model(path: &Path) -> Option<String> {
+    let contents = std::fs::read(path).ok()?;
+    let settings = serde_json::from_slice::<Value>(&contents).ok()?;
+    parse_gemini_model(&settings)
+}
+
+fn parse_gemini_model(settings: &Value) -> Option<String> {
+    let model = settings
+        .get("model")
+        .and_then(|model| model.get("name").or(Some(model)))
+        .and_then(Value::as_str)
+        .map(str::trim)
+        .filter(|model| !model.is_empty())?;
+    Some(model.to_owned())
+}
+
 fn discover_grok_models(binary: &Path) -> Vec<ProviderModel> {
     let mut command = crate::command_env::command(binary);
     let command = command.arg("models");
@@ -622,6 +675,71 @@ fn parse_kimi_default_model(output: &str) -> Option<String> {
             .filter(|value| !value.is_empty())
             .map(str::to_owned)
     })
+}
+
+/// Elph publishes its complete configured inventory through `elph models`.
+/// Its ACP `session/new` response is intended for session configuration and may
+/// contain only a partial model selector (or none at all), so the CLI listing
+/// is authoritative for the picker. This runs on the discovery thread, never a
+/// render path.
+fn discover_elph_models(binary: &Path) -> Vec<ProviderModel> {
+    let mut command = crate::command_env::command(binary);
+    let Ok(output) = crate::command_env::output(command.arg("models")) else {
+        return Vec::new();
+    };
+    parse_elph_models(&format!(
+        "{}\n{}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    ))
+}
+
+fn parse_elph_models(output: &str) -> Vec<ProviderModel> {
+    let mut provider = None;
+    output
+        .lines()
+        .flat_map(|line| {
+            let cleaned = strip_ansi(line);
+            let line = cleaned.trim();
+            if line.is_empty() || line.starts_with('─') {
+                return Vec::new();
+            }
+            if let Some((name, id)) = line
+                .strip_suffix(')')
+                .and_then(|line| line.rsplit_once(" ("))
+            {
+                provider = Some((name.to_owned(), id.to_owned()));
+                return Vec::new();
+            }
+            let Some((provider_name, _)) = &provider else {
+                return Vec::new();
+            };
+            if let Some((model_text, _)) = line.split_once(" · ") {
+                let Some(id) = model_text.split_whitespace().last() else {
+                    return Vec::new();
+                };
+                let Some(name_end) = model_text.rfind(id) else {
+                    return Vec::new();
+                };
+                let name = model_text[..name_end].trim();
+                if name.is_empty() || id.is_empty() {
+                    return Vec::new();
+                }
+                let mut model = ProviderModel::new(id, name);
+                model = model.sub_provider(provider_name);
+                return vec![model];
+            }
+            line.split(',')
+                .map(str::trim)
+                .filter(|id| !id.is_empty() && !id.chars().any(char::is_whitespace))
+                .map(|id| {
+                    let mut model = ProviderModel::new(id, display_name_from_slug(id));
+                    model = model.sub_provider(provider_name);
+                    model
+                })
+                .collect()
+        })
+        .collect()
 }
 
 fn parse_kimi_models(catalog: &Value, default_model: Option<&str>) -> Vec<ProviderModel> {
@@ -1366,6 +1484,35 @@ printf '%s\n' '{"type":"control_response","response":{"request_id":"padu-initial
         assert_eq!(models.len(), 1);
         assert_eq!(models[0].id, "cc-switch-model");
         assert_eq!(models[0].name, "CC Switch Model");
+    }
+
+    #[test]
+    fn parses_elph_cli_models_with_provider_groups() {
+        let models = parse_elph_models(
+            "Models\n────────────────\n\nAzure OpenAI (azure-openai-responses)\n────────────────\n  GPT-4                     gpt-4                · 8k ctx · $30.00/$60.00 per M\n\nGoogle (google)\n──────────────\n  Gemini 2.5 Flash          google/gemini-2.5-flash · 1.0M ctx · reasoning\n",
+        );
+
+        assert_eq!(models.len(), 2);
+        assert_eq!(models[0].id, "gpt-4");
+        assert_eq!(models[0].name, "GPT-4");
+        assert_eq!(models[0].sub_provider.as_deref(), Some("Azure OpenAI"));
+        assert_eq!(models[1].id, "google/gemini-2.5-flash");
+        assert_eq!(models[1].sub_provider.as_deref(), Some("Google"));
+    }
+
+    #[test]
+    fn parses_gemini_model_from_local_settings() {
+        assert_eq!(
+            parse_gemini_model(&json!({"model": {"name": "gemini-2.5-pro"}})),
+            Some("gemini-2.5-pro".to_owned())
+        );
+        // Accept the legacy scalar form too, so upgrading Gemini CLI does not
+        // make an existing local selection disappear from the picker.
+        assert_eq!(
+            parse_gemini_model(&json!({"model": "gemma-3-27b-it"})),
+            Some("gemma-3-27b-it".to_owned())
+        );
+        assert_eq!(parse_gemini_model(&json!({"model": {"name": "  "}})), None);
     }
 
     #[test]

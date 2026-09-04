@@ -60,8 +60,10 @@ pub fn fallback_models(provider: ProviderKind) -> Vec<ProviderModel> {
         }
         ProviderKind::DeepSeek
         | ProviderKind::Fx
+        | ProviderKind::Gemini
         | ProviderKind::Grok
         | ProviderKind::Kimi
+        | ProviderKind::Elph
         | ProviderKind::OpenCode
         | ProviderKind::OhMyPi
         | ProviderKind::Pi => Vec::new(),

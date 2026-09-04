@@ -343,6 +343,23 @@ fn agent_arguments(
             }
             return args;
         }
+        // Gemini runs headless with -p, returns the text on stdout.
+        ProviderKind::Gemini => {
+            push(&mut args, "-p");
+            push(&mut args, prompt);
+            push(&mut args, "--raw-output");
+            if let Some(model) = model {
+                push(&mut args, "--model");
+                push(&mut args, model);
+            }
+            return args;
+        }
+        // Elph run feeds the prompt positionally and returns the text on stdout.
+        ProviderKind::Elph => {
+            push(&mut args, "run");
+            push(&mut args, prompt);
+            return args;
+        }
         // Oh My Pi rejects unknown flags outright, so it gets its own list
         // rather than Pi's: context files are `--no-rules`, and it has no
         // prompt-template or project-trust switch to turn off.
@@ -802,6 +819,15 @@ mod tests {
                     assert!(has_pair(&args, "--prompt", prompt));
                     assert!(has_pair(&args, "--output-format", "text"));
                     assert!(has_pair(&args, "--model", "model"));
+                }
+                ProviderKind::Gemini => {
+                    assert!(has_pair(&args, "-p", prompt));
+                    assert!(has(&args, "--raw-output"));
+                    assert!(has_pair(&args, "--model", "model"));
+                }
+                ProviderKind::Elph => {
+                    assert_eq!(args.first().and_then(|arg| arg.to_str()), Some("run"));
+                    assert!(has(&args, prompt));
                 }
             }
         }
