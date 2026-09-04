@@ -1048,13 +1048,6 @@ fn reasoning_effort_label(effort: &str) -> String {
     }
 }
 
-fn reasoning_options<const N: usize>(efforts: [&str; N]) -> Vec<ProviderModelOption> {
-    efforts
-        .into_iter()
-        .map(|effort| ProviderModelOption::new(effort, reasoning_effort_label(effort)))
-        .collect()
-}
-
 /// The hardcoded reasoning menu is limited to the exact built-in models it
 /// was verified against. `grok models` also lists user-defined custom models,
 /// whose effort support is not knowable from the ID, so they get no menu.
@@ -1225,6 +1218,13 @@ mod tests {
         permissions.set_mode(0o755);
         std::fs::set_permissions(&path, permissions).unwrap();
         path
+    }
+
+    fn reasoning_options<const N: usize>(efforts: [&str; N]) -> Vec<ProviderModelOption> {
+        efforts
+            .into_iter()
+            .map(|effort| ProviderModelOption::new(effort, reasoning_effort_label(effort)))
+            .collect()
     }
 
     #[test]
