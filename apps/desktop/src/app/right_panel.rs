@@ -963,6 +963,22 @@ fn reusable_surface_index(
     }
 }
 
+/// Fullscreen tab order: Conversation (`None`) first, then every surface
+/// index in tab-strip order. Pure so tab cycling wraps are pinnable in tests
+/// without a window.
+fn fullscreen_tab_order(surface_count: usize) -> Vec<Option<usize>> {
+    let mut order = Vec::with_capacity(surface_count + 1);
+    order.push(None);
+    order.extend((0..surface_count).map(Some));
+    order
+}
+
+/// Next position when cycling the fullscreen order; wraps both directions.
+fn fullscreen_cycle_next(position: usize, surface_count: usize, direction: isize) -> usize {
+    let len = surface_count + 1;
+    (position as isize + direction).rem_euclid(len as isize) as usize
+}
+
 #[derive(Clone, Copy)]
 enum TabScrollFadeSide {
     Left,
@@ -1606,7 +1622,7 @@ mod tests {
     fn right_panel_tab_titles_stay_on_one_line() {
         let source = include_str!("right_panel.rs");
         let header = source
-            .split_once("\n    fn render_right_panel_header(")
+            .split_once("\n    pub(super) fn render_right_panel_header(")
             .expect("right panel header renderer")
             .1
             .split_once("\n    fn render_right_panel_chooser(")
@@ -1704,16 +1720,22 @@ mod tests {
         terminal_state.surfaces = vec![RightPanelSurface::Terminal(terminal_id)];
         terminal_state.active_surface = Some(0);
         terminal_state.file_tree_width = 248.0;
+        terminal_state.fullscreen = true;
+        terminal_state.fullscreen_conversation = true;
         states.insert(session_with_terminal, terminal_state);
 
         let other_state = RightPanelSessionState::take_or_closed(&mut states, other_session);
         assert!(!other_state.visible);
+        assert!(!other_state.fullscreen);
+        assert!(!other_state.fullscreen_conversation);
         assert!(other_state.surfaces.is_empty());
         assert_eq!(other_state.active_surface, None);
         assert_eq!(other_state.file_tree_width, DEFAULT_FILE_TREE_WIDTH);
 
         let restored = RightPanelSessionState::take_or_closed(&mut states, session_with_terminal);
         assert!(restored.visible);
+        assert!(restored.fullscreen);
+        assert!(restored.fullscreen_conversation);
         assert_eq!(
             restored.surfaces,
             vec![RightPanelSurface::Terminal(terminal_id)]
@@ -1737,6 +1759,42 @@ mod tests {
             (true, false)
         );
         assert_eq!(tab_scroll_fade_visibility(px(0.0), px(0.0)), (false, false));
+    }
+
+    #[test]
+    fn fullscreen_tabs_start_with_conversation_then_surfaces() {
+        assert_eq!(fullscreen_tab_order(0), vec![None]);
+        assert_eq!(fullscreen_tab_order(2), vec![None, Some(0), Some(1)]);
+        // Cycling wraps both directions over Conversation + surfaces.
+        assert_eq!(fullscreen_cycle_next(0, 2, 1), 1);
+        assert_eq!(fullscreen_cycle_next(2, 2, 1), 0);
+        assert_eq!(fullscreen_cycle_next(0, 2, -1), 2);
+        assert_eq!(fullscreen_cycle_next(1, 2, -1), 0);
+    }
+
+    #[test]
+    fn only_browser_terminal_files_and_review_gate_fullscreen() {
+        assert!(Padu::right_panel_surface_is_expandable(
+            &RightPanelSurface::new_browser()
+        ));
+        assert!(Padu::right_panel_surface_is_expandable(
+            &RightPanelSurface::new_terminal()
+        ));
+        assert!(Padu::right_panel_surface_is_expandable(
+            &RightPanelSurface::Files
+        ));
+        assert!(Padu::right_panel_surface_is_expandable(
+            &RightPanelSurface::File("src/main.rs".into())
+        ));
+        assert!(Padu::right_panel_surface_is_expandable(
+            &RightPanelSurface::Diff
+        ));
+        assert!(!Padu::right_panel_surface_is_expandable(
+            &RightPanelSurface::BackgroundWork {
+                key: BackgroundWorkKey::new(BackgroundWorkKind::Process, "process-1"),
+                title: "Process one".into(),
+            }
+        ));
     }
 
     #[test]
@@ -1876,6 +1934,8 @@ impl Padu {
     fn take_active_right_panel_state(&mut self) -> RightPanelSessionState {
         RightPanelSessionState {
             visible: self.right_panel_visible,
+            fullscreen: self.right_panel_fullscreen,
+            fullscreen_conversation: self.right_panel_fullscreen_conversation,
             surfaces: std::mem::take(&mut self.right_panel_surfaces),
             active_surface: self.right_panel_active_surface.take(),
             tabs_scroll_handle: std::mem::replace(
@@ -1896,6 +1956,8 @@ impl Padu {
 
     fn replace_active_right_panel_state(&mut self, state: RightPanelSessionState) {
         self.right_panel_visible = state.visible;
+        self.right_panel_fullscreen = state.fullscreen;
+        self.right_panel_fullscreen_conversation = state.fullscreen_conversation;
         self.right_panel_surfaces = state.surfaces;
         self.right_panel_active_surface = state.active_surface;
         self.right_panel_tabs_scroll_handle = state.tabs_scroll_handle;
@@ -1930,6 +1992,180 @@ impl Padu {
     fn active_right_panel_surface(&self) -> Option<&RightPanelSurface> {
         self.right_panel_active_surface
             .and_then(|index| self.right_panel_surfaces.get(index))
+    }
+
+    /// Whether a surface counts toward the fullscreen expand button: the four
+    /// primary surfaces. Background work keeps working in fullscreen but never
+    /// gates the button on its own.
+    fn right_panel_surface_is_expandable(surface: &RightPanelSurface) -> bool {
+        matches!(
+            surface,
+            RightPanelSurface::Browser(_)
+                | RightPanelSurface::Terminal(_)
+                | RightPanelSurface::Files
+                | RightPanelSurface::File(_)
+                | RightPanelSurface::Diff
+        )
+    }
+
+    /// The expand button shows while the panel is open with at least one of
+    /// browser, terminal, files, or review on screen.
+    pub(super) fn right_panel_can_expand(&self) -> bool {
+        self.right_panel_visible
+            && self
+                .right_panel_surfaces
+                .iter()
+                .any(Self::right_panel_surface_is_expandable)
+    }
+
+    /// Whether the fullscreen takeover is actually on screen. The flag alone
+    /// is not enough: closing the last expandable surface exits implicitly.
+    pub(super) fn right_panel_fullscreen_active(&self) -> bool {
+        self.right_panel_visible && self.right_panel_fullscreen && self.right_panel_can_expand()
+    }
+
+    /// Ordered fullscreen tabs: Conversation first, then every surface index
+    /// in tab-strip order. Cycling wraps over this list.
+    fn right_panel_fullscreen_order(&self) -> Vec<Option<usize>> {
+        fullscreen_tab_order(self.right_panel_surfaces.len())
+    }
+
+    /// Current position inside the fullscreen order: Conversation when the
+    /// transcript is showing, otherwise the active surface index.
+    fn right_panel_fullscreen_position(&self) -> Option<usize> {
+        if self.right_panel_fullscreen_conversation {
+            Some(0)
+        } else {
+            self.right_panel_active_surface.and_then(|active| {
+                self.right_panel_fullscreen_order()
+                    .iter()
+                    .position(|slot| *slot == Some(active))
+            })
+        }
+    }
+
+    pub(super) fn set_right_panel_fullscreen(&mut self, fullscreen: bool, cx: &mut Context<Self>) {
+        if fullscreen && !self.right_panel_can_expand() {
+            return;
+        }
+        if self.right_panel_fullscreen == fullscreen {
+            return;
+        }
+        self.right_panel_fullscreen = fullscreen;
+        if fullscreen {
+            // Entering lands on the active surface; a missing active index
+            // falls back to the first expandable tab.
+            self.right_panel_fullscreen_conversation = false;
+            if self
+                .active_right_panel_surface()
+                .is_none_or(|surface| !Self::right_panel_surface_is_expandable(surface))
+                && let Some(index) = self
+                    .right_panel_surfaces
+                    .iter()
+                    .position(Self::right_panel_surface_is_expandable)
+            {
+                self.right_panel_active_surface = Some(index);
+                self.reveal_right_panel_tab(index);
+            }
+            self.request_active_terminal_focus();
+            self.request_active_browser_focus();
+        } else {
+            self.right_panel_fullscreen_conversation = false;
+        }
+        cx.notify();
+    }
+
+    pub(super) fn toggle_right_panel_fullscreen_action(
+        &mut self,
+        _: &ToggleRightPanelFullscreen,
+        _: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        if !self.right_panel_fullscreen_active() && !self.right_panel_can_expand() {
+            return;
+        }
+        let next = !self.right_panel_fullscreen_active();
+        // Toggling back on from a collapsed-but-flagged state must land on a
+        // surface, never on a stale conversation view.
+        if next && self.right_panel_fullscreen && self.right_panel_fullscreen_conversation {
+            self.right_panel_fullscreen_conversation = false;
+        }
+        self.set_right_panel_fullscreen(next, cx);
+    }
+
+    fn cycle_right_panel_fullscreen(&mut self, direction: isize, cx: &mut Context<Self>) {
+        if !self.right_panel_fullscreen_active() {
+            return;
+        }
+        let order = self.right_panel_fullscreen_order();
+        if order.is_empty() {
+            return;
+        }
+        let current = self.right_panel_fullscreen_position().unwrap_or(0);
+        let next =
+            order[fullscreen_cycle_next(current, self.right_panel_surfaces.len(), direction)];
+        match next {
+            None => {
+                self.right_panel_fullscreen_conversation = true;
+                cx.notify();
+            }
+            Some(index) => {
+                self.right_panel_fullscreen_conversation = false;
+                self.right_panel_active_surface = Some(index);
+                self.reveal_right_panel_tab(index);
+                self.request_active_terminal_focus();
+                self.request_active_browser_focus();
+                cx.notify();
+            }
+        }
+    }
+
+    pub(super) fn next_right_panel_tab_action(
+        &mut self,
+        _: &NextRightPanelTab,
+        _: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        if self.right_panel_fullscreen_active() {
+            self.cycle_right_panel_fullscreen(1, cx);
+        } else if self.right_panel_visible && self.right_panel_surfaces.len() > 1 {
+            self.cycle_right_panel_docked(1, cx);
+        }
+    }
+
+    pub(super) fn prev_right_panel_tab_action(
+        &mut self,
+        _: &PrevRightPanelTab,
+        _: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        if self.right_panel_fullscreen_active() {
+            self.cycle_right_panel_fullscreen(-1, cx);
+        } else if self.right_panel_visible && self.right_panel_surfaces.len() > 1 {
+            self.cycle_right_panel_docked(-1, cx);
+        }
+    }
+
+    fn cycle_right_panel_docked(&mut self, direction: isize, cx: &mut Context<Self>) {
+        if self.right_panel_surfaces.len() <= 1 {
+            return;
+        }
+        let current = self.right_panel_active_surface.unwrap_or(0);
+        let len = self.right_panel_surfaces.len() as isize;
+        let next = ((current as isize + direction).rem_euclid(len)) as usize;
+        self.right_panel_active_surface = Some(next);
+        self.reveal_right_panel_tab(next);
+        self.request_active_terminal_focus();
+        self.request_active_browser_focus();
+        cx.notify();
+    }
+
+    pub(super) fn select_right_panel_fullscreen_conversation(&mut self, cx: &mut Context<Self>) {
+        if !self.right_panel_fullscreen_active() {
+            return;
+        }
+        self.right_panel_fullscreen_conversation = true;
+        cx.notify();
     }
 
     pub(super) fn request_active_terminal_focus(&mut self) {
@@ -2019,6 +2255,9 @@ impl Padu {
         self.reveal_right_panel_tab(index);
         self.request_active_terminal_focus();
         self.request_active_browser_focus();
+        // Opening a surface always lands on that surface, never on the
+        // fullscreen Conversation view.
+        self.right_panel_fullscreen_conversation = false;
         self.set_right_panel_visible(true, cx);
         cx.notify();
     }
@@ -2265,6 +2504,12 @@ impl Padu {
             self.right_panel_pending_browser_focus = None;
             self.set_right_panel_visible(false, cx);
         }
+        // Closing the last expandable surface exits fullscreen; otherwise a
+        // flagged-but-empty state would linger into the next open.
+        if !self.right_panel_can_expand() {
+            self.right_panel_fullscreen = false;
+            self.right_panel_fullscreen_conversation = false;
+        }
         cx.notify();
     }
 
@@ -2376,23 +2621,31 @@ impl Padu {
 
         div()
             .id("right-panel")
-            .w(px(width))
+            .when(!self.right_panel_fullscreen_active(), |element| {
+                element
+                    .w(px(width))
+                    .flex_none()
+                    .border_l_1()
+                    .border_color(theme.border_strong)
+            })
+            .when(self.right_panel_fullscreen_active(), |element| {
+                element.flex_1().min_w_0()
+            })
             .h_full()
-            .flex_none()
             .flex()
             .flex_col()
             .min_w_0()
-            .border_l_1()
-            .border_color(theme.border_strong)
             .bg(theme.surface)
             .relative()
             .child(self.render_right_panel_header(window, cx))
             .child(body)
-            .child(self.render_panel_resize_handle(
-                "right-panel-resize-handle",
-                PanelResizeTarget::RightPanel,
-                cx,
-            ))
+            .when(!self.right_panel_fullscreen_active(), |element| {
+                element.child(self.render_panel_resize_handle(
+                    "right-panel-resize-handle",
+                    PanelResizeTarget::RightPanel,
+                    cx,
+                ))
+            })
     }
 
     fn ensure_right_panel_browser(
@@ -2462,9 +2715,12 @@ impl Padu {
         // A webview composites above the GPUI scene, so the panel's clip does
         // not apply to it: shown mid-slide it would hang over the transcript
         // at full width. Keep it down until the panel has finished moving.
+        // Fullscreen conversation shows the transcript, so its browser stays
+        // down the same way a hidden panel does.
         let active_browser = if self.settings_page.is_none()
             && self.right_panel_visible
             && self.right_panel_slide.is_none()
+            && !(self.right_panel_fullscreen_active() && self.right_panel_fullscreen_conversation)
         {
             self.active_right_panel_surface()
                 .and_then(RightPanelSurface::browser_id)
@@ -2529,8 +2785,14 @@ impl Padu {
         }
     }
 
-    fn render_right_panel_header(&self, window: &Window, cx: &mut Context<Self>) -> Stateful<Div> {
+    pub(super) fn render_right_panel_header(
+        &self,
+        window: &Window,
+        cx: &mut Context<Self>,
+    ) -> Stateful<Div> {
         let theme = Theme::current(cx);
+        let fullscreen = self.right_panel_fullscreen_active();
+        let showing_conversation = fullscreen && self.right_panel_fullscreen_conversation;
         let active_surface = self.right_panel_active_surface;
         let mut tabs = div()
             .id("right-panel-tabs")
@@ -2542,8 +2804,54 @@ impl Padu {
             .gap(px(4.0))
             .overflow_x_scroll()
             .track_scroll(&self.right_panel_tabs_scroll_handle);
+        // Fullscreen surfaces read like tabs with Conversation first, so the
+        // transcript stays one ←/→ step away from every surface.
+        if fullscreen {
+            let active = showing_conversation;
+            let weak = cx.entity().downgrade();
+            tabs = tabs.child(
+                div()
+                    .id("right-panel-tab-conversation")
+                    .h(px(28.0))
+                    .min_w(px(100.0))
+                    .max_w(px(176.0))
+                    .px(px(8.0))
+                    .rounded(px(6.0))
+                    .flex_none()
+                    .flex()
+                    .items_center()
+                    .gap(px(6.0))
+                    .cursor_pointer()
+                    .on_mouse_down(MouseButton::Left, |_, _, cx| {
+                        cx.stop_propagation();
+                    })
+                    .when(active, |element| element.bg(theme.overlay_strong))
+                    .when(!active, |element| {
+                        element.hover(|element| element.bg(theme.overlay))
+                    })
+                    .child(icon("icons/compose.svg", 13.0, theme.text_secondary))
+                    .child(
+                        div()
+                            .min_w_0()
+                            .flex_1()
+                            .truncate()
+                            .text_size(sp(12.5))
+                            .text_color(if active {
+                                theme.text
+                            } else {
+                                theme.text_secondary
+                            })
+                            .child(tr!("right_panel.conversation")),
+                    )
+                    .on_click(move |_, _, cx| {
+                        let _ = weak.update(cx, |this, cx| {
+                            this.select_right_panel_fullscreen_conversation(cx);
+                        });
+                    }),
+            );
+        }
         for (index, surface) in self.right_panel_surfaces.iter().cloned().enumerate() {
-            let active = active_surface == Some(index);
+            let active = !showing_conversation && active_surface == Some(index);
             let dirty = self.right_panel_surface_is_dirty(&surface);
             let label = SharedString::from(match &surface {
                 // Browser tabs read like browser tabs: the page title once
@@ -2650,6 +2958,7 @@ impl Padu {
                     .on_click(move |_, _, cx| {
                         let _ = activate_weak.update(cx, |this, cx| {
                             this.right_panel_active_surface = Some(index);
+                            this.right_panel_fullscreen_conversation = false;
                             this.reveal_right_panel_tab(index);
                             this.request_active_terminal_focus();
                             cx.notify();
@@ -2657,7 +2966,19 @@ impl Padu {
                     }),
             );
         }
-        tabs = tabs.child(div().w(px(TAB_SCROLL_FADE_WIDTH)).h(px(1.0)).flex_none());
+        tabs = tabs
+            .child(div().w(px(TAB_SCROLL_FADE_WIDTH)).h(px(1.0)).flex_none())
+            .when(fullscreen, |element| element.justify_center());
+
+        let left_window_controls = (fullscreen && !self.sidebar_visible)
+            .then(|| {
+                self.render_client_window_controls(
+                    super::window_chrome::WindowControlSide::Left,
+                    window,
+                    cx,
+                )
+            })
+            .flatten();
 
         let mut header = div()
             .id("right-panel-header")
@@ -2666,8 +2987,105 @@ impl Padu {
             .flex()
             .items_center()
             .gap(px(6.0))
-            .pl(px(10.0))
+            .children(left_window_controls)
+            .pl(if fullscreen && !self.sidebar_visible {
+                if cfg!(target_os = "macos") {
+                    px(0.0)
+                } else {
+                    px(10.0)
+                }
+            } else {
+                px(10.0)
+            })
             .pr(px(14.0))
+            .when(fullscreen && !self.sidebar_visible, |element| {
+                element
+                    .child(
+                        self.window_drag_region(
+                            div()
+                                .id("right-panel-traffic-light-drag-region")
+                                .w(px((TRAFFIC_LIGHT_CLEARANCE - 8.0).max(0.0)))
+                                .h_full()
+                                .flex_none(),
+                            cx,
+                        ),
+                    )
+                    .child(
+                        div()
+                            .flex()
+                            .items_center()
+                            .gap(px(6.0))
+                            .child(self.render_sidebar_toggle(cx))
+                            .when(showing_conversation, |element| {
+                                element.child(
+                                    div()
+                                        .flex()
+                                        .items_center()
+                                        .gap(px(2.0))
+                                        .child(self.render_history_button(
+                                            "navigate-back",
+                                            "icons/arrow-left.svg",
+                                            !self.session_navigation.back.is_empty(),
+                                            true,
+                                            cx,
+                                        ))
+                                        .child(self.render_history_button(
+                                            "navigate-forward",
+                                            "icons/arrow-right.svg",
+                                            !self.session_navigation.forward.is_empty(),
+                                            false,
+                                            cx,
+                                        )),
+                                )
+                            }),
+                    )
+            })
+            .when(showing_conversation, |element| {
+                let session = self.selected_session();
+                let title = session
+                    .map(sidebar::localized_session_title)
+                    .unwrap_or_else(|| tr!("session.new_task"));
+                let agent_preset_label = session
+                    .filter(|session| {
+                        session.provider == ProviderKind::DeepSeek && session.has_started()
+                    })
+                    .and_then(|session| self.agent_preset_label_for_session(session));
+                element.child(
+                    div()
+                        .id("fullscreen-conversation-title")
+                        .flex()
+                        .items_center()
+                        .gap(px(6.0))
+                        .min_w_0()
+                        .max_w(px(220.0))
+                        .child(
+                            div()
+                                .min_w_0()
+                                .truncate()
+                                .text_size(sp(13.0))
+                                .font_weight(FontWeight::MEDIUM)
+                                .text_color(theme.text)
+                                .child(SharedString::from(title)),
+                        )
+                        .children(agent_preset_label.map(|label| {
+                            div()
+                                .h(px(20.0))
+                                .max_w(px(120.0))
+                                .px(px(6.0))
+                                .rounded(px(4.0))
+                                .flex_none()
+                                .flex()
+                                .items_center()
+                                .gap(px(4.0))
+                                .bg(theme.overlay)
+                                .text_size(sp(11.5))
+                                .font_weight(FontWeight::MEDIUM)
+                                .text_color(theme.text_secondary)
+                                .child(icon("icons/bot.svg", 10.0, theme.text_tertiary))
+                                .child(div().min_w_0().truncate().child(SharedString::from(label)))
+                        })),
+                )
+            })
             .child(
                 div()
                     .relative()
@@ -2675,6 +3093,9 @@ impl Padu {
                     .min_w_0()
                     .flex_1()
                     .overflow_hidden()
+                    .when(fullscreen, |element| {
+                        element.flex().items_center().justify_center()
+                    })
                     .child(tabs)
                     .when_some(self.right_panel_pending_tab_reveal, |element, tab_index| {
                         element.child(tab_scroll_reveal_guard(
@@ -2694,6 +3115,10 @@ impl Padu {
                         theme.surface,
                     )),
             );
+
+        if showing_conversation {
+            header = header.child(self.render_background_work_summary(cx));
+        }
 
         if !self.right_panel_surfaces.is_empty() {
             let weak = cx.entity().downgrade();
@@ -2743,14 +3168,65 @@ impl Padu {
             );
         }
 
+        // Fullscreen expand: only while an expandable surface (browser,
+        // terminal, files, review) is open. Keyboard reachable via tab stop
+        // plus ⌘J; ←/→ then cycle Conversation and surfaces like tabs.
+        if self.right_panel_can_expand() {
+            let fullscreen = self.right_panel_fullscreen_active();
+            let focus = self.transcript_control_focus("right-panel-fullscreen-toggle", cx);
+            let (icon_path, label) = if fullscreen {
+                ("icons/minimize.svg", tr!("right_panel.collapse"))
+            } else {
+                ("icons/maximize.svg", tr!("right_panel.expand"))
+            };
+            header = header.child(
+                div()
+                    .id("toggle-right-panel-fullscreen")
+                    .track_focus(&focus)
+                    .tab_index(0)
+                    .size(px(22.0))
+                    .rounded(px(6.0))
+                    .flex_none()
+                    .flex()
+                    .items_center()
+                    .justify_center()
+                    .cursor_pointer()
+                    .focus_visible(|style| style.border_1().border_color(theme.accent))
+                    .hover(|element| element.bg(theme.overlay))
+                    .active(|element| element.bg(theme.overlay_strong))
+                    .child(icon(icon_path, 13.0, theme.text_tertiary))
+                    .tooltip(Tooltip::with_shortcut(
+                        label.clone(),
+                        crate::platform::primary_shortcut("⌘J", "Ctrl+J"),
+                    ))
+                    .on_mouse_down(MouseButton::Left, |_, _, cx| {
+                        cx.stop_propagation();
+                    })
+                    .on_click(cx.listener(|this, _, _, cx| {
+                        cx.stop_propagation();
+                        let fullscreen = !this.right_panel_fullscreen_active();
+                        this.set_right_panel_fullscreen(fullscreen, cx);
+                    }))
+                    .on_key_down(cx.listener(|this, event: &KeyDownEvent, _, cx| {
+                        if matches!(event.keystroke.key.as_str(), "enter" | "space") {
+                            cx.stop_propagation();
+                            let fullscreen = !this.right_panel_fullscreen_active();
+                            this.set_right_panel_fullscreen(fullscreen, cx);
+                        }
+                    })),
+            );
+        }
+
         self.window_drag_region(
-            header.child(self.render_right_panel_toggle(cx)).children(
-                self.render_client_window_controls(
+            header
+                .when(!fullscreen, |header| {
+                    header.child(self.render_right_panel_toggle(cx))
+                })
+                .children(self.render_client_window_controls(
                     super::window_chrome::WindowControlSide::Right,
                     window,
                     cx,
-                ),
-            ),
+                )),
             cx,
         )
     }
@@ -4911,6 +5387,9 @@ impl Padu {
         _window: &mut Window,
         cx: &mut Context<Self>,
     ) {
+        if event.keystroke.modifiers.modified() {
+            return;
+        }
         let rows = self.right_panel_diff_tree_rows.borrow().clone();
         if rows.is_empty() {
             return;
