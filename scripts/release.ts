@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 
 import { $ } from "bun";
+import { existsSync } from "node:fs";
 import {
   access,
   mkdir,
@@ -136,8 +137,21 @@ function derivedBuildNumber(version: string): string {
 
 const adhoc = values.adhoc ?? false;
 const skipNotarize = values["skip-notarize"] ?? false;
-const configuredSigningIdentity =
+let configuredSigningIdentity =
   values["signing-identity"] ?? process.env.PADU_SIGNING_IDENTITY;
+
+if (!adhoc && !configuredSigningIdentity) {
+  try {
+    const output = await $`security find-identity -v -p codesigning`.quiet().text();
+    const match = output.match(/"(Developer ID Application:[^"]+)"/);
+    if (match?.[1]) {
+      configuredSigningIdentity = match[1];
+      console.log(`Auto-detected signing identity: ${configuredSigningIdentity}`);
+    }
+  } catch {
+    // Ignore error
+  }
+}
 const notaryProfile =
   values["notary-profile"] ??
   process.env.PADU_NOTARY_PROFILE ??
@@ -168,7 +182,8 @@ if (adhoc && values["signing-identity"]) {
 }
 if (!adhoc && !configuredSigningIdentity) {
   throw new Error(
-    "Set PADU_SIGNING_IDENTITY or pass --signing-identity (or use --adhoc).",
+    "Set PADU_SIGNING_IDENTITY or pass --signing-identity (or use --adhoc). " +
+      "No valid 'Developer ID Application:' identity was found in the keychain.",
   );
 }
 if (explicitBuildNumber && !/^\d+(?:\.\d+){0,2}$/.test(explicitBuildNumber)) {
@@ -540,22 +555,87 @@ try {
 
   if (!adhoc && !skipNotarize) {
     logStep("Submitting the DMG for Apple notarization");
-    const resultText =
-      await $`xcrun notarytool submit ${outputPath} --keychain-profile ${notaryProfile!} --wait --output-format json`
-        .quiet()
-        .text();
-    const result = JSON.parse(resultText) as {
-      id?: string;
-      message?: string;
-      status?: string;
-    };
-    if (result.status !== "Accepted") {
-      throw new Error(
-        `Notarization ${result.status ?? "failed"}${result.id ? ` (${result.id})` : ""}: ` +
-          (result.message ?? "inspect the submission with notarytool log"),
+    const notaryArgs: string[] = [
+      "submit",
+      outputPath,
+      "--wait",
+      "--output-format",
+      "json",
+    ];
+
+    let temporaryApiKeyPath: string | undefined;
+    const apiKey = process.env.APPLE_API_KEY?.trim();
+    const apiKeyId = (
+      process.env.APPLE_API_KEY_ID ?? process.env.APPLE_KEY_ID
+    )?.trim();
+    const apiIssuer = (
+      process.env.APPLE_API_ISSUER ?? process.env.APPLE_ISSUER_ID
+    )?.trim();
+
+    const appleId = process.env.APPLE_ID?.trim();
+    const applePassword = (
+      process.env.APPLE_APP_SPECIFIC_PASSWORD ?? process.env.APPLE_PASSWORD
+    )?.trim();
+    const appleTeamId = (
+      process.env.APPLE_TEAM_ID ?? process.env.APPLE_TEAM
+    )?.trim();
+
+    if (apiKey && apiKeyId && apiIssuer) {
+      if (existsSync(apiKey)) {
+        temporaryApiKeyPath = apiKey;
+      } else {
+        const decoded = apiKey.includes("-----BEGIN")
+          ? apiKey
+          : Buffer.from(apiKey, "base64").toString("utf-8");
+        temporaryApiKeyPath = join(tmpdir(), `AuthKey_${apiKeyId}.p8`);
+        await Bun.write(temporaryApiKeyPath, decoded);
+      }
+      notaryArgs.push(
+        "--key",
+        temporaryApiKeyPath,
+        "--key-id",
+        apiKeyId,
+        "--issuer",
+        apiIssuer,
       );
+      console.log(
+        `Using App Store Connect API Key (${apiKeyId}) for notarization.`,
+      );
+    } else if (appleId && applePassword && appleTeamId) {
+      notaryArgs.push(
+        "--apple-id",
+        appleId,
+        "--password",
+        applePassword,
+        "--team-id",
+        appleTeamId,
+      );
+      console.log(`Using Apple ID (${appleId}) for notarization.`);
+    } else {
+      notaryArgs.push("--keychain-profile", notaryProfile!);
+      console.log(`Using keychain profile "${notaryProfile}" for notarization.`);
     }
-    console.log(`Notarization accepted: ${result.id ?? "unknown submission"}`);
+
+    try {
+      const resultText =
+        await $`xcrun notarytool ${notaryArgs}`.quiet().text();
+      const result = JSON.parse(resultText) as {
+        id?: string;
+        message?: string;
+        status?: string;
+      };
+      if (result.status !== "Accepted") {
+        throw new Error(
+          `Notarization ${result.status ?? "failed"}${result.id ? ` (${result.id})` : ""}: ` +
+            (result.message ?? "inspect the submission with notarytool log"),
+        );
+      }
+      console.log(`Notarization accepted: ${result.id ?? "unknown submission"}`);
+    } finally {
+      if (temporaryApiKeyPath && temporaryApiKeyPath !== apiKey) {
+        await rm(temporaryApiKeyPath, { force: true });
+      }
+    }
 
     logStep("Stapling and assessing the notarized DMG");
     await $`xcrun stapler staple -v ${outputPath}`;

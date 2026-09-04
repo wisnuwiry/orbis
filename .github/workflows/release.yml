@@ -218,7 +218,7 @@ jobs:
           if-no-files-found: error
 
   macos:
-    name: macOS (ad-hoc)
+    name: macOS
     needs: version
     if: needs.version.outputs.published != 'true'
     runs-on: macos-latest
@@ -248,18 +248,70 @@ jobs:
           restore-keys: |
             macos-latest-rust-1.96.0-release-
 
-      # Ad-hoc signed — no Apple Developer account needed. macOS will show a
-      # Gatekeeper warning; users right-click → Open to bypass it. In-app
-      # updates via Sparkle still work because the appcast is signed with the
-      # EdDSA key.
-      - name: Release (ad-hoc)
+      - name: Import Apple Developer Certificate
+        if: env.APPLE_CERTIFICATE != ''
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        run: |
+          KEYCHAIN_PATH="$RUNNER_TEMP/build.keychain"
+          KEYCHAIN_PASSWORD=$(openssl rand -hex 16)
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          CERT_PATH="$RUNNER_TEMP/certificate.p12"
+          echo "$APPLE_CERTIFICATE" | base64 --decode > "$CERT_PATH"
+
+          security import "$CERT_PATH" \
+            -k "$KEYCHAIN_PATH" \
+            -P "$APPLE_CERTIFICATE_PASSWORD" \
+            -T /usr/bin/codesign \
+            -T /usr/bin/security
+
+          security set-key-partition-list \
+            -S apple-tool:,apple:,codesign: \
+            -s \
+            -k "$KEYCHAIN_PASSWORD" \
+            "$KEYCHAIN_PATH"
+
+          security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | tr -d '"')
+          rm -f "$CERT_PATH"
+
+      # Developer ID signed + Apple notarized when APPLE_CERTIFICATE is configured.
+      # Falls back to ad-hoc signing when certificate secrets are not set.
+      - name: Release (macOS)
         env:
           SCCACHE_GHA_ENABLED: "true"
           RUSTC_WRAPPER: "sccache"
           PADU_ANALYTICS_ENDPOINT: ${{ secrets.PADU_ANALYTICS_ENDPOINT }}
           PADU_ANALYTICS_WEBSITE_ID: ${{ secrets.PADU_ANALYTICS_WEBSITE_ID }}
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
-        run: bun run release --adhoc
+          PADU_SIGNING_IDENTITY: ${{ secrets.PADU_SIGNING_IDENTITY }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+        run: |
+          if [ -n "$APPLE_CERTIFICATE" ]; then
+            echo "Building Developer ID-signed and notarized macOS release..."
+            bun run release --local
+          else
+            echo "Notice: APPLE_CERTIFICATE secret is not set. Falling back to ad-hoc signing..."
+            bun run release --adhoc
+          fi
+
+      - name: Clean up Keychain
+        if: always() && env.APPLE_CERTIFICATE != ''
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+        run: |
+          KEYCHAIN_PATH="$RUNNER_TEMP/build.keychain"
+          security delete-keychain "$KEYCHAIN_PATH" || true
 
       - name: Show sccache statistics
         if: always()

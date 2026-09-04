@@ -71,32 +71,45 @@ new public key in Info.plist, and pass `--account padu` through to
 old key, so do this on a release that still signs with the old key… in other
 words, don't do it casually.
 
-### 2. Developer ID signing + notarization (optional)
+### 2. Developer ID signing + notarization
 
-macOS CI builds are **ad-hoc signed** by default — no Apple Developer account
-needed. Users will see a Gatekeeper warning the first time and must
-right-click → Open to launch. In-app updates still work because the appcast is
-signed with the EdDSA key.
+macOS CI builds automatically create signed and notarized DMGs when Apple credentials
+are provided as GitHub Secrets. If secrets are not configured, CI gracefully falls back to
+**ad-hoc signed** builds.
 
-For fully signed + notarized builds (no Gatekeeper warning), copy `.env.example`
-to `.env` and replace the signing and analytics placeholders:
+#### A. Create and export your Developer ID certificate
+1. Log in to [Apple Developer](https://developer.apple.com) → **Certificates, Identifiers & Profiles** → **Certificates**.
+2. Click **+** and choose **Developer ID Application** (for macOS apps distributed outside the App Store).
+3. Follow the instructions to create and upload a Certificate Signing Request (CSR) generated via **Keychain Access** on your Mac (`Keychain Access` → `Certificate Assistant` → `Request a Certificate from a Certificate Authority...`).
+4. Download the certificate file (`developerID_application.cer`) and double-click to install it into Keychain.
+5. In **Keychain Access**, under "My Certificates", right-click your `Developer ID Application: ...` certificate and choose **Export**.
+6. Export as **Personal Information Exchange (.p12)** and set an export password.
+7. Encode the `.p12` to base64 for CI:
+   ```sh
+   base64 -i DeveloperID.p12 | pbcopy
+   ```
 
+#### B. Configure Notarization Credentials
+Apple requires notarization for all Developer ID distributed applications. You can use either:
+- **Option 1 (App Store Connect API Key - Recommended for CI)**:
+  - In [App Store Connect](https://appstoreconnect.apple.com) → **Users and Access** → **Integrations** → **App Store Connect API**.
+  - Generate an API Key with **Developer** role.
+  - Note the **Key ID**, **Issuer ID**, and download the `.p8` private key.
+- **Option 2 (Apple ID + App-Specific Password)**:
+  - Note your Apple ID email and 10-character **Team ID** (from Apple Developer account membership).
+  - Generate an app-specific password at [appleid.apple.com](https://appleid.apple.com) (Security → App-Specific Passwords).
+
+#### C. Local releases
+For local builds, copy `.env.example` to `.env` with your credentials, or store notary credentials locally:
 ```sh
-cp .env.example .env
 xcrun notarytool store-credentials NOTARY \
   --apple-id you@example.com --team-id YOUR_APPLE_TEAM_ID
 ```
-
 Then run:
-
 ```sh
-bun run release --signing-identity "Developer ID Application: Your Name"
+bun run release --local
 ```
-
-Override the environment with `--signing-identity`, or change the notary
-profile with `--notary-profile` / `PADU_NOTARY_PROFILE`. The CI workflow
-accepts `PADU_SIGNING_IDENTITY`, `APPLE_CERTIFICATE`, `APPLE_ID`,
-`APPLE_APP_SPECIFIC_PASSWORD`, and `APPLE_TEAM_ID` secrets for signed builds.
+Identity and notarization credentials are auto-detected from environment variables or the macOS Keychain.
 
 ### 3. Cloudflare R2 bucket + domain  ← **still to do once**
 
@@ -243,12 +256,15 @@ secrets first:
 | --- | --- |
 | `PADU_ANALYTICS_ENDPOINT` | embedded in every desktop CI build |
 | `PADU_ANALYTICS_WEBSITE_ID` | embedded in every desktop CI build |
-| `PADU_SIGNING_IDENTITY` | Developer ID identity selector |
+| `PADU_SIGNING_IDENTITY` | Developer ID identity selector (e.g. `Developer ID Application: ...`) |
 | `APPLE_CERTIFICATE` | base64-encoded Developer ID Application `.p12` |
 | `APPLE_CERTIFICATE_PASSWORD` | password for that `.p12` |
-| `APPLE_ID` | Apple ID used by `notarytool` |
-| `APPLE_APP_SPECIFIC_PASSWORD` | app-specific password for that Apple ID |
-| `APPLE_TEAM_ID` | Developer Team ID |
+| `APPLE_ID` | Apple ID used by `notarytool` (for Option 2) |
+| `APPLE_APP_SPECIFIC_PASSWORD` | app-specific password for that Apple ID (for Option 2) |
+| `APPLE_TEAM_ID` | Developer Team ID (for Option 2) |
+| `APPLE_API_KEY` | base64-encoded AuthKey `.p8` (for Option 1) |
+| `APPLE_API_KEY_ID` | App Store Connect API Key ID (for Option 1) |
+| `APPLE_API_ISSUER` | App Store Connect Issuer UUID (for Option 1) |
 | `SPARKLE_PRIVATE_KEY` | EdDSA private key for `generate_appcast` |
 | `WINDOWS_CERTIFICATE` | optional; base64-encoded Authenticode `.pfx` |
 | `WINDOWS_CERTIFICATE_PASSWORD` | optional; password for that `.pfx` |
