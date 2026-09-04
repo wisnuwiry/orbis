@@ -16,6 +16,13 @@ the original feature bullet instead of adding separate entries for them.
 
 ## [unreleased]
 
+## 0.1.1 - 2026-09-04
+
+- **Indonesian Language Support**: Added complete Indonesian (Bahasa Indonesia) localization to the desktop client, navigation, and settings, with automatic system locale detection.
+- **Apple Developer ID Signing & Notarization**: Official macOS releases are now Developer ID-signed and Apple-notarized, eliminating Gatekeeper warnings.
+- **Provider Driver Diagnostics**: Added `padu-provider-test` CLI harness for validating and debugging AI agent provider drivers.
+- **Native Build Performance**: Integrated compiler cache optimizations (`sccache`) across native desktop packaging and build pipelines.
+
 ## 0.1.0 - 2026-09-03
 
 ### Highlights
