@@ -80,7 +80,7 @@ export function SiteFooter() {
           <p className="text-white/70 font-medium text-xs uppercase tracking-wider">Community</p>
           <div className="space-y-2">
             <a
-              href="https://github.com/wisnusaputra/padu"
+              href="https://github.com/wisnuwiry/padu"
               target="_blank"
               rel="noopener noreferrer"
               className="block text-muted-foreground hover:text-foreground transition-colors"
@@ -88,7 +88,7 @@ export function SiteFooter() {
               GitHub
             </a>
             <a
-              href="https://github.com/wisnusaputra/padu/releases"
+              href="https://github.com/wisnuwiry/padu/releases"
               target="_blank"
               rel="noopener noreferrer"
               className="block text-muted-foreground hover:text-foreground transition-colors"
@@ -96,7 +96,7 @@ export function SiteFooter() {
               Releases
             </a>
             <a
-              href="https://github.com/wisnusaputra/padu/discussions"
+              href="https://github.com/wisnuwiry/padu/discussions"
               target="_blank"
               rel="noopener noreferrer"
               className="block text-muted-foreground hover:text-foreground transition-colors"
@@ -104,7 +104,7 @@ export function SiteFooter() {
               Discussions
             </a>
             <a
-              href="https://github.com/wisnusaputra/padu/issues"
+              href="https://github.com/wisnuwiry/padu/issues"
               target="_blank"
               rel="noopener noreferrer"
               className="block text-muted-foreground hover:text-foreground transition-colors"

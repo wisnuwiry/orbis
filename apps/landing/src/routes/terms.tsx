@@ -32,7 +32,7 @@ function Terms() {
           Padu is free and open-source software licensed under the <strong>GNU General Public License v3.0 (GPL-3.0)</strong>.
           The complete source code is publicly accessible on{" "}
           <a
-            href="https://github.com/wisnusaputra/padu"
+            href="https://github.com/wisnuwiry/padu"
             target="_blank"
             rel="noopener noreferrer"
           >

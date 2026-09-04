@@ -70,7 +70,7 @@ export function SiteHeader() {
           Changelog
         </Link>
         <a
-          href="https://github.com/wisnusaputra/padu"
+          href="https://github.com/wisnuwiry/padu"
           target="_blank"
           rel="noopener noreferrer"
           aria-label={stars ? `GitHub, ${stars} stars` : "GitHub"}
@@ -152,7 +152,7 @@ export function SiteHeader() {
             </Link>
             <div className="h-px bg-white/[0.08] my-1" />
             <a
-              href="https://github.com/wisnusaputra/padu"
+              href="https://github.com/wisnuwiry/padu"
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-2.5 rounded-xl text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/[0.04] transition-all flex items-center justify-between"

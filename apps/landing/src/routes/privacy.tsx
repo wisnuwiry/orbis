@@ -105,7 +105,7 @@ function Privacy() {
         <p>
           We take software security seriously. If you discover a potential security vulnerability in Padu, please review our{" "}
           <a
-            href="https://github.com/wisnusaputra/padu/blob/main/SECURITY.md"
+            href="https://github.com/wisnuwiry/padu/blob/main/SECURITY.md"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -122,7 +122,7 @@ function Privacy() {
           If you have questions about this Privacy Policy or Padu&apos;s data practices, please contact us at{" "}
           <a href="mailto:support@padu.dev">support@padu.dev</a> or open a discussion on our{" "}
           <a
-            href="https://github.com/wisnusaputra/padu/discussions"
+            href="https://github.com/wisnuwiry/padu/discussions"
             target="_blank"
             rel="noopener noreferrer"
           >
