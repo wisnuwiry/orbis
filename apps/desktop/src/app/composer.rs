@@ -854,20 +854,23 @@ impl Padu {
                             .map(|session| session.provider)
                             .unwrap_or_default();
                         // A draft can sit on a provider that was since switched
-                        // off; open onto the first usable provider instead of a
-                        // tab whose rows the filter would leave empty.
+                        // off or uninstalled; open onto the first usable
+                        // provider instead of a tab whose rows the filter
+                        // would leave empty. While detection is unsettled the
+                        // probes still read as missing, so keep the request
+                        // rather than fall back on partial answers.
                         let locked = this
                             .selected_session()
                             .is_some_and(|session| !session.messages.is_empty());
-                        let provider =
-                            if !locked && this.state.disabled_providers.contains(&provider) {
-                                ProviderKind::ALL
-                                    .into_iter()
-                                    .find(|kind| this.provider_enabled(*kind))
-                                    .unwrap_or(provider)
-                            } else {
-                                provider
-                            };
+                        let provider = if locked || !this.provider_detection_settled() {
+                            provider
+                        } else {
+                            super::runtime::resolve_usable_provider(
+                                provider,
+                                &this.probes,
+                                &this.state.disabled_providers,
+                            )
+                        };
                         this.model_picker_tab = ModelPickerTab::Provider(provider);
                         // Opening re-runs the tab's catalog discovery so models
                         // authored since launch appear without a restart; the

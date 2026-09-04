@@ -2328,8 +2328,11 @@ impl Padu {
                 provider,
                 installed: false,
                 path: None,
-                models: crate::model_catalog::fallback_models(provider),
-                agent_presets: crate::model_catalog::fallback_agent_presets(provider),
+                // Detection answers off the UI thread: until it settles, no
+                // provider is selectable, so seed nothing rather than a
+                // fallback some selection path could offer.
+                models: Vec::new(),
+                agent_presets: Vec::new(),
             })
             .collect::<Vec<_>>();
         let (provider_probe_tx, provider_probe_events) = unbounded();

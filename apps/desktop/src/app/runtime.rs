@@ -1,5 +1,67 @@
 use super::*;
 
+/// Whether the provider can back a new session: its CLI is installed on this
+/// machine and it is not switched off in the Providers settings.
+///
+/// Pure so the picker's gating, session creation, the enable toggle, and
+/// detection migration agree on one definition — and so tests can pin it
+/// without a window. Notably, a stale model list alone never makes a provider
+/// usable: only the `installed` flag does.
+pub(super) fn provider_is_usable(
+    probes: &[ProviderProbe],
+    disabled_providers: &[ProviderKind],
+    provider: ProviderKind,
+) -> bool {
+    !disabled_providers.contains(&provider)
+        && probes
+            .iter()
+            .any(|probe| probe.provider == provider && probe.installed)
+}
+
+/// Whether any probe reports the provider's CLI on this machine, regardless
+/// of the Providers settings switch.
+pub(super) fn provider_is_installed(probes: &[ProviderProbe], provider: ProviderKind) -> bool {
+    probes
+        .iter()
+        .any(|probe| probe.provider == provider && probe.installed)
+}
+
+/// First provider that can back new work, keeping the request when it is
+/// usable. Falls back to the request itself when nothing can, so callers —
+/// not this helper — decide how the empty state reads.
+pub(super) fn resolve_usable_provider(
+    requested: ProviderKind,
+    probes: &[ProviderProbe],
+    disabled_providers: &[ProviderKind],
+) -> ProviderKind {
+    if provider_is_usable(probes, disabled_providers, requested) {
+        requested
+    } else {
+        ProviderKind::ALL
+            .into_iter()
+            .find(|kind| provider_is_usable(probes, disabled_providers, *kind))
+            .unwrap_or(requested)
+    }
+}
+
+/// Ids of sessions that must move providers: unstarted drafts sitting on a
+/// provider that cannot back new work. Started sessions keep theirs —
+/// disabling is for new work.
+pub(super) fn stranded_draft_ids(
+    sessions: &[AgentSession],
+    probes: &[ProviderProbe],
+    disabled_providers: &[ProviderKind],
+) -> Vec<Uuid> {
+    sessions
+        .iter()
+        .filter(|session| {
+            !session.has_started()
+                && !provider_is_usable(probes, disabled_providers, session.provider)
+        })
+        .map(|session| session.id)
+        .collect()
+}
+
 fn workspace_ack(
     workspace: &padu_client::WorkspaceClient,
     operation: padu_client::WorkspaceOperation,
@@ -1466,12 +1528,14 @@ impl Padu {
                     );
                     let probe = match response {
                         Ok(padu_client::ResponsePayload::ProviderProbe { probe, .. }) => probe,
+                        // A failed probe means "not known", never a provider
+                        // with models but no CLI: offer nothing selectable.
                         _ => ProviderProbe {
                             provider,
                             installed: false,
                             path: None,
-                            models: crate::model_catalog::fallback_models(provider),
-                            agent_presets: crate::model_catalog::fallback_agent_presets(provider),
+                            models: Vec::new(),
+                            agent_presets: Vec::new(),
                         },
                     };
                     if provider_detection_tx.send(probe).is_ok() {
@@ -1510,9 +1574,14 @@ impl Padu {
                 if self.provider_model_discoveries_pending.contains(&provider) {
                     // A manual refresh may overlap an older live discovery.
                     // Keep that newer catalog while still accepting PATH
-                    // detection from this response.
+                    // detection from this response — unless the CLI is gone,
+                    // in which case nothing is selectable.
                     existing.installed = probe.installed;
                     existing.path = probe.path;
+                    if !probe.installed {
+                        existing.models = Vec::new();
+                        existing.agent_presets = Vec::new();
+                    }
                 } else {
                     *existing = probe;
                 }
@@ -1531,17 +1600,72 @@ impl Padu {
         }
         if changed {
             self.request_provider_version_probes();
+            // A CLI that vanished since it was last remembered must not stay
+            // the default for new work. Migrate once detection has settled so
+            // the fallback sees every provider's final state, not a partial
+            // pass where not-yet-answered probes still look missing.
+            if self.provider_detection_remaining == 0 {
+                self.migrate_off_unusable_providers();
+            }
         }
         changed
+    }
+
+    /// Move the new-session default and any unstarted drafts off providers
+    /// that cannot back new work — no CLI on the machine, or switched off in
+    /// the Providers settings — so nothing selectable points at them.
+    /// Sessions already locked in (started) keep their provider: disabling is
+    /// for new work.
+    fn migrate_off_unusable_providers(&mut self) {
+        let fallback = resolve_usable_provider(
+            self.state.last_provider,
+            &self.probes,
+            &self.state.disabled_providers,
+        );
+        // Nothing can back new work: leave the remembered default and drafts
+        // alone so the empty state names the fix instead of blanking choices.
+        if !provider_is_usable(&self.probes, &self.state.disabled_providers, fallback) {
+            return;
+        }
+        if fallback != self.state.last_provider {
+            self.state.last_provider = fallback;
+            self.state.last_model = None;
+            self.state.last_reasoning_effort = None;
+            self.state.last_service_tier = None;
+            self.state.last_context_window = None;
+            self.save();
+        }
+        let draft_ids = stranded_draft_ids(
+            &self.state.sessions,
+            &self.probes,
+            &self.state.disabled_providers,
+        );
+        if draft_ids.is_empty() {
+            return;
+        }
+        for id in draft_ids {
+            if let Some(session) = self.state.session_mut(id) {
+                session.provider = fallback;
+                session.model = None;
+                session.reasoning_effort = None;
+                session.service_tier = None;
+                session.context_window = None;
+            }
+        }
+        self.save();
     }
 
     /// Whether the provider can back a new session: installed and not switched
     /// off in the Providers settings.
     pub(super) fn provider_enabled(&self, provider: ProviderKind) -> bool {
-        !self.state.disabled_providers.contains(&provider)
-            && self
-                .provider_probe(provider)
-                .is_some_and(|probe| probe.installed)
+        provider_is_usable(&self.probes, &self.state.disabled_providers, provider)
+    }
+
+    /// First-pass detection answers off the UI thread; until it settles every
+    /// probe still reads as "not installed". Resolution paths must keep the
+    /// request while this is false rather than fall back on a partial pass.
+    pub(super) fn provider_detection_settled(&self) -> bool {
+        self.provider_detection_checked_at.is_some()
     }
 
     /// Whether the model picker has no provider left to offer — nothing

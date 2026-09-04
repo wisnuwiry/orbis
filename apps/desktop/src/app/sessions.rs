@@ -260,6 +260,20 @@ impl Padu {
         provider: ProviderKind,
         cx: &mut Context<Self>,
     ) {
+        // A remembered provider may have been uninstalled or switched off
+        // since it was last used. New work must land somewhere usable rather
+        // than on a provider that can never start. While first-pass detection
+        // is still unsettled every probe reads as missing, so keep the request
+        // until the pass completes rather than fall back on partial answers.
+        let provider = if self.provider_detection_settled() {
+            super::runtime::resolve_usable_provider(
+                provider,
+                &self.probes,
+                &self.state.disabled_providers,
+            )
+        } else {
+            provider
+        };
         if let Some(draft_id) = self
             .state
             .sessions
@@ -267,6 +281,19 @@ impl Padu {
             .find(|session| session.project_id == project_id && !session.has_started())
             .map(|session| session.id)
         {
+            // Reusing a draft must not land on a provider that can never
+            // start: migrate a stranded draft onto the resolved provider so
+            // the remembered model resets with it.
+            if let Some(session) = self.state.session_mut(draft_id)
+                && session.provider != provider
+            {
+                session.provider = provider;
+                session.model = None;
+                session.reasoning_effort = None;
+                session.service_tier = None;
+                session.context_window = None;
+                self.save();
+            }
             self.select_session(draft_id, cx);
             return;
         }
