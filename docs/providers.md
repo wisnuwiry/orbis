@@ -250,6 +250,10 @@ unknown markers are dropped. Private control markers never reach the transcript
 
 **Models** — a throwaway app-server, `model/list` paged via `nextCursor`, up to
 32 pages ([model_catalog.rs:367](../crates/padu-core/src/model_catalog.rs#L367)).
+Discovery is authoritative — the CLI reports display names, defaults, effort
+ladders, and service tiers per model — so before the first successful probe
+the picker is empty rather than offering a list that is already stale, and an
+uninstalled CLI offers nothing at all.
 
 **Computer Use** — `-c mcp_servers.padu_js_repl.command=…` registers Padu's
 QuickJS MCP server, with several `-c` flags disabling Codex's own external
@@ -449,8 +453,11 @@ found after the fork code was written.
 **Models** — the sessionless SDK `initialize` control response publishes the
 same account- and configuration-aware list used by `/model`, including custom
 routes resolved through CC Switch. Padu probes it in the background and caches
-the last successful catalog; the curated list is only the startup/failure
-fallback ([model_catalog.rs](../crates/padu-core/src/model_catalog.rs)).
+the last successful catalog; discovery is authoritative, so before the first
+successful probe the picker is empty rather than offering a curated list that
+the CLI might reject. An uninstalled CLI offers nothing at all: its probe
+carries no models, it leaves the model-picker rail, and it cannot back new
+work ([model_catalog.rs](../crates/padu-core/src/model_catalog.rs)).
 
 ---
 
@@ -925,7 +932,11 @@ transcript uuid as a rewind checkpoint.
    answer and calls it a success. Where the cause is recoverable, recover it;
    where it is not, at least do not report success for a turn that produced
    nothing.
-9. Wire model discovery in `model_catalog.rs`, plus a fallback list for when the
-   binary is missing or the command fails. Some transports hand you a better
+9. Wire model discovery in `model_catalog.rs`. A fallback list is only for
+   providers that cannot report their own catalog (Amp's agent modes, Cursor's
+   provider-owned `auto`): wherever the CLI publishes its models — Claude's
+   `initialize`, Codex's `model/list`, Grok's `models`, and the rest — leave
+   the fallback empty and let discovery be authoritative, and never offer a
+   provider with no CLI behind it. Some transports hand you a better
    catalog than the CLI's `models` output — Cursor and Grok both return one in
    their ACP handshake.
