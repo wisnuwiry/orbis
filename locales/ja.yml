@@ -18,6 +18,7 @@ menu.view: 表示
 menu.command_palette: コマンドパレット…
 menu.toggle_sidebar: サイドバーの表示を切り替える
 menu.toggle_right_panel: 右パネルの表示を切り替える
+menu.toggle_right_panel_fullscreen: 右パネルを全画面表示に切り替える
 menu.open_browser: ブラウザを開く
 menu.open_terminal: ターミナルを開く
 menu.open_files: ファイルを開く
@@ -63,6 +64,10 @@ command_palette.show_sidebar: サイドバーを表示
 command_palette.hide_sidebar: サイドバーを隠す
 command_palette.show_right_panel: 右パネルを表示
 command_palette.hide_right_panel: 右パネルを隠す
+command_palette.enter_right_panel_fullscreen: 右パネルを全画面表示に拡大
+command_palette.exit_right_panel_fullscreen: 右パネルの全画面表示を終了
+command_palette.next_right_panel_tab: 次のパネルタブ（会話、ブラウザ、ターミナル、ファイル、レビュー）
+command_palette.prev_right_panel_tab: 前のパネルタブ（会話、ブラウザ、ターミナル、ファイル、レビュー）
 command_palette.open_browser: ブラウザを開く
 command_palette.open_terminal: ターミナルを開く
 command_palette.open_files: ファイルを開く
@@ -875,6 +880,9 @@ right_panel.terminal: ターミナル
 right_panel.files: ファイル
 right_panel.diff: レビュー
 right_panel.toggle: 右パネルの表示を切り替える
+right_panel.expand: パネルを全画面表示に拡大
+right_panel.collapse: パネルの全画面表示を終了
+right_panel.conversation: 会話
 right_panel.open_surface: パネルを開く
 right_panel.choose_surface: 右パネルに表示する内容を選択します
 right_panel.browser_description: ローカルアプリまたは URL を開きます

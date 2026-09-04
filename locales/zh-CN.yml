@@ -18,6 +18,7 @@ menu.view: 显示
 menu.command_palette: 命令面板…
 menu.toggle_sidebar: 显示或隐藏侧边栏
 menu.toggle_right_panel: 显示或隐藏右侧面板
+menu.toggle_right_panel_fullscreen: 切换右侧面板全屏
 menu.open_browser: 打开浏览器
 menu.open_terminal: 打开终端
 menu.open_files: 打开文件
@@ -61,6 +62,10 @@ command_palette.show_sidebar: 显示侧边栏
 command_palette.hide_sidebar: 隐藏侧边栏
 command_palette.show_right_panel: 显示右侧面板
 command_palette.hide_right_panel: 隐藏右侧面板
+command_palette.enter_right_panel_fullscreen: 全屏展开右侧面板
+command_palette.exit_right_panel_fullscreen: 退出右侧面板全屏
+command_palette.next_right_panel_tab: 下一个面板标签页（会话、浏览器、终端、文件、审阅）
+command_palette.prev_right_panel_tab: 上一个面板标签页（会话、浏览器、终端、文件、审阅）
 command_palette.open_browser: 打开浏览器
 command_palette.open_terminal: 打开终端
 command_palette.open_files: 打开文件
@@ -838,6 +843,9 @@ right_panel.terminal: 终端
 right_panel.files: 文件
 right_panel.diff: 审阅
 right_panel.toggle: 显示或隐藏右侧面板
+right_panel.expand: 全屏展开面板
+right_panel.collapse: 退出面板全屏
+right_panel.conversation: 会话
 right_panel.open_surface: 打开一个面板
 right_panel.choose_surface: 选择要在右侧面板中显示的内容
 right_panel.browser_description: 打开本地应用或网址

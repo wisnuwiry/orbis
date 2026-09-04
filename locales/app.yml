@@ -36,6 +36,8 @@ menu.toggle_sidebar:
   en: Toggle Sidebar
 menu.toggle_right_panel:
   en: Toggle Right Panel
+menu.toggle_right_panel_fullscreen:
+  en: Toggle Right Panel Fullscreen
 menu.open_browser:
   en: Open Browser
 menu.open_terminal:
@@ -124,6 +126,14 @@ command_palette.show_right_panel:
   en: Show right panel
 command_palette.hide_right_panel:
   en: Hide right panel
+command_palette.enter_right_panel_fullscreen:
+  en: Expand right panel fullscreen
+command_palette.exit_right_panel_fullscreen:
+  en: Exit right panel fullscreen
+command_palette.next_right_panel_tab:
+  en: Next panel tab (conversation, browser, terminal, files, review)
+command_palette.prev_right_panel_tab:
+  en: Previous panel tab (conversation, browser, terminal, files, review)
 command_palette.open_browser:
   en: Open browser
 command_palette.open_terminal:
@@ -1713,6 +1723,12 @@ right_panel.diff:
   en: Review
 right_panel.toggle:
   en: Toggle right panel
+right_panel.expand:
+  en: Expand panel fullscreen
+right_panel.collapse:
+  en: Exit panel fullscreen
+right_panel.conversation:
+  en: Conversation
 right_panel.open_surface:
   en: Open a surface
 right_panel.choose_surface:

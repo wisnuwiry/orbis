@@ -17,6 +17,7 @@ menu.view: Tampilan
 menu.command_palette: Palet Perintah…
 menu.toggle_sidebar: Alihkan Bilah Sisi
 menu.toggle_right_panel: Alihkan Panel Kanan
+menu.toggle_right_panel_fullscreen: Alihkan Panel Kanan Layar Penuh
 menu.open_browser: Buka Browser
 menu.open_terminal: Buka Terminal
 menu.open_files: Buka Berkas
@@ -60,6 +61,10 @@ command_palette.show_sidebar: Tampilkan bilah sisi
 command_palette.hide_sidebar: Sembunyikan bilah sisi
 command_palette.show_right_panel: Tampilkan panel kanan
 command_palette.hide_right_panel: Sembunyikan panel kanan
+command_palette.enter_right_panel_fullscreen: Perluas panel kanan ke layar penuh
+command_palette.exit_right_panel_fullscreen: Keluar dari panel kanan layar penuh
+command_palette.next_right_panel_tab: Tab panel berikutnya (percakapan, browser, terminal, berkas, peninjauan)
+command_palette.prev_right_panel_tab: Tab panel sebelumnya (percakapan, browser, terminal, berkas, peninjauan)
 command_palette.open_browser: Buka browser
 command_palette.open_terminal: Buka terminal
 command_palette.open_files: Buka berkas
@@ -837,6 +842,9 @@ right_panel.terminal: Terminal
 right_panel.files: Berkas
 right_panel.diff: Peninjauan
 right_panel.toggle: Alihkan panel kanan
+right_panel.expand: Perluas panel ke layar penuh
+right_panel.collapse: Keluar dari panel layar penuh
+right_panel.conversation: Percakapan
 right_panel.open_surface: Buka tampilan
 right_panel.choose_surface: Pilih apa yang ingin ditampilkan di panel kanan
 right_panel.browser_description: Buka aplikasi lokal atau URL
