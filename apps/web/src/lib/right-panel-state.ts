@@ -69,6 +69,35 @@ export function tabNavigationIndex(
   return (current + 1) % count
 }
 
+export type FullscreenPanelSurface = 'files' | 'file' | 'changes' | 'terminal'
+
+/// Whether a panel surface counts toward the fullscreen expand button.
+/// Background work keeps rendering in fullscreen but never gates the button.
+export function isFullscreenExpandableSurface(surface: string): boolean {
+  return surface === 'files'
+    || surface === 'file'
+    || surface === 'changes'
+    || surface === 'terminal'
+}
+
+/// Fullscreen tab order: Conversation (`-1`) first, then every tab index in
+/// strip order. Pure so cycling wraps are pinnable without rendering.
+export function fullscreenTabOrder(tabCount: number): number[] {
+  const order = [-1]
+  for (let index = 0; index < tabCount; index += 1) order.push(index)
+  return order
+}
+
+/// Next position when cycling the fullscreen order; wraps both directions.
+export function fullscreenCycleNext(
+  position: number,
+  tabCount: number,
+  direction: 1 | -1,
+): number {
+  const length = tabCount + 1
+  return (((position + direction) % length) + length) % length
+}
+
 export function treeNavigationAction(
   rows: readonly TreeNavigationRow[],
   current: number,

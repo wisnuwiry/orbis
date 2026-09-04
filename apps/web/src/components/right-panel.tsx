@@ -4,10 +4,12 @@ import type { AgentSession, Project, ReviewDiffSource, WorkingTreeEntry } from '
 import { GhosttyCore } from '@wterm/ghostty'
 import { Terminal, useTerminal } from '@wterm/react'
 import {
+  forwardRef,
   lazy,
   Suspense,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useRef,
   useState,
   type Dispatch,
@@ -41,6 +43,9 @@ import {
   sameReviewDiffSource,
 } from '@/lib/review-diff'
 import {
+  fullscreenCycleNext,
+  fullscreenTabOrder,
+  isFullscreenExpandableSurface,
   mergeReviewDiffFiles,
   openFileInPanel,
   tabNavigationIndex,
@@ -66,7 +71,7 @@ const CodeDiffSurface = lazy(() => import('@/components/code-surfaces').then((mo
 
 export type PanelSurface = 'files' | 'file' | 'changes' | 'terminal' | 'backgroundWork'
 
-interface PanelTab {
+export interface PanelTab {
   id: string
   surface: PanelSurface
   terminalId?: string
@@ -76,26 +81,19 @@ interface PanelTab {
   backgroundWorkKey?: BackgroundWorkKey
 }
 
-interface PanelState {
-  tabs: PanelTab[]
-  activeId: string | null
+export interface RightPanelHandle {
+  activateTab: (tabId: string) => void
+  closeTab: (tabId: string) => void
+  openSurface: (
+    surface: PanelSurface,
+    diffSource?: ReviewDiffSource,
+    backgroundWorkKey?: BackgroundWorkKey | null,
+    file?: string | null,
+  ) => void
+  cycleTabs: (direction: 1 | -1) => void
 }
 
-export function RightPanel({
-  active,
-  open,
-  panelWidth,
-  session,
-  project,
-  requestedSurface,
-  requestedDiffSource,
-  requestedBackgroundWorkKey,
-  requestedFile,
-  requestSignal,
-  sidebarWidth,
-  onOpenChange,
-  onPanelWidthChange,
-}: {
+export interface RightPanelProps {
   active: boolean
   open: boolean
   panelWidth: number
@@ -107,9 +105,46 @@ export function RightPanel({
   requestedFile: string | null
   requestSignal: number
   sidebarWidth: number
+  sidebarVisible?: boolean
+  onToggleSidebar?: () => void
   onOpenChange: (open: boolean) => void
   onPanelWidthChange: Dispatch<SetStateAction<number>>
-}) {
+  expanded?: boolean
+  showConversation?: boolean
+  onExpandedChange?: (expanded: boolean) => void
+  onShowConversationChange?: (show: boolean) => void
+  onExpandableChange?: (expandable: boolean) => void
+  onTabsReport?: (tabs: PanelTab[], activeId: string | null) => void
+}
+
+interface PanelState {
+  tabs: PanelTab[]
+  activeId: string | null
+}
+
+export const RightPanel = forwardRef<RightPanelHandle, RightPanelProps>(function RightPanel({
+  active,
+  open,
+  panelWidth,
+  session,
+  project,
+  requestedSurface,
+  requestedDiffSource,
+  requestedBackgroundWorkKey,
+  requestedFile,
+  requestSignal,
+  sidebarWidth,
+  sidebarVisible = true,
+  onToggleSidebar,
+  onOpenChange,
+  onPanelWidthChange,
+  expanded = false,
+  showConversation = false,
+  onExpandedChange,
+  onShowConversationChange,
+  onExpandableChange,
+  onTabsReport,
+}, ref) {
   const { t } = useI18n()
   const [{ tabs, activeId }, setPanelState] = useState<PanelState>({
     tabs: [],
@@ -186,7 +221,7 @@ export function RightPanel({
           }
       return { tabs: [...current.tabs, tab], activeId: id }
     })
-  }, [onPanelWidthChange])
+  }, [onPanelWidthChange, onShowConversationChange])
 
   useEffect(() => {
     if (requestSignal > 0) {
@@ -196,67 +231,149 @@ export function RightPanel({
 
   const activeTab = tabs.find((tab) => tab.id === activeId) ?? tabs.at(-1)
 
-  const updateTabOverflow = useCallback(() => {
-    const strip = tabStrip.current
-    if (!strip) return
-    const next = {
-      start: strip.scrollLeft > 1,
-      end: strip.scrollLeft + strip.clientWidth < strip.scrollWidth - 1,
-    }
-    setTabOverflow((current) => current.start === next.start && current.end === next.end
-      ? current
-      : next)
-  }, [])
+  const canExpand = tabs.some((tab) => isFullscreenExpandableSurface(tab.surface))
+  const fullscreen = expanded && open && canExpand
+  const showingConversation = fullscreen && showConversation
 
   useEffect(() => {
-    const strip = tabStrip.current
-    if (!strip) return
-    updateTabOverflow()
-    const resize = new ResizeObserver(updateTabOverflow)
-    resize.observe(strip)
-    return () => resize.disconnect()
-  }, [tabs, updateTabOverflow])
+    onExpandableChange?.(canExpand)
+  }, [canExpand, onExpandableChange])
 
   useEffect(() => {
-    if (!activeTab) return
-    const frame = window.requestAnimationFrame(() => {
-      const strip = tabStrip.current
-      const tab = document.getElementById(panelTabId(activeTab.id))
-      if (!strip || !tab) return
-      const stripBounds = strip.getBoundingClientRect()
-      const tabBounds = tab.getBoundingClientRect()
-      const inset = 16
-      if (tabBounds.left < stripBounds.left + inset) {
-        strip.scrollLeft -= stripBounds.left + inset - tabBounds.left
-      } else if (tabBounds.right > stripBounds.right - inset) {
-        strip.scrollLeft += tabBounds.right - (stripBounds.right - inset)
-      }
-      updateTabOverflow()
-    })
-    return () => window.cancelAnimationFrame(frame)
-  }, [activeTab, updateTabOverflow])
+    if (!canExpand && expanded) onExpandedChange?.(false)
+    if (!open && expanded) onExpandedChange?.(false)
+  }, [canExpand, expanded, open, onExpandedChange])
 
-  function closeTab(tabId: string) {
-    const index = tabs.findIndex((tab) => tab.id === tabId)
-    if (index < 0) return
-    const remaining = tabs.filter((tab) => tab.id !== tabId)
-    setPanelState({
-      tabs: remaining,
-      activeId: activeId === tabId
-        ? remaining[Math.min(index, remaining.length - 1)]?.id ?? null
-        : activeId,
+  const toggleExpanded = useCallback((next: boolean) => {
+    if (next && !canExpand) return
+    onShowConversationChange?.(false)
+    onExpandedChange?.(next)
+  }, [canExpand, onExpandedChange, onShowConversationChange])
+
+  function focusConversationTab() {
+    window.requestAnimationFrame(() => {
+      document.getElementById('right-panel-tab-conversation')?.focus()
     })
-    if (remaining.length === 0) onOpenChange(false)
   }
+
+  const cycleTabs = useCallback((direction: 1 | -1) => {
+    if (tabs.length === 0) return
+    if (!fullscreen) {
+      if (tabs.length <= 1) return
+      const activeIndex = Math.max(0, tabs.findIndex((tab) => tab.id === activeTab?.id))
+      const nextIndex = (activeIndex + direction + tabs.length) % tabs.length
+      const tab = tabs[nextIndex]
+      if (!tab) return
+      setPanelState((currentState) => ({ ...currentState, activeId: tab.id }))
+      window.requestAnimationFrame(() => {
+        document.getElementById(panelTabId(tab.id))?.focus()
+      })
+      return
+    }
+    const activeIndex = Math.max(0, tabs.findIndex((tab) => tab.id === activeTab?.id))
+    const current = showingConversation ? 0 : activeIndex + 1
+    const next = fullscreenCycleNext(current, tabs.length, direction)
+    const order = fullscreenTabOrder(tabs.length)
+    const target = order[next]
+    if (target === undefined) return
+    if (target === -1) {
+      onShowConversationChange?.(true)
+      focusConversationTab()
+    } else {
+      const tab = tabs[target]
+      if (!tab) return
+      onShowConversationChange?.(false)
+      setPanelState((currentState) => ({ ...currentState, activeId: tab.id }))
+      window.requestAnimationFrame(() => {
+        document.getElementById(panelTabId(tab.id))?.focus()
+      })
+    }
+  }, [fullscreen, tabs, activeTab?.id, showingConversation, onShowConversationChange])
+
+  useEffect(() => {
+    if (!active || !open) return
+    function onKeyDown(event: KeyboardEvent) {
+      const target = event.target as HTMLElement | null
+      const inDialogOrMenu = Boolean(target?.closest('[role="dialog"], [role="menu"]'))
+      if (inDialogOrMenu) return
+
+      const mod = event.metaKey || event.ctrlKey
+      if (mod && !event.shiftKey && event.key.toLowerCase() === 'j') {
+        event.preventDefault()
+        toggleExpanded(!expanded)
+        return
+      }
+      if (mod && event.altKey && (event.key === 'ArrowRight' || event.key === 'ArrowLeft')) {
+        event.preventDefault()
+        cycleTabs(event.key === 'ArrowRight' ? 1 : -1)
+        return
+      }
+      if (event.key === 'Escape' && expanded) {
+        if (target?.closest('input, textarea, select, [contenteditable="true"]')) return
+        event.preventDefault()
+        toggleExpanded(false)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [active, open, expanded, toggleExpanded, cycleTabs])
+
+  const closeTab = useCallback((tabId: string) => {
+    setPanelState((current) => {
+      const index = current.tabs.findIndex((tab) => tab.id === tabId)
+      if (index < 0) return current
+      const remaining = current.tabs.filter((tab) => tab.id !== tabId)
+      const nextActiveId = current.activeId === tabId
+        ? remaining[Math.min(index, remaining.length - 1)]?.id ?? null
+        : current.activeId
+      if (remaining.length === 0) {
+        onShowConversationChange?.(false)
+        onExpandedChange?.(false)
+        onOpenChange(false)
+      }
+      return { tabs: remaining, activeId: nextActiveId }
+    })
+  }, [onExpandedChange, onOpenChange, onShowConversationChange])
 
   function focusTab(index: number) {
     const tab = tabs[index]
     if (!tab) return
+    onShowConversationChange?.(false)
     setPanelState((current) => ({ ...current, activeId: tab.id }))
     window.requestAnimationFrame(() => {
       document.getElementById(panelTabId(tab.id))?.focus()
     })
   }
+
+  const activateTab = useCallback((tabId: string) => {
+    onShowConversationChange?.(false)
+    setPanelState((current) => ({ ...current, activeId: tabId }))
+  }, [onShowConversationChange])
+
+  function navigateStrip(stripIndex: number, key: TabNavigationKey) {
+    const next = tabNavigationIndex(tabs.length + 1, stripIndex, key)
+    if (next === 0) {
+      onShowConversationChange?.(true)
+      focusConversationTab()
+    } else {
+      focusTab(next - 1)
+    }
+  }
+
+  useImperativeHandle(ref, () => ({
+    activateTab,
+    closeTab,
+    openSurface: (surface, diff, bgKey, file) => {
+      openSurface(surface, diff, bgKey, file)
+    },
+    cycleTabs,
+  }), [activateTab, closeTab, openSurface, cycleTabs])
+
+  useEffect(() => {
+    onTabsReport?.(tabs, activeId)
+  }, [tabs, activeId, onTabsReport])
+
+  const fullscreenShortcut = usePrimaryShortcut('⌘J', 'Ctrl+J')
 
   const updateTab = useCallback((tabId: string, update: Partial<PanelTab>) => {
     setPanelState((current) => ({
@@ -295,55 +412,49 @@ export function RightPanel({
   return (
     <aside
       className={cn(
-        'absolute inset-y-0 right-0 z-30 flex shrink-0 flex-col border-l bg-background shadow-2xl xl:relative xl:z-auto xl:shadow-none',
-        !open && 'hidden',
+        'flex shrink-0 flex-col border-l bg-background',
+        (!open || (fullscreen && showingConversation)) && 'hidden',
+        fullscreen && !showingConversation && 'relative z-30 min-w-0 flex-1 shadow-none',
+        !fullscreen
+          && 'absolute inset-y-0 right-0 z-30 shadow-2xl xl:relative xl:z-auto xl:shadow-none',
       )}
-      style={{ width: `min(${fittedPanelWidth}px, 92vw)` }}
+      style={fullscreen ? undefined : { width: `min(${fittedPanelWidth}px, 92vw)` }}
     >
-      <PanelResizeHandle
-        edge="left"
-        label={t('right_panel.resize')}
-        max={maxPanelWidth}
-        min={280}
-        value={fittedPanelWidth}
-        onChange={onPanelWidthChange}
-      />
+      {!fullscreen && (
+        <PanelResizeHandle
+          edge="left"
+          label={t('right_panel.resize')}
+          max={maxPanelWidth}
+          min={280}
+          value={fittedPanelWidth}
+          onChange={onPanelWidthChange}
+        />
+      )}
       <header className="flex h-12 shrink-0 items-center gap-1.5 px-2.5 pr-3.5">
-        <div className="relative min-w-0 flex-1 self-stretch overflow-hidden">
-          <div
-            aria-label={t('right_panel.tabs')}
-            className="flex h-full min-w-0 items-center gap-1 overflow-x-auto overscroll-x-contain"
-            ref={tabStrip}
-            role="tablist"
-            onScroll={updateTabOverflow}
-          >
-            {tabs.map((tab, index) => (
-              <PanelTabButton
-                active={tab.id === activeTab?.id}
-                key={tab.id}
-                tab={tab}
-                onActivate={() => setPanelState((current) => ({ ...current, activeId: tab.id }))}
-                onClose={() => closeTab(tab.id)}
-                onNavigate={(key) => focusTab(tabNavigationIndex(tabs.length, index, key))}
-              />
-            ))}
-            <span aria-hidden="true" className="h-px w-4 shrink-0" />
-          </div>
-          <span
-            aria-hidden="true"
-            className={cn(
-              'pointer-events-none absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-background to-transparent transition-opacity motion-reduce:transition-none',
-              tabOverflow.start ? 'opacity-100' : 'opacity-0',
-            )}
-          />
-          <span
-            aria-hidden="true"
-            className={cn(
-              'pointer-events-none absolute inset-y-0 right-0 w-4 bg-gradient-to-l from-background to-transparent transition-opacity motion-reduce:transition-none',
-              tabOverflow.end ? 'opacity-100' : 'opacity-0',
-            )}
-          />
-        </div>
+        {fullscreen && !sidebarVisible && onToggleSidebar && (
+          <Tooltip content={t('menu.toggle_sidebar')} shortcut={usePrimaryShortcut('⌘B', 'Ctrl+B')}>
+            <Button
+              aria-label={t('menu.toggle_sidebar')}
+              size="icon-sm"
+              variant="ghost"
+              onClick={onToggleSidebar}
+            >
+              <PaduIcon name="panelLeft" />
+            </Button>
+          </Tooltip>
+        )}
+        <PanelTabStrip
+          activeId={activeTab?.id}
+          fullscreen={fullscreen}
+          showingConversation={showingConversation}
+          tabs={tabs}
+          onActivateTab={activateTab}
+          onCloseTab={closeTab}
+          onNavigateStrip={fullscreen
+            ? navigateStrip
+            : (index, key) => focusTab(tabNavigationIndex(tabs.length, index - 1, key))}
+          onSelectConversation={() => onShowConversationChange?.(true)}
+        />
         {tabs.length > 0 && (
           <ControlMenu
             align="right"
@@ -383,15 +494,35 @@ export function RightPanel({
             <PaduIcon className="size-3.5" name="plus" />
           </ControlMenu>
         )}
-        <Tooltip content={t('right_panel.toggle')} shortcut={usePrimaryShortcut('⇧⌘B', 'Ctrl+Shift+B')}>
-          <Button aria-label={t('right_panel.hide')} size="icon-sm" variant="ghost" onClick={() => onOpenChange(false)}>
-            <PaduIcon name="panelRight" />
-          </Button>
-        </Tooltip>
+        {canExpand && (
+          <Tooltip
+            content={t(fullscreen ? 'right_panel.collapse' : 'right_panel.expand')}
+            shortcut={fullscreenShortcut}
+          >
+            <Button
+              aria-label={t(fullscreen ? 'right_panel.collapse' : 'right_panel.expand')}
+              aria-pressed={fullscreen}
+              size="icon-sm"
+              variant="ghost"
+              onClick={() => toggleExpanded(!fullscreen)}
+            >
+              <PaduIcon name={fullscreen ? 'minimize' : 'maximize'} />
+            </Button>
+          </Tooltip>
+        )}
+        {!fullscreen && (
+          <Tooltip content={t('right_panel.toggle')} shortcut={usePrimaryShortcut('⇧⌘B', 'Ctrl+Shift+B')}>
+            <Button aria-label={t('right_panel.hide')} size="icon-sm" variant="ghost" onClick={() => onOpenChange(false)}>
+              <PaduIcon name="panelRight" />
+            </Button>
+          </Tooltip>
+        )}
       </header>
 
-      {!activeTab && <PanelChooser hasProject={hasProject} onSelect={openSurface} />}
-      {tabs.map((tab) => (
+      {!activeTab && !showingConversation && (
+        <PanelChooser hasProject={hasProject} onSelect={openSurface} />
+      )}
+      {!showingConversation && tabs.map((tab) => (
         <div
           aria-labelledby={panelTabId(tab.id)}
           className={cn('min-h-0 flex-1', tab.id === activeTab?.id ? 'flex' : 'hidden')}
@@ -441,9 +572,145 @@ export function RightPanel({
       ))}
     </aside>
   )
+})
+
+export interface PanelTabStripProps {
+  tabs: PanelTab[]
+  activeId?: string | null
+  showingConversation?: boolean
+  fullscreen?: boolean
+  onSelectConversation?: () => void
+  onActivateTab: (tabId: string) => void
+  onCloseTab: (tabId: string) => void
+  onNavigateStrip?: (index: number, key: TabNavigationKey) => void
 }
 
-function PanelTabButton({
+export function PanelTabStrip({
+  tabs,
+  activeId,
+  showingConversation = false,
+  fullscreen = false,
+  onSelectConversation,
+  onActivateTab,
+  onCloseTab,
+  onNavigateStrip,
+}: PanelTabStripProps) {
+  const { t } = useI18n()
+  const tabStrip = useRef<HTMLDivElement>(null)
+  const [tabOverflow, setTabOverflow] = useState({ start: false, end: false })
+
+  const updateTabOverflow = useCallback(() => {
+    const strip = tabStrip.current
+    if (!strip) return
+    const next = {
+      start: strip.scrollLeft > 1,
+      end: strip.scrollLeft + strip.clientWidth < strip.scrollWidth - 1,
+    }
+    setTabOverflow((current) => current.start === next.start && current.end === next.end
+      ? current
+      : next)
+  }, [])
+
+  useEffect(() => {
+    const strip = tabStrip.current
+    if (!strip) return
+    updateTabOverflow()
+    const resize = new ResizeObserver(updateTabOverflow)
+    resize.observe(strip)
+    return () => resize.disconnect()
+  }, [tabs, updateTabOverflow])
+
+  useEffect(() => {
+    if (!activeId) return
+    const frame = window.requestAnimationFrame(() => {
+      const strip = tabStrip.current
+      const tab = document.getElementById(panelTabId(activeId))
+      if (!strip || !tab) return
+      const stripBounds = strip.getBoundingClientRect()
+      const tabBounds = tab.getBoundingClientRect()
+      const inset = 16
+      if (tabBounds.left < stripBounds.left + inset) {
+        strip.scrollLeft -= stripBounds.left + inset - tabBounds.left
+      } else if (tabBounds.right > stripBounds.right - inset) {
+        strip.scrollLeft += tabBounds.right - (stripBounds.right - inset)
+      }
+      updateTabOverflow()
+    })
+    return () => window.cancelAnimationFrame(frame)
+  }, [activeId, updateTabOverflow])
+
+  return (
+    <div className={cn(
+      'relative min-w-0 flex-1 self-stretch overflow-hidden',
+      fullscreen && 'flex justify-center',
+    )}>
+      <div
+        aria-label={t('right_panel.tabs')}
+        className={cn(
+          'flex h-full min-w-0 items-center gap-1 overflow-x-auto overscroll-x-contain',
+          fullscreen && 'justify-center',
+        )}
+        ref={tabStrip}
+        role="tablist"
+        onScroll={updateTabOverflow}
+      >
+        {fullscreen && (
+          <div
+            aria-selected={showingConversation}
+            className={cn(
+              'flex h-7 min-w-[100px] max-w-44 shrink-0 items-center gap-1.5 rounded-md px-2 text-left text-[12px] outline-none hover:bg-accent focus-visible:ring-1 focus-visible:ring-ring cursor-pointer',
+              showingConversation ? 'bg-accent text-foreground' : 'text-[var(--text-secondary)]',
+            )}
+            id="right-panel-tab-conversation"
+            role="tab"
+            tabIndex={showingConversation ? 0 : -1}
+            onClick={onSelectConversation}
+            onKeyDown={(event) => {
+              if (event.target !== event.currentTarget) return
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                onSelectConversation?.()
+              } else if (!event.metaKey && !event.ctrlKey && !event.altKey && ['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
+                event.preventDefault()
+                onNavigateStrip?.(0, event.key as TabNavigationKey)
+              }
+            }}
+          >
+            <PaduIcon className="size-[13px] text-[var(--text-secondary)]" name="compose" />
+            <span className="min-w-0 flex-1 truncate">{t('right_panel.conversation')}</span>
+          </div>
+        )}
+        {tabs.map((tab, index) => (
+          <PanelTabButton
+            active={!showingConversation && tab.id === activeId}
+            key={tab.id}
+            tab={tab}
+            onActivate={() => onActivateTab(tab.id)}
+            onClose={() => onCloseTab(tab.id)}
+            onNavigate={(key) => onNavigateStrip?.(index + 1, key)}
+          />
+        ))}
+        <span aria-hidden="true" className="h-px w-4 shrink-0" />
+      </div>
+      <span
+        aria-hidden="true"
+        className={cn(
+          'pointer-events-none absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-background to-transparent transition-opacity motion-reduce:transition-none',
+          tabOverflow.start ? 'opacity-100' : 'opacity-0',
+        )}
+      />
+      <span
+        aria-hidden="true"
+        className={cn(
+          'pointer-events-none absolute inset-y-0 right-0 w-4 bg-gradient-to-l from-background to-transparent transition-opacity motion-reduce:transition-none',
+          tabOverflow.end ? 'opacity-100' : 'opacity-0',
+        )}
+      />
+    </div>
+  )
+}
+
+export function PanelTabButton({
   tab,
   active,
   onActivate,
@@ -495,7 +762,7 @@ function PanelTabButton({
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault()
           onActivate()
-        } else if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
+        } else if (!event.metaKey && !event.ctrlKey && !event.altKey && ['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
           event.preventDefault()
           onNavigate(event.key as TabNavigationKey)
         }
@@ -851,6 +1118,7 @@ function FilesPanel({
     entry: WorkingTreeEntry,
     index: number,
   ) => {
+    if (event.metaKey || event.ctrlKey || event.altKey) return
     if (!isTreeNavigationKey(event.key)) return
     event.preventDefault()
     const action = treeNavigationAction(
@@ -1134,6 +1402,7 @@ function ChangesPanel({
     row: DiffTreeRow,
     index: number,
   ) => {
+    if (event.metaKey || event.ctrlKey || event.altKey) return
     if (!isTreeNavigationKey(event.key)) return
     event.preventDefault()
     const action = treeNavigationAction(
@@ -1707,11 +1976,11 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value))
 }
 
-function panelTabId(tabId: string): string {
+export function panelTabId(tabId: string): string {
   return `right-panel-tab-${tabId}`
 }
 
-function panelContentId(tabId: string): string {
+export function panelContentId(tabId: string): string {
   return `right-panel-content-${tabId}`
 }
 

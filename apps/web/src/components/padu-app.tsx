@@ -26,7 +26,19 @@ import { Composer } from '@/components/composer'
 import { ControlMenu } from '@/components/control-menu'
 import { DaemonFilePicker } from '@/components/daemon-file-picker'
 import { OnboardingModal } from '@/components/onboarding-modal'
-import { RightPanel, type PanelSurface } from '@/components/right-panel'
+import {
+  RightPanel,
+  PanelTabStrip,
+  panelTabId,
+  type PanelSurface,
+  type PanelTab,
+  type RightPanelHandle,
+} from '@/components/right-panel'
+import {
+  tabNavigationIndex,
+  type TabNavigationKey,
+} from '@/lib/right-panel-state'
+import { cn } from '@/lib/utils'
 import { Sidebar } from '@/components/sidebar'
 import { StartupScreen } from '@/components/startup-screen'
 import type { SettingsPageId } from '@/components/settings-view'
@@ -126,6 +138,14 @@ export function PaduApp() {
   const [sidebarWidth, setSidebarWidth] = useState(readSidebarWidth)
   const [rightPanelWidth, setRightPanelWidth] = useState(readRightPanelWidth)
   const [rightPanelOpenBySession, setRightPanelOpenBySession] = useState<Record<string, boolean>>({})
+  const [panelFullscreenBySession, setPanelFullscreenBySession] = useState<
+    Record<string, { expanded: boolean, conversation: boolean }>
+  >({})
+  const [panelExpandableBySession, setPanelExpandableBySession] = useState<Record<string, boolean>>({})
+  const [panelTabsBySession, setPanelTabsBySession] = useState<
+    Record<string, { tabs: PanelTab[]; activeId: string | null }>
+  >({})
+  const rightPanelRefs = useRef<Record<string, RightPanelHandle | null>>({})
   const retainedPanelSessions = useRef(new Map<string, RetainedPanelSession>())
   const [retainedPanelSessionIds, setRetainedPanelSessionIds] = useState<string[]>([])
   const [paletteOpen, setPaletteOpen] = useState(false)
@@ -186,6 +206,19 @@ export function PaduApp() {
   const rightPanelVisible = activePanelSessionId
     ? rightPanelOpenBySession[activePanelSessionId] ?? false
     : false
+  const panelFullscreen = activePanelSessionId
+    ? panelFullscreenBySession[activePanelSessionId] ?? { expanded: false, conversation: false }
+    : { expanded: false, conversation: false }
+  const panelExpandable = activePanelSessionId
+    ? panelExpandableBySession[activePanelSessionId] ?? false
+    : false
+  // Fullscreen surface mode hides the transcript column (kept mounted, so
+  // composer drafts and scroll survive); conversation mode keeps it and
+  // floats just the tab strip above it.
+  const panelTakesCenter = rightPanelVisible
+    && panelFullscreen.expanded
+    && panelExpandable
+    && !panelFullscreen.conversation
   const choosingInitialDestination = Boolean(
     taskState.data && !search.session && !newTaskMode,
   )
@@ -477,6 +510,13 @@ export function PaduApp() {
         selectAdjacentSession(event.key === 'ArrowDown' ? 1 : -1)
         return
       }
+      if (event.altKey && (event.key === 'ArrowRight' || event.key === 'ArrowLeft')) {
+        if (activePanelSessionId && rightPanelVisible) {
+          event.preventDefault()
+          rightPanelRefs.current[activePanelSessionId]?.cycleTabs(event.key === 'ArrowRight' ? 1 : -1)
+          return
+        }
+      }
       if (event.shiftKey && (event.key === '[' || event.key === ']')) {
         event.preventDefault()
         selectAdjacentSession(event.key === ']' ? 1 : -1)
@@ -663,6 +703,28 @@ export function PaduApp() {
     setActiveRightPanel((current) => !current)
   }
 
+  function setPanelFullscreenForSession(
+    sessionId: string,
+    next: Partial<{ expanded: boolean, conversation: boolean }>,
+  ) {
+    setPanelFullscreenBySession((current) => {
+      const previous = current[sessionId] ?? { expanded: false, conversation: false }
+      const value = { ...previous, ...next }
+      if (value.expanded === previous.expanded && value.conversation === previous.conversation) {
+        return current
+      }
+      return { ...current, [sessionId]: value }
+    })
+  }
+
+  function togglePanelFullscreen() {
+    if (!activeSession || !panelExpandable) return
+    retainPanelSession(activeSession, activeProject)
+    setRightPanelForSession(activeSession.id, true)
+    const next = !panelFullscreen.expanded
+    setPanelFullscreenForSession(activeSession.id, { expanded: next, conversation: false })
+  }
+
   function forgetRightPanelSession(sessionId: string) {
     retainedPanelSessions.current.delete(sessionId)
     setRetainedPanelSessionIds((current) => current.filter((id) => id !== sessionId))
@@ -672,6 +734,25 @@ export function PaduApp() {
       delete next[sessionId]
       return next
     })
+    setPanelFullscreenBySession((current) => {
+      if (!(sessionId in current)) return current
+      const next = { ...current }
+      delete next[sessionId]
+      return next
+    })
+    setPanelExpandableBySession((current) => {
+      if (!(sessionId in current)) return current
+      const next = { ...current }
+      delete next[sessionId]
+      return next
+    })
+    setPanelTabsBySession((current) => {
+      if (!(sessionId in current)) return current
+      const next = { ...current }
+      delete next[sessionId]
+      return next
+    })
+    delete rightPanelRefs.current[sessionId]
     setPanelRequestSessionId((current) => current === sessionId ? null : current)
   }
 
@@ -1041,6 +1122,11 @@ export function PaduApp() {
     },
     toggleSidebar: () => setSidebarVisible((value) => !value),
     toggleRightPanel,
+    toggleRightPanelFullscreen: togglePanelFullscreen,
+    cycleRightPanelTab: (direction) => {
+      if (!activePanelSessionId) return
+      rightPanelRefs.current[activePanelSessionId]?.cycleTabs(direction)
+    },
     openSettings,
     openOnboarding: () => setOnboardingOpen(true),
     selectTask: (sessionId) => {
@@ -1065,6 +1151,8 @@ export function PaduApp() {
       initialView={paletteInitialView}
       open={paletteOpen}
       rightPanelVisible={rightPanelVisible}
+      rightPanelExpanded={panelFullscreen.expanded && panelExpandable}
+      canExpandRightPanel={panelExpandable}
       selectedSessionId={search.session}
       sidebarVisible={sidebarVisible}
       taskState={taskState.data}
@@ -1103,20 +1191,42 @@ export function PaduApp() {
         />
       )}
 
-      <main className="relative flex min-w-0 flex-1 flex-col">
+      <main className={panelTakesCenter ? 'hidden' : 'relative flex min-w-0 flex-1 flex-col'}>
         <TaskHeader
+          activeTabId={activePanelSessionId ? panelTabsBySession[activePanelSessionId]?.activeId : null}
+          fullscreen={panelFullscreen.expanded && panelExpandable}
+          onActivateTab={(tabId) => {
+            if (!activePanelSessionId) return
+            setPanelFullscreenForSession(activePanelSessionId, { conversation: false })
+            rightPanelRefs.current[activePanelSessionId]?.activateTab(tabId)
+          }}
+          onAddSurface={(surface) => {
+            if (!activePanelSessionId) return
+            setPanelFullscreenForSession(activePanelSessionId, { conversation: false })
+            rightPanelRefs.current[activePanelSessionId]?.openSurface(surface)
+          }}
+          onCloseTab={(tabId) => {
+            if (!activePanelSessionId) return
+            rightPanelRefs.current[activePanelSessionId]?.closeTab(tabId)
+          }}
           onCommit={(returnFocus) => {
             commitDialogReturnFocus.current = returnFocus
             setCommitDialogOpen(true)
           }}
           onCompareBranch={() => openPanel('changes', 'branch')}
-          onOpenBackgroundWork={openBackgroundWork}
           onMenu={showSidebar}
+          onOpenBackgroundWork={openBackgroundWork}
           onOpenChanges={() => openPanel('changes', 'uncommitted')}
+          onToggleFullscreen={() => {
+            if (!activePanelSessionId) return
+            setPanelFullscreenForSession(activePanelSessionId, { expanded: false, conversation: false })
+          }}
           onTogglePanel={toggleRightPanel}
           project={activeProject}
           session={activeSession}
+          showingConversation={panelFullscreen.expanded && panelExpandable && panelFullscreen.conversation}
           sidebarVisible={sidebarVisible}
+          tabs={activePanelSessionId ? panelTabsBySession[activePanelSessionId]?.tabs ?? [] : []}
           title={newTaskMode ? t('menu.new_task') : current ? displayTitle(current) : 'Padu'}
         />
 
@@ -1280,8 +1390,22 @@ export function PaduApp() {
         const panelSession = isActive ? activeSession : retained?.session
         const panelProject = isActive ? activeProject : retained?.project
         if (!panelSession) return null
+        const fullscreen = panelFullscreenBySession[sessionId] ?? {
+          expanded: false,
+          conversation: false,
+        }
         return (
           <RightPanel
+            ref={(instance) => {
+              rightPanelRefs.current[sessionId] = instance
+            }}
+            onTabsReport={(tabs, activeId) => {
+              setPanelTabsBySession((current) => {
+                const existing = current[sessionId]
+                if (existing && existing.tabs === tabs && existing.activeId === activeId) return current
+                return { ...current, [sessionId]: { tabs, activeId } }
+              })
+            }}
             active={isActive}
             key={sessionId}
             open={isActive && (rightPanelOpenBySession[sessionId] ?? false)}
@@ -1293,8 +1417,31 @@ export function PaduApp() {
             requestedSurface={requestedPanel}
             requestSignal={panelRequestSessionId === sessionId ? panelRequestSignal : 0}
             session={panelSession}
+            sidebarVisible={sidebarVisible}
             sidebarWidth={sidebarVisible ? sidebarWidth : 0}
-            onOpenChange={(open) => setRightPanelForSession(sessionId, open)}
+            onToggleSidebar={() => setSidebarVisible((value) => !value)}
+            expanded={isActive && fullscreen.expanded}
+            showConversation={isActive && fullscreen.conversation}
+            onExpandedChange={(expanded) => {
+              if (expanded) retainPanelSession(panelSession, panelProject)
+              setPanelFullscreenForSession(sessionId, expanded
+                ? { expanded: true }
+                : { expanded: false, conversation: false })
+            }}
+            onShowConversationChange={(conversation) => {
+              setPanelFullscreenForSession(sessionId, { conversation })
+            }}
+            onExpandableChange={(expandable) => {
+              setPanelExpandableBySession((current) => current[sessionId] === expandable
+                ? current
+                : { ...current, [sessionId]: expandable })
+            }}
+            onOpenChange={(open) => {
+              setRightPanelForSession(sessionId, open)
+              if (!open) {
+                setPanelFullscreenForSession(sessionId, { expanded: false, conversation: false })
+              }
+            }}
             onPanelWidthChange={setRightPanelWidth}
           />
         )
@@ -1355,33 +1502,68 @@ function TaskHeader({
   title,
   session,
   project,
+  sidebarVisible,
+  fullscreen = false,
+  showingConversation = false,
+  tabs = [],
+  activeTabId,
   onMenu,
   onOpenChanges,
   onCommit,
   onCompareBranch,
   onOpenBackgroundWork,
   onTogglePanel,
-  sidebarVisible,
+  onActivateTab,
+  onCloseTab,
+  onAddSurface,
+  onToggleFullscreen,
 }: {
   title: string
   session: AgentSession | null
   project?: Project
+  sidebarVisible: boolean
+  fullscreen?: boolean
+  showingConversation?: boolean
+  tabs?: PanelTab[]
+  activeTabId?: string | null
   onMenu: () => void
   onOpenChanges: () => void
   onCommit: (returnFocus: HTMLElement | null) => void
   onCompareBranch: () => void
   onOpenBackgroundWork: (key: BackgroundWorkKey) => void
   onTogglePanel: () => void
-  sidebarVisible: boolean
+  onActivateTab?: (tabId: string) => void
+  onCloseTab?: (tabId: string) => void
+  onAddSurface?: (surface: PanelSurface) => void
+  onToggleFullscreen?: () => void
 }) {
   const { t } = useI18n()
   const sidebarShortcut = usePrimaryShortcut('⌘B', 'Ctrl+B')
   const rightPanelShortcut = usePrimaryShortcut('⇧⌘B', 'Ctrl+Shift+B')
+  const fullscreenShortcut = usePrimaryShortcut('⌘J', 'Ctrl+J')
   const cwd = session && project ? sessionCwd(session, project) : undefined
   const branches = useWorkspaceBranches(cwd)
   const preset = session?.provider === 'deepSeek' && session.messages.length
     ? agentPresetIdLabel(session.agent_preset || 'standard', t)
     : null
+  const isFullscreenConversation = fullscreen && showingConversation
+  const hasProject = Boolean(project)
+
+  function navigateStrip(stripIndex: number, key: TabNavigationKey) {
+    const next = tabNavigationIndex(tabs.length + 1, stripIndex, key)
+    if (next === 0) {
+      document.getElementById('right-panel-tab-conversation')?.focus()
+    } else {
+      const tab = tabs[next - 1]
+      if (tab) {
+        onActivateTab?.(tab.id)
+        window.requestAnimationFrame(() => {
+          document.getElementById(panelTabId(tab.id))?.focus()
+        })
+      }
+    }
+  }
+
   return (
     <header className="flex h-12 shrink-0 items-center gap-2 px-3 lg:px-3.5">
       <Tooltip content={t('sidebar.toggle')} shortcut={sidebarShortcut}>
@@ -1395,16 +1577,35 @@ function TaskHeader({
           <PaduIcon name="panelLeft" />
         </Button>
       </Tooltip>
-      <h1 className="min-w-0 truncate text-[13px] font-medium">{title}</h1>
-      {preset && (
-        <span className="max-w-44 truncate rounded-md bg-accent px-1.5 py-1 text-[11px] font-medium text-[var(--text-secondary)]">
-          {preset}
-        </span>
+      <div className={cn('flex min-w-0 items-center gap-2', isFullscreenConversation && 'max-w-56 shrink-0')}>
+        <h1 className="min-w-0 truncate text-[13px] font-medium">{title}</h1>
+        {preset && (
+          <span className="max-w-44 truncate rounded-md bg-accent px-1.5 py-1 text-[11px] font-medium text-[var(--text-secondary)]">
+            {preset}
+          </span>
+        )}
+      </div>
+
+      {isFullscreenConversation ? (
+        <div className="flex min-w-0 flex-1 justify-center overflow-hidden">
+          <PanelTabStrip
+            activeId={activeTabId}
+            fullscreen={true}
+            showingConversation={true}
+            tabs={tabs}
+            onActivateTab={(tabId) => onActivateTab?.(tabId)}
+            onCloseTab={(tabId) => onCloseTab?.(tabId)}
+            onNavigateStrip={navigateStrip}
+            onSelectConversation={() => {}}
+          />
+        </div>
+      ) : (
+        <div className="flex-1" />
       )}
-      <div className="flex-1" />
+
       {branches.data && (branches.data.additions > 0 || branches.data.deletions > 0) && (
         <button
-          className="flex items-center gap-1 rounded px-1.5 py-1 text-[11px] hover:bg-accent cursor-pointer"
+          className="flex shrink-0 items-center gap-1 rounded px-1.5 py-1 text-[11px] hover:bg-accent cursor-pointer"
           type="button"
           onClick={onOpenChanges}
         >
@@ -1412,6 +1613,7 @@ function TaskHeader({
           <span className="text-destructive">-{branches.data.deletions}</span>
         </button>
       )}
+
       {session && (
         <EnvironmentPopover
           sessionId={session.id}
@@ -1420,11 +1622,69 @@ function TaskHeader({
           onOpenBackgroundWork={onOpenBackgroundWork}
         />
       )}
-      <Tooltip content={t('right_panel.toggle')} shortcut={rightPanelShortcut}>
-        <Button aria-label={t('right_panel.toggle')} size="icon-sm" variant="ghost" onClick={onTogglePanel}>
-          <PaduIcon name="panelRight" />
-        </Button>
-      </Tooltip>
+
+      {isFullscreenConversation && onAddSurface && tabs.length > 0 && (
+        <ControlMenu
+          align="right"
+          caret={false}
+          highlightTriggerWhenOpen={false}
+          label={t('right_panel.add_tab')}
+          placement="below"
+          selectionMode="status"
+          triggerClassName="size-7 justify-center px-0 shrink-0"
+          items={[
+            {
+              id: 'terminal',
+              label: t('right_panel.terminal'),
+              icon: 'terminal',
+              onSelect: () => onAddSurface('terminal'),
+            },
+            ...(hasProject
+              ? [
+                  {
+                    id: 'files',
+                    label: t('right_panel.files'),
+                    icon: 'folder' as const,
+                    selected: tabs.some((tab) => tab.surface === 'files'),
+                    onSelect: () => onAddSurface('files'),
+                  },
+                  {
+                    id: 'changes',
+                    label: t('right_panel.diff'),
+                    icon: 'fileDiff' as const,
+                    selected: tabs.some((tab) => tab.surface === 'changes'),
+                    onSelect: () => onAddSurface('changes'),
+                  },
+                ]
+              : []),
+          ]}
+        >
+          <PaduIcon className="size-3.5" name="plus" />
+        </ControlMenu>
+      )}
+
+      {isFullscreenConversation && onToggleFullscreen && (
+        <Tooltip content={t('right_panel.collapse')} shortcut={fullscreenShortcut}>
+          <Button
+            aria-label={t('right_panel.collapse')}
+            aria-pressed={true}
+            className="shrink-0"
+            size="icon-sm"
+            variant="ghost"
+            onClick={onToggleFullscreen}
+          >
+            <PaduIcon name="minimize" />
+          </Button>
+        </Tooltip>
+      )}
+
+      {!fullscreen && (
+        <Tooltip content={t('right_panel.toggle')} shortcut={rightPanelShortcut}>
+          <Button aria-label={t('right_panel.toggle')} size="icon-sm" variant="ghost" onClick={onTogglePanel}>
+            <PaduIcon name="panelRight" />
+          </Button>
+        </Tooltip>
+      )}
     </header>
   )
 }
