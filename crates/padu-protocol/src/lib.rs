@@ -11,10 +11,11 @@ rust_i18n::i18n!("../../locales", fallback = "en");
 // `i18n!` reads these files in a proc macro. Explicit includes make them
 // visible to Cargo's dependency tracker, so locale-only edits rebuild this
 // shared translation registry under the development watcher.
-const _LOCALE_SOURCES: [&str; 3] = [
+const _LOCALE_SOURCES: [&str; 4] = [
     include_str!("../../../locales/app.yml"),
     include_str!("../../../locales/zh-CN.yml"),
     include_str!("../../../locales/ja.yml"),
+    include_str!("../../../locales/id.yml"),
 ];
 
 macro_rules! tr {

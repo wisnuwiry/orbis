@@ -5,10 +5,11 @@ rust_i18n::i18n!("../../locales", fallback = "en");
 // rust-i18n expands locale data in a proc macro, which Cargo does not always
 // discover as an input when only a YAML file changes. Keep explicit source
 // dependencies so the watcher rebuilds the translation registry itself.
-const _LOCALE_SOURCES: [&str; 3] = [
+const _LOCALE_SOURCES: [&str; 4] = [
     include_str!("../../../locales/app.yml"),
     include_str!("../../../locales/zh-CN.yml"),
     include_str!("../../../locales/ja.yml"),
+    include_str!("../../../locales/id.yml"),
 ];
 
 macro_rules! tr {

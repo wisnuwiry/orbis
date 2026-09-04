@@ -11,14 +11,16 @@ pub enum AppLanguage {
     English,
     SimplifiedChinese,
     Japanese,
+    Indonesian,
 }
 
 impl AppLanguage {
-    pub const ALL: [Self; 4] = [
+    pub const ALL: [Self; 5] = [
         Self::System,
         Self::English,
         Self::SimplifiedChinese,
         Self::Japanese,
+        Self::Indonesian,
     ];
 
     pub fn locale(self) -> &'static str {
@@ -27,6 +29,7 @@ impl AppLanguage {
             Self::English => "en",
             Self::SimplifiedChinese => "zh-CN",
             Self::Japanese => "ja",
+            Self::Indonesian => "id",
         }
     }
 
@@ -38,6 +41,7 @@ impl AppLanguage {
             Self::English => "English".to_owned(),
             Self::SimplifiedChinese => "简体中文".to_owned(),
             Self::Japanese => "日本語".to_owned(),
+            Self::Indonesian => "Bahasa Indonesia".to_owned(),
         }
     }
 
@@ -58,6 +62,8 @@ impl AppLanguage {
             Self::SimplifiedChinese
         } else if locale == "ja" || locale.starts_with("ja-") {
             Self::Japanese
+        } else if locale == "id" || locale.starts_with("id-") {
+            Self::Indonesian
         } else {
             Self::English
         }
@@ -117,11 +123,13 @@ mod tests {
         assert_eq!(AppLanguage::English.locale(), "en");
         assert_eq!(AppLanguage::SimplifiedChinese.locale(), "zh-CN");
         assert_eq!(AppLanguage::Japanese.locale(), "ja");
+        assert_eq!(AppLanguage::Indonesian.locale(), "id");
         let locales = rust_i18n::available_locales!();
-        assert_eq!(locales.len(), 3);
+        assert_eq!(locales.len(), 4);
         assert!(locales.iter().any(|locale| locale.as_ref() == "en"));
         assert!(locales.iter().any(|locale| locale.as_ref() == "zh-CN"));
         assert!(locales.iter().any(|locale| locale.as_ref() == "ja"));
+        assert!(locales.iter().any(|locale| locale.as_ref() == "id"));
     }
 
     #[test]
@@ -129,6 +137,7 @@ mod tests {
         assert_eq!(AppLanguage::English.label(), "English");
         assert_eq!(AppLanguage::SimplifiedChinese.label(), "简体中文");
         assert_eq!(AppLanguage::Japanese.label(), "日本語");
+        assert_eq!(AppLanguage::Indonesian.label(), "Bahasa Indonesia");
     }
 
     #[test]
@@ -140,8 +149,21 @@ mod tests {
         );
         assert!(matches!(
             AppLanguage::System.locale(),
-            "en" | "zh-CN" | "ja"
+            "en" | "zh-CN" | "ja" | "id"
         ));
+    }
+
+    #[test]
+    fn indonesian_system_locales_are_detected() {
+        assert_eq!(AppLanguage::from_locale_id("id"), AppLanguage::Indonesian);
+        assert_eq!(
+            AppLanguage::from_locale_id("id_ID"),
+            AppLanguage::Indonesian
+        );
+        assert_eq!(
+            AppLanguage::from_locale_id("id-ID"),
+            AppLanguage::Indonesian
+        );
     }
 
     #[test]
@@ -155,6 +177,7 @@ mod tests {
         assert!(locale_uses_east_asian_date_format("ja"));
         assert!(locale_uses_east_asian_date_format("zh-CN"));
         assert!(!locale_uses_east_asian_date_format("en"));
+        assert!(!locale_uses_east_asian_date_format("id"));
     }
 
     #[test]
@@ -208,6 +231,15 @@ mod tests {
             &*rust_i18n::t!("session.rewound", locale = "ja", turn = 3),
             "タスクをターン 3 の前まで巻き戻しました"
         );
+        assert_eq!(&*rust_i18n::t!("settings.general", locale = "id"), "Umum");
+        assert_eq!(
+            &*rust_i18n::t!("computer_use.allow_control", locale = "id", app = "Finder"),
+            "Izinkan Padu mengontrol Finder?"
+        );
+        assert_eq!(
+            &*rust_i18n::t!("session.rewound", locale = "id", turn = 3),
+            "Diputar kembali ke sebelum putaran 3"
+        );
     }
 
     #[test]
@@ -220,6 +252,18 @@ mod tests {
         assert_eq!(
             &*rust_i18n::t!("providers.disabled_for_new_tasks", locale = "en"),
             "Disabled for new tasks"
+        );
+        assert_eq!(
+            &*rust_i18n::t!("menu.new_task", locale = "id"),
+            "Tugas Baru"
+        );
+        assert_eq!(
+            &*rust_i18n::t!("command_palette.new_task", locale = "id"),
+            "Tugas baru"
+        );
+        assert_eq!(
+            &*rust_i18n::t!("providers.disabled_for_new_tasks", locale = "id"),
+            "Dinonaktifkan untuk tugas baru"
         );
     }
 }

@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import englishSource from '../../../../locales/app.yml?raw'
+import indonesianSource from '../../../../locales/id.yml?raw'
 import japaneseSource from '../../../../locales/ja.yml?raw'
 import simplifiedChineseSource from '../../../../locales/zh-CN.yml?raw'
 import {
@@ -21,6 +22,7 @@ const catalogs: Record<AppLocale, Record<string, string>> = {
   en: parseRustI18nCatalog(englishSource, 'en'),
   'zh-CN': parseRustI18nCatalog(simplifiedChineseSource, 'zh-CN'),
   ja: parseRustI18nCatalog(japaneseSource, 'ja'),
+  id: parseRustI18nCatalog(indonesianSource, 'id'),
 }
 
 interface LanguageSnapshot {
@@ -59,6 +61,7 @@ export function languageLabel(language: AppLanguage, locale: AppLocale) {
     case 'en': return 'English'
     case 'zh-CN': return '简体中文'
     case 'ja': return '日本語'
+    case 'id': return 'Bahasa Indonesia'
   }
 }
 
