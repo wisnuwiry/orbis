@@ -1942,7 +1942,7 @@ impl Padu {
                 .label(selected_language.label())
                 .outlined()
                 .selected(language_handle.is_open())
-                .w(px(116.0))
+                .w(px(150.0))
                 .justify_between(),
             "language-selector-menu",
             &language_handle,
