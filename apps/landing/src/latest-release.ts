@@ -13,7 +13,9 @@ export interface GitHubRelease {
 
 export interface ReleaseInfo {
   version: string;
-  linuxAppImageAsset: string;
+  macDmgAsset: string;
+  linuxX64Tarball: string;
+  linuxArm64Tarball: string | null;
   windowsX64Asset: string | null;
   windowsArm64Asset: string | null;
 }
@@ -24,17 +26,14 @@ export interface ReleaseChannels {
   beta: ReleaseInfo | null;
 }
 
-const LINUX_APPIMAGE_ASSET_PATTERN =
-  /^(?:Padu|Padu)-(?:\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)-)?x86_64\.AppImage$/;
-
 const REQUIRED_ASSET_PATTERNS = [
-  /(?:Padu|Padu)-.*-arm64\.dmg$/,
-  LINUX_APPIMAGE_ASSET_PATTERN,
-  /(?:Padu|Padu)-Setup-.*\.exe$/,
+  /^Padu-.*\.dmg$/,
+  /^padu-.*-x86_64-unknown-linux-gnu\.tar\.gz$/,
+  /(?:^Padu-.*-(?:x86_64|x64)-Setup\.exe$|^Padu-Setup-.*\.exe$)/,
 ];
 
 const GITHUB_RELEASES_URL = "https://api.github.com/repos/wisnuwiry/padu/releases?per_page=10";
-const RELEASE_CACHE_KEY = "github-release:v2";
+const RELEASE_CACHE_KEY = "github-release:v3";
 const ANDROID_RELEASE_CACHE_KEY = "github-android-release:v1";
 
 function hasRequiredAssets(release: GitHubRelease): boolean {
@@ -43,23 +42,37 @@ function hasRequiredAssets(release: GitHubRelease): boolean {
   );
 }
 
-function pickWindowsAssets(assets: GitHubAsset[]) {
-  const x64Suffixed = assets.find((asset) => /(?:Padu|Padu)-Setup-.*-x64\.exe$/.test(asset.name));
-  const arm64 = assets.find((asset) => /(?:Padu|Padu)-Setup-.*-arm64\.exe$/.test(asset.name));
-  const legacy = assets.find(
-    (asset) =>
-      /(?:Padu|Padu)-Setup-.*\.exe$/.test(asset.name) &&
-      !asset.name.endsWith("-x64.exe") &&
-      !asset.name.endsWith("-arm64.exe"),
-  );
+function pickMacDmgAsset(assets: GitHubAsset[]): string | null {
+  return assets.find((asset) => /^Padu-.*\.dmg$/.test(asset.name))?.name ?? null;
+}
+
+function pickLinuxTarballAssets(assets: GitHubAsset[]) {
+  const x64 = assets.find((asset) => /^padu-.*-x86_64-unknown-linux-gnu\.tar\.gz$/.test(asset.name));
+  const arm64 = assets.find((asset) => /^padu-.*-aarch64-unknown-linux-gnu\.tar\.gz$/.test(asset.name));
   return {
-    x64: (x64Suffixed ?? legacy)?.name ?? null,
+    x64: x64?.name ?? null,
     arm64: arm64?.name ?? null,
   };
 }
 
-function pickLinuxAppImageAsset(assets: GitHubAsset[]) {
-  return assets.find((asset) => LINUX_APPIMAGE_ASSET_PATTERN.test(asset.name))?.name ?? null;
+function pickWindowsAssets(assets: GitHubAsset[]) {
+  const x64 = assets.find(
+    (asset) =>
+      /^Padu-.*-(?:x86_64|x64)-Setup\.exe$/.test(asset.name) ||
+      /^Padu-Setup-.*-x64\.exe$/.test(asset.name) ||
+      (/^Padu-Setup-.*\.exe$/.test(asset.name) &&
+        !asset.name.includes("arm64") &&
+        !asset.name.includes("aarch64")),
+  );
+  const arm64 = assets.find(
+    (asset) =>
+      /^Padu-.*-(?:aarch64|arm64)-Setup\.exe$/.test(asset.name) ||
+      /^Padu-Setup-.*-(?:arm64|aarch64)\.exe$/.test(asset.name),
+  );
+  return {
+    x64: x64?.name ?? null,
+    arm64: arm64?.name ?? null,
+  };
 }
 
 function versionFromTag(tag: string): string {
@@ -86,13 +99,18 @@ async function fetchGitHubReleases(): Promise<GitHubRelease[]> {
 function toReleaseInfo(release: GitHubRelease): ReleaseInfo | null {
   if (release.draft || !hasRequiredAssets(release)) return null;
 
-  const linuxAppImageAsset = pickLinuxAppImageAsset(release.assets);
-  if (!linuxAppImageAsset) return null;
+  const macDmgAsset = pickMacDmgAsset(release.assets);
+  if (!macDmgAsset) return null;
+
+  const linuxAssets = pickLinuxTarballAssets(release.assets);
+  if (!linuxAssets.x64) return null;
 
   const windowsAssets = pickWindowsAssets(release.assets);
   return {
     version: versionFromTag(release.tag_name),
-    linuxAppImageAsset,
+    macDmgAsset,
+    linuxX64Tarball: linuxAssets.x64,
+    linuxArm64Tarball: linuxAssets.arm64,
     windowsX64Asset: windowsAssets.x64,
     windowsArm64Asset: windowsAssets.arm64,
   };
@@ -136,9 +154,11 @@ export function selectReleaseChannels(releases: GitHubRelease[]): ReleaseChannel
 const DEFAULT_FALLBACK_RELEASE: ReleaseChannels = {
   stable: {
     version: "0.1.0",
-    linuxAppImageAsset: "Padu-0.1.0-x86_64.AppImage",
-    windowsX64Asset: "Padu-Setup-0.1.0-x64.exe",
-    windowsArm64Asset: "Padu-Setup-0.1.0-arm64.exe",
+    macDmgAsset: "Padu-0.1.0.dmg",
+    linuxX64Tarball: "padu-0.1.0-x86_64-unknown-linux-gnu.tar.gz",
+    linuxArm64Tarball: "padu-0.1.0-aarch64-unknown-linux-gnu.tar.gz",
+    windowsX64Asset: "Padu-0.1.0-x86_64-Setup.exe",
+    windowsArm64Asset: "Padu-0.1.0-aarch64-Setup.exe",
   },
   beta: null,
 };
@@ -178,21 +198,13 @@ function isReleaseInfo(value: unknown): value is ReleaseInfo {
   return (
     typeof record.version === "string" &&
     /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(record.version) &&
-    typeof record.linuxAppImageAsset === "string" &&
-    (record.linuxAppImageAsset === "Padu-x86_64.AppImage" ||
-      new RegExp(`^Padu-${record.version.replaceAll(".", "\\.")}-x86_64\\.AppImage$`).test(
-        record.linuxAppImageAsset,
-      )) &&
+    typeof record.macDmgAsset === "string" &&
+    record.macDmgAsset.endsWith(".dmg") &&
+    typeof record.linuxX64Tarball === "string" &&
+    record.linuxX64Tarball.endsWith(".tar.gz") &&
+    (typeof record.linuxArm64Tarball === "string" || record.linuxArm64Tarball === null) &&
     (typeof record.windowsX64Asset === "string" || record.windowsX64Asset === null) &&
-    (typeof record.windowsArm64Asset === "string" || record.windowsArm64Asset === null) &&
-    (record.windowsX64Asset === null ||
-      new RegExp(`^Padu-Setup-${record.version.replaceAll(".", "\\.")}(?:-x64)?\\.exe$`).test(
-        record.windowsX64Asset,
-      )) &&
-    (record.windowsArm64Asset === null ||
-      new RegExp(`^Padu-Setup-${record.version.replaceAll(".", "\\.")}-arm64\\.exe$`).test(
-        record.windowsArm64Asset,
-      ))
+    (typeof record.windowsArm64Asset === "string" || record.windowsArm64Asset === null)
   );
 }
 

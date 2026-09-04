@@ -35,10 +35,10 @@ function desktopRelease({
   return {
     tag_name: `v${version}`,
     assets: [
-      { name: `Padu-${version}-arm64.dmg` },
-      { name: "Padu-x86_64.AppImage" },
-      { name: `Padu-Setup-${version}-x64.exe` },
-      { name: `Padu-Setup-${version}-arm64.exe` },
+      { name: `Padu-${version}.dmg` },
+      { name: `padu-${version}-x86_64-unknown-linux-gnu.tar.gz` },
+      { name: `Padu-${version}-x86_64-Setup.exe` },
+      { name: `Padu-${version}-aarch64-Setup.exe` },
     ],
     prerelease,
     draft,
@@ -67,7 +67,7 @@ describe("selectReleaseChannels", () => {
 
     expect(channels.stable.version).toBe("0.2.5");
     expect(channels.beta?.version).toBe("0.3.0-beta.2");
-    expect(channels.beta?.windowsArm64Asset).toBe("Padu-Setup-0.3.0-beta.2-arm64.exe");
+    expect(channels.beta?.windowsArm64Asset).toBe("Padu-0.3.0-beta.2-aarch64-Setup.exe");
   });
 
   it("retires the beta channel once stable ships the same version", () => {
