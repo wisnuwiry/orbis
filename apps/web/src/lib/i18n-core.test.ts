@@ -17,6 +17,7 @@ describe('web i18n', () => {
     for (const [locale, file] of [
       ['zh-CN', 'zh-CN.yml'],
       ['ja', 'ja.yml'],
+      ['id', 'id.yml'],
     ] as const) {
       const translated = parseRustI18nCatalog(
         await Bun.file(new URL(file, localeRoot)).text(),
@@ -48,12 +49,16 @@ quoted: "值：%{count}"
     expect(resolveLanguage('system', ['zh-Hans-SG', 'en-US'])).toBe('zh-CN')
     expect(resolveLanguage('system', ['zh-Hant-TW'])).toBe('en')
     expect(resolveLanguage('system', ['ja-JP'])).toBe('ja')
+    expect(resolveLanguage('system', ['id-ID', 'en-US'])).toBe('id')
+    expect(resolveLanguage('system', ['id'])).toBe('id')
     expect(resolveLanguage('system', ['fr-FR'])).toBe('en')
     expect(resolveLanguage('zh-CN', ['en-US'])).toBe('zh-CN')
+    expect(resolveLanguage('id', ['en-US'])).toBe('id')
   })
 
   test('normalizes persisted values and interpolates named parameters', () => {
     expect(normalizeLanguage('ja')).toBe('ja')
+    expect(normalizeLanguage('id')).toBe('id')
     expect(normalizeLanguage('invalid')).toBe('system')
     expect(interpolateTranslation('%{count} files in %{project}', {
       count: 2,

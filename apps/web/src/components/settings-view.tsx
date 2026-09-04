@@ -307,9 +307,9 @@ function AppearanceSettings() {
             onSelect: () => setLanguage(choice),
           }))}
           label={languageLabel(language, locale)}
-          menuClassName="w-[160px]"
+          menuClassName="w-[170px]"
           placement="below"
-          triggerClassName="h-8 w-[116px] max-w-none justify-between border bg-background px-3 text-[12px]"
+          triggerClassName="h-8 w-[150px] max-w-none justify-between border bg-background px-3 text-[12px]"
         />
       </div>
     </div>
