@@ -2,17 +2,6 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "padu-web",
   "compatibility_date": "2026-08-08",
-  "compatibility_flags": ["nodejs_compat"],
-  "main": "@tanstack/react-start/server-entry",
-  "observability": {
-    "enabled": true,
-    "logs": {
-      "enabled": true,
-      "head_sampling_rate": 1
-    },
-    "traces": {
-      "enabled": true,
-      "head_sampling_rate": 0.05
-    }
-  }
+  "pages_build_output_dir": "dist/client",
+  "compatibility_flags": ["nodejs_compat"]
 }
