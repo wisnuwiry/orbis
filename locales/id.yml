@@ -1,0 +1,1219 @@
+_version: 1
+menu.about: Tentang %{app}
+menu.check_for_updates: Periksa Pembaruan…
+menu.settings: Pengaturan…
+menu.quit: Keluar dari %{app}
+menu.file: Berkas
+menu.new_task: Tugas Baru
+menu.new_project: Proyek Baru…
+menu.edit: Edit
+menu.undo: Urungkan
+menu.redo: Ulangi
+menu.cut: Potong
+menu.copy: Salin
+menu.paste: Tempel
+menu.select_all: Pilih Semua
+menu.view: Tampilan
+menu.command_palette: Palet Perintah…
+menu.toggle_sidebar: Alihkan Bilah Sisi
+menu.toggle_right_panel: Alihkan Panel Kanan
+menu.open_browser: Buka Browser
+menu.open_terminal: Buka Terminal
+menu.open_files: Buka Berkas
+menu.open_review: Buka Peninjauan
+menu.focus_composer: Fokuskan Komposer
+menu.toggle_model_picker: Alihkan Pemilih Model
+menu.toggle_usage_panel: Alihkan Panel Penggunaan
+menu.previous_session: Percakapan Sebelumnya
+menu.next_session: Percakapan Berikutnya
+menu.window: Jendela
+menu.toggle_fps_counter: Alihkan Penghitung FPS
+menu.close_window: Tutup Jendela
+window.minimize: Minimalkan
+window.maximize: Maksimalkan
+window.restore: Pulihkan
+updater.update: Perbarui
+updater.updating: Memperbarui…
+updater.up_to_date: Padu sudah menggunakan versi terbaru
+updater.failed: "Pembaruan gagal: %{error}"
+command_palette.placeholder: Cari tugas atau jalankan perintah…
+command_palette.resume_placeholder: Cari sesi terminal…
+command_palette.resume_provider_placeholder: Pilih penyedia…
+command_palette.suggested: Disarankan
+command_palette.tasks: Tugas
+command_palette.sessions: Sesi terminal
+command_palette.providers: Penyedia
+command_palette.commands: Perintah
+command_palette.settings: Pengaturan
+command_palette.new_task: Tugas baru
+command_palette.resume: Lanjutkan…
+command_palette.change_provider: Ubah penyedia
+command_palette.current_provider: Penyedia saat ini
+command_palette.open_project: Buka proyek…
+command_palette.choose_model: Pilih model…
+command_palette.copy_task_id: Salin ID Tugas
+command_palette.copy_agent_cli_thread_id: Salin ID Thread CLI Agen
+command_palette.task_id_copied: ID Tugas disalin
+command_palette.agent_cli_thread_id_copied: ID Thread CLI Agen disalin
+command_palette.collapse_sidebar_groups: Ciutkan semua grup bilah sisi
+command_palette.show_sidebar: Tampilkan bilah sisi
+command_palette.hide_sidebar: Sembunyikan bilah sisi
+command_palette.show_right_panel: Tampilkan panel kanan
+command_palette.hide_right_panel: Sembunyikan panel kanan
+command_palette.open_browser: Buka browser
+command_palette.open_terminal: Buka terminal
+command_palette.open_files: Buka berkas
+command_palette.open_review: Buka peninjauan
+command_palette.previous_session: Percakapan Sebelumnya
+command_palette.next_session: Percakapan Berikutnya
+command_palette.current: Saat Ini
+command_palette.you: Anda
+command_palette.agent: Agen
+command_palette.no_results: Tidak ada tugas atau perintah yang cocok
+command_palette.no_results_hint: Coba cari judul tugas, pesan, proyek, pengaturan, atau perintah
+command_palette.no_matching_providers: Tidak ada penyedia yang cocok
+command_palette.loading_sessions: Memuat sesi terminal…
+command_palette.no_resume_sessions: Tidak ada sesi terminal yang dapat dilanjutkan
+command_palette.no_resume_sessions_hint: Sesi yang sudah ada di Padu disembunyikan. Mulai sesi di CLI agen lalu coba lagi.
+command_palette.could_not_load_sessions: Tidak dapat memuat sesi terminal
+command_palette.loading_selected_session: Memuat percakapan…
+command_palette.resume_failed: "Tidak dapat melanjutkan sesi: %{error}"
+language.title: Bahasa
+language.system: Sistem
+language.description: Pilih bahasa yang digunakan di seluruh Padu
+settings.general: Umum
+settings.appearance: Tampilan
+settings.keybindings: Pintasan Tombol
+settings.providers: Penyedia
+settings.usage: Penggunaan
+settings.daemon: Host & Daemon
+settings.computer_use: Penggunaan Komputer
+settings.general_keywords: umum lokal proyek percakapan privasi analitik telemetri anonim bagikan pembaruan otomatis sparkle versi
+settings.appearance_keywords: tampilan tema sistem terang gelap bahasa inggris indonesia jepang mandarin font ukuran teks editor
+settings.keybindings_keywords: pintasan tombol keyboard shortcut hotkey pengikatan navigasi perintah
+settings.providers_keywords: penyedia agen model cli versi instalasi deteksi claude codex cursor opencode amp grok pi
+settings.skills: Skill
+settings.skills_keywords: skill keahlian pustaka agen nonaktifkan aktifkan hapus claude codex cursor opencode pi amp dibagikan
+settings.usage_keywords: penggunaan token biaya pengeluaran cache harian grafik model rincian riwayat claude codex
+settings.daemon_keywords: host jarak jauh remote server devbox cloud daemon web jaringan ekspos origin token port websocket ssh lan
+settings.computer_use_keywords: penggunaan komputer perekaman layar aksesibilitas aplikasi kontrol codex
+keybindings.section_general: Umum & Jendela
+keybindings.section_navigation: Navigasi & Panel
+keybindings.section_chat: Obrolan & Komposer
+keybindings.section_editor: Editor & Pencarian
+keybindings.section_browser: Browser Bawaan
+keybindings.new_task: Tugas Baru
+keybindings.new_task_desc: Buat percakapan atau tugas baru
+keybindings.open_project: Buka Proyek
+keybindings.open_project_desc: Buka folder proyek atau ruang kerja
+keybindings.command_palette: Palet Perintah
+keybindings.command_palette_desc: Cari tugas, jalankan perintah, atau buka pengaturan
+keybindings.open_settings: Pengaturan
+keybindings.open_settings_desc: Buka preferensi aplikasi
+keybindings.close_window: Tutup Jendela
+keybindings.close_window_desc: Tutup jendela Padu saat ini
+keybindings.quit: Keluar
+keybindings.quit_desc: Keluar dari aplikasi Padu
+keybindings.toggle_sidebar: Alihkan Bilah Sisi
+keybindings.toggle_sidebar_desc: Tampilkan atau sembunyikan bilah sisi proyek dan tugas
+keybindings.toggle_right_panel: Alihkan Panel Kanan
+keybindings.toggle_right_panel_desc: Tampilkan atau sembunyikan panel alat, diff, dan berkas
+keybindings.open_browser: Buka Browser
+keybindings.open_browser_desc: Tampilkan atau sembunyikan browser di panel kanan
+keybindings.open_terminal: Buka Terminal
+keybindings.open_terminal_desc: Tampilkan atau sembunyikan terminal di panel kanan
+keybindings.open_files: Buka Berkas
+keybindings.open_files_desc: Tampilkan atau sembunyikan penjelajah berkas di panel kanan
+keybindings.open_review: Buka Peninjauan
+keybindings.open_review_desc: Tampilkan atau sembunyikan peninjauan diff di panel kanan
+keybindings.toggle_usage_panel: Alihkan Panel Penggunaan
+keybindings.toggle_usage_panel_desc: Tampilkan atau sembunyikan penggunaan token dan biaya
+keybindings.toggle_fps: Alihkan Penghitung FPS
+keybindings.toggle_fps_desc: Tampilkan atau sembunyikan penghitung performa rendering
+keybindings.navigate_back: Navigasi Mundur
+keybindings.navigate_back_desc: Kembali ke riwayat navigasi sesi sebelumnya
+keybindings.navigate_forward: Navigasi Maju
+keybindings.navigate_forward_desc: Maju ke riwayat navigasi sesi berikutnya
+keybindings.previous_session: Percakapan Sebelumnya
+keybindings.previous_session_desc: Beralih ke percakapan sebelumnya di bilah sisi
+keybindings.next_session: Percakapan Berikutnya
+keybindings.next_session_desc: Beralih ke percakapan berikutnya di bilah sisi
+keybindings.next_task: Tugas Berikutnya
+keybindings.next_task_desc: Pindah maju di pengalih tugas
+keybindings.prev_task: Tugas Sebelumnya
+keybindings.prev_task_desc: Pindah mundur di pengalih tugas
+keybindings.focus_composer: Fokuskan Komposer
+keybindings.focus_composer_desc: Pindahkan fokus ke bidang masukan prompt
+keybindings.select_model: Pilih Model
+keybindings.select_model_desc: Buka menu pemilih model
+keybindings.cancel_turn: Hentikan Pembuatan
+keybindings.cancel_turn_desc: Batalkan putaran aktif atau hentikan respons model
+keybindings.save_file: Simpan Berkas
+keybindings.save_file_desc: Simpan berkas aktif di editor
+keybindings.find: Cari dalam Berkas
+keybindings.find_desc: Buka bilah pencarian di editor berkas
+keybindings.replace: Ganti dalam Berkas
+keybindings.replace_desc: Buka bilah cari dan ganti di editor berkas
+keybindings.find_next: Cari Berikutnya
+keybindings.find_next_desc: Lompat ke kecocokan berikutnya
+keybindings.find_prev: Cari Sebelumnya
+keybindings.find_prev_desc: Lompat ke kecocokan sebelumnya
+keybindings.browser_focus: Fokuskan Bilah Alamat
+keybindings.browser_focus_desc: Fokuskan bilah alamat di tab browser
+keybindings.browser_reload: Muat Ulang Halaman
+keybindings.browser_reload_desc: Muat ulang halaman web saat ini
+keybindings.browser_hard_reload: Muat Ulang Penuh
+keybindings.browser_hard_reload_desc: Muat ulang halaman dengan mengabaikan konten cache
+keybindings.browser_back: Browser Mundur
+keybindings.browser_back_desc: Kembali ke riwayat browser
+keybindings.browser_forward: Browser Maju
+keybindings.browser_forward_desc: Maju ke riwayat browser
+keybindings.browser_devtools: Alat Pengembang
+keybindings.browser_devtools_desc: Alihkan alat pengembang web
+keybindings.search: Cari pintasan tombol...
+keybindings.no_results: Pintasan tombol tidak ditemukan
+settings.back: Kembali
+settings.search: Cari Pengaturan
+daemon.expose_title: Izinkan Koneksi Jarak Jauh & Web
+daemon.expose_description: Izinkan Padu Web di browser atau perangkat lain di jaringan lokal untuk terhubung ke runtime agen AI di mesin ini.
+daemon.status_local: Hanya lokal
+daemon.status_exposed: Terekspos
+daemon.status_restarting: Memulai ulang
+daemon.connection_title: Kebijakan Jaringan & Origin
+daemon.connection_description: Origin browser harus cocok persis. Pisahkan beberapa origin dengan tanda koma.
+daemon.port: Port
+daemon.port_description: Padu mendengarkan pada semua antarmuka jaringan di port ini selama eksposur diaktifkan.
+daemon.port_placeholder: 34123
+daemon.allowed_origins: Origin browser yang diizinkan
+daemon.allowed_origins_description: "Origin http:// atau https:// persis yang diizinkan untuk membuka WebSocket."
+daemon.allowed_origins_placeholder: "https://padu.example.com, http://localhost:3001"
+daemon.apply: Terapkan
+daemon.restarting: Memulai ulang…
+daemon.credentials_title: Kredensial Akses Daemon
+daemon.credentials_description: Gunakan kredensial koneksi ini di Padu Web atau aplikasi klien jarak jauh untuk terhubung ke mesin ini.
+daemon.websocket_url: URL WebSocket
+daemon.token: Token
+daemon.reveal_token: Tampilkan token
+daemon.hide_token: Sembunyikan token
+daemon.regenerate_token: Buat ulang
+daemon.security_warning: Token memberikan akses penuh ke tugas, berkas, Git, lampiran, dan agen pengodean di komputer ini. Gunakan WSS melalui proksi TLS tepercaya di luar jaringan privat.
+daemon.remote_active_banner_title: "Terhubung ke Host Jarak Jauh: %{name}"
+daemon.remote_active_banner_desc: Semua eksekusi agen, transkrip, dan operasi ruang kerja berjalan di host daemon jarak jauh ini.
+daemon.switch_to_local: Beralih ke Daemon Lokal
+daemon.external_title: Host Daemon Jarak Jauh
+daemon.external_description: Instans Padu ini sedang terhubung ke host daemon jarak jauh.
+daemon.web_external_description: Padu Web terhubung ke daemon yang dikelola di luar browser ini. Konfigurasikan listener, origin browser, dan token pada host tersebut.
+daemon.web_connection_description: Browser ini tidak pernah memulai atau menghentikan daemon.
+daemon.not_configured: Belum dikonfigurasi
+daemon.status: Status
+daemon.disconnect: Putuskan sambungan
+daemon.forget: Lupakan daemon
+daemon.reconnect: Sambungkan ulang
+daemon.phase_booting: Memulai
+daemon.phase_disconnected: Terputus
+daemon.phase_connecting: Menghubungkan
+daemon.phase_connected: Terhubung
+daemon.phase_error: Kesalahan
+daemon.invalid_port: Masukkan port antara 1 hingga 65535
+daemon.invalid_settings: "Pengaturan daemon tidak valid: %{error}"
+daemon.stop_active_tasks: Hentikan tugas aktif sebelum mengubah akses daemon
+daemon.settings_applied: Akses daemon diperbarui
+daemon.restart_failed: "Tidak dapat memulai ulang daemon: %{error}"
+daemon.url_copied: URL WebSocket disalin
+daemon.token_copied: Token daemon disalin
+host.hosts: Host
+host.local: Lokal
+host.add_host: Tambah Host...
+host.edit_host: Edit Host
+host.remove_host: Hapus Host
+host.delete_confirm_title: Hapus Profil Host
+host.delete_confirm_message: "Apakah Anda yakin ingin menghapus \"%{name}\"? Tindakan ini tidak dapat dibatalkan."
+host.name: Nama
+host.name_placeholder: mis. Server Dev
+host.address: Alamat
+host.address_placeholder: "mis. 192.168.1.100:34123"
+host.token: Token
+host.token_placeholder: Token autentikasi daemon (opsional)
+host.save_and_connect: Simpan & Hubungkan
+host.save: Simpan
+host.settings: Pengaturan Host...
+host.connection_failed: "Koneksi gagal: %{error}"
+host.confirm_remove: "Hapus host \"%{name}\"?"
+host.connecting: Menghubungkan...
+host.remote_hosts: Host Jarak Jauh
+host.remote_hosts_description: Hubungkan ke instans daemon Padu yang berjalan di server jarak jauh atau workstation.
+host.active: Aktif
+host.authenticated: Terautentikasi
+host.no_auth: Tanpa Token
+host.no_remote_hosts: Tidak ada host jarak jauh yang dikonfigurasi
+host.last_connected: Terakhir terhubung %{time}
+host.never_connected: Belum pernah terhubung
+host.switch_host: Ganti Host
+host.connect: Hubungkan
+web.connect_title: Hubungkan ke daemon Padu
+web.connect_description: Masukkan URL listener jarak jauh dan token dari Pengaturan Desktop → Daemon.
+web.token_placeholder: Token akses daemon
+web.remember_device: Ingat di perangkat ini
+web.remember_device_description: Jika tidak, kredensial akan dihapus saat sesi browser ini berakhir.
+web.connect: Hubungkan
+web.connecting: Menghubungkan…
+web.security_warning: Browser hanya mengirimkan token ke WebSocket ini. Gunakan WSS melalui proksi TLS tepercaya di luar jaringan privat.
+web.starting: Memulai Padu…
+web.starting_label: Memulai Padu
+web.start_failed_label: Padu tidak dapat dimulai
+web.load_failed: Tidak dapat memuat Padu
+web.try_again: Coba lagi
+web.daemon_connection_closed: Koneksi daemon ditutup
+web.daemon_not_configured: Belum ada daemon yang dikonfigurasi
+web.error_daemon_url_required: Masukkan URL daemon
+web.error_daemon_url_invalid: "Masukkan URL daemon ws:// atau wss:// yang valid"
+web.error_daemon_url_scheme: "URL daemon harus menggunakan ws:// atau wss://"
+web.error_daemon_url_host: URL daemon harus menyertakan host dan tanpa kredensial
+web.error_secure_websocket_required: "Halaman Padu Web yang aman hanya dapat terhubung melalui wss://"
+web.error_daemon_token_required: Masukkan token daemon
+settings.theme: Tema
+settings.theme_description: Pilih tema sistem, terang, atau gelap
+settings.ui_font_size: Ukuran font UI
+settings.ui_font_size_description: Ukuran teks di seluruh antarmuka dan pesan
+settings.code_font_size: Ukuran font kode
+settings.code_font_size_description: Ukuran teks di editor berkas, diff, blok kode, dan output alat
+settings.theme_system: Sistem
+settings.theme_light: Terang
+settings.theme_dark: Gelap
+input.do_anything: Lakukan apa saja…
+input.search_models: Cari model…
+input.search_branches: Cari cabang
+input.new_branch_name: Nama cabang baru
+input.detected_automatically: Terdeteksi secara otomatis
+input.filter_projects: Filter proyek
+input.search_or_enter_address: Cari atau masukkan alamat
+input.find: Cari
+input.replace: Ganti
+common.checking: Memeriksa…
+common.refresh: Segarkan
+common.recheck: Periksa ulang
+common.reset: Atur ulang
+common.revoke: Cabut
+common.retry: Coba lagi
+common.creating: Membuat…
+settings.local_by_default: Lokal secara default
+settings.local_by_default_description: Proyek, percakapan, dan pengaturan disimpan di komputer ini
+settings.local_by_default_web_description: Proyek, percakapan, dan lampiran tetap berada di host daemon yang terhubung. Preferensi Padu Web disimpan di browser ini.
+settings.automatic_updates: Pembaruan otomatis
+settings.automatic_updates_description: Periksa versi baru di latar belakang dan tawarkan untuk memasangnya
+settings.share_anonymous_usage_data: Bagikan data penggunaan anonim
+settings.share_anonymous_usage_data_description: Bantu tingkatkan Padu dengan membagikan data penggunaan fitur dan keandalan. Masukan prompt, respons, nama proyek, jalur berkas, dan data pribadi lainnya tidak akan pernah disertakan
+providers.coding_agents: Agen pengodean
+providers.description: Padu menjalankan CLI agen yang terpasang di komputer ini. Pasang atau masuk dengan CLI masing-masing agen, lalu segarkan
+providers.web_description: Padu menjalankan CLI agen yang terpasang di host daemon. Pasang atau masuk dengan CLI masing-masing agen, lalu segarkan
+providers.check_failed: "Tidak dapat memeriksa %{command}: %{error}"
+providers.show_settings: Tampilkan pengaturan %{provider}
+providers.hide_settings: Sembunyikan pengaturan %{provider}
+providers.enable: Aktifkan %{provider}
+providers.disable: Nonaktifkan %{provider}
+providers.disabled_for_new_tasks: Dinonaktifkan untuk tugas baru
+providers.model_count_one: "%{count} model"
+providers.model_count_many: "%{count} model"
+providers.not_detected_as: Tidak terdeteksi di PATH sebagai %{command}
+providers.using_override: Menggunakan %{path} alih-alih deteksi PATH
+providers.invalid_override: Tidak ada yang dapat dijalankan di jalur ini. Kosongkan untuk mendeteksi dari PATH
+providers.detected_at: Terdeteksi di %{path}
+providers.detected_as: Terdeteksi sebagai %{command}
+providers.searches_path: Padu tidak mendeteksi %{command} di PATH
+providers.binary_path: Jalur biner
+providers.binary_path_description: Eksekusi yang dijalankan Padu untuk %{provider}. Tekan Return untuk menerapkan; kosongkan untuk mendeteksi dari PATH
+providers.checked_just_now: Baru saja diperiksa
+providers.checked_minutes_ago: Diperiksa %{count}m yang lalu
+providers.checked_hours_ago: Diperiksa %{count}j yang lalu
+computer_use.allow_apps: Izinkan Padu menggunakan aplikasi
+computer_use.availability: Penggunaan Komputer tersedia dengan Codex, OpenCode, Grok, dan Pi
+computer_use.macos_access: Akses macOS
+computer_use.helper_access: Berikan akses ke %{helper}, helper kontrol terisolasi Padu
+computer_use.screen_recording: Perekaman Layar
+computer_use.screen_recording_description: Hanya merekam jendela aplikasi yang disetujui
+computer_use.accessibility: Aksesibilitas
+computer_use.accessibility_description: Mengirim peristiwa penunjuk dan keyboard setelah disetujui
+computer_use.always_allowed_apps: Aplikasi yang selalu diizinkan
+computer_use.always_allowed_apps_description: Padu menautkan izin ini ke ID bundel dan tim penandatangan aplikasi
+computer_use.no_always_allowed_apps: Tidak ada aplikasi yang selalu diizinkan. Izin tingkat tugas hanya disimpan di memori
+computer_use.access_granted: Akses Diberikan
+computer_use.grant_access: Berikan Akses
+computer_use.permission_check_failed: Tidak dapat memeriksa izin Penggunaan Komputer
+common.settings: Pengaturan
+common.copy: Salin
+common.remove: Hapus
+common.rename: Ganti nama
+session.new_task: Tugas baru
+sidebar.today: Hari Ini
+sidebar.search: Cari
+sidebar.options: Opsi bilah sisi
+sidebar.grouping: Pengelompokan
+sidebar.grouping_project: Proyek
+sidebar.grouping_updated: Diperbarui
+sidebar.ordering: Urutan
+sidebar.ordering_newest: Terbaru dulu
+sidebar.ordering_oldest: Terlama dulu
+sidebar.show_more: Tampilkan lebih banyak
+sidebar.yesterday: Kemarin
+sidebar.this_week: Minggu Ini
+sidebar.this_month: Bulan Ini
+sidebar.this_year: Tahun Ini
+sidebar.more: Lainnya
+sidebar.working: Bekerja selama %{elapsed}
+sidebar.just_now: baru saja
+sidebar.minutes_ago: "%{count}m"
+sidebar.hours_ago: "%{count}j"
+sidebar.days_ago: "%{count}h"
+sidebar.unknown_project: Proyek tidak dikenal
+sidebar.close: Tutup bilah sisi
+sidebar.hide: Sembunyikan bilah sisi
+sidebar.open: Buka bilah sisi
+sidebar.toggle: Alihkan Bilah Sisi
+sidebar.back: Kembali
+sidebar.forward: Maju
+sidebar.tasks: Tugas
+sidebar.add_project: Tambah proyek jarak jauh
+sidebar.resize: Ubah ukuran bilah sisi
+sidebar.status_working: Bekerja
+sidebar.status_waiting: Menunggu
+sidebar.status_failed: Gagal
+project.new_project: Proyek baru…
+project.no_project: Jangan bekerja dalam proyek
+project.no_project_name: Tanpa proyek
+project.choose_project: pilih proyek
+project.default_folder: Folder default
+project.project_lower: proyek
+project.without_a_project: tanpa proyek
+project.your_project: proyek Anda
+onboarding.open_project_to_begin: Buka proyek untuk memulai
+onboarding.description: Padu menjalankan agen pengodean di folder yang Anda pilih. Kode, sesi, dan riwayat Anda tetap ada di komputer ini
+onboarding.web_description: Pilih jalur di host daemon, atau mulai tanpa proyek.
+onboarding.open_project_folder: Buka folder proyek…
+onboarding.what_should_we_build: Apa yang ingin kita buat?
+onboarding.what_should_we_build_in: "Apa yang ingin kita buat di "
+onboarding.question_mark: "?"
+common.copied: Disalin
+common.copy_message: Salin pesan
+common.copy_message_title: Salin Pesan
+common.copy_selection: Salin Pilihan
+common.copy_to_composer: Salin ke Komposer
+common.copy_code: Salin Kode
+common.cancel: Batal
+common.edit: Edit
+common.send: Kirim
+session.fork_task: Cabangkan tugas
+session.fork_task_title: Cabangkan Tugas
+session.forking_task: Mencabangkan tugas…
+session.forking_task_title: Mencabangkan Tugas…
+session.revert_to_here: Kembalikan ke sini
+session.revert_to_here_title: Kembalikan ke Sini
+session.reverting_message: Mengembalikan pesan…
+session.reverting_message_title: Mengembalikan Pesan…
+session.delete_title: Hapus Percakapan
+session.delete_message: Apakah Anda yakin ingin menghapus “%{title}”? Tindakan ini tidak dapat dibatalkan.
+session.delete_confirm: Hapus
+time.yesterday_at: Kemarin %{time}
+time.weekday_at: "%{weekday} %{time}"
+time.date_at: "%{day}/%{month}, %{time}"
+time.full_date_at: "%{day}/%{month}/%{year}, %{time}"
+time.monday: Senin
+time.tuesday: Selasa
+time.wednesday: Rabu
+time.thursday: Kamis
+time.friday: Jumat
+time.saturday: Sabtu
+time.sunday: Minggu
+activity.count: "%{count} %{activity}"
+activity.running: Menjalankan %{activities}
+activity.detail: Detail aktivitas
+activity.named_content: Konten %{name}
+activity.ran: Menjalankan %{activities}
+activity.action_think: Berpikir
+activity.action_run: Jalankan
+activity.action_edit: Edit
+activity.action_read: Baca
+activity.action_search: Cari
+activity.action_list: Daftar
+activity.action_plan: Rencana
+activity.action_use: Gunakan
+activity.ask_questions: Ajukan pertanyaan
+activity.arguments: Argumen
+activity.output: Output
+activity.image_output: Output gambar
+activity.open_file: Buka berkas
+activity.search_for: Cari %{query}
+activity.searched_web: Mencari di web
+activity.open_url: Buka %{url}
+activity.opened_web_page: Membuka halaman web
+activity.find_in_url: Temukan %{pattern} di %{url}
+activity.find_on_page: Temukan %{pattern} di halaman
+activity.search_within_url: Cari di dalam %{url}
+activity.searched_within_page: Mencari di dalam halaman web
+activity.browsed_page: Menjelajahi %{count} halaman
+activity.browsed_pages: Menjelajahi %{count} halaman
+activity.browsed_web: Menjelajahi web
+activity.exit_code: "Kode keluar: %{code}"
+activity.output_with_exit_code: "%{output}\n\nKode keluar: %{code}"
+activity.run_command: Jalankan perintah
+activity.running_named_command: Menjalankan %{command}
+activity.ran_named_command: Telah menjalankan %{command}
+activity.named_command_failed: "Perintah gagal: %{command}"
+activity.running_described_command: "Menjalankan perintah: %{description}"
+activity.ran_described_command: "Telah menjalankan perintah: %{description}"
+activity.described_command_failed: "Perintah gagal: %{description}"
+activity.running_command: Menjalankan perintah
+activity.ran_command: Telah menjalankan perintah
+activity.command_failed: Perintah gagal
+activity.edit_file: Edit berkas
+activity.write_file: Tulis berkas
+activity.editing_named_file: Mengedit %{file}
+activity.edited_named_file: Telah mengedit %{file}
+activity.edit_failed_named_file: Gagal mengedit %{file}
+activity.editing_files: Mengedit berkas
+activity.edited_files: Telah mengedit berkas
+activity.edit_failed: Gagal mengedit berkas
+activity.file_count: "%{count} berkas"
+activity.read_file: Baca berkas
+activity.reading_named_file: Membaca %{file}
+activity.read_named_file: Telah membaca %{file}
+activity.read_named_file_failed: Gagal membaca %{file}
+activity.reading_file: Membaca berkas
+activity.read_file_completed: Selesai membaca berkas
+activity.read_file_failed: Gagal membaca berkas
+activity.search_files: Cari berkas
+activity.find_files: Temukan berkas
+activity.searching_files_for: Mencari berkas untuk %{query}
+activity.searched_files_for: Telah mencari berkas untuk %{query}
+activity.file_search_failed_for: Gagal mencari berkas untuk %{query}
+activity.searching_files: Mencari berkas
+activity.searched_files: Telah mencari berkas
+activity.file_search_failed: Gagal mencari berkas
+activity.list_files: Daftar berkas
+activity.listing_files_in: Mendaftar berkas di %{directory}
+activity.listed_files_in: Telah mendaftar berkas di %{directory}
+activity.file_list_failed_in: Gagal mendaftar berkas di %{directory}
+activity.listing_files: Mendaftar berkas
+activity.listed_files: Telah mendaftar berkas
+activity.file_list_failed: Gagal mendaftar berkas
+activity.searching_web_for: Mencari di web untuk %{query}
+activity.searched_web_for: Telah mencari di web untuk %{query}
+activity.web_search_failed_for: Gagal mencari di web untuk %{query}
+activity.searching_web: Mencari di web
+activity.searched_the_web: Telah mencari di web
+activity.web_search_failed: Gagal mencari di web
+activity.updating_plan: Memperbarui rencana
+activity.updated_plan: Rencana diperbarui
+activity.plan_update_failed: Gagal memperbarui rencana
+activity.activity: Aktivitas
+activity.tool: Alat
+activity.plan_updated: Rencana diperbarui
+activity.output_truncated: "\n\n… output dipotong"
+activity.thought: pemikiran
+activity.thoughts: pemikiran
+activity.command: perintah
+activity.command_detail: Perintah
+activity.commands: perintah
+activity.file_edit: edit berkas
+activity.file_edits: edit berkas
+activity.file_read: baca berkas
+activity.file_reads: baca berkas
+activity.file_search: pencarian berkas
+activity.file_searches: pencarian berkas
+activity.file_list: daftar berkas
+activity.file_lists: daftar berkas
+activity.search: pencarian
+activity.searches: pencarian
+activity.plan_step: langkah rencana
+activity.plan_steps: langkah rencana
+activity.tool_call: panggilan alat
+activity.tool_calls: panggilan alat
+mode.build: Bangun
+mode.plan: Rencana
+mode.supervised: Diawasi
+mode.auto_accept_edits: Terima edit otomatis
+mode.auto: Otomatis
+mode.full_access: Akses penuh
+mode.plan_description: Periksa dan rencanakan tanpa membuat perubahan
+mode.plan_not_supported: Agen ini tidak mendukung Rencana
+mode.supervised_description: Minta konfirmasi sebelum perintah dan perubahan berkas
+mode.auto_accept_edits_description: Setujui edit otomatis, minta konfirmasi untuk tindakan lain
+mode.auto_description: Peninjau AI menyetujui tindakan rutin; tindakan berisiko tetap meminta konfirmasi
+mode.full_access_description: Izinkan perintah dan edit tanpa konfirmasi
+mode.switch_to: Beralih ke %{mode}
+agent_preset.standard: Mode standar
+agent_preset.code: Mode kode
+agent_preset.minimal: Mode minimal
+agent_preset.creator: Mode kreator
+agent_preset.standard_description: Agen pengodean lengkap dengan pengeditan berkas, shell, pencarian berkas dan web, skill, perencanaan, target, sub-agen, dan alur kerja.
+agent_preset.code_description: Semua kemampuan mode Standar, dengan alat yang diekspos melalui Code Mode SDK sehingga model dapat menggabungkan operasi multi-langkah dalam satu program TypeScript.
+agent_preset.minimal_description: Agen pengodean dua alat dengan bash persisten dan str_replace_editor.
+agent_preset.creator_description: Dibuat untuk membuat preset agen kustom, dengan semua kemampuan mode Standar ditambah inspeksi runtime, eksperimen plugin, dan panduan pembuatan preset.
+agent_preset.custom: Kustom
+agent_preset.no_description: Tidak ada deskripsi.
+agent_preset.minimal_no_plan: Mode minimal tidak mencakup Rencana
+computer_use.allow_for_task: Izinkan untuk tugas ini
+computer_use.always_allow_app: Selalu izinkan aplikasi
+computer_use.allow_control: Izinkan Padu mengontrol %{app}?
+computer_use.screenshot_shared: Tangkapan layar jendela ini akan dibagikan dengan model Codex yang aktif
+computer_use.sensitive_action: Tindakan ini dapat mengetik teks atau menekan tombol keyboard
+computer_use.bundle_id: "ID Bundel: %{id}"
+computer_use.no_bundle_id: Aplikasi ini tidak memiliki pengenal bundel, sehingga tidak dapat selalu diizinkan
+computer_use.stopped: Dihentikan
+computer_use.controlling: Mengontrol
+computer_use.captured: Ditangkap
+computer_use.take_control: Ambil Alih Kontrol
+computer_use.preparing_preview: Menyiapkan pratinjau…
+common.deny: Tolak
+permission.allow_once: Izinkan sekali
+permission.allow_for_session: Izinkan untuk sesi ini
+permission.always_allow: Selalu izinkan
+permission.a_tool: sebuah alat
+permission.run_a_tool: Jalankan alat
+permission.run_a_tool_lower: menjalankan alat
+permission.blocked_path: "Jalur diblokir: %{path}"
+permission.agent_wants_to_run: Agen ingin menjalankan %{tool}
+permission.run_tool: Jalankan %{tool}?
+permission.allow_named_permission: Izinkan %{permission}?
+permission.agent_asks_for_named_permission: Agen meminta izin %{permission}
+permission.agent_asks_for_permission: Agen meminta izin
+permission.agent_wants_to: Agen ingin %{action}
+common.close: Tutup
+common.default: Default
+composer.no_providers: Pasang atau aktifkan penyedia untuk mengirim
+models.none_found: Tidak ada model yang ditemukan
+models.favorite_hint: Beri bintang pada model untuk menyimpannya di sini
+models.loading: Memuat model…
+models.none_reported: Tidak ada model yang dilaporkan oleh penyedia ini
+models.no_providers: Tidak ada penyedia
+models.no_providers_title: Tidak ada penyedia yang tersedia
+models.no_providers_description: Pasang CLI agen, atau aktifkan kembali di pengaturan Penyedia.
+models.open_provider_settings: Buka Pengaturan Penyedia
+models.choose: Pilih model
+models.favorites: Favorit
+models.add_favorite: Tambah ke favorit
+models.remove_favorite: Hapus dari favorit
+models.standard: Standar
+models.reasoning: Penalaran
+models.service_tier: Tingkat Layanan
+models.context_window: Jendela Konteks
+model_option.none: Tidak ada
+model_option.minimal: Minimal
+model_option.low: Rendah
+model_option.medium: Sedang
+model_option.high: Tinggi
+model_option.extra_high: Sangat Tinggi
+model_option.max: Maksimal
+model_option.ultra: Ultra
+model_option.ultracode: Ultracode
+model_option.context_200k: 200K
+model_option.context_1m: 1M
+model_option.auto: Otomatis
+model_option.fast: Cepat
+model_option.amp_fast_description: Gunakan tingkat penyajian Amp yang lebih cepat dengan tarif penggunaan lebih tinggi
+model_option.fast_description: Respons lebih cepat dengan tarif penggunaan lebih tinggi
+command_scope.project: proyek
+command_scope.user: pengguna
+command_scope.skill: skill
+command_scope.builtin: bawaan
+skills.search: Cari skill…
+skills.count_one: 1 skill
+skills.count_many: "%{count} skill"
+skills.count_disabled: "%{count} dinonaktifkan"
+skills.filter_caption: "%{shown} dari %{total} ditampilkan"
+skills.scanning: Memindai folder skill…
+skills.no_match: Tidak ada skill yang cocok dengan pencarian Anda
+skills.section_user: Pengguna
+skills.source_shared: Bersama
+skills.scope_user_detail: tersedia di setiap proyek
+skills.scope_in_project: di %{project}
+skills.filter_all: Semua skill
+skills.select_placeholder: Pilih skill
+skills.detail_invoke: Panggil
+skills.detail_location: Lokasi
+skills.detail_contents: Konten
+skills.detail_updated: Diperbarui
+skills.no_description: Tidak ada deskripsi
+skills.disabled_badge: Dinonaktifkan
+skills.file_count_one: 1 berkas pendukung
+skills.file_count_many: "%{count} berkas pendukung"
+skills.updated_just_now: Baru saja
+skills.updated_minutes: "%{count}m yang lalu"
+skills.updated_hours: "%{count}j yang lalu"
+skills.updated_days: "%{count}h yang lalu"
+skills.allowed_tools: Alat
+skills.duplicate_one: Nama yang sama di 1 lokasi lain — salinan paling spesifik yang berlaku
+skills.duplicate_many: Nama yang sama di %{count} lokasi lain — salinan paling spesifik yang berlaku
+skills.open_file: Buka SKILL.md
+skills.reveal: Tampilkan di Manajer Berkas
+skills.copy_path: Salin Jalur
+skills.path_copied: Jalur disalin
+skills.delete: Hapus
+skills.confirm_delete: Konfirmasi hapus
+skills.deleted_toast: Memindahkan “%{name}” ke Tempat Sampah
+skills.delete_failed: "Tidak dapat menghapus skill: %{error}"
+skills.toggle_failed: "Tidak dapat memperbarui skill: %{error}"
+skills.empty_title: Belum ada skill
+skills.empty_description: Skill adalah folder dengan berkas SKILL.md — instruksi yang dapat digunakan kembali dan dimuat oleh agen mana pun, seperti runbook deploy atau daftar periksa peninjauan. Skill yang dipasang untuk Claude Code, Codex, dan agen lainnya muncul di sini, dipanggil sebagai /name.
+skills.library: Pustaka skill
+skills.details: Detail skill
+skills.section_user_skills: Skill pengguna
+skills.enable_named: Aktifkan %{name}
+skills.disable_named: Nonaktifkan %{name}
+commands.fast_description: Alihkan mode cepat
+commands.fast_enabled: Mode cepat diaktifkan
+commands.fast_disabled: Mode cepat dinonaktifkan
+commands.goal_description: Tetapkan target yang terus diupayakan tugas ini
+commands.resume_description: Lanjutkan sesi agen terminal
+goal.title: Target
+goal.objective_placeholder: Apa yang harus terus diupayakan oleh tugas ini?
+goal.set: Tetapkan target
+goal.save: Simpan target
+goal.replace: Ganti target
+goal.replace_notice: Menyimpan akan menggantikan target saat ini dan memulai ulang progresnya.
+goal.pause: Jeda target
+goal.resume: Lanjutkan target
+goal.clear: Hapus target
+goal.status_active: Aktif
+goal.status_paused: Dijeda
+goal.status_stalled: Terhenti
+goal.status_usage_limited: Penggunaan terbatas
+goal.status_budget_limited: Anggaran habis
+goal.status_complete: Selesai
+goal.chip_active: Mengejar target
+goal.chip_paused: Target dijeda
+goal.chip_stalled: Target terhenti
+goal.chip_usage_limited: Target mencapai batas penggunaan
+goal.chip_budget_limited: Target belum tercapai
+goal.chip_complete: Target tercapai
+goal.set_notice: "Target ditetapkan: %{objective}"
+goal.usage_tokens: "%{used} / %{budget} token"
+goal.usage_tokens_unbudgeted: "%{used} token"
+composer.edit_in_composer: Edit di komposer
+composer.steer: Arahkan
+composer.remove_followup: Hapus dari antrean
+user_input.other_placeholder: Ketik jawaban lain
+user_input.back: Kembali
+user_input.next: Berikutnya
+user_input.submit: Kirim
+user_input.progress: "%{current} dari %{total}"
+composer.preparing_task: Menyiapkan tugas…
+composer.queue_followup: Antrekan sebagai tindak lanjut (⏎)
+composer.message: Pesan
+composer.queue_placeholder: Antrekan tindak lanjut…
+composer.prompt_placeholder: Minta Padu membuat sesuatu…
+composer.attach_daemon: Lampirkan berkas atau folder dari host daemon
+composer.attach_daemon_title: Lampirkan dari host daemon
+composer.stop: Berhenti
+composer.stop_confirm: Tekan Escape lagi untuk berhenti
+composer.steer_current: Arahkan putaran saat ini
+composer.starting_agent: Memulai agen…
+composer.suggestions: Saran komposer
+composer.loading_suggestions: Memuat saran…
+composer.remove_attachment: Hapus %{name}
+composer.queued_message_actions: Tindakan tindak lanjut
+branches.detached_head: HEAD Terlepas (Detached)
+branches.search_project: Cari cabang %{project}
+branches.switching: Beralih…
+branches.create_and_checkout: Buat dan checkout cabang baru
+branches.create_hint: Tekan Return untuk membuat · Esc untuk membatalkan
+branches.none_found: Tidak ada cabang yang ditemukan
+branches.create_and_checkout_ellipsis: Buat dan checkout cabang baru…
+branches.title: Cabang
+branches.choose: Pilih cabang
+branches.checked_out_elsewhere: Di-checkout di worktree lain
+workspace.work_in: Bekerja di
+workspace.local: Lokal
+workspace.new_worktree: Worktree baru
+workspace.workspace: ruang kerja
+workspace.worktree: Worktree
+terminal.starting: Memulai terminal…
+project.add_project: Tambah proyek
+errors.remote_project_picker: Menambahkan proyek host daemon memerlukan pemilih jalur jarak jauh, yang saat ini belum tersedia
+session.stopped: Dihentikan
+session.turn_completed: Putaran selesai
+session.stopped_before_response: Agen berhenti sebelum mengembalikan respons
+session.codex_exited_before_response: App-server Codex keluar sebelum mengembalikan respons
+session.steer_rejected: Agen tidak dapat diarahkan (%{error}); pesan diantrekan sebagai tindak lanjut
+session.steer_rejected_plain: Agen tidak dapat diarahkan; pesan diantrekan sebagai tindak lanjut
+session.agent_ran_out_of_context: Agen kehabisan konteks untuk putaran ini
+session.agent_declined_turn: Agen menolak putaran ini
+session.agent_stopped_reason: "Agen berhenti: %{reason}"
+errors.open_session: "Tidak dapat membuka sesi tersebut: %{error}"
+errors.create_projectless_task: "Tidak dapat membuat tugas di bawah ~/.padu/projects: %{error}"
+errors.save_projectless_migration: "Tidak dapat menyimpan migrasi tugas tanpa proyek: %{error}"
+errors.move_projectless_task: "Tidak dapat memindahkan tugas lama tanpa proyek ke bawah ~/.padu/projects: %{error}"
+errors.remote_host_path: Jalur ini milik host daemon dan tidak dapat dibuka oleh desktop
+errors.change_branch: "Tidak dapat mengubah cabang: %{error}"
+errors.capture_pre_turn_checkpoint: "Tidak dapat mengambil checkpoint pra-putaran: %{error}"
+errors.capture_turn_checkpoint: "Tidak dapat mengambil checkpoint putaran: %{error}"
+errors.save_local_state: "Tidak dapat menyimpan status lokal: %{error}"
+errors.task_project_not_found: Proyek tugas tidak dapat ditemukan
+errors.provider_native_session_unavailable: Sesi bawaan %{provider} tidak tersedia
+errors.provider_native_thread_unavailable: Thread bawaan %{provider} tidak tersedia
+errors.provider_native_cursor_unavailable: Kursor sesi bawaan %{provider} tidak tersedia
+errors.provider_native_thread_cursor_unavailable: Kursor thread bawaan %{provider} tidak tersedia
+errors.provider_padu_task_unavailable: Tugas Padu %{provider} tidak tersedia
+errors.provider_not_installed: "%{provider} belum terpasang"
+errors.provider_not_found: "%{provider} belum terpasang atau tidak dapat ditemukan"
+errors.claude_fork_checkpoint_missing: Claude menghilangkan checkpoint percabangan
+errors.claude_turn_checkpoint_unavailable: "Checkpoint bawaan Claude untuk putaran tersebut tidak tersedia: %{error}"
+errors.provider_session_file_unavailable: Berkas sesi bawaan %{provider} tidak tersedia
+errors.provider_turn_branching_unsupported: "%{provider} tidak dapat memutar kembali atau mencabangkan percakapan pada suatu putaran"
+errors.fork_task: "Tidak dapat mencabangkan tugas: %{error}"
+errors.create_rewind_snapshot: "Tidak dapat membuat snapshot keamanan pemutaran kembali: %{error}"
+errors.restore_checkpoint: "Tidak dapat memulihkan checkpoint: %{error}"
+errors.restore_checkpoint_and_safety: Pemulihan checkpoint gagal (%{error}); pemulihan keamanan juga gagal (%{restore_error}). Ref pemulihan dipertahankan di %{safety_ref}
+errors.rollback_rejected_workspace_restored: "Penyedia menolak rollback, sehingga ruang kerja dipulihkan: %{error}"
+errors.rollback_and_safety_failed: Rollback penyedia gagal (%{error}) dan snapshot keamanan tidak dapat dipulihkan (%{restore_error}). Ref pemulihan dipertahankan di %{safety_ref}
+errors.no_session_selected: Tidak ada sesi yang dipilih
+errors.session_not_found: Sesi tidak ditemukan
+errors.task_not_found: Tugas tidak ditemukan
+errors.task_not_loaded: Tugas ini tidak dimuat
+errors.task_already_forking: Tugas ini sudah sedang dicabangkan
+errors.task_already_rewinding: Tugas ini sudah sedang diputar kembali
+errors.no_live_runtime: Tugas ini tidak memiliki runtime aktif
+errors.unexpected_daemon_response: Mengharapkan %{expected}, menerima %{actual} dari daemon
+errors.daemon_disconnected: Daemon Padu terputus
+errors.path_outside_workspace: Jalur ini berada di luar ruang kerja aktif pada host daemon
+errors.rename_task: "Tidak dapat mengganti nama tugas: %{error}"
+errors.remove_task: "Tidak dapat menghapus tugas: %{error}"
+errors.save_draft: "Tidak dapat menyimpan draf: %{error}"
+errors.rewind_task: "Tidak dapat memutar kembali tugas: %{error}"
+errors.project_not_found: Proyek tidak ditemukan
+errors.prepare_task_project_not_found: "Tidak dapat menyiapkan tugas: proyek tidak ditemukan"
+errors.store_pasted_image: "Tidak dapat melampirkan gambar yang ditempel: %{error}"
+errors.create_worktree: "Tidak dapat membuat worktree: %{error}"
+errors.prepared_runtime_unavailable: Runtime agen yang disiapkan tidak tersedia
+errors.start_agent: "Tidak dapat memulai agen: %{error}"
+errors.provider_no_active_turn: "%{provider} tidak memiliki putaran aktif untuk diarahkan"
+errors.provider_transport_write: "Penulisan transport %{provider} gagal: %{error}"
+errors.provider_transport_write_short: Penulisan transport %{provider} gagal
+errors.provider_transport_read: "Pembacaan transport %{provider} gagal: %{error}"
+errors.provider_invalid_json: "%{provider} mengirim JSON tidak valid: %{error}"
+errors.provider_exited: "%{provider} keluar dengan status %{status}"
+errors.provider_rpc_exited: RPC %{provider} keluar dengan status %{status}
+errors.read_provider_exit_status: "Tidak dapat membaca status keluar %{provider}: %{error}"
+errors.initialize_provider: "Tidak dapat menginisialisasi %{provider}: %{error}"
+errors.provider_no_session_id: "%{provider} tidak melaporkan ID sesi"
+errors.provider_rejected_prompt_detail: "%{provider} menolak prompt: %{error}"
+errors.stop_provider: "Tidak dapat menghentikan %{provider}: %{error}"
+errors.switch_provider_model: "Tidak dapat mengganti model %{provider}: %{error}"
+errors.change_provider_thinking: "Tidak dapat mengubah tingkat pemikiran %{provider}: %{error}"
+errors.open_provider_session: "Tidak dapat membuka sesi %{provider}: %{error}"
+errors.select_model: "Tidak dapat memilih model: %{error}"
+errors.read_provider_event_stream: "Tidak dapat membaca aliran peristiwa %{provider}: %{error}"
+errors.answer_provider_permission: "Tidak dapat menjawab permintaan izin %{provider}: %{error}"
+errors.answer_provider_question: "Tidak dapat menjawab pertanyaan %{provider}: %{error}"
+errors.initialize_codex_app_server: Gagal menginisialisasi app-server Codex
+errors.register_computer_use_skill: Gagal mendaftarkan skill Padu Computer Use dengan Codex
+errors.codex_thread_open_incomplete: Codex belum selesai membuka thread-nya
+errors.codex_goals_unsupported: Versi Codex ini tidak mendukung target thread
+errors.provider_receive_prompt: "%{provider} tidak dapat menerima prompt"
+errors.provider_start_turn: "%{provider} tidak dapat memulai putaran"
+errors.provider_rejected_steer: "%{provider} menolak pengarahan: %{error}"
+errors.provider_stopped_receiving: "%{provider} berhenti menerima pesan"
+errors.provider_initialize_session: "%{provider} tidak dapat menginisialisasi sesi ini"
+errors.provider_rejected_prompt: "%{provider} menolak prompt sebelum dijalankan"
+errors.provider_complete_turn: "%{provider} tidak dapat menyelesaikan putaran ini"
+errors.provider_reported_error: "%{provider} melaporkan kesalahan"
+session.response_unavailable: Respons tersebut tidak lagi tersedia
+session.response_cannot_fork: Respons tersebut tidak dapat dicabangkan saat ini
+session.response_fork_in_progress: Tunggu percabangan tugas selesai sebelum menghapus tugas sumbernya
+session.response_cannot_copy: Respons tersebut tidak dapat disalin ke tugas baru
+session.forked_with_checkpoint_warning: "Tugas dicabangkan; beberapa checkpoint Git tidak dapat disalin: %{error}"
+session.forked_from_response: Mencabangkan tugas dari respons ini
+session.message_not_editable: Pesan tersebut tidak dapat diedit saat ini
+session.edited_message_empty: Pesan yang diedit tidak boleh kosong
+session.message_unavailable: Pesan tersebut tidak lagi tersedia
+session.select_before_rewind: Pilih tugas sebelum memutar kembali percakapannya
+session.stop_before_rewind: Hentikan putaran saat ini sebelum memutar kembali percakapan
+session.provider_cannot_rewind: "%{provider} belum dapat memutar kembali percakapan bawaannya dengan aman"
+session.pre_turn_checkpoint_missing: Checkpoint Git pra-putaran untuk pesan tersebut hilang
+session.rewind_title: "%{title} (putar kembali)"
+session.rewound: Diputar kembali ke sebelum putaran %{turn}
+session.rewound_with_stale_refs: "Diputar kembali ke sebelum putaran %{turn}; ref basi masih tersisa: %{error}"
+right_panel.browser: Browser
+right_panel.terminal: Terminal
+right_panel.files: Berkas
+right_panel.diff: Peninjauan
+right_panel.toggle: Alihkan panel kanan
+right_panel.open_surface: Buka tampilan
+right_panel.choose_surface: Pilih apa yang ingin ditampilkan di panel kanan
+right_panel.browser_description: Buka aplikasi lokal atau URL
+right_panel.terminal_description: Mulai shell di ruang kerja ini
+right_panel.files_description: Jelajahi dan baca berkas ruang kerja
+right_panel.diff_description: Tinjau perubahan berkas
+right_panel.terminal_unavailable: Terminal tidak tersedia
+right_panel.terminal_unavailable_description: Buka tampilan Terminal lagi untuk memulai shell
+right_panel.resize: Ubah ukuran panel kanan
+right_panel.tabs: Tab panel kanan
+right_panel.add_tab: Tambah tab panel
+right_panel.hide: Sembunyikan panel kanan
+right_panel.close_tab: Tutup %{title}
+open_in.open: Buka proyek di %{app}
+open_in.choose: Buka proyek di…
+environment.title: Lingkungan
+environment.summary: Pekerjaan lingkungan dan latar belakang
+environment.changes: Perubahan
+environment.commit_or_push: Komit atau push
+environment.compare_branch: Bandingkan cabang
+environment.task_id: ID Tugas
+environment.agent_cli_thread_id: ID Thread CLI Agen
+commit.message_placeholder: Pesan komit (kosongkan untuk dibuat otomatis)…
+commit.message: Pesan komit
+commit.include_unstaged: Sertakan perubahan yang belum di-stage
+commit.commit: Komit
+commit.commit_and_push: Komit dan push
+commit.push: Push
+commit.generating_message: Membuat pesan komit…
+commit.committing: Melakukan komit…
+commit.committing_and_pushing: Melakukan komit dan push…
+commit.pushing: Melakukan push…
+commit.no_task: Tidak ada tugas yang tersedia untuk dikomit
+commit.no_workspace: Tugas ini tidak memiliki ruang kerja
+commit.no_changes: Tidak ada perubahan untuk dikomit
+commit.agent_unavailable: CLI agen saat ini tidak tersedia, sehingga tidak dapat membuat pesan komit
+commit.committed: Perubahan berhasil dikomit
+commit.committed_and_pushed: Perubahan berhasil dikomit dan di-push
+commit.pushed: Perubahan berhasil di-push
+background.title: Latar Belakang
+background.description: Periksa proses dan sub-agen yang dimulai oleh agen
+background.processes: Proses latar belakang
+background.agents: Sub-agen
+background.process: Proses
+background.monitor: Pantau
+background.subagent: Sub-agen
+background.no_work: Tidak ada pekerjaan latar belakang
+background.no_work_description: Perintah yang berjalan lama dan sub-agen akan muncul di sini.
+background.view: Lihat
+background.stop: Berhenti
+background.stop_named: Hentikan %{name}
+background.stop_all: Hentikan semua
+background.stop_not_running: Proses ini sudah tidak berjalan.
+background.output: Output
+background.no_output: Belum ada output
+background.command: Perintah
+background.prompt: Prompt
+background.cwd: Direktori kerja
+background.role: Peran
+background.model: Model
+background.latest_update: Pembaruan terkini
+background.exit_code: Kode keluar
+background.output_truncated: Output sebelumnya dipotong
+background.process_count: "%{count} proses latar belakang"
+background.process_count_one: 1 proses latar belakang
+background.agent_count: "%{count} sub-agen"
+background.agent_count_one: 1 sub-agen
+background.status.starting: Memulai
+background.status.running: Berjalan
+background.status.monitoring: Memantau
+background.status.stopping: Menghentikan
+background.status.completed: Selesai
+background.status.failed: Gagal
+background.status.stopped: Dihentikan
+background.status.lost: Terputus
+background.unavailable: Pekerjaan ini sudah tidak tersedia.
+files.unsaved_changes: Perubahan belum disimpan — %{shortcut} untuk menyimpan
+files.no_project_open: Tidak ada proyek yang terbuka
+files.no_project_open_description: Buka proyek untuk menjelajahi berkasnya
+files.no_project_is_open: Tidak ada proyek yang sedang terbuka
+files.unable_to_edit: "Tidak dapat mengedit berkas ini: %{error}"
+files.could_not_save_opening: "Tidak dapat menyimpan %{path}: masih membuka"
+files.could_not_save_read_only: "Tidak dapat menyimpan %{path}: berkas tidak dapat diedit"
+files.could_not_save: "Tidak dapat menyimpan %{path}: %{error}"
+files.preview_markdown: Pratinjau markdown
+files.edit_markdown_source: Edit sumber
+files.resize_tree: Ubah ukuran hierarki berkas
+files.refresh: Segarkan berkas
+files.loading: Memuat berkas…
+files.workspace_files: Berkas ruang kerja
+files.loading_file: Memuat berkas
+files.reading_from_daemon: Membaca dari host daemon.
+files.file_unavailable: Berkas tidak tersedia
+files.loading_editor: Memuat editor
+files.preparing_editor: Menyiapkan editor…
+files.preparing_syntax: Menyiapkan penyorotan sintaksis.
+files.copy_path: Salin jalur
+files.copied_path: "%{path} disalin ke papan klip"
+file_picker.open_project: Buka Proyek
+file_picker.attach: Lampirkan
+file_picker.daemon_folders: Folder daemon
+file_picker.daemon_items: Berkas dan folder daemon
+file_picker.choose_project_folder: Pilih folder proyek dari daemon
+file_picker.attach_from_daemon: Lampirkan berkas atau folder dari daemon
+file_picker.daemon_disconnected: Daemon tidak terhubung
+file_picker.locations: Lokasi
+file_picker.home: Beranda
+file_picker.file_system: Sistem Berkas
+file_picker.back: Kembali
+file_picker.forward: Maju
+file_picker.enclosing_folder: Folder induk
+file_picker.filter_folder: Filter folder ini
+file_picker.filter: Filter
+file_picker.refresh: Segarkan
+file_picker.name: Nama
+file_picker.kind: Jenis
+file_picker.loading_folder: Memuat folder…
+file_picker.no_matching_items: Tidak ada item yang cocok
+file_picker.empty_folder: Folder ini kosong
+file_picker.folders: Folder
+file_picker.files: Berkas
+file_picker.selected_folder: Folder yang dipilih
+file_picker.selected_item: Item yang dipilih
+file_picker.none: Tidak ada
+file_picker.opening: Membuka…
+file_picker.attaching: Melampirkan…
+file_picker.open: Buka
+file_picker.folder: Folder
+file_picker.file: Berkas
+file_picker.typed_file: Berkas %{type}
+diff.no_changes: Tidak ada perubahan
+diff.no_changes_description: Sumber ini tidak memiliki perubahan berkas untuk ditinjau
+diff.filter_files: Filter berkas…
+diff.source_last_turn: Putaran Terakhir
+diff.source_turn: Putaran %{turn}
+diff.source_uncommitted: Belum Dikomit
+diff.source_unstaged: Tidak Di-stage
+diff.source_staged: Di-stage
+diff.source_committed: Dikomit
+diff.source_branch: Cabang
+diff.loading: Memuat perubahan…
+diff.preparing_review: Menyiapkan peninjauan…
+diff.loading_description: Mengambil snapshot Git yang konsisten untuk peninjauan
+diff.unavailable: Perubahan tidak tersedia
+diff.refresh: Segarkan perubahan
+diff.refresh_failed: "Tidak dapat menyegarkan perubahan: %{error}"
+diff.truncated: Diff besar · menampilkan 50.000 baris pertama
+diff.unmodified_lines: "%{count} baris yang tidak diubah"
+diff.expand_all_context: Perluas semua baris yang tidak diubah
+diff.expand_context: Perluas baris yang tidak diubah · Shift-klik untuk semua
+diff.expand_context_above: Tampilkan 100 baris di atas · Shift-klik untuk semua
+diff.expand_context_below: Tampilkan 100 baris di bawah · Shift-klik untuk semua
+diff.resize_tree: Ubah ukuran hierarki berkas diff
+diff.changed_files: Berkas yang diubah
+diff.file_count_one: 1 berkas
+diff.file_count: "%{count} berkas"
+diff.status_added: Ditambahkan
+diff.status_deleted: Dihapus
+diff.rows_hidden_one: 1 baris lagi · buka Peninjauan untuk melihat seluruh perubahan
+diff.rows_hidden: "%{count} baris lagi · buka Peninjauan untuk melihat seluruh perubahan"
+terminal.transport_failed: Transport terminal gagal
+terminal.no_workspace_description: Pilih tugas sebelum membuka terminal.
+terminal.process_exited: Proses telah keluar
+browser.back: Kembali (%{shortcut})
+browser.forward: Maju (%{shortcut})
+browser.stop_loading: Hentikan pemuatan (Esc)
+browser.reload: Muat ulang (%{shortcut})
+browser.open_external: Buka di browser default
+browser.browse_web: Jelajahi web
+browser.start_hint: Masukkan URL atau cari di atas — %{shortcut} memfokuskan bilah alamat
+browser.unavailable: Browser tidak tersedia
+browser.unavailable_on_platform: Tampilan browser belum tersedia di platform ini
+find.bad_pattern: Pola tidak valid
+find.no_results: Tidak ada hasil
+find.result_count: "%{current} dari %{total}"
+find.match_case: Cocokkan huruf besar/kecil (%{shortcut})
+find.match_whole_word: Cocokkan seluruh kata (%{shortcut})
+find.use_regex: Gunakan ekspresi reguler (%{shortcut})
+find.previous_match: Kecocokan sebelumnya (⇧Enter)
+find.next_match: Kecocokan berikutnya (Enter)
+find.close: Tutup (Esc)
+find.replace: Ganti (Enter)
+find.replace_all: Ganti semua (%{shortcut})
+find.toggle_replace: Alihkan ganti
+common.dismiss_notification: Tutup notifikasi
+common.reveal_in_finder: Tampilkan di Manajer Berkas
+attachments.close_preview: Tutup pratinjau gambar
+attachments.open_preview: Buka %{name}
+attachments.preview_unavailable: Gambar tidak tersedia
+common.copy_named: Salin %{name}
+transcript.worked: Bekerja
+transcript.worked_for: Bekerja selama %{duration}
+transcript.you_stopped_after: Anda menghentikan setelah %{duration}
+transcript.working_for: Bekerja selama %{duration}
+transcript.thinking: Berpikir
+transcript.thought_for: Berpikir selama %{duration}
+transcript.changed_file: Mengubah %{count} berkas
+transcript.changed_files: Mengubah %{count} berkas
+transcript.review_changes: Tinjau
+transcript.show_more_files: Tampilkan %{count} berkas lagi
+transcript.show_fewer_files: Tampilkan lebih sedikit berkas
+transcript.showing_first_files: Menampilkan %{count} pertama dari %{total}
+transcript.scroll_to_bottom: Gulir ke bawah
+transcript.conversation_turns: Putaran percakapan
+transcript.turn_label: "Putaran %{number}: %{prompt}"
+transcript.edit_message: Edit pesan
+duration.second: "%{count} detik"
+duration.seconds: "%{count} detik"
+duration.minute: "%{count} menit"
+duration.minutes: "%{count} menit"
+duration.hour: "%{count} jam"
+duration.hours: "%{count} jam"
+duration.seconds_short: "%{count} dtk"
+duration.minutes_short: "%{count} mnt"
+duration.hours_short: "%{count} jam"
+duration.two_units: "%{first} %{second}"
+usage.scan_summary: Memindai %{scanned} transkrip (%{skipped} di luar rentang) · %{records} catatan penggunaan · %{seconds} dtk
+usage.daily: Harian
+usage.monthly: Bulanan
+usage.projects: Proyek
+usage.scanning: Memindai transkrip penyedia…
+usage.rescan: Pindai ulang transkrip penyedia
+usage.range: "%{start} hingga %{end}"
+usage.full_api_rate_note: "* jika ditagih pada tarif API penuh"
+usage.sessions_summary: Input, pembacaan cache, dan output di seluruh %{count} sesi
+usage.raw_token_cost: BIAYA TOKEN MENTAH
+usage.processed_tokens_upper: TOKEN DIPROSES
+usage.cost_share: "%{share} dari biaya · %{tokens} token"
+usage.token_share: "%{share} dari token · %{cost}"
+usage.no_activity_window: Tidak ada aktivitas dalam rentang ini
+usage.cost_upper: BIAYA
+usage.tokens_upper: TOKEN
+usage.daily_cost: Biaya harian
+usage.daily_processed_tokens: Token diproses harian
+usage.model_upper: MODEL
+usage.day_upper: HARI
+usage.breakdown: Rincian
+usage.no_projects_match: Tidak ada proyek yang cocok dengan filter
+usage.by_project: Berdasarkan proyek
+usage.projects_caption: "%{projects} · %{tokens} token · %{sessions}"
+usage.projects_shown: "%{shown} dari %{projects} ditampilkan"
+usage.percent_of_cost: "%{share} dari biaya"
+usage.token_count: "%{count} token"
+usage.last_active: terakhir aktif %{date}
+usage.show_models: Tampilkan %{models} beserta detail pengeluaran
+usage.other_sessions: Sesi lainnya
+usage.rates_unavailable: Tarif model tidak tersedia, sehingga biaya belum diberi harga hingga tabel tarif dimuat
+usage.total: Total
+usage.processed_tokens: Token diproses
+usage.per_active_day: "%{count} per hari aktif"
+usage.cached_input: Input dalam cache
+usage.observed_input_share: "%{share} dari input yang diamati"
+usage.uncached_input: Input tanpa cache
+usage.cache_writes: "%{count} penulisan cache"
+usage.output: Output
+usage.includes_reasoning: termasuk %{count} penalaran
+usage.cache_savings: Penghematan cache
+usage.raw_cost_multiple: "%{multiple}x biaya token mentah"
+usage.vs_full_input_rates: dibandingkan tarif input penuh
+usage.model: Model
+usage.cost: Biaya
+usage.share: Pangsa
+usage.tokens: Token
+usage.day: Hari
+usage.cost_quality: Kualitas biaya
+usage.provider_reported: Dilaporkan penyedia
+usage.model_priced: Diberi harga model
+usage.unpriced: Belum diberi harga
+usage.no_activity_12_months: Tidak ada aktivitas dalam 12 bulan terakhir
+usage.last_12_months: 12 bulan terakhir
+usage.so_far: sejauh ini
+usage.no_activity: Tidak ada aktivitas
+usage.models_by_spend: "%{models} · berdasarkan pengeluaran"
+usage.tokens_and_sessions: "%{tokens} token · %{sessions}"
+usage.month_caption: "%{tokens} token · %{sessions} · %{days}"
+usage.last_7_days: 7 hari terakhir
+usage.last_30_days: 30 hari terakhir
+usage.last_90_days: 90 hari terakhir
+usage.this_month: Bulan ini
+usage.last_month: Bulan lalu
+usage.custom: Kustom
+usage.project_one: "%{count} proyek"
+usage.project_many: "%{count} proyek"
+usage.session_one: "%{count} sesi"
+usage.session_many: "%{count} sesi"
+usage.model_one: "%{count} model"
+usage.model_many: "%{count} model"
+usage.active_day_one: "%{count} hari aktif"
+usage.active_day_many: "%{count} hari aktif"
+usage.filter_projects: Filter proyek…
+usage.chart_description: "%{metric} harian terbagi antara Claude Code dan Codex."
+usage.refresh_failed: "Penyegaran penggunaan gagal: %{error}"
+usage.context_used: Jendela konteks %{percent}% digunakan (%{shortcut})
+usage.shortcut: Penggunaan (%{shortcut})
+usage.context_window: Jendela konteks
+usage.plan_limits: Batas penggunaan paket
+usage.plan_limits_named: Batas penggunaan paket · %{plan}
+usage.open_account_settings: Buka pengaturan penggunaan akun
+usage.unavailable: Tidak tersedia — %{error}
+usage.usage_limit: Batas penggunaan
+usage.hour_limit: Batas %{count} jam
+usage.day_limit: Batas %{count} hari
+usage.weekly_limit: Batas mingguan
+usage.daily_limit: Batas harian
+usage.monthly_limit: Batas bulanan
+usage.limit_suffix: " batas"
+usage.scoped_limit: "%{period} · %{name}"
+usage.weekly_all_models: Mingguan · semua model
+usage.weekly_model: Mingguan · %{model}
+usage.resets_soon: Segera diatur ulang
+usage.resets_in_minutes: Diatur ulang dalam %{count} mnt
+usage.resets_in_hours: Diatur ulang dalam %{count} jam
+usage.resets_in_hours_minutes: Diatur ulang dalam %{hours} jam %{minutes} mnt
+usage.resets_date: Diatur ulang %{date}
+usage_error.signin_cannot_read: Masuk %{provider} tidak dapat membaca penggunaan (HTTP %{status}). Menjalankan putaran %{provider} akan menyegarkannya
+usage_error.rate_limited: Endpoint penggunaan sedang terkena batas laju (rate limited)
+usage_error.http_status: Endpoint penggunaan merespons HTTP %{status}
+usage_error.invalid_json: Endpoint penggunaan mengembalikan JSON tidak valid
+usage_error.no_home_directory: Tidak ada direktori home
+usage_error.read_file: Gagal membaca %{path}
+usage_error.codex_auth_invalid: auth.json Codex bukan JSON
+usage_error.codex_access_token_missing: auth.json Codex tidak memiliki token akses; jalankan `codex login`
+usage_error.opencode_go_key_rejected: Kunci API OpenCode Go tidak dapat membaca penggunaan (HTTP %{status}); hubungkan kembali OpenCode Go
+usage_error.no_rate_limit_windows: Endpoint penggunaan tidak melaporkan rentang batas laju
+usage_error.start_grok_probe: Gagal memulai `grok agent stdio`
+usage_error.grok_stdin_unavailable: stdin Grok tidak tersedia
+usage_error.grok_stdout_unavailable: stdout Grok tidak tersedia
+usage_error.start_grok_reader: Gagal memulai pembaca probe Grok
+usage_error.grok_billing_timeout: Grok tidak menjawab permintaan penagihan tepat waktu
+usage_error.grok_answered: "Grok menjawab: %{error}"
+usage_error.grok_no_billing_data: Grok tidak melaporkan data penagihan; jalankan `grok` untuk masuk
+usage_error.claude_credentials_missing: Tidak ada kredensial Claude Code di keychain atau ~/.claude
+usage_error.run_security: Gagal menjalankan /usr/bin/security
+usage_error.keychain_item_missing: Keychain tidak memiliki item %{service}
+usage_error.claude_credentials_invalid: Kredensial Claude Code bukan JSON
+usage_error.claude_oauth_missing: Kredensial Claude Code tidak memiliki entri claudeAiOauth
+usage_error.claude_access_token_missing: Kredensial Claude Code tidak memiliki token akses
+usage_error.run_curl: Gagal menjalankan /usr/bin/curl
+usage_error.curl_stdin_unavailable: stdin curl tidak tersedia
+usage_error.configure_curl: Gagal meneruskan konfigurasi ke curl
+usage_error.curl_did_not_finish: curl tidak selesai
+usage_error.curl_failed: "curl gagal: %{error}"
+usage_error.unknown_error: kesalahan tidak diketahui
+usage_error.curl_no_status: curl tidak mengembalikan baris status HTTP
+onboarding.welcome_title: Selamat Datang di Padu
+onboarding.welcome_subtitle: Control plane cepat dan bawaan untuk agen pengodean lokal
+onboarding.step_indicator: "%{current} dari %{total}"
+onboarding.skip: Lewati
+onboarding.back: Kembali
+onboarding.next: Berikutnya
+onboarding.get_started: Mulai Sekarang
+onboarding.command_title: Tur Sambutan & Orientasi
+onboarding.replay_button: Putar Ulang Tur Orientasi
+onboarding.slide1_badge: Selamat Datang
+onboarding.slide1_title: Selamat Datang di Padu
+onboarding.slide1_desc: Control plane bawaan yang cepat dan terhubung langsung ke agen pengodean AI lokal favorit Anda.
+onboarding.slide1_item1_title: Dukungan Multi-Agen
+onboarding.slide1_item1_desc: Jalankan Claude Code, Codex, Cursor, OpenCode, dan lainnya tanpa perantara cloud.
+onboarding.slide1_item2_title: Kecepatan Bawaan & Kelancaran
+onboarding.slide1_item2_desc: Dibangun dengan Rust dan GPUI untuk responsivitas instan serta rendering lancar 120 FPS.
+onboarding.slide1_item3_title: 100% Lokal & Privat
+onboarding.slide1_item3_desc: Kode, transkrip, dan kredensial Anda tetap tersimpan dengan aman di komputer Anda.
+onboarding.slide2_badge: Ruang Kerja Anda
+onboarding.slide2_title: Bangun Bersama Agen Anda
+onboarding.slide2_desc: Satukan proyek, sesi, dan perubahan sambil tetap memegang kendali penuh.
+onboarding.slide2_item1_title: Satu Ruang Kerja untuk Setiap Proyek
+onboarding.slide2_item1_desc: Kelola repositori dan sesi agen independen Anda di satu tempat yang terorganisir.
+onboarding.slide2_item2_title: Antrekan dan Arahkan Selagi Agen Bekerja
+onboarding.slide2_item2_desc: Kirim prompt tindak lanjut di tengah putaran tanpa kehilangan konteks percakapan.
+onboarding.slide2_item3_title: Tinjau dan Putar Kembali Dengan Git
+onboarding.slide2_item3_desc: Periksa perubahan berkas dan kembali ke titik sebelumnya dalam tugas saat diperlukan.
+onboarding.slide3_badge: Mulai Sekarang
+onboarding.slide3_title: Siap Membangun Sesuatu yang Luar Biasa?
+onboarding.slide3_desc: "Semuanya sudah siap. Pilih bagaimana Anda ingin memulai:"
+onboarding.slide3_item1_title: Buka Folder Proyek
+onboarding.slide3_item1_desc: Tambahkan repositori Git atau folder ruang kerja yang ada untuk mulai berkolaborasi.
+onboarding.slide3_item2_title: Scratchpad Cepat
+onboarding.slide3_item2_desc: Mulai seketika tanpa proyek untuk pertanyaan singkat, skrip, dan pembuatan purwarupa.
+onboarding.slide3_item3_title: Ganti Model Kapan Saja
+onboarding.slide3_item3_desc: Pilih model, sesuaikan upaya penalaran, dan ganti penyedia kapan saja dengan Cmd/Ctrl + /.
