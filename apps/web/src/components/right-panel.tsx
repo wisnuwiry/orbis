@@ -61,6 +61,7 @@ import {
   type BackgroundWorkStatus,
 } from '@/lib/runtime-context'
 import { cn } from '@/lib/utils'
+import { Kbd } from './ui/kbd'
 
 const CodeFileSurface = lazy(() => import('@/components/code-surfaces').then((module) => ({
   default: module.CodeFileSurface,
@@ -868,9 +869,9 @@ function PanelCard({
       <div className="flex w-full items-center justify-between">
         <span className="text-[var(--text-tertiary)]">{icon}</span>
         {shortcut && (
-          <kbd className="inline-flex h-5 min-w-5 items-center justify-center rounded border border-[var(--border)] bg-[var(--overlay-strong)] px-1.5 text-[11px] font-medium text-[var(--text-tertiary)]">
+          <Kbd size="sm">
             {shortcut}
-          </kbd>
+          </Kbd>
         )}
       </div>
       <span className="mt-3 text-[12.5px] font-medium">{label}</span>
