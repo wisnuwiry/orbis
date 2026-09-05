@@ -826,7 +826,10 @@ impl Padu {
                 "toggle show hide right panel files diff terminal browser",
                 next(),
             ),
-            CommandPaletteItem::command(
+        ]);
+
+        if self.right_panel_can_expand() || self.right_panel_fullscreen_active() {
+            commands.push(CommandPaletteItem::command(
                 PaletteSection::Commands,
                 tr!(if self.right_panel_fullscreen_active() {
                     "command_palette.exit_right_panel_fullscreen"
@@ -842,25 +845,33 @@ impl Padu {
                 PaletteAction::ToggleRightPanelFullscreen,
                 "fullscreen expand maximize collapse right panel conversation",
                 next(),
-            ),
-            CommandPaletteItem::command(
-                PaletteSection::Commands,
-                tr!("command_palette.next_right_panel_tab"),
-                "icons/arrow-right.svg",
-                Some(crate::platform::primary_shortcut("⌥⌘→", "Ctrl+Alt+Right")),
-                PaletteAction::NextRightPanelTab,
-                "next right panel tab conversation browser terminal files review",
-                next(),
-            ),
-            CommandPaletteItem::command(
-                PaletteSection::Commands,
-                tr!("command_palette.prev_right_panel_tab"),
-                "icons/arrow-left.svg",
-                Some(crate::platform::primary_shortcut("⌥⌘←", "Ctrl+Alt+Left")),
-                PaletteAction::PrevRightPanelTab,
-                "previous right panel tab conversation browser terminal files review",
-                next(),
-            ),
+            ));
+        }
+
+        if self.right_panel_visible || self.right_panel_fullscreen_active() {
+            commands.extend([
+                CommandPaletteItem::command(
+                    PaletteSection::Commands,
+                    tr!("command_palette.next_right_panel_tab"),
+                    "icons/arrow-right.svg",
+                    Some(crate::platform::primary_shortcut("⌥⌘→", "Ctrl+Alt+Right")),
+                    PaletteAction::NextRightPanelTab,
+                    "next right panel tab conversation browser terminal files review",
+                    next(),
+                ),
+                CommandPaletteItem::command(
+                    PaletteSection::Commands,
+                    tr!("command_palette.prev_right_panel_tab"),
+                    "icons/arrow-left.svg",
+                    Some(crate::platform::primary_shortcut("⌥⌘←", "Ctrl+Alt+Left")),
+                    PaletteAction::PrevRightPanelTab,
+                    "previous right panel tab conversation browser terminal files review",
+                    next(),
+                ),
+            ]);
+        }
+
+        commands.extend([
             CommandPaletteItem::command(
                 PaletteSection::Commands,
                 tr!("command_palette.open_browser"),

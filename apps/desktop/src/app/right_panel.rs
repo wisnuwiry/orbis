@@ -2401,11 +2401,7 @@ impl Padu {
                 if !self.right_panel_fullscreen_conversation
                     && self.right_panel_active_surface == Some(index)
                 {
-                    self.right_panel_fullscreen_conversation = true;
-                    if let Some(window) = window {
-                        let focus = self.composer_focus(cx);
-                        window.focus(&focus, cx);
-                    }
+                    self.select_right_panel_fullscreen_conversation(window, cx);
                 } else {
                     self.right_panel_fullscreen_conversation = false;
                     self.right_panel_active_surface = Some(index);
@@ -2414,8 +2410,8 @@ impl Padu {
                     if let Some(window) = window {
                         self.focus_active_surface(window, cx);
                     }
+                    cx.notify();
                 }
-                cx.notify();
             } else if self.right_panel_visible && self.right_panel_active_surface == Some(index) {
                 self.set_right_panel_visible(false, cx);
             } else {
@@ -2451,11 +2447,7 @@ impl Padu {
                 if !self.right_panel_fullscreen_conversation
                     && self.right_panel_active_surface == Some(index)
                 {
-                    self.right_panel_fullscreen_conversation = true;
-                    if let Some(window) = window {
-                        let focus = self.composer_focus(cx);
-                        window.focus(&focus, cx);
-                    }
+                    self.select_right_panel_fullscreen_conversation(window, cx);
                 } else {
                     self.right_panel_fullscreen_conversation = false;
                     if let Some(terminal_id) = surface.terminal_id() {
@@ -2467,8 +2459,8 @@ impl Padu {
                     if let Some(window) = window {
                         self.focus_active_surface(window, cx);
                     }
+                    cx.notify();
                 }
-                cx.notify();
             } else if self.right_panel_visible && self.right_panel_active_surface == Some(index) {
                 self.set_right_panel_visible(false, cx);
             } else {
@@ -2515,11 +2507,7 @@ impl Padu {
                 if !self.right_panel_fullscreen_conversation
                     && self.right_panel_active_surface == Some(index)
                 {
-                    self.right_panel_fullscreen_conversation = true;
-                    if let Some(window) = window {
-                        let focus = self.composer_focus(cx);
-                        window.focus(&focus, cx);
-                    }
+                    self.select_right_panel_fullscreen_conversation(window, cx);
                 } else {
                     self.right_panel_fullscreen_conversation = false;
                     self.refresh_right_panel_working_tree(cx);
@@ -2528,8 +2516,8 @@ impl Padu {
                     if let Some(window) = window {
                         self.focus_active_surface(window, cx);
                     }
+                    cx.notify();
                 }
-                cx.notify();
             } else if self.right_panel_visible && self.right_panel_active_surface == Some(index) {
                 self.set_right_panel_visible(false, cx);
             } else {
@@ -2568,11 +2556,7 @@ impl Padu {
                 if !self.right_panel_fullscreen_conversation
                     && self.right_panel_active_surface == Some(index)
                 {
-                    self.right_panel_fullscreen_conversation = true;
-                    if let Some(window) = window {
-                        let focus = self.composer_focus(cx);
-                        window.focus(&focus, cx);
-                    }
+                    self.select_right_panel_fullscreen_conversation(window, cx);
                 } else {
                     self.right_panel_fullscreen_conversation = false;
                     self.refresh_right_panel_diff(cx);
@@ -2581,8 +2565,8 @@ impl Padu {
                     if let Some(window) = window {
                         self.focus_active_surface(window, cx);
                     }
+                    cx.notify();
                 }
-                cx.notify();
             } else if self.right_panel_visible && self.right_panel_active_surface == Some(index) {
                 self.set_right_panel_visible(false, cx);
             } else {
@@ -3401,16 +3385,22 @@ impl Padu {
                     .on_mouse_down(MouseButton::Left, |_, _, cx| {
                         cx.stop_propagation();
                     })
-                    .on_click(cx.listener(|this, _, _, cx| {
+                    .on_click(cx.listener(|this, _, window, cx| {
                         cx.stop_propagation();
-                        let fullscreen = !this.right_panel_fullscreen_active();
-                        this.set_right_panel_fullscreen(fullscreen, cx);
+                        this.toggle_right_panel_fullscreen_action(
+                            &ToggleRightPanelFullscreen,
+                            window,
+                            cx,
+                        );
                     }))
-                    .on_key_down(cx.listener(|this, event: &KeyDownEvent, _, cx| {
+                    .on_key_down(cx.listener(|this, event: &KeyDownEvent, window, cx| {
                         if matches!(event.keystroke.key.as_str(), "enter" | "space") {
                             cx.stop_propagation();
-                            let fullscreen = !this.right_panel_fullscreen_active();
-                            this.set_right_panel_fullscreen(fullscreen, cx);
+                            this.toggle_right_panel_fullscreen_action(
+                                &ToggleRightPanelFullscreen,
+                                window,
+                                cx,
+                            );
                         }
                     })),
             );
