@@ -14,6 +14,7 @@ const sitemapPages = [
   '/settings/skills',
   '/settings/usage',
   '/settings/daemon',
+  '/settings/about',
 ].map((routePath) => ({ path: routePath }))
 
 export default defineConfig({
