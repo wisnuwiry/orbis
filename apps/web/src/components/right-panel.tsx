@@ -374,6 +374,8 @@ export const RightPanel = forwardRef<RightPanelHandle, RightPanelProps>(function
   }, [tabs, activeId, onTabsReport])
 
   const fullscreenShortcut = usePrimaryShortcut('⌘J', 'Ctrl+J')
+  const toggleSidebarShortcut = usePrimaryShortcut('⌘B', 'Ctrl+B')
+  const togglePanelShortcut = usePrimaryShortcut('⇧⌘B', 'Ctrl+Shift+B')
 
   const updateTab = useCallback((tabId: string, update: Partial<PanelTab>) => {
     setPanelState((current) => ({
@@ -432,7 +434,7 @@ export const RightPanel = forwardRef<RightPanelHandle, RightPanelProps>(function
       )}
       <header className="flex h-12 shrink-0 items-center gap-1.5 px-2.5 pr-3.5">
         {fullscreen && !sidebarVisible && onToggleSidebar && (
-          <Tooltip content={t('menu.toggle_sidebar')} shortcut={usePrimaryShortcut('⌘B', 'Ctrl+B')}>
+          <Tooltip content={t('menu.toggle_sidebar')} shortcut={toggleSidebarShortcut}>
             <Button
               aria-label={t('menu.toggle_sidebar')}
               size="icon-sm"
@@ -511,7 +513,7 @@ export const RightPanel = forwardRef<RightPanelHandle, RightPanelProps>(function
           </Tooltip>
         )}
         {!fullscreen && (
-          <Tooltip content={t('right_panel.toggle')} shortcut={usePrimaryShortcut('⇧⌘B', 'Ctrl+Shift+B')}>
+          <Tooltip content={t('right_panel.toggle')} shortcut={togglePanelShortcut}>
             <Button aria-label={t('right_panel.hide')} size="icon-sm" variant="ghost" onClick={() => onOpenChange(false)}>
               <PaduIcon name="panelRight" />
             </Button>
