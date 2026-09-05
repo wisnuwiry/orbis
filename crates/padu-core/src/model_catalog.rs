@@ -30,42 +30,16 @@ pub fn fallback_models(provider: ProviderKind) -> Vec<ProviderModel> {
             )
         })
         .collect(),
-        ProviderKind::Codex => [
-            ProviderModel::new("gpt-5.6-sol", "GPT-5.6-Sol").default(),
-            ProviderModel::new("gpt-5.6-terra", "GPT-5.6-Terra"),
-            ProviderModel::new("gpt-5.6-luna", "GPT-5.6-Luna"),
-            ProviderModel::new("gpt-5.5", "GPT-5.5"),
-            ProviderModel::new("gpt-5.4", "GPT-5.4"),
-        ]
-        .into_iter()
-        .map(|model| {
-            model
-                .reasoning(
-                    reasoning_options(["low", "medium", "high", "xhigh"]),
-                    "medium",
-                )
-                .service_tiers(
-                    [ProviderModelOption::new("fast", tr!("model_option.fast"))
-                        .description(tr!("model_option.fast_description"))],
-                    "default",
-                )
-        })
-        .collect(),
-        ProviderKind::Claude => vec![
-            claude_long_context(claude_ultracode_model("claude-fable-5", "Claude Fable 5")),
-            claude_long_context(claude_ultracode_model("claude-opus-5", "Claude Opus 5")),
-            claude_long_context(claude_ultracode_model("claude-opus-4-8", "Claude Opus 4.8")),
-            claude_long_context(claude_ultracode_model("claude-opus-4-7", "Claude Opus 4.7")),
-            claude_long_context(claude_reasoning_model("claude-opus-4-6", "Claude Opus 4.6")),
-            claude_reasoning_model("claude-opus-4-5", "Claude Opus 4.5"),
-            claude_long_context(claude_ultracode_model("claude-sonnet-5", "Claude Sonnet 5"))
-                .default(),
-            claude_long_context(claude_reasoning_model(
-                "claude-sonnet-4-6",
-                "Claude Sonnet 4.6",
-            )),
-            ProviderModel::new("claude-haiku-4-5", "Claude Haiku 4.5"),
-        ],
+        // Codex reports its account-specific catalog over `model/list` on a
+        // throwaway app-server, including effort ladders and service tiers
+        // per model. An invented fallback would offer models the CLI rejects
+        // and hide ones it added, so discovery is authoritative.
+        ProviderKind::Codex => Vec::new(),
+        // Claude's catalog is account-specific and reported by the installed
+        // CLI's sessionless initialization probe (including CC-Switch role
+        // mappings). An invented fallback would offer models the CLI rejects
+        // and hide custom entries, so discovery is authoritative.
+        ProviderKind::Claude => Vec::new(),
         // Cursor's full catalog is account-specific and exposed by the
         // installed CLI. Auto remains the provider-owned default and keeps
         // older CLIs selectable if model discovery is unavailable.
@@ -268,6 +242,15 @@ fn parse_claude_models(value: &Value) -> Vec<ProviderModel> {
                             .map(|option| option.id.as_str())
                     })
                     .map(str::to_owned);
+            }
+            // The 1M window is opt-in behind a `[1m]` model-id suffix, so it
+            // is a per-model trait rather than a separate model. Offer it
+            // wherever the resolved model looks like a supporting Claude
+            // family; unknown/custom slugs get no menu rather than one the
+            // CLI may reject. An entry already carrying the suffix *is* the
+            // 1M variant, so a toggle would be meaningless on it.
+            if !id.ends_with("[1m]") && claude_supports_long_context(resolved.unwrap_or(id)) {
+                model = claude_long_context(model);
             }
             Some(model)
         })
@@ -1065,13 +1048,6 @@ fn reasoning_effort_label(effort: &str) -> String {
     }
 }
 
-fn reasoning_options<const N: usize>(efforts: [&str; N]) -> Vec<ProviderModelOption> {
-    efforts
-        .into_iter()
-        .map(|effort| ProviderModelOption::new(effort, reasoning_effort_label(effort)))
-        .collect()
-}
-
 /// The hardcoded reasoning menu is limited to the exact built-in models it
 /// was verified against. `grok models` also lists user-defined custom models,
 /// whose effort support is not knowable from the ID, so they get no menu.
@@ -1088,22 +1064,22 @@ fn grok_reasoning_model(model: ProviderModel) -> ProviderModel {
     }
 }
 
-fn claude_reasoning_model(id: &str, name: &str) -> ProviderModel {
-    ProviderModel::new(id, name).reasoning(
-        reasoning_options(["low", "medium", "high", "xhigh", "max"]),
-        "high",
-    )
-}
-
-/// `ultracode` is an effort value Claude Code accepts alongside the ordinary
-/// ladder: it resolves to xhigh and turns on standing dynamic-workflow
-/// orchestration for that session. It therefore needs an xhigh-capable model —
-/// older ones clamp xhigh back to high, which would leave the entry inert.
-fn claude_ultracode_model(id: &str, name: &str) -> ProviderModel {
-    ProviderModel::new(id, name).reasoning(
-        reasoning_options(["low", "medium", "high", "xhigh", "max", "ultracode"]),
-        "high",
-    )
+/// Whether a discovered Claude entry supports the opt-in 1M window behind the
+/// `[1m]` model-id suffix. The CLI refuses the suffix on Claude 3,
+/// Opus 4.0/4.1/4.5, and Haiku 4.5, and non-Claude role mappings (e.g. a
+/// `default` alias resolving to another lab's model) take no suffix at all,
+/// so only supporting Claude families carry the choice.
+fn claude_supports_long_context(slug: &str) -> bool {
+    let slug = slug.to_ascii_lowercase();
+    let is_claude_family = ["claude", "opus", "sonnet", "haiku", "fable"]
+        .iter()
+        .any(|marker| slug.contains(marker));
+    if !is_claude_family {
+        return false;
+    }
+    !["claude-3", "opus-4-0", "opus-4-1", "opus-4-5", "haiku-4-5"]
+        .iter()
+        .any(|refused| slug.contains(refused))
 }
 
 /// Claude Code serves a 200K window by default and reaches the 1M one through
@@ -1244,6 +1220,13 @@ mod tests {
         path
     }
 
+    fn reasoning_options<const N: usize>(efforts: [&str; N]) -> Vec<ProviderModelOption> {
+        efforts
+            .into_iter()
+            .map(|effort| ProviderModelOption::new(effort, reasoning_effort_label(effort)))
+            .collect()
+    }
+
     #[test]
     fn model_cache_round_trips_and_rejects_empty_or_invalid_files() {
         let directory =
@@ -1283,8 +1266,63 @@ mod tests {
     }
 
     #[test]
-    fn claude_catalog_offers_ultracode_only_on_xhigh_capable_models() {
-        let models = fallback_models(ProviderKind::Claude);
+    fn claude_fallback_catalog_is_empty() {
+        // The catalog is account-specific and reported by the installed CLI,
+        // so discovery is authoritative and the pre-discovery picker is empty.
+        assert!(fallback_models(ProviderKind::Claude).is_empty());
+    }
+
+    #[test]
+    fn codex_fallback_catalog_is_empty() {
+        // The CLI reports its own catalog over `model/list`, so discovery is
+        // authoritative and the pre-discovery picker is empty.
+        assert!(fallback_models(ProviderKind::Codex).is_empty());
+    }
+
+    #[test]
+    fn discovered_claude_models_offer_ultracode_and_long_context() {
+        let models = parse_claude_models(&json!({
+            "type": "control_response",
+            "response": {"response": {"models": [
+                {
+                    "value": "opus",
+                    "resolvedModel": "claude-opus-5",
+                    "displayName": "Opus",
+                    "supportsEffort": true,
+                    "supportedEffortLevels": ["low", "medium", "high", "xhigh", "max"]
+                },
+                {
+                    "value": "legacy-opus",
+                    "resolvedModel": "claude-opus-4-5",
+                    "displayName": "Legacy Opus",
+                    "supportsEffort": true,
+                    "supportedEffortLevels": ["low", "medium", "high", "max"]
+                },
+                {
+                    "value": "haiku",
+                    "resolvedModel": "claude-haiku-4-5",
+                    "displayName": "Haiku"
+                },
+                {
+                    "value": "opus[1m]",
+                    "resolvedModel": "claude-opus-5",
+                    "displayName": "Opus (1M context)"
+                }
+            ]}}
+        }));
+        let windows = |id: &str| {
+            models
+                .iter()
+                .find(|model| model.id == id)
+                .map(|model| {
+                    model
+                        .context_windows
+                        .iter()
+                        .map(|option| option.id.clone())
+                        .collect::<Vec<_>>()
+                })
+                .unwrap_or_default()
+        };
         let efforts = |id: &str| {
             models
                 .iter()
@@ -1299,15 +1337,19 @@ mod tests {
                 .unwrap_or_default()
         };
 
+        // `ultracode` is offered wherever the probe metadata says xhigh is
+        // supported; the 1M window follows the supporting Claude families.
         assert_eq!(
-            efforts("claude-opus-5"),
+            efforts("opus"),
             ["low", "medium", "high", "xhigh", "max", "ultracode"]
         );
-        assert_eq!(
-            efforts("claude-sonnet-4-6"),
-            ["low", "medium", "high", "xhigh", "max"]
-        );
-        assert!(efforts("claude-haiku-4-5").is_empty());
+        assert_eq!(windows("opus"), ["200k", "1m"]);
+        assert_eq!(efforts("legacy-opus"), ["low", "medium", "high", "max"]);
+        assert!(windows("legacy-opus").is_empty());
+        assert!(windows("haiku").is_empty());
+        // An entry already carrying the `[1m]` suffix is the 1M variant, so
+        // it gains no context toggle of its own.
+        assert!(windows("opus[1m]").is_empty());
     }
 
     #[test]
@@ -1345,8 +1387,19 @@ mod tests {
             ["low", "medium", "high", "xhigh", "max", "ultracode"]
         );
         assert_eq!(models[0].default_reasoning_effort.as_deref(), Some("high"));
+        // A non-Claude role mapping takes no `[1m]` suffix; a Claude
+        // resolution carries the 1M choice even without effort support.
+        assert!(models[0].context_windows.is_empty());
         assert_eq!(models[1].name, "Sonnet");
         assert!(models[1].reasoning_efforts.is_empty());
+        assert_eq!(
+            models[1]
+                .context_windows
+                .iter()
+                .map(|option| option.id.as_str())
+                .collect::<Vec<_>>(),
+            ["200k", "1m"]
+        );
     }
 
     #[cfg(unix)]

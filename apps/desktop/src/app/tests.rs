@@ -2,7 +2,10 @@ use super::composer::{
     ComposerSubmitAction, composer_submit_action, dropped_file_mention, merged_submission,
     next_picker_highlight, visible_branch_entries,
 };
-use super::runtime::{merge_remote_session_catalog, session_has_active_provider_turn};
+use super::runtime::{
+    merge_remote_session_catalog, provider_is_installed, provider_is_usable,
+    resolve_usable_provider, session_has_active_provider_turn, stranded_draft_ids,
+};
 use super::settings::visible_settings_pages;
 use super::{
     ESCAPE_STOP_CONFIRMATION_TIMEOUT, EscapeStopConfirmation, EscapeStopPress, EscapeStopTarget,
@@ -2072,8 +2075,8 @@ fn the_picker_is_empty_only_once_detection_has_answered() {
         models: vec![ProviderModel::new("model", "model")],
         agent_presets: Vec::new(),
     };
-    // What every probe looks like before detection answers: seeded with a
-    // fallback catalog and not yet installed.
+    // What every probe looks like before detection answers: seeded empty
+    // and not yet installed.
     let undetected = [
         probe(ProviderKind::Claude, false),
         probe(ProviderKind::Codex, false),
@@ -2157,4 +2160,98 @@ fn the_rail_draws_only_installed_providers_the_settings_left_on() {
         Some(ProviderKind::Claude),
         ProviderKind::Claude
     ));
+}
+
+#[test]
+fn uninstalled_providers_are_never_usable_for_new_work() {
+    use crate::model::{ProviderModel, ProviderProbe};
+
+    // A stale model list alone must not make a provider usable: only the
+    // `installed` flag does. The uninstalled entry below deliberately keeps
+    // its models to pin the Claude regression — a probe with models but no
+    // CLI behind it.
+    let probe = |provider: ProviderKind, installed: bool| ProviderProbe {
+        provider,
+        installed,
+        path: installed.then(|| std::path::PathBuf::from(format!("/bin/{}", provider.id()))),
+        models: vec![ProviderModel::new("model", "model")],
+        agent_presets: Vec::new(),
+    };
+    let probes = [
+        probe(ProviderKind::Claude, false),
+        probe(ProviderKind::Codex, true),
+    ];
+
+    assert!(!provider_is_installed(&probes, ProviderKind::Claude));
+    assert!(provider_is_installed(&probes, ProviderKind::Codex));
+    assert!(!provider_is_usable(&probes, &[], ProviderKind::Claude));
+    assert!(provider_is_usable(&probes, &[], ProviderKind::Codex));
+    // Switched off in settings: installed, but still not usable for new work.
+    assert!(!provider_is_usable(
+        &probes,
+        &[ProviderKind::Codex],
+        ProviderKind::Codex
+    ));
+
+    // New work falls back to the first usable provider...
+    assert_eq!(
+        resolve_usable_provider(ProviderKind::Claude, &probes, &[]),
+        ProviderKind::Codex
+    );
+    // ...keeps a usable request...
+    assert_eq!(
+        resolve_usable_provider(ProviderKind::Codex, &probes, &[]),
+        ProviderKind::Codex
+    );
+    // ...and keeps the request when nothing can back it, so the empty state
+    // names the fix instead of inventing a choice.
+    let none_usable = [probe(ProviderKind::Claude, false)];
+    assert_eq!(
+        resolve_usable_provider(ProviderKind::Claude, &none_usable, &[]),
+        ProviderKind::Claude
+    );
+}
+
+#[test]
+fn detection_migration_only_moves_unstarted_drafts_off_unusable_providers() {
+    use crate::model::{ProviderModel, ProviderProbe};
+
+    let probe = |provider: ProviderKind, installed: bool| ProviderProbe {
+        provider,
+        installed,
+        path: installed.then(|| std::path::PathBuf::from(format!("/bin/{}", provider.id()))),
+        models: vec![ProviderModel::new("model", "model")],
+        agent_presets: Vec::new(),
+    };
+    let probes = [
+        probe(ProviderKind::Claude, false),
+        probe(ProviderKind::Codex, true),
+    ];
+    let project = Uuid::new_v4();
+    let draft_on_missing = AgentSession::new(project, ProviderKind::Claude);
+    let draft_on_usable = AgentSession::new(project, ProviderKind::Codex);
+    // A stored skeleton counts as started even before its transcript loads.
+    let mut started_on_missing = AgentSession::new(project, ProviderKind::Claude);
+    started_on_missing.detail_loaded = false;
+    let sessions = [
+        draft_on_missing.clone(),
+        draft_on_usable.clone(),
+        started_on_missing.clone(),
+    ];
+
+    // Only the unstarted draft on the missing CLI moves; the started session
+    // keeps its provider and the usable draft is untouched.
+    assert_eq!(
+        stranded_draft_ids(&sessions, &probes, &[]),
+        vec![draft_on_missing.id]
+    );
+    // The remembered default follows the same rule.
+    assert_eq!(
+        resolve_usable_provider(ProviderKind::Claude, &probes, &[]),
+        ProviderKind::Codex
+    );
+    assert_eq!(
+        resolve_usable_provider(ProviderKind::Codex, &probes, &[]),
+        ProviderKind::Codex
+    );
 }

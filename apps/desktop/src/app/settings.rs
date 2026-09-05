@@ -3028,6 +3028,11 @@ impl Padu {
         enabled: bool,
         cx: &mut Context<Self>,
     ) {
+        // The toggle is hidden for uninstalled providers, but guard anyway:
+        // enabling a provider with no CLI must not mark it usable for new work.
+        if enabled && !super::runtime::provider_is_installed(&self.probes, provider) {
+            return;
+        }
         if enabled {
             self.state
                 .disabled_providers
@@ -3927,7 +3932,14 @@ impl Padu {
             terminal.update(cx, |terminal, cx| terminal.refresh_localized_text(cx));
         }
         for probe in &mut self.probes {
-            probe.models = crate::model_catalog::fallback_models(probe.provider);
+            // Re-translate fallback labels; uninstalled providers stay empty
+            // so no selection path can offer a provider with no CLI behind it.
+            if probe.installed {
+                probe.models = crate::model_catalog::fallback_models(probe.provider);
+            } else {
+                probe.models = Vec::new();
+                probe.agent_presets = Vec::new();
+            }
         }
         self.refresh_provider_detection(None);
         self.invalidate_composer_sources(cx);
