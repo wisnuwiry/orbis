@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { PaduIcon } from '@/components/padu-icon'
 import { useI18n } from '@/lib/i18n'
 import { useMacLikePlatform } from '@/lib/platform'
+import { Kbd } from './ui/kbd'
 
 export interface KeybindingItem {
   titleKey: string
@@ -302,9 +303,9 @@ export function KeybindingsSettings() {
                         {t(item.descKey)}
                       </div>
                     </div>
-                    <div className="flex h-6 min-w-8 shrink-0 items-center justify-center rounded-md border border-[var(--border-strong)] bg-background px-2 font-mono text-[12px] font-medium text-[var(--text-secondary)] shadow-2xs">
+                    <Kbd size="md">
                       {isMac ? item.mac : item.other}
-                    </div>
+                    </Kbd>
                   </div>
                 </div>
               ))}
