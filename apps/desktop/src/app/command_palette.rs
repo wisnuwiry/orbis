@@ -2247,7 +2247,7 @@ impl Padu {
                                     .justify_center()
                                     .bg(theme.overlay_strong)
                                     .child(icon(
-                                        "icons/corner-down-right.svg",
+                                        "icons/corner-down-left.svg",
                                         10.0,
                                         theme.text_tertiary,
                                     )),

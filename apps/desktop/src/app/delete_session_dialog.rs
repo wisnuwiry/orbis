@@ -147,12 +147,17 @@ impl Padu {
             .cursor_pointer()
             .text_size(sp(13.0))
             .font_weight(FontWeight::MEDIUM)
-            .bg(theme.danger)
-            .text_color(rgb(0xFFFFFF))
-            .hover(|s| s.bg(theme.danger_soft))
-            .focus_visible(|s| s.border_1().border_color(rgb(0xFFFFFF)))
+            .bg(theme.inverse)
+            .text_color(theme.on_inverse)
+            .hover(|s| s.opacity(0.9))
+            .focus_visible(|s| s.border_1().border_color(theme.accent))
             .child(tr!("session.delete_confirm"))
-            .child(kbd_badge_on_danger("↵"))
+            .child(kbd_badge_icon(
+                "icons/corner-down-left.svg",
+                theme.inverse,
+                theme.on_inverse,
+                gpui::hsla(0.0, 0.0, 1.0, 0.2),
+            ))
             .on_click(cx.listener(|padu, _, window, cx| {
                 padu.execute_delete_session_dialog(window, cx);
             }))
@@ -197,11 +202,11 @@ impl Padu {
                         div()
                             .size(px(32.0))
                             .rounded(px(8.0))
-                            .bg(theme.danger_soft)
+                            .bg(theme.overlay)
                             .flex()
                             .items_center()
                             .justify_center()
-                            .child(icon("icons/trash.svg", 16.0, theme.danger)),
+                            .child(icon("icons/trash.svg", 16.0, theme.text_secondary)),
                     )
                     .child(
                         div()

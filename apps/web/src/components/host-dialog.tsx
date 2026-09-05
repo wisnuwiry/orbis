@@ -182,7 +182,9 @@ export function HostDialog({
                 </Button>
                 <Button className="gap-1.5" disabled={busy} size="sm" type="submit">
                   <span>{saveLabel}</span>
-                  <Kbd size="xs" variant="subtle">↵</Kbd>
+                  <Kbd size="xs" variant="onPrimary" className="px-1">
+                    <PaduIcon name="cornerDownLeft" className="size-2.5" />
+                  </Kbd>
                 </Button>
               </div>
             </div>

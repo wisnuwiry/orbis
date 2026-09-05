@@ -84,13 +84,26 @@ pub(super) fn kbd_badge(label: impl Into<SharedString>, theme: &Theme) -> AnyEle
     )
 }
 
-pub(super) fn kbd_badge_on_danger(label: impl Into<SharedString>) -> AnyElement {
-    kbd_badge_styled(
-        label,
-        gpui::hsla(0.0, 0.0, 0.0, 0.25),
-        gpui::rgb(0xFFFFFF).into(),
-        gpui::hsla(0.0, 0.0, 1.0, 0.2),
-    )
+pub(super) fn kbd_badge_icon(
+    icon_path: &'static str,
+    bg: Hsla,
+    icon_color: Hsla,
+    border_color: Hsla,
+) -> AnyElement {
+    div()
+        .h(px(20.0))
+        .min_w(px(20.0))
+        .px(px(4.0))
+        .rounded(px(5.0))
+        .flex_none()
+        .flex()
+        .items_center()
+        .justify_center()
+        .bg(bg)
+        .border_1()
+        .border_color(border_color)
+        .child(icon(icon_path, 9.5, icon_color))
+        .into_any_element()
 }
 
 pub(super) fn format_message_time(created_at: u64) -> String {

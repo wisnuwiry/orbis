@@ -19,6 +19,7 @@ export const PADU_ICONS = {
   command: 'i-padu-command',
   compose: 'i-padu-compose',
   copy: 'i-padu-copy',
+  cornerDownLeft: 'i-padu-corner-down-left',
   cornerDownRight: 'i-padu-corner-down-right',
   ellipsis: 'i-padu-ellipsis',
   eye: 'i-padu-eye',

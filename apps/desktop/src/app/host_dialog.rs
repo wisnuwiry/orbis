@@ -507,8 +507,8 @@ impl Padu {
                                     .items_center()
                                     .justify_center()
                                     .child(save_label)
-                                    .child(kbd_badge_styled(
-                                        "↵",
+                                    .child(kbd_badge_icon(
+                                        "icons/corner-down-left.svg",
                                         theme.inverse,
                                         theme.on_inverse,
                                         gpui::hsla(0.0, 0.0, 1.0, 0.2),

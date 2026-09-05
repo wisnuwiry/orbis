@@ -11,6 +11,8 @@ const kbdVariants = cva(
         outline: 'rounded-[5px] border border-border bg-transparent text-[var(--text-secondary)]',
         subtle: 'rounded-[5px] bg-[color:var(--foreground)]/[0.07] text-[var(--text-tertiary)]',
         inverse: 'rounded-[5px] bg-black/25 text-white border border-white/20',
+        onPrimary:
+          'rounded-[5px] bg-primary-foreground/15 text-primary-foreground border border-primary-foreground/20',
       },
       size: {
         xs: 'h-4 min-w-4 px-1 text-[10px]',

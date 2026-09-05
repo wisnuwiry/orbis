@@ -55,12 +55,19 @@ export function ConfirmDialog({
     onCancel?.()
   }
 
+  const handleConfirm = async () => {
+    await onConfirm()
+    onOpenChange(false)
+  }
+
   const isDanger = variant === 'danger'
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="max-w-[420px]"
+        showCloseButton={false}
+        initialFocus={confirmButtonRef}
         onKeyDown={(event) => {
           if (event.key === 'ArrowLeft') {
             event.preventDefault()
@@ -68,16 +75,27 @@ export function ConfirmDialog({
           } else if (event.key === 'ArrowRight') {
             event.preventDefault()
             confirmButtonRef.current?.focus()
+          } else if (event.key === 'Enter') {
+            if (document.activeElement === cancelButtonRef.current) {
+              event.preventDefault()
+              handleClose()
+              return
+            }
+            event.preventDefault()
+            void handleConfirm()
+          } else if (event.key === 'Escape') {
+            event.preventDefault()
+            handleClose()
           }
         }}
       >
         <DialogHeader>
-          <DialogTitle className={cn('flex items-center gap-2.5', isDanger && 'text-danger')}>
+          <DialogTitle className={cn('flex items-center gap-2.5', isDanger && 'text-destructive')}>
             {icon && (
               <span
                 className={cn(
                   'grid size-8 place-items-center rounded-lg',
-                  isDanger ? 'bg-danger/10 text-danger' : 'bg-accent text-[var(--text-secondary)]',
+                  isDanger ? 'bg-[var(--danger-soft)] text-destructive' : 'bg-accent text-[var(--text-secondary)]',
                 )}
               >
                 <PaduIcon name={icon} className="size-4" />
@@ -106,21 +124,19 @@ export function ConfirmDialog({
             className={cn(
               'flex h-8 items-center gap-1.5 rounded-lg px-3.5 text-xs font-medium focus-visible:ring-1 focus-visible:ring-ring cursor-pointer',
               isDanger
-                ? 'bg-danger text-white hover:bg-danger/90'
+                ? 'bg-destructive text-white hover:bg-destructive/90'
                 : 'bg-primary text-primary-foreground hover:bg-primary/90',
             )}
-            onClick={async () => {
-              await onConfirm()
-              onOpenChange(false)
-            }}
+            onClick={handleConfirm}
           >
             <span>{confirmLabel ?? (isDanger ? t('common.remove') : t('common.confirm'))}</span>
             {showShortcuts && (
               <Kbd
                 size="xs"
-                variant={isDanger ? 'inverse' : 'subtle'}
+                variant={isDanger ? 'inverse' : 'onPrimary'}
+                className="px-1"
               >
-                ↵
+                <PaduIcon name="cornerDownLeft" className="size-2.5" />
               </Kbd>
             )}
           </button>

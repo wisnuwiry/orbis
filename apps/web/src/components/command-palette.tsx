@@ -499,7 +499,7 @@ export function CommandPalette({
           </span>
           <span className="flex items-center gap-1.5">
             <Kbd variant="subtle" size="sm" className="px-1.5">
-              <PaduIcon className="size-3" name="cornerDownRight" />
+              <PaduIcon className="size-3" name="cornerDownLeft" />
             </Kbd>
             Select
           </span>
