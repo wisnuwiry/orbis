@@ -899,6 +899,7 @@ impl Padu {
                                 match workspace.request(padu_client::WorkspaceOperation::ListTree {
                                     root: path,
                                     expanded_paths: expanded.into_iter().collect(),
+                                    show_hidden: false,
                                 }) {
                                     Ok(padu_client::WorkspaceResult::WorkingTree { entries }) => {
                                         entries
@@ -910,6 +911,7 @@ impl Padu {
                                                 absolute_path: entry.absolute_path,
                                                 name: entry.name,
                                                 is_dir: entry.is_dir,
+                                                is_ignored: entry.is_ignored,
                                                 expanded: entry.expanded,
                                                 depth: entry.depth,
                                             })

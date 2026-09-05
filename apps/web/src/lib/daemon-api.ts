@@ -295,6 +295,7 @@ export async function listWorkspaceTree(
     type: 'listTree',
     root,
     expanded_paths: expandedPaths,
+    show_hidden: false,
   })
   if (result.type !== 'workingTree') throw new Error('The daemon returned an unexpected file tree')
   return result.entries

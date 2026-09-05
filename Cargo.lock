@@ -5174,6 +5174,7 @@ dependencies = [
  "chrono",
  "crossbeam-channel",
  "dirs",
+ "ignore",
  "libc",
  "nucleo-matcher",
  "objc2-foundation 0.3.2",
