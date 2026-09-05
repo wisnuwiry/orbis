@@ -1255,6 +1255,7 @@ export function PaduApp() {
             setPanelFullscreenForSession(activePanelSessionId, { expanded: false, conversation: false })
           }}
           onTogglePanel={toggleRightPanel}
+          panelVisible={rightPanelVisible}
           project={activeProject}
           session={activeSession}
           showingConversation={panelFullscreen.expanded && panelExpandable && panelFullscreen.conversation}
@@ -1536,6 +1537,7 @@ function TaskHeader({
   session,
   project,
   sidebarVisible,
+  panelVisible = false,
   fullscreen = false,
   showingConversation = false,
   tabs = [],
@@ -1555,6 +1557,7 @@ function TaskHeader({
   session: AgentSession | null
   project?: Project
   sidebarVisible: boolean
+  panelVisible?: boolean
   fullscreen?: boolean
   showingConversation?: boolean
   tabs?: PanelTab[]
@@ -1711,7 +1714,7 @@ function TaskHeader({
         </Tooltip>
       )}
 
-      {!fullscreen && (
+      {!fullscreen && !panelVisible && (
         <Tooltip content={t('right_panel.toggle')} shortcut={rightPanelShortcut}>
           <Button aria-label={t('right_panel.toggle')} size="icon-sm" variant="ghost" onClick={onTogglePanel}>
             <PaduIcon name="panelRight" />
@@ -2068,7 +2071,7 @@ function NoProjectState({
   return (
     <div className="flex min-h-0 flex-1 items-center justify-center px-8 pb-12">
       <div className="max-w-sm text-center">
-        <PaduIcon className="mx-auto size-6 text-ring" name="sparkle" />
+        <PaduIcon className="mx-auto size-10 text-ring sm:size-12 lg:size-14" name="logo" />
         <h2 className="mt-4 text-xl font-medium">{t('onboarding.open_project_to_begin')}</h2>
         <p className="mt-2 text-[12.5px] leading-[19px] text-[var(--text-tertiary)]">
           {t('onboarding.web_description')}
