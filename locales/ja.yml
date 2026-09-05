@@ -19,6 +19,8 @@ menu.command_palette: コマンドパレット…
 menu.toggle_sidebar: サイドバーの表示を切り替える
 menu.toggle_right_panel: 右パネルの表示を切り替える
 menu.toggle_right_panel_fullscreen: 右パネルを全画面表示に切り替える
+menu.next_tab: 次のタブ
+menu.previous_tab: 前のタブ
 menu.open_browser: ブラウザを開く
 menu.open_terminal: ターミナルを開く
 menu.open_files: ファイルを開く

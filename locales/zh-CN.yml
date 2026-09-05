@@ -19,6 +19,8 @@ menu.command_palette: 命令面板…
 menu.toggle_sidebar: 显示或隐藏侧边栏
 menu.toggle_right_panel: 显示或隐藏右侧面板
 menu.toggle_right_panel_fullscreen: 切换右侧面板全屏
+menu.next_tab: 下一个标签页
+menu.previous_tab: 上一个标签页
 menu.open_browser: 打开浏览器
 menu.open_terminal: 打开终端
 menu.open_files: 打开文件

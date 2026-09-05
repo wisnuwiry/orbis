@@ -38,6 +38,10 @@ menu.toggle_right_panel:
   en: Toggle Right Panel
 menu.toggle_right_panel_fullscreen:
   en: Toggle Right Panel Fullscreen
+menu.next_tab:
+  en: Next Tab
+menu.previous_tab:
+  en: Previous Tab
 menu.open_browser:
   en: Open Browser
 menu.open_terminal:

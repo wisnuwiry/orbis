@@ -18,6 +18,8 @@ menu.command_palette: Palet Perintah…
 menu.toggle_sidebar: Alihkan Bilah Sisi
 menu.toggle_right_panel: Alihkan Panel Kanan
 menu.toggle_right_panel_fullscreen: Alihkan Panel Kanan Layar Penuh
+menu.next_tab: Tab Berikutnya
+menu.previous_tab: Tab Sebelumnya
 menu.open_browser: Buka Browser
 menu.open_terminal: Buka Terminal
 menu.open_files: Buka Berkas
