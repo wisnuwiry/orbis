@@ -2098,7 +2098,7 @@ impl Padu {
     pub(super) fn toggle_right_panel_fullscreen_action(
         &mut self,
         _: &ToggleRightPanelFullscreen,
-        _: &mut Window,
+        window: &mut Window,
         cx: &mut Context<Self>,
     ) {
         if !self.right_panel_fullscreen_active() && !self.right_panel_can_expand() {
@@ -2111,13 +2111,20 @@ impl Padu {
             self.right_panel_fullscreen_conversation = false;
         }
         self.set_right_panel_fullscreen(next, cx);
+        if next {
+            self.focus_active_surface(window, cx);
+        }
     }
 
     fn focus_active_surface(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         match self.active_right_panel_surface() {
             Some(RightPanelSurface::Diff) => {
-                let focus = self.transcript_control_focus("right-panel-diff-tree", cx);
+                let focus = self.transcript_control_focus("right-panel-diff", cx);
                 window.focus(&focus, cx);
+                let next_focus = focus.clone();
+                window.on_next_frame(move |window, cx| {
+                    window.focus(&next_focus, cx);
+                });
             }
             Some(RightPanelSurface::Files | RightPanelSurface::File(_)) => {
                 if let Some(path) = self.visible_right_panel_file_path()
@@ -2125,9 +2132,17 @@ impl Padu {
                 {
                     let focus = editor.state.read(cx).focus();
                     window.focus(&focus, cx);
+                    let next_focus = focus.clone();
+                    window.on_next_frame(move |window, cx| {
+                        window.focus(&next_focus, cx);
+                    });
                 } else {
                     let focus = self.transcript_control_focus("right-panel-working-tree", cx);
                     window.focus(&focus, cx);
+                    let next_focus = focus.clone();
+                    window.on_next_frame(move |window, cx| {
+                        window.focus(&next_focus, cx);
+                    });
                 }
             }
             Some(RightPanelSurface::Terminal(_)) => {
@@ -2161,6 +2176,10 @@ impl Padu {
                 self.right_panel_fullscreen_conversation = true;
                 let composer_focus = self.composer_focus(cx);
                 window.focus(&composer_focus, cx);
+                let next_focus = composer_focus.clone();
+                window.on_next_frame(move |window, cx| {
+                    window.focus(&next_focus, cx);
+                });
                 cx.notify();
             }
             Some(index) => {
@@ -2229,6 +2248,10 @@ impl Padu {
         if let Some(window) = window {
             let composer_focus = self.composer_focus(cx);
             window.focus(&composer_focus, cx);
+            let next_focus = composer_focus.clone();
+            window.on_next_frame(move |window, cx| {
+                window.focus(&next_focus, cx);
+            });
         }
         cx.notify();
     }
@@ -4395,7 +4418,7 @@ impl Padu {
         panel_width: f32,
         window: &mut Window,
         cx: &mut Context<Self>,
-    ) -> Div {
+    ) -> Stateful<Div> {
         let theme = Theme::current(cx);
         let toolbar = self.render_right_panel_diff_toolbar(cx);
         let content = match self.right_panel_diff_snapshot.clone() {
@@ -4451,7 +4474,20 @@ impl Padu {
                 .into_any_element(),
         };
 
+        let focus = self.transcript_control_focus("right-panel-diff", cx);
+
         div()
+            .id("right-panel-diff")
+            .track_focus(&focus)
+            .tab_index(0)
+            .key_context("ReviewDiff")
+            .on_mouse_down(
+                MouseButton::Left,
+                cx.listener(|this, _, window, cx| {
+                    let focus = this.transcript_control_focus("right-panel-diff", cx);
+                    window.focus(&focus, cx);
+                }),
+            )
             .flex_1()
             .min_h_0()
             .min_w_0()
@@ -4621,6 +4657,14 @@ impl Padu {
         }
         let entity = cx.entity().downgrade();
         div()
+            .id("right-panel-unified-diff")
+            .on_mouse_down(
+                MouseButton::Left,
+                cx.listener(|this, _, window, cx| {
+                    let focus = this.transcript_control_focus("right-panel-diff", cx);
+                    window.focus(&focus, cx);
+                }),
+            )
             .flex_1()
             .min_h_0()
             .min_w_0()
@@ -5009,6 +5053,13 @@ impl Padu {
                     .on_key_down(cx.listener(|this, event: &KeyDownEvent, window, cx| {
                         this.right_panel_diff_tree_key_down(event, window, cx)
                     }))
+                    .on_mouse_down(
+                        MouseButton::Left,
+                        cx.listener(|this, _, window, cx| {
+                            let focus = this.transcript_control_focus("right-panel-diff-tree", cx);
+                            window.focus(&focus, cx);
+                        }),
+                    )
                     .child(
                         list(
                             self.right_panel_diff_tree_list_state.clone(),
@@ -5198,6 +5249,13 @@ impl Padu {
     ) -> Div {
         let theme = Theme::current(cx);
         div()
+            .on_mouse_down(
+                MouseButton::Left,
+                cx.listener(|this, _, window, cx| {
+                    let focus = this.transcript_control_focus("right-panel-diff", cx);
+                    window.focus(&focus, cx);
+                }),
+            )
             .flex_1()
             .min_h_0()
             .flex()
