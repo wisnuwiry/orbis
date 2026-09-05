@@ -530,8 +530,19 @@ export function PaduApp() {
       if (key === 't') {
         event.preventDefault()
         if (rightPanelVisible && requestedPanel === 'terminal') {
-          toggleRightPanel()
+          if (panelFullscreen.expanded) {
+            if (activeSession) {
+              setPanelFullscreenForSession(activeSession.id, {
+                conversation: !panelFullscreen.conversation,
+              })
+            }
+          } else {
+            toggleRightPanel()
+          }
         } else {
+          if (panelFullscreen.expanded && activeSession) {
+            setPanelFullscreenForSession(activeSession.id, { conversation: false })
+          }
           openPanel('terminal')
         }
         return
@@ -540,8 +551,19 @@ export function PaduApp() {
         if (!activeProject || isProjectlessProject(activeProject)) return
         event.preventDefault()
         if (rightPanelVisible && requestedPanel === 'files') {
-          toggleRightPanel()
+          if (panelFullscreen.expanded) {
+            if (activeSession) {
+              setPanelFullscreenForSession(activeSession.id, {
+                conversation: !panelFullscreen.conversation,
+              })
+            }
+          } else {
+            toggleRightPanel()
+          }
         } else {
+          if (panelFullscreen.expanded && activeSession) {
+            setPanelFullscreenForSession(activeSession.id, { conversation: false })
+          }
           openPanel('files')
         }
         return
@@ -550,8 +572,19 @@ export function PaduApp() {
         if (!activeProject || isProjectlessProject(activeProject)) return
         event.preventDefault()
         if (rightPanelVisible && requestedPanel === 'changes') {
-          toggleRightPanel()
+          if (panelFullscreen.expanded) {
+            if (activeSession) {
+              setPanelFullscreenForSession(activeSession.id, {
+                conversation: !panelFullscreen.conversation,
+              })
+            }
+          } else {
+            toggleRightPanel()
+          }
         } else {
+          if (panelFullscreen.expanded && activeSession) {
+            setPanelFullscreenForSession(activeSession.id, { conversation: false })
+          }
           openPanel('changes')
         }
         return
