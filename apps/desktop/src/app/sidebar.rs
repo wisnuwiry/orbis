@@ -846,7 +846,7 @@ impl Padu {
             .child(search)
     }
 
-    fn start_available_update(&mut self, cx: &mut Context<Self>) {
+    pub(super) fn start_available_update(&mut self, cx: &mut Context<Self>) {
         if self.updater_status != crate::updater::UpdateStatus::Available {
             return;
         }
@@ -968,7 +968,7 @@ impl Padu {
         )
     }
 
-    fn check_for_updates(&mut self, cx: &mut Context<Self>) {
+    pub(super) fn check_for_updates(&mut self, cx: &mut Context<Self>) {
         if let Some(updater) = cx
             .try_global::<crate::updater::UpdaterState>()
             .and_then(|state| state.0.as_ref())

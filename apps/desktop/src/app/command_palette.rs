@@ -982,6 +982,12 @@ impl Padu {
                 "icons/cursor-spark.svg",
                 "settings preferences computer use accessibility screen recording",
             ),
+            (
+                SettingsPage::About,
+                "settings.about",
+                "icons/info.svg",
+                "settings preferences about info version update host connected github sponsor",
+            ),
         ] {
             if !page.is_visible_in_navigation() {
                 continue;

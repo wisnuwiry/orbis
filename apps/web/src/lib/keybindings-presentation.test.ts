@@ -17,6 +17,7 @@ describe('keybindings settings parity', () => {
       'skills',
       'usage',
       'daemon',
+      'about',
     ])
 
     const keybindingsPage = SETTINGS_PAGES.find((p) => p.id === 'keybindings')

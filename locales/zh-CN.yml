@@ -96,6 +96,7 @@ settings.providers: 服务商
 settings.usage: 用量
 settings.daemon: 主机与守护进程
 settings.computer_use: 电脑操作
+settings.about: 关于
 settings.general_keywords: 通用 本地 项目 对话 隐私 匿名 使用数据 分析 分享 更新 自动 版本
 settings.appearance_keywords: 外观 主题 系统 浅色 深色 语言 英语 中文 简体 字号 字体 大小 编辑器
 settings.keybindings_keywords: 快捷键 键盘 按键 绑定 热键 命令 操作 导航 窗口 浏览器
@@ -105,6 +106,27 @@ settings.skills_keywords: 技能 技能库 智能体 禁用 启用 删除 claude
 settings.usage_keywords: 用量 令牌 费用 支出 缓存 每日 图表 模型 明细 历史 claude codex
 settings.daemon_keywords: 主机 远程 服务器 云主机 守护进程 服务 网页 网络 暴露 来源 令牌 端口 websocket ssh 局域网
 settings.computer_use_keywords: 电脑操作 屏幕录制 辅助功能 应用 控制 codex
+settings.about_keywords: 关于 信息 版本 更新 检查更新 主机 已连接 github 仓库 赞助 支持
+about.tagline: 面向本地编码智能体的高性能原生控制台
+about.app_version: 应用版本
+about.check_for_updates: 检查更新
+about.checking_for_updates: 正在检查更新...
+about.up_to_date: 已是最新版本
+about.update_available: 有新版本可用
+about.install_update: 安装并重启
+about.connected_host: 已连接的主机
+about.connected_host_description: 运行智能体会话的活跃守护进程主机
+about.local_daemon: 本地守护进程
+about.remote_host: 远程主机
+about.manage_hosts: 管理主机
+about.community: 社区与支持
+about.website: 官方网站
+about.website_description: 官方网站与文档
+about.github: GitHub
+about.github_description: 源代码、发行说明与问题跟踪
+about.sponsor: 赞助支持
+about.sponsor_description: 在 GitHub Sponsors 上支持 Padu 的开发
+about.open_in_browser: 在浏览器中打开
 keybindings.section_general: 通用与窗口
 keybindings.section_navigation: 导航与面板
 keybindings.section_chat: 对话与输入

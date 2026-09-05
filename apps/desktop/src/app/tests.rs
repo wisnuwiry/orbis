@@ -1888,11 +1888,13 @@ fn settings_search_filters_pages_for_arrow_cycling() {
     if cfg!(all(debug_assertions, target_os = "macos")) {
         all_pages.push(SettingsPage::ComputerUse);
     }
+    all_pages.push(SettingsPage::About);
     assert_eq!(pages(""), all_pages);
 
     assert_eq!(pages("theme"), vec![SettingsPage::Appearance]);
     assert_eq!(pages("shortcut"), vec![SettingsPage::Keybindings]);
     assert_eq!(pages("skill"), vec![SettingsPage::Skills]);
+    assert_eq!(pages("sponsor"), vec![SettingsPage::About]);
 
     // A keyword shared across pages keeps them all reachable.
     let mut codex_pages = vec![
@@ -1913,6 +1915,7 @@ fn computer_use_navigation_is_macos_debug_only() {
     use super::SettingsPage;
 
     assert!(SettingsPage::General.is_visible_in_navigation());
+    assert!(SettingsPage::About.is_visible_in_navigation());
     assert_eq!(
         SettingsPage::ComputerUse.is_visible_in_navigation(),
         cfg!(all(debug_assertions, target_os = "macos"))
