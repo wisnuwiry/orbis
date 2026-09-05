@@ -1,7 +1,7 @@
 use super::*;
 
 impl Padu {
-    pub(super) fn render_right_panel_diff(
+    pub(crate) fn render_right_panel_diff(
         &mut self,
         panel_width: f32,
         window: &mut Window,
@@ -90,7 +90,7 @@ impl Padu {
             .child(self.right_panel_diff_selection_input())
     }
 
-    pub(super) fn render_right_panel_diff_toolbar(&self, cx: &mut Context<Self>) -> AnyElement {
+    pub(crate) fn render_right_panel_diff_toolbar(&self, cx: &mut Context<Self>) -> AnyElement {
         let theme = Theme::current(cx);
         let selected = self.right_panel_diff_source;
         let latest_turn = self.latest_review_turn_source();
@@ -229,7 +229,7 @@ impl Padu {
             .into_any_element()
     }
 
-    pub(super) fn render_right_panel_unified_diff(
+    pub(crate) fn render_right_panel_unified_diff(
         &self,
         snapshot: Arc<ReviewDiffSnapshot>,
         cx: &mut Context<Self>,
@@ -280,7 +280,7 @@ impl Padu {
             .into_any_element()
     }
 
-    pub(super) fn render_right_panel_diff_line(
+    pub(crate) fn render_right_panel_diff_line(
         &self,
         index: usize,
         cx: &mut Context<Self>,
@@ -506,7 +506,7 @@ impl Padu {
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub(super) fn render_right_panel_diff_gap_action(
+    pub(crate) fn render_right_panel_diff_gap_action(
         &self,
         line_index: usize,
         gap_id: u64,
@@ -573,7 +573,7 @@ impl Padu {
             }))
     }
 
-    pub(super) fn expand_right_panel_diff_gap(
+    pub(crate) fn expand_right_panel_diff_gap(
         &mut self,
         line_index: usize,
         direction: crate::review_diff::ExpansionDirection,
@@ -593,7 +593,7 @@ impl Padu {
 
     /// One listener set covers every selectable code line registered while
     /// the virtualized Review list paints this frame.
-    pub(super) fn right_panel_diff_selection_input(&self) -> impl IntoElement {
+    pub(crate) fn right_panel_diff_selection_input(&self) -> impl IntoElement {
         let selection = self.right_panel_diff_selection.clone();
         canvas(
             |_, _, _| (),
@@ -604,7 +604,7 @@ impl Padu {
         .h(px(0.0))
     }
 
-    pub(super) fn render_right_panel_diff_tree(
+    pub(crate) fn render_right_panel_diff_tree(
         &mut self,
         window: &mut Window,
         cx: &mut Context<Self>,
@@ -684,7 +684,7 @@ impl Padu {
             )
     }
 
-    pub(super) fn render_right_panel_diff_tree_row(
+    pub(crate) fn render_right_panel_diff_tree_row(
         &self,
         index: usize,
         tree_focused: bool,
@@ -837,7 +837,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn latest_review_turn_source(&self) -> Option<ReviewDiffSource> {
+    pub(crate) fn latest_review_turn_source(&self) -> Option<ReviewDiffSource> {
         let session = self.selected_session()?;
         session
             .turns
@@ -857,7 +857,7 @@ impl Padu {
             })
     }
 
-    pub(super) fn review_diff_source_label(&self, source: ReviewDiffSource) -> String {
+    pub(crate) fn review_diff_source_label(&self, source: ReviewDiffSource) -> String {
         match source {
             ReviewDiffSource::LastTurn { .. }
                 if self.latest_review_turn_source() == Some(source) =>
@@ -875,7 +875,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn set_right_panel_diff_source(
+    pub(crate) fn set_right_panel_diff_source(
         &mut self,
         source: ReviewDiffSource,
         cx: &mut Context<Self>,
@@ -898,7 +898,7 @@ impl Padu {
     /// Captures one stable Git range and turns it into render-ready rows. Git,
     /// patch parsing, and syntax tokenization all stay off the UI thread; the
     /// generation check prevents an old source or session from landing late.
-    pub(super) fn refresh_right_panel_diff(&mut self, cx: &mut Context<Self>) {
+    pub(crate) fn refresh_right_panel_diff(&mut self, cx: &mut Context<Self>) {
         let Some(session_id) = self.state.selected_session else {
             self.right_panel_diff_selection.clear();
             self.right_panel_diff_snapshot = None;
@@ -1015,7 +1015,7 @@ impl Padu {
         .detach();
     }
 
-    pub(super) fn sync_right_panel_diff_tree_rows(&mut self, cx: &mut Context<Self>) {
+    pub(crate) fn sync_right_panel_diff_tree_rows(&mut self, cx: &mut Context<Self>) {
         let filter = self.right_panel_diff_filter.read(cx).content().to_owned();
         let previous_cursor_row = self
             .right_panel_diff_tree_cursor
@@ -1068,7 +1068,7 @@ impl Padu {
             .reset_with_uniform_height(row_count, px(30.0));
     }
 
-    pub(super) fn toggle_right_panel_diff_directory(
+    pub(crate) fn toggle_right_panel_diff_directory(
         &mut self,
         path: String,
         cx: &mut Context<Self>,
@@ -1080,7 +1080,7 @@ impl Padu {
         cx.notify();
     }
 
-    pub(super) fn select_right_panel_diff_file(
+    pub(crate) fn select_right_panel_diff_file(
         &mut self,
         file_index: usize,
         cx: &mut Context<Self>,
@@ -1105,7 +1105,7 @@ impl Padu {
         cx.notify();
     }
 
-    pub(super) fn right_panel_diff_tree_key_down(
+    pub(crate) fn right_panel_diff_tree_key_down(
         &mut self,
         event: &KeyDownEvent,
         _window: &mut Window,

@@ -1,7 +1,7 @@
 use super::*;
 
 impl Padu {
-    pub(super) fn render_right_panel_files(
+    pub(crate) fn render_right_panel_files(
         &mut self,
         panel_width: f32,
         window: &mut Window,
@@ -14,7 +14,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn render_right_panel_working_tree(
+    pub(crate) fn render_right_panel_working_tree(
         &self,
         selected_path: Option<&str>,
         cx: &mut Context<Self>,
@@ -306,7 +306,7 @@ impl Padu {
             )
     }
 
-    pub(super) fn render_right_panel_file(
+    pub(crate) fn render_right_panel_file(
         &mut self,
         relative_path: String,
         panel_width: f32,
@@ -502,7 +502,7 @@ impl Padu {
             )
     }
 
-    pub(super) fn ensure_right_panel_file_editor(
+    pub(crate) fn ensure_right_panel_file_editor(
         &mut self,
         relative_path: &str,
         window: &mut Window,
@@ -584,7 +584,7 @@ impl Padu {
     /// The result is applied only if the same session is still selected and the
     /// editor is still the one that asked, so a read started before a project
     /// or session switch cannot write another workspace's text into the view.
-    pub(super) fn read_right_panel_file_into_editor(
+    pub(crate) fn read_right_panel_file_into_editor(
         &mut self,
         relative_path: String,
         cx: &mut Context<Self>,
@@ -684,7 +684,7 @@ impl Padu {
     /// Row heights come from the text's measured layout rather than a nominal
     /// line height, so a soft-wrapped line still gets exactly one number and the
     /// two columns cannot drift apart down a long file.
-    pub(super) fn render_file_editor_body(
+    pub(crate) fn render_file_editor_body(
         &mut self,
         relative_path: &str,
         editor_state: &Entity<TextInput>,
@@ -816,7 +816,7 @@ impl Padu {
 
     /// Flips the global markdown source/preview mode and persists it, so the
     /// choice follows the user across files and sessions.
-    pub(super) fn toggle_markdown_preview(&mut self, cx: &mut Context<Self>) {
+    pub(crate) fn toggle_markdown_preview(&mut self, cx: &mut Context<Self>) {
         self.state.markdown_preview = !self.state.markdown_preview;
         self.save();
         cx.notify();
@@ -828,7 +828,7 @@ impl Padu {
     /// parse is cached per path, so re-rendering an unchanged document costs
     /// `Rc` clones, not a re-parse. Reads only in-memory editor state: the
     /// render path may not touch the filesystem.
-    pub(super) fn render_file_markdown_preview(
+    pub(crate) fn render_file_markdown_preview(
         &mut self,
         relative_path: &str,
         editor_state: &Entity<TextInput>,
@@ -896,7 +896,7 @@ impl Padu {
     ///
     /// Reaches the filesystem, so it queues a background read rather than
     /// blocking; the editor keeps showing its current text until that lands.
-    pub(super) fn reload_right_panel_file_if_clean(
+    pub(crate) fn reload_right_panel_file_if_clean(
         &mut self,
         relative_path: &str,
         cx: &mut Context<Self>,
@@ -911,7 +911,7 @@ impl Padu {
         self.read_right_panel_file_into_editor(relative_path.to_owned(), cx);
     }
 
-    pub(super) fn reload_clean_right_panel_file_editors(&mut self, cx: &mut Context<Self>) {
+    pub(crate) fn reload_clean_right_panel_file_editors(&mut self, cx: &mut Context<Self>) {
         let paths = self
             .right_panel_file_editors
             .iter()
@@ -923,7 +923,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn save_right_panel_file_action(
+    pub(crate) fn save_right_panel_file_action(
         &mut self,
         _: &SaveFile,
         _: &mut Window,
@@ -1013,7 +1013,7 @@ impl Padu {
     }
 
     /// Re-reads whichever workspace surface is on screen.
-    pub(super) fn refresh_workspace_surfaces(&mut self, cx: &mut Context<Self>) {
+    pub(crate) fn refresh_workspace_surfaces(&mut self, cx: &mut Context<Self>) {
         match self.active_right_panel_surface() {
             Some(RightPanelSurface::Diff) => self.refresh_right_panel_diff(cx),
             Some(RightPanelSurface::Files | RightPanelSurface::File(_)) => {
@@ -1023,7 +1023,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn begin_file_operation_dialog(
+    pub(crate) fn begin_file_operation_dialog(
         &mut self,
         kind: FileOperationDialogKind,
         window: &mut Window,
@@ -1055,7 +1055,7 @@ impl Padu {
         cx.notify();
     }
 
-    pub(super) fn close_file_operation_dialog(
+    pub(crate) fn close_file_operation_dialog(
         &mut self,
         window: &mut Window,
         cx: &mut Context<Self>,
@@ -1069,7 +1069,7 @@ impl Padu {
         cx.notify();
     }
 
-    pub(super) fn submit_file_operation_dialog(
+    pub(crate) fn submit_file_operation_dialog(
         &mut self,
         window: &mut Window,
         cx: &mut Context<Self>,
@@ -1144,7 +1144,7 @@ impl Padu {
         cx.notify();
     }
 
-    pub(super) fn delete_right_panel_path(&mut self, path: PathBuf, cx: &mut Context<Self>) {
+    pub(crate) fn delete_right_panel_path(&mut self, path: PathBuf, cx: &mut Context<Self>) {
         let Some(root) = self.selected_workspace_path().map(Path::to_path_buf) else {
             return;
         };
@@ -1174,7 +1174,7 @@ impl Padu {
         .detach();
     }
 
-    pub(super) fn render_file_operation_dialog(
+    pub(crate) fn render_file_operation_dialog(
         &mut self,
         _window: &mut Window,
         cx: &mut Context<Self>,
@@ -1263,7 +1263,7 @@ impl Padu {
         )
     }
 
-    pub(super) fn toggle_right_panel_hidden_files(&mut self, cx: &mut Context<Self>) {
+    pub(crate) fn toggle_right_panel_hidden_files(&mut self, cx: &mut Context<Self>) {
         self.right_panel_show_hidden_files = !self.right_panel_show_hidden_files;
         self.refresh_right_panel_working_tree(cx);
         cx.notify();
@@ -1275,7 +1275,7 @@ impl Padu {
     /// directories — filesystem I/O, so it runs on the background executor and
     /// the panel keeps drawing the previous listing until the result lands.
     /// Called when the tree's inputs change, never from a frame.
-    pub(super) fn refresh_right_panel_working_tree(&mut self, cx: &mut Context<Self>) {
+    pub(crate) fn refresh_right_panel_working_tree(&mut self, cx: &mut Context<Self>) {
         let Some(project_path) = self
             .selected_workspace_path()
             .map(std::path::Path::to_path_buf)

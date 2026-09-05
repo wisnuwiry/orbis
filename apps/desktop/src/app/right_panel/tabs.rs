@@ -1,29 +1,29 @@
 use super::*;
 
 impl RightPanelSurface {
-    pub(super) fn new_browser() -> Self {
+    pub(crate) fn new_browser() -> Self {
         Self::Browser(Uuid::new_v4())
     }
 
-    pub(super) fn new_terminal() -> Self {
+    pub(crate) fn new_terminal() -> Self {
         Self::Terminal(Uuid::new_v4())
     }
 
-    pub(super) fn terminal_id(&self) -> Option<Uuid> {
+    pub(crate) fn terminal_id(&self) -> Option<Uuid> {
         match self {
             Self::Terminal(id) => Some(*id),
             _ => None,
         }
     }
 
-    pub(super) fn browser_id(&self) -> Option<Uuid> {
+    pub(crate) fn browser_id(&self) -> Option<Uuid> {
         match self {
             Self::Browser(id) => Some(*id),
             _ => None,
         }
     }
 
-    pub(super) fn label(&self) -> String {
+    pub(crate) fn label(&self) -> String {
         match self {
             Self::Browser(_) => tr!("right_panel.browser"),
             Self::Terminal(_) => tr!("right_panel.terminal"),
@@ -44,7 +44,7 @@ impl RightPanelSurface {
         }
     }
 
-    pub(super) fn icon_path(&self) -> &'static str {
+    pub(crate) fn icon_path(&self) -> &'static str {
         match self {
             Self::Browser(_) => "icons/globe.svg",
             Self::Terminal(_) => "icons/terminal.svg",
@@ -55,7 +55,7 @@ impl RightPanelSurface {
         }
     }
 
-    pub(super) fn shortcut(&self) -> Option<&'static str> {
+    pub(crate) fn shortcut(&self) -> Option<&'static str> {
         match self {
             Self::Browser(_) => Some(crate::platform::primary_shortcut("⌥⌘B", "Ctrl+Alt+B")),
             Self::Terminal(_) => Some(crate::platform::primary_shortcut("⌘T", "Ctrl+T")),
@@ -66,7 +66,10 @@ impl RightPanelSurface {
     }
 }
 
-fn right_panel_tab_label(surface: &RightPanelSurface, files_selected_path: Option<&str>) -> String {
+pub(crate) fn right_panel_tab_label(
+    surface: &RightPanelSurface,
+    files_selected_path: Option<&str>,
+) -> String {
     let label = match surface {
         RightPanelSurface::Files => files_selected_path
             .and_then(|path| Path::new(path).file_name())
@@ -79,7 +82,7 @@ fn right_panel_tab_label(surface: &RightPanelSurface, files_selected_path: Optio
     single_line_label(&label)
 }
 
-fn right_panel_tab_icon(
+pub(crate) fn right_panel_tab_icon(
     surface: &RightPanelSurface,
     files_selected_path: Option<&str>,
 ) -> &'static str {
@@ -91,7 +94,7 @@ fn right_panel_tab_icon(
     }
 }
 
-fn reusable_surface_index(
+pub(crate) fn reusable_surface_index(
     surfaces: &[RightPanelSurface],
     requested: &RightPanelSurface,
 ) -> Option<usize> {
@@ -109,7 +112,7 @@ fn reusable_surface_index(
 /// Fullscreen tab order: Conversation (`None`) first, then every surface
 /// index in tab-strip order. Pure so tab cycling wraps are pinnable in tests
 /// without a window.
-fn fullscreen_tab_order(surface_count: usize) -> Vec<Option<usize>> {
+pub(crate) fn fullscreen_tab_order(surface_count: usize) -> Vec<Option<usize>> {
     let mut order = Vec::with_capacity(surface_count + 1);
     order.push(None);
     order.extend((0..surface_count).map(Some));
@@ -117,24 +120,28 @@ fn fullscreen_tab_order(surface_count: usize) -> Vec<Option<usize>> {
 }
 
 /// Next position when cycling the fullscreen order; wraps both directions.
-fn fullscreen_cycle_next(position: usize, surface_count: usize, direction: isize) -> usize {
+pub(crate) fn fullscreen_cycle_next(
+    position: usize,
+    surface_count: usize,
+    direction: isize,
+) -> usize {
     let len = surface_count + 1;
     (position as isize + direction).rem_euclid(len as isize) as usize
 }
 
 #[derive(Clone, Copy)]
-enum TabScrollFadeSide {
+pub(crate) enum TabScrollFadeSide {
     Left,
     Right,
 }
 
-fn tab_scroll_fade_visibility(offset_x: Pixels, max_offset: Pixels) -> (bool, bool) {
+pub(crate) fn tab_scroll_fade_visibility(offset_x: Pixels, max_offset: Pixels) -> (bool, bool) {
     let scrolled = -offset_x;
     let threshold = px(0.5);
     (scrolled > threshold, max_offset - scrolled > threshold)
 }
 
-fn fade_safe_tab_offset(
+pub(crate) fn fade_safe_tab_offset(
     current_offset: Pixels,
     max_offset: Pixels,
     item_left: Pixels,
@@ -154,7 +161,7 @@ fn fade_safe_tab_offset(
     offset.clamp(-max_offset, px(0.0))
 }
 
-fn tab_scroll_reveal_guard(
+pub(crate) fn tab_scroll_reveal_guard(
     scroll_handle: ScrollHandle,
     tab_index: usize,
     padu: WeakEntity<Padu>,
@@ -192,7 +199,7 @@ fn tab_scroll_reveal_guard(
     .size_full()
 }
 
-fn tab_scroll_fade(
+pub(crate) fn tab_scroll_fade(
     scroll_handle: ScrollHandle,
     side: TabScrollFadeSide,
     surface: Hsla,
@@ -241,7 +248,7 @@ fn tab_scroll_fade(
 }
 
 impl Padu {
-    pub(super) fn open_transcript_link(&mut self, target: &str, cx: &mut Context<Self>) -> bool {
+    pub(crate) fn open_transcript_link(&mut self, target: &str, cx: &mut Context<Self>) -> bool {
         match transcript_link_route(target, self.selected_workspace_path()) {
             TranscriptLinkRoute::ProjectFile(relative_path) => {
                 self.open_right_panel_surface(RightPanelSurface::Files, cx);
@@ -266,7 +273,7 @@ impl Padu {
     /// to the session's workspace — so resolve it before routing. Inside the
     /// workspace it opens in the file viewer; anywhere else it goes to the file
     /// manager, the same split a file link in the transcript takes.
-    pub(super) fn open_activity_file(&mut self, path: &str, cx: &mut Context<Self>) {
+    pub(crate) fn open_activity_file(&mut self, path: &str, cx: &mut Context<Self>) {
         let path = Path::new(path.trim());
         let resolved = if path.is_absolute() {
             path.to_path_buf()
@@ -278,7 +285,7 @@ impl Padu {
         self.open_transcript_link(&resolved.to_string_lossy(), cx);
     }
 
-    pub(super) fn store_selected_right_panel_state(&mut self) {
+    pub(crate) fn store_selected_right_panel_state(&mut self) {
         let Some(session_id) = self.state.selected_session else {
             return;
         };
@@ -286,7 +293,7 @@ impl Padu {
         self.right_panel_session_states.insert(session_id, state);
     }
 
-    pub(super) fn restore_right_panel_state(&mut self, session_id: Uuid, cx: &mut Context<Self>) {
+    pub(crate) fn restore_right_panel_state(&mut self, session_id: Uuid, cx: &mut Context<Self>) {
         let state = RightPanelSessionState::take_or_closed(
             &mut self.right_panel_session_states,
             session_id,
@@ -323,7 +330,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn remove_right_panel_session_state(&mut self, session_id: Uuid) {
+    pub(crate) fn remove_right_panel_session_state(&mut self, session_id: Uuid) {
         let state = if self.state.selected_session == Some(session_id) {
             let state = self.take_active_right_panel_state();
             self.replace_active_right_panel_state(RightPanelSessionState::empty(false));
@@ -343,7 +350,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn take_active_right_panel_state(&mut self) -> RightPanelSessionState {
+    pub(crate) fn take_active_right_panel_state(&mut self) -> RightPanelSessionState {
         RightPanelSessionState {
             visible: self.right_panel_visible,
             fullscreen: self.right_panel_fullscreen,
@@ -366,7 +373,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn replace_active_right_panel_state(&mut self, state: RightPanelSessionState) {
+    pub(crate) fn replace_active_right_panel_state(&mut self, state: RightPanelSessionState) {
         self.right_panel_visible = state.visible;
         self.right_panel_fullscreen = state.fullscreen;
         self.right_panel_fullscreen_conversation = state.fullscreen_conversation;
@@ -396,12 +403,12 @@ impl Padu {
         self.right_panel_diff_list_state.reset(line_count);
     }
 
-    pub(super) fn reveal_right_panel_tab(&mut self, index: usize) {
+    pub(crate) fn reveal_right_panel_tab(&mut self, index: usize) {
         self.right_panel_pending_tab_reveal = Some(index);
         self.right_panel_tabs_scroll_handle.scroll_to_item(index);
     }
 
-    pub(super) fn active_right_panel_surface(&self) -> Option<&RightPanelSurface> {
+    pub(crate) fn active_right_panel_surface(&self) -> Option<&RightPanelSurface> {
         self.right_panel_active_surface
             .and_then(|index| self.right_panel_surfaces.get(index))
     }
@@ -409,7 +416,7 @@ impl Padu {
     /// Whether a surface counts toward the fullscreen expand button: the four
     /// primary surfaces. Background work keeps working in fullscreen but never
     /// gates the button on its own.
-    pub(super) fn right_panel_surface_is_expandable(surface: &RightPanelSurface) -> bool {
+    pub(crate) fn right_panel_surface_is_expandable(surface: &RightPanelSurface) -> bool {
         matches!(
             surface,
             RightPanelSurface::Browser(_)
@@ -422,7 +429,7 @@ impl Padu {
 
     /// The expand button shows while the panel is open with at least one of
     /// browser, terminal, files, or review on screen.
-    pub(super) fn right_panel_can_expand(&self) -> bool {
+    pub(crate) fn right_panel_can_expand(&self) -> bool {
         self.right_panel_visible
             && self
                 .right_panel_surfaces
@@ -432,19 +439,19 @@ impl Padu {
 
     /// Whether the fullscreen takeover is actually on screen. The flag alone
     /// is not enough: closing the last expandable surface exits implicitly.
-    pub(super) fn right_panel_fullscreen_active(&self) -> bool {
+    pub(crate) fn right_panel_fullscreen_active(&self) -> bool {
         self.right_panel_visible && self.right_panel_fullscreen && self.right_panel_can_expand()
     }
 
     /// Ordered fullscreen tabs: Conversation first, then every surface index
     /// in tab-strip order. Cycling wraps over this list.
-    pub(super) fn right_panel_fullscreen_order(&self) -> Vec<Option<usize>> {
+    pub(crate) fn right_panel_fullscreen_order(&self) -> Vec<Option<usize>> {
         fullscreen_tab_order(self.right_panel_surfaces.len())
     }
 
     /// Current position inside the fullscreen order: Conversation when the
     /// transcript is showing, otherwise the active surface index.
-    pub(super) fn right_panel_fullscreen_position(&self) -> Option<usize> {
+    pub(crate) fn right_panel_fullscreen_position(&self) -> Option<usize> {
         if self.right_panel_fullscreen_conversation {
             Some(0)
         } else {
@@ -456,7 +463,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn set_right_panel_fullscreen(&mut self, fullscreen: bool, cx: &mut Context<Self>) {
+    pub(crate) fn set_right_panel_fullscreen(&mut self, fullscreen: bool, cx: &mut Context<Self>) {
         if fullscreen && !self.right_panel_can_expand() {
             return;
         }
@@ -487,7 +494,7 @@ impl Padu {
         cx.notify();
     }
 
-    pub(super) fn toggle_right_panel_fullscreen_action(
+    pub(crate) fn toggle_right_panel_fullscreen_action(
         &mut self,
         _: &ToggleRightPanelFullscreen,
         window: &mut Window,
@@ -508,7 +515,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn focus_active_surface(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+    pub(crate) fn focus_active_surface(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         match self.active_right_panel_surface() {
             Some(RightPanelSurface::Diff) => {
                 let focus = self.transcript_control_focus("right-panel-diff", cx);
@@ -547,7 +554,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn cycle_right_panel_fullscreen(
+    pub(crate) fn cycle_right_panel_fullscreen(
         &mut self,
         direction: isize,
         window: &mut Window,
@@ -584,7 +591,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn next_right_panel_tab_action(
+    pub(crate) fn next_right_panel_tab_action(
         &mut self,
         _: &NextRightPanelTab,
         window: &mut Window,
@@ -597,7 +604,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn prev_right_panel_tab_action(
+    pub(crate) fn prev_right_panel_tab_action(
         &mut self,
         _: &PrevRightPanelTab,
         window: &mut Window,
@@ -610,7 +617,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn cycle_right_panel_docked(
+    pub(crate) fn cycle_right_panel_docked(
         &mut self,
         direction: isize,
         window: &mut Window,
@@ -628,7 +635,7 @@ impl Padu {
         cx.notify();
     }
 
-    pub(super) fn select_right_panel_fullscreen_conversation(
+    pub(crate) fn select_right_panel_fullscreen_conversation(
         &mut self,
         window: Option<&mut Window>,
         cx: &mut Context<Self>,
@@ -648,13 +655,13 @@ impl Padu {
         cx.notify();
     }
 
-    pub(super) fn request_active_terminal_focus(&mut self) {
+    pub(crate) fn request_active_terminal_focus(&mut self) {
         self.right_panel_pending_terminal_focus = self
             .active_right_panel_surface()
             .and_then(RightPanelSurface::terminal_id);
     }
 
-    pub(super) fn request_active_browser_focus(&mut self) {
+    pub(crate) fn request_active_browser_focus(&mut self) {
         self.right_panel_pending_browser_focus = self
             .active_right_panel_surface()
             .and_then(RightPanelSurface::browser_id);
@@ -664,7 +671,7 @@ impl Padu {
     /// or the Files browser's selection — regardless of whether the panel is
     /// currently visible, which is a per-caller decision: save works on a
     /// hidden panel, find does not.
-    pub(super) fn visible_right_panel_file_path(&self) -> Option<String> {
+    pub(crate) fn visible_right_panel_file_path(&self) -> Option<String> {
         match self.active_right_panel_surface() {
             Some(RightPanelSurface::Files) => self.right_panel_files_selected_path.clone(),
             Some(RightPanelSurface::File(path)) => Some(path.clone()),
@@ -672,13 +679,13 @@ impl Padu {
         }
     }
 
-    pub(super) fn right_panel_file_is_dirty(&self, relative_path: &str) -> bool {
+    pub(crate) fn right_panel_file_is_dirty(&self, relative_path: &str) -> bool {
         self.right_panel_file_editors
             .get(relative_path)
             .is_some_and(|editor| editor.dirty)
     }
 
-    pub(super) fn right_panel_surface_is_dirty(&self, surface: &RightPanelSurface) -> bool {
+    pub(crate) fn right_panel_surface_is_dirty(&self, surface: &RightPanelSurface) -> bool {
         match surface {
             RightPanelSurface::Files => self
                 .right_panel_files_selected_path
@@ -689,7 +696,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn ensure_initial_right_panel_file_editor_width(&mut self) {
+    pub(crate) fn ensure_initial_right_panel_file_editor_width(&mut self) {
         if self.right_panel_file_editors.is_empty() {
             self.right_panel_width = widened_panel_width_for_file_editor(
                 self.right_panel_width,
@@ -698,7 +705,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn open_right_panel_surface(
+    pub(crate) fn open_right_panel_surface(
         &mut self,
         surface: RightPanelSurface,
         cx: &mut Context<Self>,
@@ -742,7 +749,7 @@ impl Padu {
         cx.notify();
     }
 
-    pub(super) fn open_browser_action(
+    pub(crate) fn open_browser_action(
         &mut self,
         _: &OpenBrowser,
         window: &mut Window,
@@ -751,7 +758,7 @@ impl Padu {
         self.toggle_or_open_browser_surface(Some(window), cx);
     }
 
-    pub(super) fn open_terminal_action(
+    pub(crate) fn open_terminal_action(
         &mut self,
         _: &OpenTerminal,
         window: &mut Window,
@@ -760,7 +767,7 @@ impl Padu {
         self.toggle_or_open_terminal_surface(Some(window), cx);
     }
 
-    pub(super) fn open_files_action(
+    pub(crate) fn open_files_action(
         &mut self,
         _: &OpenFiles,
         window: &mut Window,
@@ -769,7 +776,7 @@ impl Padu {
         self.toggle_or_open_files_surface(Some(window), cx);
     }
 
-    pub(super) fn open_review_action(
+    pub(crate) fn open_review_action(
         &mut self,
         _: &OpenReview,
         window: &mut Window,
@@ -778,7 +785,7 @@ impl Padu {
         self.toggle_or_open_review_surface(Some(window), cx);
     }
 
-    pub(super) fn toggle_or_open_browser_surface(
+    pub(crate) fn toggle_or_open_browser_surface(
         &mut self,
         window: Option<&mut Window>,
         cx: &mut Context<Self>,
@@ -824,7 +831,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn toggle_or_open_terminal_surface(
+    pub(crate) fn toggle_or_open_terminal_surface(
         &mut self,
         window: Option<&mut Window>,
         cx: &mut Context<Self>,
@@ -876,7 +883,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn toggle_or_open_files_surface(
+    pub(crate) fn toggle_or_open_files_surface(
         &mut self,
         window: Option<&mut Window>,
         cx: &mut Context<Self>,
@@ -930,7 +937,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn toggle_or_open_review_surface(
+    pub(crate) fn toggle_or_open_review_surface(
         &mut self,
         window: Option<&mut Window>,
         cx: &mut Context<Self>,
@@ -979,7 +986,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn open_turn_diff(&mut self, turn_id: Uuid, cx: &mut Context<Self>) {
+    pub(crate) fn open_turn_diff(&mut self, turn_id: Uuid, cx: &mut Context<Self>) {
         let Some((session_id, turn_count)) = self.selected_session().and_then(|session| {
             session
                 .turns
@@ -1000,7 +1007,7 @@ impl Padu {
         self.open_right_panel_surface(RightPanelSurface::Diff, cx);
     }
 
-    pub(super) fn open_right_panel_file(&mut self, relative_path: String, cx: &mut Context<Self>) {
+    pub(crate) fn open_right_panel_file(&mut self, relative_path: String, cx: &mut Context<Self>) {
         self.ensure_initial_right_panel_file_editor_width();
         let Some(active) = self.right_panel_active_surface else {
             self.open_right_panel_surface(RightPanelSurface::File(relative_path), cx);
@@ -1056,7 +1063,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn close_right_panel_surface(&mut self, index: usize, cx: &mut Context<Self>) {
+    pub(crate) fn close_right_panel_surface(&mut self, index: usize, cx: &mut Context<Self>) {
         if index >= self.right_panel_surfaces.len() {
             return;
         }
@@ -1096,7 +1103,7 @@ impl Padu {
         cx.notify();
     }
 
-    pub(super) fn close_window_or_right_panel_tab_action(
+    pub(crate) fn close_window_or_right_panel_tab_action(
         &mut self,
         _: &CloseWindow,
         window: &mut Window,

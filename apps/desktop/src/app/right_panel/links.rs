@@ -1,19 +1,19 @@
 use super::*;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-enum TranscriptLinkRoute {
+pub(crate) enum TranscriptLinkRoute {
     ProjectFile(String),
     Finder(PathBuf),
     External,
 }
 
-pub(super) fn positive_number(value: &str) -> bool {
+pub(crate) fn positive_number(value: &str) -> bool {
     !value.is_empty()
         && value.bytes().all(|byte| byte.is_ascii_digit())
         && value.parse::<usize>().is_ok_and(|value| value > 0)
 }
 
-pub(super) fn line_fragment(fragment: &str) -> bool {
+pub(crate) fn line_fragment(fragment: &str) -> bool {
     let Some(location) = fragment.strip_prefix('L') else {
         return false;
     };
@@ -26,7 +26,7 @@ pub(super) fn line_fragment(fragment: &str) -> bool {
 /// Removes the `:line`, `:line:column`, or `#LlineCcolumn` suffixes Codex uses
 /// in clickable local-file references. The location is not yet consumed by
 /// Padu's compact editor, but it must not become part of the filesystem path.
-pub(super) fn strip_file_location(target: &str) -> &str {
+pub(crate) fn strip_file_location(target: &str) -> &str {
     if let Some((path, fragment)) = target.rsplit_once('#')
         && line_fragment(fragment)
     {
@@ -48,7 +48,7 @@ pub(super) fn strip_file_location(target: &str) -> &str {
     }
 }
 
-pub(super) fn hex_value(byte: u8) -> Option<u8> {
+pub(crate) fn hex_value(byte: u8) -> Option<u8> {
     match byte {
         b'0'..=b'9' => Some(byte - b'0'),
         b'a'..=b'f' => Some(byte - b'a' + 10),
@@ -57,7 +57,7 @@ pub(super) fn hex_value(byte: u8) -> Option<u8> {
     }
 }
 
-pub(super) fn percent_decode_file_path(path: &str) -> String {
+pub(crate) fn percent_decode_file_path(path: &str) -> String {
     let bytes = path.as_bytes();
     let mut decoded = Vec::with_capacity(bytes.len());
     let mut index = 0;
@@ -78,7 +78,7 @@ pub(super) fn percent_decode_file_path(path: &str) -> String {
     String::from_utf8(decoded).unwrap_or_else(|_| path.to_owned())
 }
 
-pub(super) fn markdown_file_link_path(target: &str) -> Option<PathBuf> {
+pub(crate) fn markdown_file_link_path(target: &str) -> Option<PathBuf> {
     let target = strip_file_location(target.trim());
     if target
         .get(..5)
@@ -91,7 +91,7 @@ pub(super) fn markdown_file_link_path(target: &str) -> Option<PathBuf> {
     path.is_absolute().then_some(path)
 }
 
-pub(super) fn normalized_path(path: &Path) -> PathBuf {
+pub(crate) fn normalized_path(path: &Path) -> PathBuf {
     let mut normalized = PathBuf::new();
     for component in path.components() {
         match component {
@@ -105,7 +105,7 @@ pub(super) fn normalized_path(path: &Path) -> PathBuf {
     normalized
 }
 
-pub(super) fn workspace_relative_file_path(workspace: &Path, target: &Path) -> Option<String> {
+pub(crate) fn workspace_relative_file_path(workspace: &Path, target: &Path) -> Option<String> {
     fn relative(workspace: &Path, target: &Path) -> Option<String> {
         let relative = target.strip_prefix(workspace).ok()?;
         if relative.as_os_str().is_empty() {
@@ -121,7 +121,7 @@ pub(super) fn workspace_relative_file_path(workspace: &Path, target: &Path) -> O
     relative(&workspace, &target)
 }
 
-pub(super) fn transcript_link_route(target: &str, workspace: Option<&Path>) -> TranscriptLinkRoute {
+pub(crate) fn transcript_link_route(target: &str, workspace: Option<&Path>) -> TranscriptLinkRoute {
     let Some(path) = markdown_file_link_path(target) else {
         return TranscriptLinkRoute::External;
     };
