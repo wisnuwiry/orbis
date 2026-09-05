@@ -1966,6 +1966,24 @@ files.show_hidden:
   en: Show hidden files
 files.hide_hidden:
   en: Hide hidden files
+files.name_placeholder:
+  en: Name
+files.invalid_name:
+  en: Enter a single valid name
+files.operation_failed:
+  en: File operation failed
+files.operation_failed_detail:
+  en: "File operation failed: %{error}"
+files.new_file:
+  en: New file
+files.new_folder:
+  en: New folder
+files.confirm:
+  en: Confirm
+files.delete:
+  en: Delete
+files.copy_relative_path:
+  en: Copy relative path
 files.loading:
   en: Loading files…
 files.workspace_files:

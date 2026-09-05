@@ -1,6 +1,20 @@
 use super::*;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
+pub(super) enum FileOperationDialogKind {
+    CreateFile { parent: PathBuf },
+    CreateDirectory { parent: PathBuf },
+    Rename { source: PathBuf },
+}
+
+pub(super) struct FileOperationDialog {
+    pub(super) kind: FileOperationDialogKind,
+    pub(super) input: Entity<TextInput>,
+    pub(super) focus: FocusHandle,
+    pub(super) previous_focus: Option<FocusHandle>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub(super) struct WorkingTreeEntry {
     pub(super) relative_path: String,
     pub(super) absolute_path: PathBuf,

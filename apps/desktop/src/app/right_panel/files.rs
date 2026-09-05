@@ -92,20 +92,120 @@ impl Padu {
                         })
                         .child(entry.name),
                 );
-            list = if is_dir {
-                list.child(row.on_click(cx.listener(move |this, _, _, cx| {
+            let menu = self.menu_handle(
+                SharedString::from(format!("right-panel-file-menu-{relative_path}")),
+                cx,
+            );
+            let keyboard_menu = menu.clone();
+            let menu_path = absolute_path.clone();
+            let menu_relative = relative_path.clone();
+
+            let weak = cx.entity().downgrade();
+            let mut row = if is_dir {
+                row.on_click(cx.listener(move |this, _, _, cx| {
                     if !this.right_panel_expanded_paths.remove(&absolute_path) {
                         this.right_panel_expanded_paths
                             .insert(absolute_path.clone());
                     }
                     this.refresh_right_panel_working_tree(cx);
                     cx.notify();
-                })))
+                }))
             } else {
-                list.child(row.on_click(cx.listener(move |this, _, _, cx| {
+                row.on_click(cx.listener(move |this, _, _, cx| {
                     this.open_right_panel_file(relative_path.clone(), cx);
-                })))
+                }))
             };
+            row = row.on_key_down(move |event: &KeyDownEvent, window, cx| {
+                if event.keystroke.key == "f10" && event.keystroke.modifiers.shift {
+                    keyboard_menu.open_context_menu(window, cx);
+                    cx.stop_propagation();
+                }
+            });
+            list = list.child(context_menu(
+                row,
+                SharedString::from(format!("right-panel-file-context-{menu_relative}")),
+                &menu,
+                move |_| {
+                    let copy_path = menu_path.clone();
+                    let copy_relative = menu_relative.clone();
+                    let rename_weak = weak.clone();
+                    let delete_weak = weak.clone();
+                    let new_file_weak = weak.clone();
+                    let new_folder_weak = weak.clone();
+                    let mut items = Vec::new();
+                    if is_dir {
+                        let parent = menu_path.clone();
+                        items.push(
+                            MenuItem::new(tr!("files.new_file"), move |window, cx| {
+                                let _ = new_file_weak.update(cx, |this, cx| {
+                                    this.begin_file_operation_dialog(
+                                        FileOperationDialogKind::CreateFile {
+                                            parent: parent.clone(),
+                                        },
+                                        window,
+                                        cx,
+                                    );
+                                });
+                            })
+                            .icon("icons/file.svg"),
+                        );
+                        let parent = menu_path.clone();
+                        items.push(
+                            MenuItem::new(tr!("files.new_folder"), move |window, cx| {
+                                let _ = new_folder_weak.update(cx, |this, cx| {
+                                    this.begin_file_operation_dialog(
+                                        FileOperationDialogKind::CreateDirectory {
+                                            parent: parent.clone(),
+                                        },
+                                        window,
+                                        cx,
+                                    );
+                                });
+                            })
+                            .icon("icons/folder-new.svg"),
+                        );
+                    }
+                    items.push(
+                        MenuItem::new(tr!("files.copy_path"), move |_, cx| {
+                            cx.write_to_clipboard(ClipboardItem::new_string(
+                                copy_path.to_string_lossy().into_owned(),
+                            ));
+                        })
+                        .icon("icons/copy.svg"),
+                    );
+                    items.push(
+                        MenuItem::new(tr!("files.copy_relative_path"), move |_, cx| {
+                            cx.write_to_clipboard(ClipboardItem::new_string(copy_relative.clone()));
+                        })
+                        .icon("icons/copy.svg"),
+                    );
+                    let source = menu_path.clone();
+                    items.push(
+                        MenuItem::new(tr!("common.rename"), move |window, cx| {
+                            let _ = rename_weak.update(cx, |this, cx| {
+                                this.begin_file_operation_dialog(
+                                    FileOperationDialogKind::Rename {
+                                        source: source.clone(),
+                                    },
+                                    window,
+                                    cx,
+                                );
+                            });
+                        })
+                        .icon("icons/pencil.svg"),
+                    );
+                    let target = menu_path.clone();
+                    items.push(
+                        MenuItem::new(tr!("files.delete"), move |_, cx| {
+                            let _ = delete_weak.update(cx, |this, cx| {
+                                this.delete_right_panel_path(target.clone(), cx)
+                            });
+                        })
+                        .icon("icons/trash.svg"),
+                    );
+                    items
+                },
+            ));
         }
 
         div()
@@ -921,6 +1021,246 @@ impl Padu {
             }
             _ => {}
         }
+    }
+
+    pub(super) fn begin_file_operation_dialog(
+        &mut self,
+        kind: FileOperationDialogKind,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        let initial = match &kind {
+            FileOperationDialogKind::Rename { source } => source
+                .file_name()
+                .and_then(|name| name.to_str())
+                .unwrap_or_default()
+                .to_owned(),
+            _ => String::new(),
+        };
+        let input =
+            cx.new(|cx| TextInput::new(window, cx).placeholder(tr!("files.name_placeholder")));
+        if !initial.is_empty() {
+            input.update(cx, |input, cx| input.set_content(initial, cx));
+        }
+        let focus = input.read(cx).focus();
+        let focus_target = focus.clone();
+        let previous_focus = window.focused(cx);
+        self.right_panel_file_operation_dialog = Some(FileOperationDialog {
+            kind,
+            input,
+            focus,
+            previous_focus,
+        });
+        window.on_next_frame(move |window, cx| window.focus(&focus_target, cx));
+        cx.notify();
+    }
+
+    pub(super) fn close_file_operation_dialog(
+        &mut self,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        let Some(dialog) = self.right_panel_file_operation_dialog.take() else {
+            return;
+        };
+        if let Some(previous_focus) = dialog.previous_focus {
+            window.focus(&previous_focus, cx);
+        }
+        cx.notify();
+    }
+
+    pub(super) fn submit_file_operation_dialog(
+        &mut self,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        let Some(dialog) = self.right_panel_file_operation_dialog.take() else {
+            return;
+        };
+        let name = dialog.input.read(cx).content().trim().to_owned();
+        if name.is_empty() || Path::new(&name).components().count() != 1 {
+            self.show_toast(tr!("files.invalid_name"));
+            self.right_panel_file_operation_dialog = Some(dialog);
+            cx.notify();
+            return;
+        }
+        let Some(root) = self.selected_workspace_path().map(Path::to_path_buf) else {
+            return;
+        };
+        let operation = match dialog.kind {
+            FileOperationDialogKind::CreateFile { parent } => {
+                let Ok(parent) = parent.strip_prefix(&root) else {
+                    return;
+                };
+                padu_client::WorkspaceOperation::CreateFile {
+                    root: root.clone(),
+                    relative_path: parent.join(&name),
+                }
+            }
+            FileOperationDialogKind::CreateDirectory { parent } => {
+                let Ok(parent) = parent.strip_prefix(&root) else {
+                    return;
+                };
+                padu_client::WorkspaceOperation::CreateDirectory {
+                    root: root.clone(),
+                    relative_path: parent.join(&name),
+                }
+            }
+            FileOperationDialogKind::Rename { source } => {
+                let Ok(source_relative) = source.strip_prefix(&root) else {
+                    return;
+                };
+                let Some(parent) = source_relative.parent() else {
+                    return;
+                };
+                padu_client::WorkspaceOperation::RenamePath {
+                    root: root.clone(),
+                    from: source_relative.to_path_buf(),
+                    to: parent.join(&name),
+                }
+            }
+        };
+        let workspace = padu_client::WorkspaceClient::new(self.daemon.client());
+        cx.spawn(async move |padu, cx| {
+            let result = cx
+                .background_executor()
+                .spawn(async move { workspace.request(operation) })
+                .await;
+            let _ = padu.update(cx, |padu, cx| {
+                match result {
+                    Ok(padu_client::WorkspaceResult::Ack) => {
+                        padu.refresh_right_panel_working_tree(cx);
+                    }
+                    Ok(_) | Err(_) => padu.show_toast(tr!("files.operation_failed")),
+                }
+                cx.notify();
+            });
+        })
+        .detach();
+        window.focus(
+            &self.transcript_control_focus("right-panel-working-tree", cx),
+            cx,
+        );
+        cx.notify();
+    }
+
+    pub(super) fn delete_right_panel_path(&mut self, path: PathBuf, cx: &mut Context<Self>) {
+        let Some(root) = self.selected_workspace_path().map(Path::to_path_buf) else {
+            return;
+        };
+        let Ok(relative_path) = path.strip_prefix(&root) else {
+            return;
+        };
+        let workspace = padu_client::WorkspaceClient::new(self.daemon.client());
+        let operation = padu_client::WorkspaceOperation::DeletePath {
+            root: root.clone(),
+            relative_path: relative_path.to_path_buf(),
+        };
+        cx.spawn(async move |padu, cx| {
+            let result = cx
+                .background_executor()
+                .spawn(async move { workspace.request(operation) })
+                .await;
+            let _ = padu.update(cx, |padu, cx| {
+                match result {
+                    Ok(padu_client::WorkspaceResult::Ack) => {
+                        padu.refresh_right_panel_working_tree(cx)
+                    }
+                    _ => padu.show_toast(tr!("files.operation_failed")),
+                }
+                cx.notify();
+            });
+        })
+        .detach();
+    }
+
+    pub(super) fn render_file_operation_dialog(
+        &mut self,
+        _window: &mut Window,
+        cx: &mut Context<Self>,
+    ) -> Option<AnyElement> {
+        let dialog = self.right_panel_file_operation_dialog.as_ref()?;
+        let theme = Theme::current(cx);
+        let title = match dialog.kind {
+            FileOperationDialogKind::CreateFile { .. } => tr!("files.new_file"),
+            FileOperationDialogKind::CreateDirectory { .. } => tr!("files.new_folder"),
+            FileOperationDialogKind::Rename { .. } => tr!("common.rename"),
+        };
+        let cancel = div()
+            .id("file-operation-cancel")
+            .track_focus(&dialog.focus)
+            .tab_index(0)
+            .px(px(12.0))
+            .py(px(7.0))
+            .rounded(px(7.0))
+            .cursor_pointer()
+            .text_color(theme.text_secondary)
+            .child(tr!("common.cancel"))
+            .on_click(
+                cx.listener(|this, _, window, cx| this.close_file_operation_dialog(window, cx)),
+            );
+        let confirm = div()
+            .id("file-operation-confirm")
+            .tab_index(0)
+            .px(px(12.0))
+            .py(px(7.0))
+            .rounded(px(7.0))
+            .cursor_pointer()
+            .bg(theme.inverse)
+            .text_color(theme.on_inverse)
+            .child(tr!("files.confirm"))
+            .on_click(
+                cx.listener(|this, _, window, cx| this.submit_file_operation_dialog(window, cx)),
+            );
+        let card = div()
+            .id("file-operation-dialog")
+            .w(px(380.0))
+            .p(px(18.0))
+            .gap(px(12.0))
+            .flex()
+            .flex_col()
+            .rounded(px(14.0))
+            .bg(theme.surface)
+            .border_1()
+            .border_color(theme.border)
+            .shadow_lg()
+            .on_mouse_down(MouseButton::Left, |_, _, cx| cx.stop_propagation())
+            .child(
+                div()
+                    .text_size(sp(15.0))
+                    .font_weight(FontWeight::SEMIBOLD)
+                    .text_color(theme.text)
+                    .child(title),
+            )
+            .child(dialog.input.clone())
+            .child(
+                div()
+                    .flex()
+                    .justify_end()
+                    .gap(px(8.0))
+                    .child(cancel)
+                    .child(confirm),
+            )
+            .on_key_down(cx.listener(|this, event: &KeyDownEvent, window, cx| {
+                match event.keystroke.key.as_str() {
+                    "enter" => this.submit_file_operation_dialog(window, cx),
+                    "escape" => this.close_file_operation_dialog(window, cx),
+                    _ => {}
+                }
+            }));
+        Some(
+            div()
+                .id("file-operation-layer")
+                .absolute()
+                .inset_0()
+                .occlude()
+                .bg(gpui::hsla(0.0, 0.0, 0.0, 0.2))
+                .flex()
+                .items_center()
+                .justify_center()
+                .child(card)
+                .into_any_element(),
+        )
     }
 
     pub(super) fn toggle_right_panel_hidden_files(&mut self, cx: &mut Context<Self>) {
