@@ -44,7 +44,14 @@ impl Default for DaemonExposureSettings {
         Self {
             enabled: false,
             port: DEFAULT_EXPOSED_DAEMON_PORT,
-            allowed_origins: vec!["http://localhost:3001".into()],
+            allowed_origins: if cfg!(debug_assertions) {
+                vec![
+                    "https://app.padu.dev".into(),
+                    "http://localhost:3001".into(),
+                ]
+            } else {
+                vec!["https://app.padu.dev".into()]
+            },
             token: Self::new_token(),
         }
     }
@@ -72,6 +79,26 @@ impl DaemonExposureSettings {
         Ok(self)
     }
 
+    pub fn with_allowed_origins(
+        mut self,
+        origins: impl IntoIterator<Item = impl AsRef<str>>,
+    ) -> anyhow::Result<Self> {
+        let mut parsed = Vec::new();
+        let mut seen = HashSet::new();
+        for origin in origins {
+            let origin = origin.as_ref().trim();
+            if origin.is_empty() {
+                continue;
+            }
+            let valid = parse_single_origin(origin)?;
+            if seen.insert(valid.clone()) {
+                parsed.push(valid);
+            }
+        }
+        self.allowed_origins = parsed;
+        Ok(self)
+    }
+
     pub fn validate(mut self) -> anyhow::Result<Self> {
         if self.port == 0 {
             bail!("daemon port must be between 1 and 65535");
@@ -79,7 +106,15 @@ impl DaemonExposureSettings {
         if self.token.trim().is_empty() {
             bail!("daemon authentication token is empty");
         }
-        self.allowed_origins = parse_allowed_origins(&self.allowed_origins_text())?;
+        let mut parsed = Vec::new();
+        let mut seen = HashSet::new();
+        for origin in &self.allowed_origins {
+            let valid = parse_single_origin(origin)?;
+            if seen.insert(valid.clone()) {
+                parsed.push(valid);
+            }
+        }
+        self.allowed_origins = parsed;
         Ok(self)
     }
 
@@ -92,8 +127,39 @@ impl DaemonExposureSettings {
     }
 }
 
-/// Parse the comma-separated exact browser origins edited by the desktop.
-/// Browser Origin headers contain only an HTTP(S) origin, never a path.
+/// Parse a single exact browser origin. If a scheme is omitted (e.g. `app.padu.dev`),
+/// `https://` is prepended by default.
+pub fn parse_single_origin(candidate: &str) -> anyhow::Result<String> {
+    let candidate = candidate.trim();
+    if candidate.is_empty() {
+        bail!("browser origin is empty");
+    }
+    let normalized = if !candidate.starts_with("http://") && !candidate.starts_with("https://") {
+        format!("https://{candidate}")
+    } else {
+        candidate.to_owned()
+    };
+    let url = url::Url::parse(&normalized)
+        .with_context(|| format!("invalid browser origin {candidate:?}"))?;
+    if !matches!(url.scheme(), "http" | "https")
+        || !url.username().is_empty()
+        || url.password().is_some()
+        || url.query().is_some()
+        || url.fragment().is_some()
+        || url.path() != "/"
+    {
+        bail!(
+            "browser origin {candidate:?} must be an exact http:// or https:// origin without a path"
+        );
+    }
+    let origin = url.origin().ascii_serialization();
+    if origin == "null" {
+        bail!("browser origin {candidate:?} is not a network origin");
+    }
+    Ok(origin)
+}
+
+/// Parse comma-separated exact browser origins.
 pub fn parse_allowed_origins(text: &str) -> anyhow::Result<Vec<String>> {
     let mut origins = Vec::new();
     let mut seen = HashSet::new();
@@ -102,23 +168,7 @@ pub fn parse_allowed_origins(text: &str) -> anyhow::Result<Vec<String>> {
         .map(str::trim)
         .filter(|value| !value.is_empty())
     {
-        let url = url::Url::parse(candidate)
-            .with_context(|| format!("invalid browser origin {candidate:?}"))?;
-        if !matches!(url.scheme(), "http" | "https")
-            || !url.username().is_empty()
-            || url.password().is_some()
-            || url.query().is_some()
-            || url.fragment().is_some()
-            || url.path() != "/"
-        {
-            bail!(
-                "browser origin {candidate:?} must be an exact http:// or https:// origin without a path"
-            );
-        }
-        let origin = url.origin().ascii_serialization();
-        if origin == "null" {
-            bail!("browser origin {candidate:?} is not a network origin");
-        }
+        let origin = parse_single_origin(candidate)?;
         if seen.insert(origin.clone()) {
             origins.push(origin);
         }
@@ -699,6 +749,21 @@ mod tests {
             .unwrap(),
             ["https://app.padu.test", "http://localhost:3001"]
         );
+        assert_eq!(
+            parse_single_origin("app.padu.dev").unwrap(),
+            "https://app.padu.dev"
+        );
+        if cfg!(debug_assertions) {
+            assert_eq!(
+                DaemonExposureSettings::default().allowed_origins,
+                ["https://app.padu.dev", "http://localhost:3001"]
+            );
+        } else {
+            assert_eq!(
+                DaemonExposureSettings::default().allowed_origins,
+                ["https://app.padu.dev"]
+            );
+        }
         assert!(parse_allowed_origins("https://app.padu.test/path").is_err());
         assert!(parse_allowed_origins("ws://app.padu.test").is_err());
     }
