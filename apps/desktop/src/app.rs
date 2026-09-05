@@ -223,6 +223,7 @@ enum SettingsPage {
     Usage,
     Daemon,
     ComputerUse,
+    About,
 }
 
 impl SettingsPage {
