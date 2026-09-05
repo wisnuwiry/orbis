@@ -90,7 +90,6 @@ impl Padu {
         let theme = Theme::current(cx);
         let title = dialog.title.clone();
 
-        let cancel_focus_next = dialog.confirm_focus.clone();
         let cancel_button = div()
             .id("delete-session-cancel")
             .track_focus(&dialog.cancel_focus)
@@ -116,10 +115,6 @@ impl Padu {
             }))
             .on_key_down(cx.listener(move |padu, event: &KeyDownEvent, window, cx| {
                 match event.keystroke.key.as_str() {
-                    "right" => {
-                        window.focus(&cancel_focus_next, cx);
-                        cx.stop_propagation();
-                    }
                     "enter" | "space" => {
                         padu.close_delete_session_dialog(window, cx);
                         cx.stop_propagation();
@@ -132,7 +127,6 @@ impl Padu {
                 }
             }));
 
-        let confirm_focus_prev = dialog.cancel_focus.clone();
         let confirm_button = div()
             .id("delete-session-confirm")
             .track_focus(&dialog.confirm_focus)
@@ -163,10 +157,6 @@ impl Padu {
             }))
             .on_key_down(cx.listener(move |padu, event: &KeyDownEvent, window, cx| {
                 match event.keystroke.key.as_str() {
-                    "left" => {
-                        window.focus(&confirm_focus_prev, cx);
-                        cx.stop_propagation();
-                    }
                     "enter" | "space" => {
                         padu.execute_delete_session_dialog(window, cx);
                         cx.stop_propagation();

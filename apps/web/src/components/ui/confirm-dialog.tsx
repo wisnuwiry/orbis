@@ -69,23 +69,21 @@ export function ConfirmDialog({
         showCloseButton={false}
         initialFocus={confirmButtonRef}
         onKeyDown={(event) => {
-          if (event.key === 'ArrowLeft') {
+          if (event.key === 'Escape') {
             event.preventDefault()
-            cancelButtonRef.current?.focus()
-          } else if (event.key === 'ArrowRight') {
-            event.preventDefault()
-            confirmButtonRef.current?.focus()
+            handleClose()
           } else if (event.key === 'Enter') {
-            if (document.activeElement === cancelButtonRef.current) {
+            if (
+              cancelButtonRef.current &&
+              (cancelButtonRef.current === event.target ||
+                cancelButtonRef.current.contains(event.target as Node))
+            ) {
               event.preventDefault()
               handleClose()
               return
             }
             event.preventDefault()
             void handleConfirm()
-          } else if (event.key === 'Escape') {
-            event.preventDefault()
-            handleClose()
           }
         }}
       >
@@ -114,6 +112,13 @@ export function ConfirmDialog({
             type="button"
             className="flex h-8 items-center gap-1.5 rounded-lg px-3.5 text-xs font-medium text-[var(--text-secondary)] hover:bg-muted hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
             onClick={handleClose}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                e.stopPropagation()
+                handleClose()
+              }
+            }}
           >
             <span>{cancelLabel ?? t('common.cancel')}</span>
             {showShortcuts && <Kbd size="xs" variant="outline">Esc</Kbd>}
@@ -128,6 +133,13 @@ export function ConfirmDialog({
                 : 'bg-primary text-primary-foreground hover:bg-primary/90',
             )}
             onClick={handleConfirm}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                e.stopPropagation()
+                void handleConfirm()
+              }
+            }}
           >
             <span>{confirmLabel ?? (isDanger ? t('common.remove') : t('common.confirm'))}</span>
             {showShortcuts && (
