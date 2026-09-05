@@ -100,6 +100,7 @@ settings.providers: プロバイダー
 settings.usage: 使用状況
 settings.daemon: ホストとデーモン
 settings.computer_use: コンピュータ操作
+settings.about: 情報
 settings.general_keywords: 一般 ローカル プロジェクト 会話 プライバシー 分析 テレメトリ 匿名 共有 アップデート 自動 バージョン
 settings.appearance_keywords: 外観 テーマ システム ライト ダーク 言語 英語 中国語 簡体字 日本語 フォント サイズ 文字 エディタ
 settings.keybindings_keywords: キーバインド ショートカット キーボード ホットキー 操作 コマンド
@@ -109,6 +110,27 @@ settings.skills_keywords: スキル ライブラリ エージェント 無効 �
 settings.usage_keywords: 使用状況 トークン コスト 支出 キャッシュ 日別 グラフ モデル 内訳 履歴 claude codex
 settings.daemon_keywords: ホスト リモート サーバー クラウド デーモン ウェブ ネットワーク 公開 オリジン トークン ポート websocket ssh lan
 settings.computer_use_keywords: コンピュータ 操作 画面収録 アクセシビリティ アプリ 制御 codex
+settings.about_keywords: 情報 バージョン アップデート 更新 ホスト 接続 github リポジトリ スポンサー 支援
+about.tagline: ローカルコーディングエージェントのための高速ネイティブコントロールプレーン
+about.app_version: アプリバージョン
+about.check_for_updates: アップデートを確認
+about.checking_for_updates: アップデートを確認中...
+about.up_to_date: 最新バージョンです
+about.update_available: アップデートが利用可能です
+about.install_update: インストールして再起動
+about.connected_host: 接続中のホスト
+about.connected_host_description: エージェントセッションを実行しているアクティブなデーモンホスト
+about.local_daemon: ローカルデーモン
+about.remote_host: リモートホスト
+about.manage_hosts: ホストの管理
+about.community: コミュニティとサポート
+about.website: ウェブサイト
+about.website_description: 公式ウェブサイトとドキュメント
+about.github: GitHub
+about.github_description: ソースコード、リリースノート、課題トラッカー
+about.sponsor: スポンサー
+about.sponsor_description: GitHub Sponsors で Padu の開発を支援する
+about.open_in_browser: ブラウザで開く
 keybindings.section_general: 一般とウィンドウ
 keybindings.section_navigation: ナビゲーションとパネル
 keybindings.section_chat: チャットと入力

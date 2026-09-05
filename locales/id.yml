@@ -95,6 +95,7 @@ settings.providers: Penyedia
 settings.usage: Penggunaan
 settings.daemon: Host & Daemon
 settings.computer_use: Penggunaan Komputer
+settings.about: Tentang
 settings.general_keywords: umum lokal proyek percakapan privasi analitik telemetri anonim bagikan pembaruan otomatis sparkle versi
 settings.appearance_keywords: tampilan tema sistem terang gelap bahasa inggris indonesia jepang mandarin font ukuran teks editor
 settings.keybindings_keywords: pintasan tombol keyboard shortcut hotkey pengikatan navigasi perintah
@@ -104,6 +105,27 @@ settings.skills_keywords: skill keahlian pustaka agen nonaktifkan aktifkan hapus
 settings.usage_keywords: penggunaan token biaya pengeluaran cache harian grafik model rincian riwayat claude codex
 settings.daemon_keywords: host jarak jauh remote server devbox cloud daemon web jaringan ekspos origin token port websocket ssh lan
 settings.computer_use_keywords: penggunaan komputer perekaman layar aksesibilitas aplikasi kontrol codex
+settings.about_keywords: tentang info versi pembaruan perbarui host terhubung github repositori sponsor donasi berkontribusi
+about.tagline: Control plane native yang cepat untuk local coding agent
+about.app_version: Versi Aplikasi
+about.check_for_updates: Periksa Pembaruan
+about.checking_for_updates: Memeriksa pembaruan...
+about.up_to_date: Versi sudah terbaru
+about.update_available: Pembaruan tersedia
+about.install_update: Pasang dan Mulai Ulang
+about.connected_host: Host Terhubung
+about.connected_host_description: Host daemon aktif yang menjalankan sesi agen Anda
+about.local_daemon: Daemon Lokal
+about.remote_host: Host Jarak Jauh
+about.manage_hosts: Kelola Host
+about.community: Komunitas & Dukungan
+about.website: Situs Web
+about.website_description: Situs web resmi dan dokumentasi
+about.github: GitHub
+about.github_description: Kode sumber, catatan rilis, dan pelacak masalah
+about.sponsor: Sponsor
+about.sponsor_description: Dukung pengembangan Padu di GitHub Sponsors
+about.open_in_browser: Buka di Peramban
 keybindings.section_general: Umum & Jendela
 keybindings.section_navigation: Navigasi & Panel
 keybindings.section_chat: Obrolan & Komposer

@@ -196,6 +196,8 @@ settings.daemon:
   en: Hosts & Daemon
 settings.computer_use:
   en: Computer Use
+settings.about:
+  en: About
 settings.general_keywords:
   en: general local projects conversations privacy analytics telemetry anonymous sharing updates automatic sparkle version
 settings.appearance_keywords:
@@ -214,6 +216,48 @@ settings.daemon_keywords:
   en: hosts host remote server devbox cloud daemon web network expose origin token port websocket ssh lan
 settings.computer_use_keywords:
   en: computer use screen recording accessibility apps control codex
+settings.about_keywords:
+  en: about info version update updates host connected github repository repo sponsor contribute
+about.tagline:
+  en: A fast, native control plane for local coding agents
+about.app_version:
+  en: App Version
+about.check_for_updates:
+  en: Check for Updates
+about.checking_for_updates:
+  en: Checking for updates...
+about.up_to_date:
+  en: Up to date
+about.update_available:
+  en: Update available
+about.install_update:
+  en: Install and Relaunch
+about.connected_host:
+  en: Connected Host
+about.connected_host_description:
+  en: Active daemon host running your agent sessions
+about.local_daemon:
+  en: Local Daemon
+about.remote_host:
+  en: Remote Host
+about.manage_hosts:
+  en: Manage Hosts
+about.community:
+  en: Community & Support
+about.website:
+  en: Website
+about.website_description:
+  en: Official website and documentation
+about.github:
+  en: GitHub
+about.github_description:
+  en: Source code, release notes, and issue tracker
+about.sponsor:
+  en: Sponsor
+about.sponsor_description:
+  en: Support the development of Padu on GitHub Sponsors
+about.open_in_browser:
+  en: Open in Browser
 keybindings.section_general:
   en: General & Window
 keybindings.section_navigation:
