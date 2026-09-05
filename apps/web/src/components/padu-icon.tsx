@@ -35,6 +35,7 @@ export const PADU_ICONS = {
   gitCommitHorizontal: 'i-padu-git-commit-horizontal',
   globe: 'i-padu-globe',
   github: 'i-padu-github',
+  heart: 'i-padu-heart',
   info: 'i-padu-info',
   logo: 'i-padu-logo',
   laptop: 'i-padu-laptop',
