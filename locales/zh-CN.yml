@@ -960,6 +960,19 @@ files.preview_markdown: 预览 Markdown
 files.edit_markdown_source: 编辑源码
 files.resize_tree: 调整文件树宽度
 files.refresh: 刷新文件
+files.show_hidden: 显示隐藏文件
+files.hide_hidden: 隐藏隐藏文件
+files.name_placeholder: 名称
+files.invalid_name: 请输入有效的文件名
+files.operation_failed: 文件操作失败
+files.operation_failed_detail: "文件操作失败：%{error}"
+files.actions: 文件操作
+files.new_file: 新建文件
+files.new_folder: 新建文件夹
+files.confirm: 确认
+files.delete: 删除
+files.delete_confirm: "确认删除 %{name}？"
+files.copy_relative_path: 复制相对路径
 files.loading: 正在加载文件…
 files.workspace_files: 工作区文件
 files.loading_file: 正在加载文件

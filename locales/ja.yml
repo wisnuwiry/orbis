@@ -1002,6 +1002,19 @@ files.preview_markdown: Markdown をプレビュー
 files.edit_markdown_source: ソースを編集
 files.resize_tree: ファイルツリーの幅を変更
 files.refresh: ファイルを更新
+files.show_hidden: 隠しファイルを表示
+files.hide_hidden: 隠しファイルを非表示
+files.name_placeholder: 名前
+files.invalid_name: 有効な名前を1つ入力してください
+files.operation_failed: ファイル操作に失敗しました
+files.operation_failed_detail: "ファイル操作に失敗しました：%{error}"
+files.actions: ファイル操作
+files.new_file: 新規ファイル
+files.new_folder: 新規フォルダー
+files.confirm: 確認
+files.delete: 削除
+files.delete_confirm: "%{name} を削除しますか？"
+files.copy_relative_path: 相対パスをコピー
 files.loading: ファイルを読み込み中…
 files.workspace_files: ワークスペースのファイル
 files.loading_file: ファイルを読み込み中
