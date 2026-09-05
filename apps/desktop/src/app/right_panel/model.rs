@@ -1,34 +1,50 @@
 use super::*;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub(super) struct WorkingTreeEntry {
-    pub(super) relative_path: String,
-    pub(super) absolute_path: PathBuf,
-    pub(super) name: String,
-    pub(super) is_dir: bool,
-    pub(super) file_icon: Option<&'static str>,
-    pub(super) expanded: bool,
-    pub(super) depth: usize,
+pub(crate) enum FileOperationDialogKind {
+    CreateFile { parent: PathBuf },
+    CreateDirectory { parent: PathBuf },
+    Rename { source: PathBuf },
+    Delete { target: PathBuf },
+}
+
+pub(crate) struct FileOperationDialog {
+    pub(crate) kind: FileOperationDialogKind,
+    pub(crate) input: Entity<TextInput>,
+    pub(crate) focus: FocusHandle,
+    pub(crate) previous_focus: Option<FocusHandle>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub(super) enum ReviewDiffTreeRow {
+pub(crate) struct WorkingTreeEntry {
+    pub(crate) relative_path: String,
+    pub(crate) absolute_path: PathBuf,
+    pub(crate) name: String,
+    pub(crate) is_dir: bool,
+    pub(crate) is_ignored: bool,
+    pub(crate) file_icon: Option<&'static str>,
+    pub(crate) expanded: bool,
+    pub(crate) depth: usize,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub(crate) enum ReviewDiffTreeRow {
     Directory {
-        pub(super) path: String,
-        pub(super) name: String,
-        pub(super) depth: usize,
-        pub(super) expanded: bool,
+        path: String,
+        name: String,
+        depth: usize,
+        expanded: bool,
     },
     File {
-        pub(super) file_index: usize,
-        pub(super) depth: usize,
+        file_index: usize,
+        depth: usize,
     },
 }
 
 /// Select from a compact, embedded subset of Material Icon Theme rather than
 /// shipping its entire icon catalog. The SVG path is resolved once per entry
 /// during the directory scan, not on every row paint.
-pub(super) fn file_icon_for_path(path: &str) -> &'static str {
+pub(crate) fn file_icon_for_path(path: &str) -> &'static str {
     let name = Path::new(path)
         .file_name()
         .and_then(|name| name.to_str())
@@ -36,7 +52,7 @@ pub(super) fn file_icon_for_path(path: &str) -> &'static str {
     file_icon_for_name(name)
 }
 
-pub(super) fn review_diff_gap_icon_path(
+pub(crate) fn review_diff_gap_icon_path(
     direction: crate::review_diff::ExpansionDirection,
 ) -> &'static str {
     match direction {
@@ -50,7 +66,7 @@ pub(super) fn review_diff_gap_icon_path(
     }
 }
 
-pub(super) fn review_diff_gap_tooltip(direction: crate::review_diff::ExpansionDirection) -> String {
+pub(crate) fn review_diff_gap_tooltip(direction: crate::review_diff::ExpansionDirection) -> String {
     match direction {
         crate::review_diff::ExpansionDirection::Start => tr!("diff.expand_context_below"),
         crate::review_diff::ExpansionDirection::End => tr!("diff.expand_context_above"),
@@ -59,7 +75,7 @@ pub(super) fn review_diff_gap_tooltip(direction: crate::review_diff::ExpansionDi
     }
 }
 
-pub(super) fn review_diff_gap_directions(
+pub(crate) fn review_diff_gap_directions(
     position: crate::review_diff::GapPosition,
     chunked: bool,
 ) -> &'static [crate::review_diff::ExpansionDirection] {
@@ -73,7 +89,7 @@ pub(super) fn review_diff_gap_directions(
     }
 }
 
-pub(super) fn review_diff_directory_paths(files: &[crate::review_diff::File]) -> HashSet<String> {
+pub(crate) fn review_diff_directory_paths(files: &[crate::review_diff::File]) -> HashSet<String> {
     let mut paths = HashSet::new();
     for file in files {
         let parts = file.path.split('/').collect::<Vec<_>>();
@@ -89,7 +105,7 @@ pub(super) fn review_diff_directory_paths(files: &[crate::review_diff::File]) ->
     paths
 }
 
-pub(super) fn review_diff_tree_rows(
+pub(crate) fn review_diff_tree_rows(
     files: &[crate::review_diff::File],
     expanded_paths: &HashSet<String>,
     filter: &str,
@@ -147,22 +163,22 @@ pub(super) fn review_diff_tree_rows(
 /// surface; the copy embedded in a transcript activity is a summary and gives
 /// its space back to the code.
 #[derive(Clone, Copy)]
-pub(super) struct DiffRowStyle {
-    pub(super) gutter_width: f32,
-    pub(super) row_height: f32,
-    pub(super) text_size: f32,
+pub(crate) struct DiffRowStyle {
+    pub(crate) gutter_width: f32,
+    pub(crate) row_height: f32,
+    pub(crate) text_size: f32,
     /// What to put in the gutter of a row that has no line number. Git always
     /// reports positions, so this only comes up on a diff synthesized from a
     /// provider's before/after text: there the `+`/`-` marker stands in, which
     /// keeps the gutter from going blank and the meaning off color alone.
-    pub(super) marker_fallback: bool,
+    pub(crate) marker_fallback: bool,
 }
 
 impl DiffRowStyle {
     /// Review-tab rows at the user's code font size. The gutter holds a
     /// right-aligned line number: ~0.6em per mono digit, five digits, plus
     /// its padding and border.
-    pub(super) fn review(text_size: f32) -> Self {
+    pub(crate) fn review(text_size: f32) -> Self {
         Self {
             gutter_width: (text_size * 3.0 + 14.0).round(),
             row_height: (text_size * 1.5).round(),
@@ -173,14 +189,14 @@ impl DiffRowStyle {
 
     /// The same rows the Review tab draws, so an edit reads the same wherever
     /// it is opened.
-    pub(super) fn activity(text_size: f32) -> Self {
+    pub(crate) fn activity(text_size: f32) -> Self {
         Self {
             marker_fallback: true,
             ..Self::review(text_size)
         }
     }
 
-    pub(super) fn gutter_width(&self) -> f32 {
+    pub(crate) fn gutter_width(&self) -> f32 {
         self.gutter_width
     }
 }
@@ -196,7 +212,7 @@ impl DiffRowStyle {
 /// the same key, and a drag resolved against whichever duplicate registered
 /// first: selections jumped rows, skipped wrapped lines, and collapsed when
 /// the head crossed into context.
-pub(super) fn diff_row_selection_key(
+pub(crate) fn diff_row_selection_key(
     key_prefix: &str,
     line: &crate::review_diff::Line,
     index: usize,
@@ -220,7 +236,7 @@ pub(super) fn diff_row_selection_key(
 
 /// One context, addition, or deletion row, shared by the Review panel and the
 /// diff inside an expanded file-change activity so the two never drift.
-pub(super) fn render_diff_code_row(
+pub(crate) fn render_diff_code_row(
     line: &crate::review_diff::Line,
     index: usize,
     key_prefix: &str,
@@ -322,7 +338,7 @@ pub(super) fn render_diff_code_row(
         .into_any_element()
 }
 
-pub(super) fn review_diff_flat_text(
+pub(crate) fn review_diff_flat_text(
     line: &crate::review_diff::Line,
     theme: &Theme,
 ) -> md::render::FlatText {
@@ -361,7 +377,7 @@ pub(super) fn review_diff_flat_text(
     }
 }
 
-pub(super) fn file_icon_for_name(name: &str) -> &'static str {
+pub(crate) fn file_icon_for_name(name: &str) -> &'static str {
     let name = name.to_ascii_lowercase();
     let named_icon = if name.starts_with("readme") {
         Some("icons/file-types/readme.svg")
@@ -563,7 +579,7 @@ pub(super) fn file_icon_for_name(name: &str) -> &'static str {
 }
 
 #[cfg(test)]
-pub(super) fn visible_working_tree_entries(
+pub(crate) fn visible_working_tree_entries(
     root: &Path,
     expanded_paths: &HashSet<PathBuf>,
 ) -> Vec<WorkingTreeEntry> {
@@ -599,6 +615,7 @@ pub(super) fn visible_working_tree_entries(
                 absolute_path: absolute_path.clone(),
                 name,
                 is_dir,
+                is_ignored: false,
                 file_icon,
                 expanded,
                 depth,
@@ -622,7 +639,7 @@ pub(super) fn visible_working_tree_entries(
 
 /// The language name for a file, as understood by [`crate::md::highlight`].
 /// Names the lexer does not know simply render unhighlighted.
-pub(super) fn file_highlighter_language(relative_path: &str) -> &'static str {
+pub(crate) fn file_highlighter_language(relative_path: &str) -> &'static str {
     let path = Path::new(relative_path);
     let file_name = path
         .file_name()
@@ -698,7 +715,7 @@ pub(super) fn file_highlighter_language(relative_path: &str) -> &'static str {
 ///
 /// One unbounded `read_to_string`, so callers keep it off the UI thread; the
 /// only caller is [`Padu::read_right_panel_file_into_editor`].
-pub(super) fn read_right_panel_file(
+pub(crate) fn read_right_panel_file(
     workspace: &padu_client::WorkspaceClient,
     project_path: &Path,
     relative_path: &str,

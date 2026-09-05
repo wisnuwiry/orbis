@@ -1,7 +1,7 @@
 use super::*;
 
 impl Padu {
-    pub(super) fn render_right_panel_toggle(&self, cx: &mut Context<Self>) -> Stateful<Div> {
+    pub(crate) fn render_right_panel_toggle(&self, cx: &mut Context<Self>) -> Stateful<Div> {
         let theme = Theme::current(cx);
         div()
             .id("toggle-right-panel")
@@ -29,7 +29,7 @@ impl Padu {
             }))
     }
 
-    pub(super) fn render_right_panel(
+    pub(crate) fn render_right_panel(
         &mut self,
         width: f32,
         window: &mut Window,
@@ -119,7 +119,7 @@ impl Padu {
             })
     }
 
-    pub(super) fn ensure_right_panel_browser(
+    pub(crate) fn ensure_right_panel_browser(
         &mut self,
         browser_id: Uuid,
         window: &mut Window,
@@ -138,7 +138,7 @@ impl Padu {
     }
 
     /// Drop browser views whose tab no longer exists in any session.
-    pub(super) fn retain_right_panel_browsers(&mut self) {
+    pub(crate) fn retain_right_panel_browsers(&mut self) {
         let retained_browser_ids = self
             .right_panel_surfaces
             .iter()
@@ -157,7 +157,7 @@ impl Padu {
     /// Whether any GPUI overlay that could float above the right panel is
     /// open. The native webview always draws over GPUI, so while this holds
     /// the live page swaps for a frozen snapshot.
-    pub(super) fn any_overlay_open(&self, cx: &App) -> bool {
+    pub(crate) fn any_overlay_open(&self, cx: &App) -> bool {
         self.menus.borrow().values().any(ContextMenuHandle::is_open)
             || self.command_palette.is_open()
             || self.task_switcher.is_open()
@@ -175,7 +175,7 @@ impl Padu {
     /// single authority — tab switches, panel toggles, session switches, the
     /// settings page and overlay menus all funnel through here, so a webview
     /// can never linger over unrelated UI.
-    pub(super) fn sync_browser_webviews(&mut self, cx: &mut Context<Self>) {
+    pub(crate) fn sync_browser_webviews(&mut self, cx: &mut Context<Self>) {
         if self.right_panel_browsers.is_empty() {
             return;
         }
@@ -206,7 +206,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn ensure_right_panel_terminal(
+    pub(crate) fn ensure_right_panel_terminal(
         &mut self,
         terminal_id: Uuid,
         cx: &mut Context<Self>,
@@ -237,7 +237,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn ensure_right_panel_terminals(&mut self, cx: &mut Context<Self>) {
+    pub(crate) fn ensure_right_panel_terminals(&mut self, cx: &mut Context<Self>) {
         let active_terminal_ids = self
             .right_panel_surfaces
             .iter()
@@ -260,7 +260,7 @@ impl Padu {
         }
     }
 
-    pub(super) fn render_right_panel_header(
+    pub(crate) fn render_right_panel_header(
         &self,
         window: &Window,
         cx: &mut Context<Self>,
@@ -704,7 +704,7 @@ impl Padu {
         )
     }
 
-    pub(super) fn render_right_panel_chooser(&self, cx: &mut Context<Self>) -> Stateful<Div> {
+    pub(crate) fn render_right_panel_chooser(&self, cx: &mut Context<Self>) -> Stateful<Div> {
         let theme = Theme::current(cx);
         let has_project = self.active_project().is_some();
         div()
@@ -776,7 +776,7 @@ impl Padu {
             )
     }
 
-    pub(super) fn render_right_panel_card(
+    pub(crate) fn render_right_panel_card(
         &self,
         surface: RightPanelSurface,
         description: String,
@@ -840,7 +840,7 @@ impl Padu {
             }))
     }
 
-    pub(super) fn render_right_panel_empty_message(
+    pub(crate) fn render_right_panel_empty_message(
         &self,
         title: String,
         description: String,

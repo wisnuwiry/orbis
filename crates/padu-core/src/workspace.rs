@@ -22,9 +22,50 @@ pub fn execute(operation: WorkspaceOperation) -> anyhow::Result<WorkspaceResult>
         WorkspaceOperation::ListTree {
             root,
             expanded_paths,
+            show_hidden,
         } => WorkspaceResult::WorkingTree {
-            entries: list_tree(&root, &expanded_paths.into_iter().collect()),
+            entries: list_tree(&root, &expanded_paths.into_iter().collect(), show_hidden),
         },
+        WorkspaceOperation::CreateFile {
+            root,
+            relative_path,
+        } => {
+            let path = resolve_workspace_path(&root, &relative_path)?;
+            if path.exists() {
+                bail!("path already exists: {}", relative_path.display());
+            }
+            fs::File::create(path)?;
+            WorkspaceResult::Ack
+        }
+        WorkspaceOperation::CreateDirectory {
+            root,
+            relative_path,
+        } => {
+            fs::create_dir(resolve_workspace_path(&root, &relative_path)?)?;
+            WorkspaceResult::Ack
+        }
+        WorkspaceOperation::RenamePath { root, from, to } => {
+            let from = resolve_workspace_path(&root, &from)?;
+            let to = resolve_workspace_path(&root, &to)?;
+            if to.exists() {
+                bail!("path already exists: {}", to.display());
+            }
+            fs::rename(from, to)?;
+            WorkspaceResult::Ack
+        }
+        WorkspaceOperation::DeletePath {
+            root,
+            relative_path,
+        } => {
+            let path = resolve_workspace_path(&root, &relative_path)?;
+            let metadata = fs::symlink_metadata(&path)?;
+            if metadata.is_dir() {
+                fs::remove_dir_all(path)?;
+            } else {
+                fs::remove_file(path)?;
+            }
+            WorkspaceResult::Ack
+        }
         WorkspaceOperation::BrowseDirectory { path } => {
             let home = dirs::home_dir().ok_or_else(|| anyhow!("home directory is unavailable"))?;
             let path = fs::canonicalize(path.as_deref().unwrap_or(&home)).with_context(|| {
@@ -229,12 +270,32 @@ fn resolve_workspace_path(root: &Path, relative: &Path) -> anyhow::Result<PathBu
     Ok(root.join(relative))
 }
 
-fn list_tree(root: &Path, expanded_paths: &HashSet<PathBuf>) -> Vec<WorkingTreeEntry> {
+fn gitignore_for_root(root: &Path) -> Option<ignore::gitignore::Gitignore> {
+    let path = root.join(".gitignore");
+    if !path.is_file() {
+        return None;
+    }
+    let mut builder = ignore::gitignore::GitignoreBuilder::new(root);
+    if builder.add(path).is_some() {
+        return None;
+    }
+    builder.build().ok()
+}
+
+fn list_tree(
+    root: &Path,
+    expanded_paths: &HashSet<PathBuf>,
+    show_hidden: bool,
+) -> Vec<WorkingTreeEntry> {
+    let gitignore = gitignore_for_root(root);
+
     fn visit(
         directory: &Path,
         relative_directory: &Path,
         depth: usize,
         expanded_paths: &HashSet<PathBuf>,
+        show_hidden: bool,
+        gitignore: Option<&ignore::gitignore::Gitignore>,
         output: &mut Vec<WorkingTreeEntry>,
     ) {
         let Ok(entries) = fs::read_dir(directory) else {
@@ -244,15 +305,20 @@ fn list_tree(root: &Path, expanded_paths: &HashSet<PathBuf>) -> Vec<WorkingTreeE
             .filter_map(Result::ok)
             .filter_map(|entry| {
                 let name = entry.file_name().to_string_lossy().into_owned();
-                if name == ".git" {
+                if name == ".git" || (!show_hidden && name.starts_with('.')) {
                     return None;
                 }
                 let is_dir = entry.file_type().ok()?.is_dir();
-                Some((entry.path(), name, is_dir))
+                let is_ignored = gitignore.is_some_and(|gitignore| {
+                    gitignore
+                        .matched_path_or_any_parents(&entry.path(), is_dir)
+                        .is_ignore()
+                });
+                Some((entry.path(), name, is_dir, is_ignored))
             })
             .collect::<Vec<_>>();
-        children.sort_by_key(|(_, name, is_dir)| (!*is_dir, name.to_lowercase()));
-        for (absolute_path, name, is_dir) in children {
+        children.sort_by_key(|(_, name, is_dir, _)| (!*is_dir, name.to_lowercase()));
+        for (absolute_path, name, is_dir, is_ignored) in children {
             let relative_path = relative_directory.join(&name);
             let expanded = is_dir && expanded_paths.contains(&absolute_path);
             output.push(WorkingTreeEntry {
@@ -260,6 +326,7 @@ fn list_tree(root: &Path, expanded_paths: &HashSet<PathBuf>) -> Vec<WorkingTreeE
                 absolute_path: absolute_path.clone(),
                 name,
                 is_dir,
+                is_ignored,
                 expanded,
                 depth,
             });
@@ -269,13 +336,23 @@ fn list_tree(root: &Path, expanded_paths: &HashSet<PathBuf>) -> Vec<WorkingTreeE
                     &relative_path,
                     depth + 1,
                     expanded_paths,
+                    show_hidden,
+                    gitignore,
                     output,
                 );
             }
         }
     }
     let mut output = Vec::new();
-    visit(root, Path::new(""), 0, expanded_paths, &mut output);
+    visit(
+        root,
+        Path::new(""),
+        0,
+        expanded_paths,
+        show_hidden,
+        gitignore.as_ref(),
+        &mut output,
+    );
     output
 }
 
@@ -291,6 +368,7 @@ fn list_directory(directory: &Path) -> anyhow::Result<Vec<WorkingTreeEntry>> {
                 absolute_path: entry.path(),
                 name,
                 is_dir,
+                is_ignored: false,
                 expanded: false,
                 depth: 0,
             })
@@ -602,6 +680,88 @@ mod tests {
         );
 
         fs::remove_dir_all(directory).unwrap();
+    }
+
+    #[test]
+    fn working_tree_marks_ignored_entries_and_hides_dotfiles() {
+        let root = std::env::temp_dir().join(format!("padu-working-tree-{}", Uuid::new_v4()));
+        fs::create_dir_all(root.join("ignored-dir")).unwrap();
+        fs::write(root.join(".gitignore"), "ignored.txt\nignored-dir/\n").unwrap();
+        fs::write(root.join("ignored.txt"), "ignored").unwrap();
+        fs::write(root.join("visible.txt"), "visible").unwrap();
+        fs::write(root.join(".env"), "secret").unwrap();
+
+        let WorkspaceResult::WorkingTree { entries } = execute(WorkspaceOperation::ListTree {
+            root: root.clone(),
+            expanded_paths: Vec::new(),
+            show_hidden: false,
+        })
+        .unwrap() else {
+            panic!("unexpected workspace response")
+        };
+        assert!(
+            entries
+                .iter()
+                .any(|entry| entry.name == "ignored.txt" && entry.is_ignored)
+        );
+        assert!(
+            entries
+                .iter()
+                .any(|entry| entry.name == "ignored-dir" && entry.is_ignored)
+        );
+        assert!(!entries.iter().any(|entry| entry.name == ".env"));
+
+        let WorkspaceResult::WorkingTree { entries } = execute(WorkspaceOperation::ListTree {
+            root: root.clone(),
+            expanded_paths: Vec::new(),
+            show_hidden: true,
+        })
+        .unwrap() else {
+            panic!("unexpected workspace response")
+        };
+        assert!(entries.iter().any(|entry| entry.name == ".env"));
+
+        fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn workspace_file_mutations_stay_relative_to_the_root() {
+        let root =
+            std::env::temp_dir().join(format!("padu-workspace-mutations-{}", Uuid::new_v4()));
+        fs::create_dir_all(&root).unwrap();
+        execute(WorkspaceOperation::CreateDirectory {
+            root: root.clone(),
+            relative_path: PathBuf::from("src"),
+        })
+        .unwrap();
+        execute(WorkspaceOperation::CreateFile {
+            root: root.clone(),
+            relative_path: PathBuf::from("src/main.rs"),
+        })
+        .unwrap();
+        execute(WorkspaceOperation::RenamePath {
+            root: root.clone(),
+            from: PathBuf::from("src/main.rs"),
+            to: PathBuf::from("src/lib.rs"),
+        })
+        .unwrap();
+        assert!(root.join("src/lib.rs").is_file());
+        assert!(
+            execute(WorkspaceOperation::DeletePath {
+                root: root.clone(),
+                relative_path: PathBuf::from("src"),
+            })
+            .is_ok()
+        );
+        assert!(!root.join("src").exists());
+        assert!(
+            execute(WorkspaceOperation::CreateFile {
+                root: root.clone(),
+                relative_path: PathBuf::from("../outside.txt"),
+            })
+            .is_err()
+        );
+        fs::remove_dir_all(root).unwrap();
     }
 
     #[test]

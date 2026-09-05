@@ -12,12 +12,11 @@ mod model;
 mod render;
 mod tabs;
 
-pub(super) use diff::*;
-pub(super) use files::*;
-pub(super) use links::*;
-pub(super) use model::*;
-pub(super) use render::*;
-pub(super) use tabs::*;
+pub(crate) use links::*;
+pub(crate) use model::*;
+pub(crate) use tabs::*;
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -265,13 +264,13 @@ mod tests {
 
     #[test]
     fn review_render_path_only_reads_the_in_memory_snapshot() {
-        let source = include_str!("right_panel.rs");
+        let source = include_str!("diff.rs");
         let start = source
-            .find("\n    fn render_right_panel_diff(")
+            .find("\n    pub(crate) fn render_right_panel_diff(")
             .expect("review render fn");
         let body = &source[start + 1..];
         let end = body
-            .find("\n    fn render_right_panel_empty_message(")
+            .find("\n    pub(crate) fn render_right_panel_diff_toolbar(")
             .expect("review render end");
         let body = &body[..end];
 
@@ -293,19 +292,20 @@ mod tests {
     /// and the shared one is also what the transcript's diff paints with.
     #[test]
     fn diff_text_rows_soft_wrap() {
-        let source = include_str!("right_panel.rs");
-        let panel = source
-            .split_once("\n    fn render_right_panel_diff_line(")
+        let diff_source = include_str!("diff.rs");
+        let panel = diff_source
+            .split_once("\n    pub(crate) fn render_right_panel_diff_line(")
             .expect("review diff line renderer")
             .1
             .split_once("\n    #[allow(clippy::too_many_arguments)]")
             .expect("review diff line renderer end")
             .0;
-        let shared = source
-            .split_once("\npub(super) fn render_diff_code_row(")
+        let model_source = include_str!("model.rs");
+        let shared = model_source
+            .split_once("\npub(crate) fn render_diff_code_row(")
             .expect("shared diff code row")
             .1
-            .split_once("\nfn review_diff_flat_text(")
+            .split_once("\npub(crate) fn review_diff_flat_text(")
             .expect("shared diff code row end")
             .0;
 
@@ -324,14 +324,14 @@ mod tests {
     /// is large or its volume is slow.
     #[test]
     fn the_working_tree_render_path_does_no_filesystem_work() {
-        let source = include_str!("right_panel.rs");
+        let source = include_str!("files.rs");
         // Anchored on the definition's indentation so this test does not match
         // its own string literals.
         let start = source
-            .find("\n    fn render_right_panel_working_tree(")
+            .find("\n    pub(crate) fn render_right_panel_working_tree(")
             .expect("render fn");
         let body = &source[start + 1..];
-        let end = body.find("\n    fn ").unwrap_or(body.len());
+        let end = body.find("\n    pub(crate) fn ").unwrap_or(body.len());
         let body = &body[..end];
 
         for forbidden in [
@@ -353,9 +353,9 @@ mod tests {
     /// it inline, so the frame that revealed the tab paid for the whole file.
     #[test]
     fn the_file_editor_render_path_does_no_filesystem_work() {
-        let source = include_str!("right_panel.rs");
+        let source = include_str!("files.rs");
         let start = source
-            .find("\n    fn ensure_right_panel_file_editor(")
+            .find("\n    pub(crate) fn ensure_right_panel_file_editor(")
             .expect("ensure fn");
         let body = &source[start + 1..];
         let end = body
@@ -539,12 +539,12 @@ mod tests {
 
     #[test]
     fn right_panel_tab_titles_stay_on_one_line() {
-        let source = include_str!("right_panel.rs");
+        let source = include_str!("render.rs");
         let header = source
-            .split_once("\n    pub(super) fn render_right_panel_header(")
+            .split_once("\n    pub(crate) fn render_right_panel_header(")
             .expect("right panel header renderer")
             .1
-            .split_once("\n    fn render_right_panel_chooser(")
+            .split_once("\n    pub(crate) fn render_right_panel_chooser(")
             .expect("right panel header renderer end")
             .0;
 
@@ -764,5 +764,52 @@ mod tests {
             fade_safe_tab_offset(px(0.0), px(0.0), px(0.0), px(100.0), px(0.0), px(300.0),),
             px(0.0)
         );
+    }
+
+    #[test]
+    fn working_tree_entry_preserves_ignored_state() {
+        let entry = WorkingTreeEntry {
+            relative_path: "target".into(),
+            absolute_path: PathBuf::from("/project/target"),
+            name: "target".into(),
+            is_dir: true,
+            is_ignored: true,
+            file_icon: None,
+            expanded: false,
+            depth: 0,
+        };
+        assert!(entry.is_ignored);
+        assert!(entry.is_dir);
+
+        let file_dialog = FileOperationDialogKind::CreateFile {
+            parent: PathBuf::from("/project/src"),
+        };
+        assert_eq!(
+            file_dialog,
+            FileOperationDialogKind::CreateFile {
+                parent: PathBuf::from("/project/src")
+            }
+        );
+    }
+
+    #[test]
+    fn file_operation_dialog_kind_supports_delete_and_path_name_extraction() {
+        let delete_dialog = FileOperationDialogKind::Delete {
+            target: PathBuf::from("/project/src/index.ts"),
+        };
+        assert_eq!(
+            delete_dialog,
+            FileOperationDialogKind::Delete {
+                target: PathBuf::from("/project/src/index.ts")
+            }
+        );
+
+        let path = Path::new("/project/src/components/button.tsx");
+        let name = path.file_name().and_then(|n| n.to_str()).unwrap();
+        assert_eq!(name, "button.tsx");
+
+        let folder_path = Path::new("/project/src/components");
+        let folder_name = folder_path.file_name().and_then(|n| n.to_str()).unwrap();
+        assert_eq!(folder_name, "components");
     }
 }

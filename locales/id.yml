@@ -959,6 +959,19 @@ files.preview_markdown: Pratinjau markdown
 files.edit_markdown_source: Edit sumber
 files.resize_tree: Ubah ukuran hierarki berkas
 files.refresh: Segarkan berkas
+files.show_hidden: Tampilkan berkas tersembunyi
+files.hide_hidden: Sembunyikan berkas tersembunyi
+files.name_placeholder: Nama
+files.invalid_name: Masukkan satu nama yang valid
+files.operation_failed: Operasi berkas gagal
+files.operation_failed_detail: "Operasi berkas gagal: %{error}"
+files.actions: Tindakan berkas
+files.new_file: Berkas baru
+files.new_folder: Folder baru
+files.confirm: Konfirmasi
+files.delete: Hapus
+files.delete_confirm: "Hapus %{name}?"
+files.copy_relative_path: Salin jalur relatif
 files.loading: Memuat berkas…
 files.workspace_files: Berkas ruang kerja
 files.loading_file: Memuat berkas

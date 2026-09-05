@@ -341,6 +341,7 @@ impl Render for Padu {
             let delete_session_dialog = self.render_delete_session_dialog(window, cx);
             let goal_dialog = self.render_goal_dialog(window, cx);
             let host_dialog = self.render_host_dialog(window, cx);
+            let file_operation_dialog = self.render_file_operation_dialog(window, cx);
             let toast = self.render_active_toast(cx);
             let content = div()
                 .relative()
@@ -361,6 +362,7 @@ impl Render for Padu {
                 .children(delete_session_dialog)
                 .children(goal_dialog)
                 .children(host_dialog)
+                .children(file_operation_dialog)
                 .children(image_preview)
                 .children(task_switcher)
                 .children(onboarding_modal)
@@ -380,6 +382,7 @@ impl Render for Padu {
         let delete_session_dialog = self.render_delete_session_dialog(window, cx);
         let goal_dialog = self.render_goal_dialog(window, cx);
         let host_dialog = self.render_host_dialog(window, cx);
+        let file_operation_dialog = self.render_file_operation_dialog(window, cx);
         let toast = self.render_active_toast(cx);
         // Fullscreen owns the transcript column: sidebar stays, the docked
         // panel slides away, and the center renders the takeover instead.
@@ -529,6 +532,7 @@ impl Render for Padu {
             .children(delete_session_dialog)
             .children(goal_dialog)
             .children(host_dialog)
+            .children(file_operation_dialog)
             .children(image_preview)
             .children(task_switcher)
             .children(onboarding_modal)

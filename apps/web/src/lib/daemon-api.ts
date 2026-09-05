@@ -65,8 +65,8 @@ export const daemonKeys = {
     cwd: string,
     binaryOverride: string | null,
   ) => [...daemonKeys.composerSources(address), 'commands', provider, cwd, binaryOverride] as const,
-  workspaceTree: (address: string, cwd: string, expanded: string[]) =>
-    ['daemon', address, 'workspace-tree', cwd, ...[...expanded].sort()] as const,
+  workspaceTree: (address: string, cwd: string, expanded: string[], showHidden = false) =>
+    ['daemon', address, 'workspace-tree', cwd, showHidden ? 'hidden' : 'visible', ...[...expanded].sort()] as const,
   directory: (address: string, path: string | null) =>
     ['daemon', address, 'directory', path] as const,
   workspaceFile: (address: string, cwd: string, path: string) =>
@@ -290,14 +290,36 @@ export async function listWorkspaceTree(
   client: PaduClient,
   root: string,
   expandedPaths: string[],
+  showHidden = false,
 ): Promise<WorkingTreeEntry[]> {
   const result = await workspaceRequest(client, {
     type: 'listTree',
     root,
     expanded_paths: expandedPaths,
+    show_hidden: showHidden,
   })
   if (result.type !== 'workingTree') throw new Error('The daemon returned an unexpected file tree')
   return result.entries
+}
+
+export async function createWorkspaceFile(client: PaduClient, root: string, relativePath: string): Promise<void> {
+  const result = await workspaceRequest(client, { type: 'createFile', root, relative_path: relativePath })
+  if (result.type !== 'ack') throw new Error('The daemon returned an unexpected create-file response')
+}
+
+export async function createWorkspaceDirectory(client: PaduClient, root: string, relativePath: string): Promise<void> {
+  const result = await workspaceRequest(client, { type: 'createDirectory', root, relative_path: relativePath })
+  if (result.type !== 'ack') throw new Error('The daemon returned an unexpected create-folder response')
+}
+
+export async function renameWorkspacePath(client: PaduClient, root: string, from: string, to: string): Promise<void> {
+  const result = await workspaceRequest(client, { type: 'renamePath', root, from, to })
+  if (result.type !== 'ack') throw new Error('The daemon returned an unexpected rename response')
+}
+
+export async function deleteWorkspacePath(client: PaduClient, root: string, relativePath: string): Promise<void> {
+  const result = await workspaceRequest(client, { type: 'deletePath', root, relative_path: relativePath })
+  if (result.type !== 'ack') throw new Error('The daemon returned an unexpected delete response')
 }
 
 export async function browseDaemonDirectory(

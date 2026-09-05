@@ -523,7 +523,7 @@ fn fitted_panel_widths(
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-enum RightPanelSurface {
+pub(crate) enum RightPanelSurface {
     Browser(Uuid),
     Terminal(Uuid),
     BackgroundWork {
@@ -713,42 +713,42 @@ impl Render for PaduPane {
     }
 }
 
-struct RightPanelFileEditor {
-    state: Entity<TextInput>,
-    disk_content: String,
-    writable: bool,
-    dirty: bool,
+pub(crate) struct RightPanelFileEditor {
+    pub(crate) state: Entity<TextInput>,
+    pub(crate) disk_content: String,
+    pub(crate) writable: bool,
+    pub(crate) dirty: bool,
     /// A read is in flight on the background executor. Set from the moment the
     /// editor is created, because `render` may not touch the filesystem: until
     /// the first read lands the editor is empty and locked, and that means
     /// "not read yet", never "empty file".
-    reading: bool,
+    pub(crate) reading: bool,
     /// Bumped whenever the editor's idea of the file changes, so a read that
     /// started earlier cannot apply over a newer truth — a save in particular,
     /// which makes any read already in flight describe the pre-save file.
-    read_epoch: u64,
+    pub(crate) read_epoch: u64,
 }
 
-struct RightPanelSessionState {
-    visible: bool,
-    fullscreen: bool,
-    fullscreen_conversation: bool,
-    surfaces: Vec<RightPanelSurface>,
-    active_surface: Option<usize>,
-    tabs_scroll_handle: ScrollHandle,
-    pending_tab_reveal: Option<usize>,
-    expanded_paths: HashSet<PathBuf>,
-    files_selected_path: Option<String>,
-    file_tree_width: f32,
-    file_editors: HashMap<String, RightPanelFileEditor>,
-    diff_source: ReviewDiffSource,
-    diff_snapshot: Option<Arc<ReviewDiffSnapshot>>,
-    diff_selected_file: Option<usize>,
-    diff_expanded_paths: HashSet<String>,
+pub(crate) struct RightPanelSessionState {
+    pub(crate) visible: bool,
+    pub(crate) fullscreen: bool,
+    pub(crate) fullscreen_conversation: bool,
+    pub(crate) surfaces: Vec<RightPanelSurface>,
+    pub(crate) active_surface: Option<usize>,
+    pub(crate) tabs_scroll_handle: ScrollHandle,
+    pub(crate) pending_tab_reveal: Option<usize>,
+    pub(crate) expanded_paths: HashSet<PathBuf>,
+    pub(crate) files_selected_path: Option<String>,
+    pub(crate) file_tree_width: f32,
+    pub(crate) file_editors: HashMap<String, RightPanelFileEditor>,
+    pub(crate) diff_source: ReviewDiffSource,
+    pub(crate) diff_snapshot: Option<Arc<ReviewDiffSnapshot>>,
+    pub(crate) diff_selected_file: Option<usize>,
+    pub(crate) diff_expanded_paths: HashSet<String>,
 }
 
 impl RightPanelSessionState {
-    fn empty(visible: bool) -> Self {
+    pub(crate) fn empty(visible: bool) -> Self {
         Self {
             visible,
             fullscreen: false,
@@ -768,7 +768,7 @@ impl RightPanelSessionState {
         }
     }
 
-    fn take_or_closed(states: &mut HashMap<Uuid, Self>, session_id: Uuid) -> Self {
+    pub(crate) fn take_or_closed(states: &mut HashMap<Uuid, Self>, session_id: Uuid) -> Self {
         states
             .remove(&session_id)
             .unwrap_or_else(|| Self::empty(false))
@@ -1392,7 +1392,10 @@ pub struct Padu {
     right_panel_pending_tab_reveal: Option<usize>,
     right_panel_pending_terminal_focus: Option<Uuid>,
     right_panel_expanded_paths: HashSet<PathBuf>,
+    right_panel_show_hidden_files: bool,
+    right_panel_file_operation_dialog: Option<right_panel::FileOperationDialog>,
     right_panel_files_selected_path: Option<String>,
+    pub(crate) right_panel_files_cursor: Option<usize>,
     right_panel_file_tree_width: f32,
     right_panel_file_editors: HashMap<String, RightPanelFileEditor>,
     /// Find-and-replace over the visible file editor. Created on first use of
@@ -1957,11 +1960,11 @@ impl Padu {
         cx.notify();
     }
 
-    pub(super) fn show_toast(&mut self, message: impl Into<String>) {
+    pub(crate) fn show_toast(&mut self, message: impl Into<String>) {
         self.show_toast_with_tone(message, ToastTone::Alert);
     }
 
-    pub(super) fn show_success_toast(&mut self, message: impl Into<String>) {
+    pub(crate) fn show_success_toast(&mut self, message: impl Into<String>) {
         self.show_toast_with_tone(message, ToastTone::Success);
     }
 
@@ -3097,7 +3100,10 @@ impl Padu {
                 right_panel_pending_tab_reveal: None,
                 right_panel_pending_terminal_focus: None,
                 right_panel_expanded_paths: HashSet::new(),
+                right_panel_show_hidden_files: false,
+                right_panel_file_operation_dialog: None,
                 right_panel_files_selected_path: None,
+                right_panel_files_cursor: None,
                 right_panel_file_tree_width: DEFAULT_FILE_TREE_WIDTH,
                 right_panel_file_editors: HashMap::new(),
                 file_search: None,

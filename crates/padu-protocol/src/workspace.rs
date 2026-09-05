@@ -40,6 +40,7 @@ pub struct WorkingTreeEntry {
     pub absolute_path: PathBuf,
     pub name: String,
     pub is_dir: bool,
+    pub is_ignored: bool,
     pub expanded: bool,
     pub depth: usize,
 }
@@ -52,6 +53,33 @@ pub enum WorkspaceOperation {
         root: PathBuf,
         #[ts(type = "string[]")]
         expanded_paths: Vec<PathBuf>,
+        show_hidden: bool,
+    },
+    CreateFile {
+        #[ts(type = "string")]
+        root: PathBuf,
+        #[ts(type = "string")]
+        relative_path: PathBuf,
+    },
+    CreateDirectory {
+        #[ts(type = "string")]
+        root: PathBuf,
+        #[ts(type = "string")]
+        relative_path: PathBuf,
+    },
+    RenamePath {
+        #[ts(type = "string")]
+        root: PathBuf,
+        #[ts(type = "string")]
+        from: PathBuf,
+        #[ts(type = "string")]
+        to: PathBuf,
+    },
+    DeletePath {
+        #[ts(type = "string")]
+        root: PathBuf,
+        #[ts(type = "string")]
+        relative_path: PathBuf,
     },
     BrowseDirectory {
         #[ts(type = "string | null")]
