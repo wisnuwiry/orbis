@@ -765,4 +765,30 @@ mod tests {
             px(0.0)
         );
     }
+
+    #[test]
+    fn working_tree_entry_preserves_ignored_state() {
+        let entry = WorkingTreeEntry {
+            relative_path: "target".into(),
+            absolute_path: PathBuf::from("/project/target"),
+            name: "target".into(),
+            is_dir: true,
+            is_ignored: true,
+            file_icon: None,
+            expanded: false,
+            depth: 0,
+        };
+        assert!(entry.is_ignored);
+        assert!(entry.is_dir);
+
+        let file_dialog = FileOperationDialogKind::CreateFile {
+            parent: PathBuf::from("/project/src"),
+        };
+        assert_eq!(
+            file_dialog,
+            FileOperationDialogKind::CreateFile {
+                parent: PathBuf::from("/project/src")
+            }
+        );
+    }
 }
