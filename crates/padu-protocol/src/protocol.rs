@@ -24,6 +24,8 @@ pub const MAX_WIRE_MESSAGE_BYTES: usize = 48 * 1024 * 1024;
 pub const DAEMON_TOKEN_ENV: &str = "PADU_DAEMON_TOKEN";
 pub const DAEMON_ADDRESS_ENV: &str = "PADU_DAEMON_ADDRESS";
 pub const APP_EXECUTABLE_ENV: &str = "PADU_APP_EXECUTABLE";
+pub const PADU_CLIENT_HEADER: &str = "x-padu-client";
+pub const PADU_CLIENT_NATIVE: &str = "native";
 
 #[derive(Clone, Debug, Deserialize, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
