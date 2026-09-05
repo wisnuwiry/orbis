@@ -194,7 +194,9 @@ daemon.port_description: 启用暴露后，Padu 会在所有网络接口的此�
 daemon.port_placeholder: "34123"
 daemon.allowed_origins: 允许的浏览器来源
 daemon.allowed_origins_description: 可打开 WebSocket 的确切 http:// 或 https:// 来源。
-daemon.allowed_origins_placeholder: https://padu.example.com, http://localhost:3001
+daemon.allowed_origins_placeholder: https://app.padu.dev
+daemon.add_origin: 添加来源
+daemon.remove_origin: 移除来源
 daemon.apply: 应用
 daemon.restarting: 正在重启…
 daemon.credentials_title: 守护进程访问凭据

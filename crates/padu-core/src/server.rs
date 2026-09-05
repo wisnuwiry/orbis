@@ -18,10 +18,10 @@ use tungstenite::{Message, WebSocket, accept_hdr_with_config};
 use uuid::Uuid;
 
 use crate::model::{AgentSession, Project, ProviderKind, SessionStatus};
-use crate::protocol::MAX_WIRE_MESSAGE_BYTES;
 use crate::protocol::{
-    ClientMessage, Command, PROTOCOL_VERSION, ReplayCursor, Request, ResponseOutcome,
-    ResponsePayload, RpcError, SequencedEvent, ServerMessage, WireDriverEvent,
+    ClientMessage, Command, MAX_WIRE_MESSAGE_BYTES, PADU_CLIENT_HEADER, PADU_CLIENT_NATIVE,
+    PROTOCOL_VERSION, ReplayCursor, Request, ResponseOutcome, ResponsePayload, RpcError,
+    SequencedEvent, ServerMessage, WireDriverEvent,
 };
 
 const ACCEPT_POLL_INTERVAL: Duration = Duration::from_millis(25);
@@ -643,16 +643,29 @@ fn validate_handshake(
             "unknown daemon endpoint",
         ));
     }
-    if let Some(origin) = request.headers().get(ORIGIN) {
-        let allowed = origin
-            .to_str()
-            .ok()
-            .is_some_and(|origin| allowed_origins.contains(origin));
-        if !allowed {
-            return Err(handshake_error(
-                StatusCode::FORBIDDEN,
-                "WebSocket origin is not allowed",
-            ));
+    // Native clients (such as Padu Mobile via React Native) send `X-Padu-Client: native`.
+    // Standard browser WebSockets cannot attach custom handshake headers, so this header
+    // cannot be forged by an untrusted web page. Because React Native's WebSocket implementation
+    // attaches an Origin header even on native sockets, bypass browser origin validation when
+    // this native client marker is present.
+    let is_native = request
+        .headers()
+        .get(PADU_CLIENT_HEADER)
+        .and_then(|value| value.to_str().ok())
+        .is_some_and(|value| value.eq_ignore_ascii_case(PADU_CLIENT_NATIVE));
+
+    if !is_native {
+        if let Some(origin) = request.headers().get(ORIGIN) {
+            let allowed = origin
+                .to_str()
+                .ok()
+                .is_some_and(|origin| allowed_origins.contains(origin));
+            if !allowed {
+                return Err(handshake_error(
+                    StatusCode::FORBIDDEN,
+                    "WebSocket origin is not allowed",
+                ));
+            }
         }
     }
     Ok(response)
@@ -1690,6 +1703,135 @@ mod tests {
         assert!(validate_handshake(&request, HandshakeResponse::new(()), &allowed).is_ok());
         let native = HandshakeRequest::builder().uri("/v1").body(()).unwrap();
         assert!(validate_handshake(&native, HandshakeResponse::new(()), &HashSet::new()).is_ok());
+
+        let native_mobile = HandshakeRequest::builder()
+            .uri("/v1")
+            .header(ORIGIN, "http://localhost:8081")
+            .header(PADU_CLIENT_HEADER, PADU_CLIENT_NATIVE)
+            .body(())
+            .unwrap();
+        assert!(
+            validate_handshake(&native_mobile, HandshakeResponse::new(()), &HashSet::new()).is_ok()
+        );
+    }
+
+    #[test]
+    fn comprehensive_handshake_security_scenarios() {
+        let allowed = HashSet::from(["https://app.padu.dev".to_owned()]);
+
+        // Scenario 1: Exact allowed origin is accepted
+        let req_valid = HandshakeRequest::builder()
+            .uri("/v1")
+            .header(ORIGIN, "https://app.padu.dev")
+            .body(())
+            .unwrap();
+        assert!(validate_handshake(&req_valid, HandshakeResponse::new(()), &allowed).is_ok());
+
+        // Scenario 2: Subdomain hijack attempt (e.g. app.padu.dev.evil.com) is rejected
+        let req_subdomain = HandshakeRequest::builder()
+            .uri("/v1")
+            .header(ORIGIN, "https://app.padu.dev.evil.com")
+            .body(())
+            .unwrap();
+        assert_eq!(
+            validate_handshake(&req_subdomain, HandshakeResponse::new(()), &allowed)
+                .unwrap_err()
+                .status(),
+            StatusCode::FORBIDDEN
+        );
+
+        // Scenario 3: Prefix spoof (e.g. evil-app.padu.dev) is rejected
+        let req_prefix = HandshakeRequest::builder()
+            .uri("/v1")
+            .header(ORIGIN, "https://evil-app.padu.dev")
+            .body(())
+            .unwrap();
+        assert_eq!(
+            validate_handshake(&req_prefix, HandshakeResponse::new(()), &allowed)
+                .unwrap_err()
+                .status(),
+            StatusCode::FORBIDDEN
+        );
+
+        // Scenario 4: Protocol downgrade attack (http:// instead of https://) is rejected
+        let req_http = HandshakeRequest::builder()
+            .uri("/v1")
+            .header(ORIGIN, "http://app.padu.dev")
+            .body(())
+            .unwrap();
+        assert_eq!(
+            validate_handshake(&req_http, HandshakeResponse::new(()), &allowed)
+                .unwrap_err()
+                .status(),
+            StatusCode::FORBIDDEN
+        );
+
+        // Scenario 5: Port spoofing (e.g. port 8080) is rejected
+        let req_port = HandshakeRequest::builder()
+            .uri("/v1")
+            .header(ORIGIN, "https://app.padu.dev:8080")
+            .body(())
+            .unwrap();
+        assert_eq!(
+            validate_handshake(&req_port, HandshakeResponse::new(()), &allowed)
+                .unwrap_err()
+                .status(),
+            StatusCode::FORBIDDEN
+        );
+
+        // Scenario 6: Null origin is rejected
+        let req_null = HandshakeRequest::builder()
+            .uri("/v1")
+            .header(ORIGIN, "null")
+            .body(())
+            .unwrap();
+        assert_eq!(
+            validate_handshake(&req_null, HandshakeResponse::new(()), &allowed)
+                .unwrap_err()
+                .status(),
+            StatusCode::FORBIDDEN
+        );
+
+        // Scenario 7: Spoofed or invalid X-Padu-Client header is rejected when origin is disallowed
+        for invalid_header in ["web", "browser", "true", "1", "Native-Spoof", ""] {
+            let req_spoofed = HandshakeRequest::builder()
+                .uri("/v1")
+                .header(ORIGIN, "https://evil.com")
+                .header(PADU_CLIENT_HEADER, invalid_header)
+                .body(())
+                .unwrap();
+            assert_eq!(
+                validate_handshake(&req_spoofed, HandshakeResponse::new(()), &allowed)
+                    .unwrap_err()
+                    .status(),
+                StatusCode::FORBIDDEN
+            );
+        }
+
+        // Scenario 8: Valid native header bypasses origin check case-insensitively
+        for valid_header in ["native", "Native", "NATIVE"] {
+            let req_native = HandshakeRequest::builder()
+                .uri("/v1")
+                .header(ORIGIN, "http://localhost:8081")
+                .header(PADU_CLIENT_HEADER, valid_header)
+                .body(())
+                .unwrap();
+            assert!(
+                validate_handshake(&req_native, HandshakeResponse::new(()), &HashSet::new())
+                    .is_ok()
+            );
+        }
+
+        // Scenario 9: Invalid URI paths are rejected with 404
+        for path in ["/", "/v1/", "/v2", "/api", "/ws", "/index.html"] {
+            let req_path = HandshakeRequest::builder().uri(path).body(()).unwrap();
+            assert_eq!(
+                validate_handshake(&req_path, HandshakeResponse::new(()), &allowed)
+                    .unwrap_err()
+                    .status(),
+                StatusCode::NOT_FOUND
+            );
+        }
     }
 
     #[test]
@@ -1697,6 +1839,18 @@ mod tests {
         assert!(token_matches("secret", "secret"));
         assert!(!token_matches("secret", "Secret"));
         assert!(!token_matches("secret", "secret-extra"));
+        assert!(!token_matches("secret-extra", "secret"));
+        assert!(!token_matches("secret", ""));
+        assert!(!token_matches("", "secret"));
+        assert!(token_matches("", ""));
+        assert!(!token_matches(
+            "0e666721cc0140daa222d9dd3ea4e17e",
+            "0E666721CC0140DAA222D9DD3EA4E17E"
+        ));
+        assert!(!token_matches(
+            "0e666721cc0140daa222d9dd3ea4e17e",
+            "0e666721cc0140daa222d9dd3ea4e17f"
+        ));
     }
 
     #[test]

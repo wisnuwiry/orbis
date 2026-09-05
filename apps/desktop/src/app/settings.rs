@@ -1462,14 +1462,88 @@ impl Padu {
                                         ),
                                 )
                                 .child(
-                                    div().flex_1().min_w_0().flex().justify_end().child(
-                                        TextField::new(
-                                            "daemon-origins-field",
-                                            self.daemon_origins_input.clone(),
-                                        )
-                                        .w_full()
-                                        .max_w(px(360.0)),
-                                    ),
+                                    div()
+                                        .flex_1()
+                                        .min_w_0()
+                                        .max_w(px(360.0))
+                                        .flex()
+                                        .flex_col()
+                                        .gap(px(8.0))
+                                        .children(self.daemon_origin_inputs.iter().enumerate().map(
+                                            |(i, input)| {
+                                                div()
+                                                    .flex()
+                                                    .items_center()
+                                                    .gap(px(8.0))
+                                                    .w_full()
+                                                    .child(
+                                                        TextField::new(
+                                                            ("daemon-origin-field", i),
+                                                            input.clone(),
+                                                        )
+                                                        .w_full(),
+                                                    )
+                                                    .child(
+                                                        icon_button(
+                                                            ("delete-daemon-origin", i),
+                                                            "icons/trash.svg",
+                                                            theme,
+                                                        )
+                                                        .on_click(cx.listener(
+                                                            move |this, _, _, cx| {
+                                                                this.remove_daemon_origin(i, cx);
+                                                            },
+                                                        ))
+                                                        .tooltip(Tooltip::text(tr!(
+                                                            "daemon.remove_origin"
+                                                        ))),
+                                                    )
+                                            },
+                                        ))
+                                        .child(
+                                            div().flex().items_center().justify_start().child(
+                                                div()
+                                                    .id("add-daemon-origin-btn")
+                                                    .tab_index(0)
+                                                    .h(px(26.0))
+                                                    .px(px(8.0))
+                                                    .rounded(px(6.0))
+                                                    .border_1()
+                                                    .border_color(theme.border_strong)
+                                                    .flex()
+                                                    .items_center()
+                                                    .gap(px(5.0))
+                                                    .cursor_pointer()
+                                                    .text_size(sp(12.0))
+                                                    .text_color(theme.text_secondary)
+                                                    .hover(|el| el.bg(theme.overlay))
+                                                    .focus_visible(|style| {
+                                                        style.border_color(theme.accent)
+                                                    })
+                                                    .on_click(cx.listener(|this, _, window, cx| {
+                                                        this.add_daemon_origin(window, cx);
+                                                    }))
+                                                    .on_key_down(cx.listener(
+                                                        |this, event: &KeyDownEvent, window, cx| {
+                                                            if !event.keystroke.modifiers.modified()
+                                                                && matches!(
+                                                                    event.keystroke.key.as_str(),
+                                                                    "enter" | "space"
+                                                                )
+                                                            {
+                                                                this.add_daemon_origin(window, cx);
+                                                                cx.stop_propagation();
+                                                            }
+                                                        },
+                                                    ))
+                                                    .child(icon(
+                                                        "icons/plus.svg",
+                                                        11.0,
+                                                        theme.text_secondary,
+                                                    ))
+                                                    .child(tr!("daemon.add_origin")),
+                                            ),
+                                        ),
                                 ),
                         )
                         .child(div().mt(px(13.0)).flex().justify_end().child(apply_button)),
@@ -1591,6 +1665,32 @@ impl Padu {
             .into_any_element()
     }
 
+    pub(super) fn add_daemon_origin(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+        let input = cx.new(|cx| {
+            TextInput::new(window, cx)
+                .select_all_on_focus_click()
+                .placeholder(tr!("daemon.allowed_origins_placeholder"))
+        });
+        cx.subscribe(
+            &input,
+            |this: &mut Self, _, event: &InputEvent, cx| match event {
+                InputEvent::Submit(_) => this.apply_daemon_exposure_fields(cx),
+                InputEvent::Edited => cx.notify(),
+                _ => {}
+            },
+        )
+        .detach();
+        self.daemon_origin_inputs.push(input);
+        cx.notify();
+    }
+
+    pub(super) fn remove_daemon_origin(&mut self, index: usize, cx: &mut Context<Self>) {
+        if index < self.daemon_origin_inputs.len() {
+            self.daemon_origin_inputs.remove(index);
+            cx.notify();
+        }
+    }
+
     fn daemon_exposure_from_fields(
         &self,
         cx: &App,
@@ -1605,11 +1705,16 @@ impl Padu {
         if port == 0 {
             return Err(tr!("daemon.invalid_port"));
         }
-        let origins = self.daemon_origins_input.read(cx).content().to_owned();
+        let origins: Vec<String> = self
+            .daemon_origin_inputs
+            .iter()
+            .map(|input| input.read(cx).content().trim().to_owned())
+            .filter(|origin| !origin.is_empty())
+            .collect();
         let mut settings = self.state.daemon_exposure.clone();
         settings.port = port;
         settings
-            .with_allowed_origins_text(&origins)
+            .with_allowed_origins(origins)
             .and_then(padu_client::DaemonExposureSettings::validate)
             .map_err(|error| error.to_string())
     }
@@ -1717,9 +1822,13 @@ impl Padu {
                         this.daemon_port_input.update(cx, |input, cx| {
                             input.set_content(applied.port.to_string(), cx)
                         });
-                        this.daemon_origins_input.update(cx, |input, cx| {
-                            input.set_content(applied.allowed_origins_text(), cx)
-                        });
+                        for (i, origin) in applied.allowed_origins.iter().enumerate() {
+                            if let Some(input) = this.daemon_origin_inputs.get(i) {
+                                input.update(cx, |input, cx| input.set_content(origin.clone(), cx));
+                            }
+                        }
+                        this.daemon_origin_inputs
+                            .truncate(applied.allowed_origins.len());
                         this.save();
                         this.show_success_toast(tr!("daemon.settings_applied"));
                     }
