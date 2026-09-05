@@ -158,7 +158,7 @@ export function OnboardingModal({
       onClick={() => onOpenChange(false)}
     >
       <div
-        className="relative flex w-[540px] max-w-[calc(100vw-32px)] flex-col rounded-[16px] border border-[var(--border-strong)] bg-background p-7 text-foreground shadow-2xl"
+        className="relative flex w-[540px] max-w-[calc(100vw-32px)] flex-col rounded-[16px] bg-background p-7 text-foreground shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top bar: Step indicators & close button */}
@@ -211,7 +211,7 @@ export function OnboardingModal({
           <div className="flex w-full flex-col gap-2.5">
             {currentSlide.items.map((item) => (
               <div
-                className="flex items-start gap-3 rounded-[10px] border border-[var(--border-strong)] bg-[var(--raised)] p-3"
+                className="flex items-start gap-3 rounded-[10px] bg-[var(--raised)] p-3"
                 key={item.titleKey}
               >
                 <div className="grid size-7 shrink-0 place-items-center rounded-[7px] border border-[var(--border-strong)] bg-background text-[var(--text-secondary)] shadow-2xs">
