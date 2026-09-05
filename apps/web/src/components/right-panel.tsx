@@ -1508,7 +1508,7 @@ function TreeRow({
         aria-expanded={entry.isDir ? expanded : undefined}
         aria-level={entry.depth + 1}
         className={cn(
-          'mx-2 flex h-[30px] min-w-0 items-center gap-1.5 rounded-md pr-2 text-left text-[11.5px] outline-none hover:bg-accent focus-visible:bg-accent',
+          'mx-2 flex h-[30px] min-h-[30px] shrink-0 min-w-0 items-center gap-1.5 rounded-md pr-2 text-left text-[11.5px] outline-none hover:bg-accent focus-visible:bg-accent',
           selected && 'bg-accent',
           entry.isIgnored && 'opacity-55 text-[var(--text-ghost)]',
         )}
@@ -1767,7 +1767,7 @@ function ChangesPanel({
               <button
                 aria-expanded={row.expanded}
                 aria-level={row.depth + 1}
-                className="mx-1.5 my-0.5 flex h-[26px] min-w-0 items-center gap-1.5 rounded-md pr-2 text-left text-[11px] text-[var(--text-secondary)] outline-none hover:bg-accent focus-visible:bg-accent"
+                className="mx-1.5 my-0.5 flex h-[26px] min-h-[26px] shrink-0 min-w-0 items-center gap-1.5 rounded-md pr-2 text-left text-[11px] text-[var(--text-secondary)] outline-none hover:bg-accent focus-visible:bg-accent"
                 id={diffTreeRowId(diffTreeRowKey(row))}
                 role="treeitem"
                 style={{ paddingLeft: `${7 + row.depth * 14}px`, width: 'calc(100% - 12px)' }}
@@ -1786,7 +1786,7 @@ function ChangesPanel({
                 aria-level={row.depth + 1}
                 aria-selected={selectedFile === row.file.id}
                 className={cn(
-                  'mx-1.5 my-0.5 flex h-[26px] min-w-0 items-center gap-1.5 rounded-md pr-2 text-left text-[11px] text-[var(--text-secondary)] outline-none hover:bg-accent focus-visible:bg-accent',
+                  'mx-1.5 my-0.5 flex h-[26px] min-h-[26px] shrink-0 min-w-0 items-center gap-1.5 rounded-md pr-2 text-left text-[11px] text-[var(--text-secondary)] outline-none hover:bg-accent focus-visible:bg-accent',
                   selectedFile === row.file.id && 'bg-accent text-foreground',
                 )}
                 id={diffTreeRowId(diffTreeRowKey(row))}

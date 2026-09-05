@@ -68,6 +68,8 @@ impl Padu {
             let row = div()
                 .id(index)
                 .h(px(30.0))
+                .min_h(px(30.0))
+                .flex_none()
                 .mx(px(8.0))
                 .pl(px(8.0 + entry.depth as f32 * 16.0))
                 .pr(px(8.0))
