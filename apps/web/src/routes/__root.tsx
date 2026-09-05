@@ -40,7 +40,11 @@ export const Route = createRootRouteWithContext<{
         content: '#191a1a',
       },
     ],
-    links: [{ rel: 'stylesheet', href: appCss }],
+    links: [
+      { rel: 'stylesheet', href: appCss },
+      { rel: 'icon', href: '/favicon.ico', sizes: '48x48' },
+      { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+    ],
     scripts: [
       {
         children: `try{var d=document.documentElement,p=localStorage.getItem('padu.theme'),s=matchMedia('(prefers-color-scheme: dark)').matches,x=p==='dark'||p!=='light'&&s,l=localStorage.getItem('padu.language'),n=(navigator.languages&&navigator.languages[0]||navigator.language||'en').replaceAll('_','-').toLowerCase(),r=l==='zh-CN'||l==='ja'||l==='id'||l==='en'?l:n==='zh-cn'||n==='zh-sg'||n.startsWith('zh-hans')?'zh-CN':n==='ja'||n.startsWith('ja-')?'ja':n==='id'||n.startsWith('id-')?'id':'en';d.classList.toggle('dark',x);d.classList.toggle('light',!x);d.lang=r}catch(e){}`,
