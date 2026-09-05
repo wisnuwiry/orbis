@@ -1974,6 +1974,8 @@ files.operation_failed:
   en: File operation failed
 files.operation_failed_detail:
   en: "File operation failed: %{error}"
+files.actions:
+  en: File actions
 files.new_file:
   en: New file
 files.new_folder:
@@ -1982,6 +1984,8 @@ files.confirm:
   en: Confirm
 files.delete:
   en: Delete
+files.delete_confirm:
+  en: "Delete %{name}?"
 files.copy_relative_path:
   en: Copy relative path
 files.loading:
