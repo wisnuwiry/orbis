@@ -18,7 +18,6 @@ export function DeleteSessionDialog({ session, onClose, onConfirm }: DeleteSessi
       description={t('session.delete_message', { title: session?.title || t('sidebar.new_task') })}
       confirmLabel={t('session.delete_confirm')}
       cancelLabel={t('common.cancel')}
-      variant="danger"
       icon="trash"
       onConfirm={() => {
         if (session) {

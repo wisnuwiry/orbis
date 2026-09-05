@@ -491,7 +491,7 @@ impl Padu {
             )
     }
 
-    fn render_sidebar_toggle(&self, cx: &mut Context<Self>) -> Stateful<Div> {
+    pub(super) fn render_sidebar_toggle(&self, cx: &mut Context<Self>) -> Stateful<Div> {
         let theme = Theme::current(cx);
         let label = if self.sidebar_visible {
             tr!("sidebar.close")
@@ -2752,7 +2752,7 @@ impl Padu {
     }
 }
 
-fn localized_session_title(session: &AgentSession) -> String {
+pub(super) fn localized_session_title(session: &AgentSession) -> String {
     let title = session.display_title();
     if title == AgentSession::DEFAULT_TITLE {
         tr!("session.new_task")

@@ -1,5 +1,18 @@
 use super::*;
 
+/// Target layout width for transcript rows given viewport, sidebar, and dock widths.
+/// While the right panel is in fullscreen mode, the dock is hidden so the right dock width
+/// is 0.
+pub(super) fn calculate_transcript_content_width(
+    viewport_width: f32,
+    sidebar_width: f32,
+    right_panel_width: f32,
+    fullscreen: bool,
+) -> Pixels {
+    let right_dock = if fullscreen { 0.0 } else { right_panel_width };
+    px((viewport_width - sidebar_width - right_dock - 40.0).clamp(1.0, CONTENT_MAX_WIDTH))
+}
+
 impl Padu {
     /// One list row per message plus each ordered non-message turn block.
     pub(super) fn transcript_row_count(&self) -> usize {
@@ -327,11 +340,12 @@ impl Padu {
 
     pub(super) fn sync_transcript_layout_width(&self, window: &Window) -> bool {
         let (sidebar_width, right_panel_width) = self.effective_panel_widths(window);
-        let sidebar_width = px(sidebar_width);
-        let right_panel_width = px(right_panel_width);
-        let content_width =
-            (window.viewport_size().width - sidebar_width - right_panel_width - px(40.0))
-                .clamp(px(1.0), px(CONTENT_MAX_WIDTH));
+        let content_width = calculate_transcript_content_width(
+            f32::from(window.viewport_size().width),
+            sidebar_width,
+            right_panel_width,
+            self.right_panel_fullscreen_active(),
+        );
         let previous = self.transcript_layout_width.replace(content_width);
         if previous > Pixels::ZERO && (previous - content_width).abs() < px(1.0) {
             return false;
@@ -1271,4 +1285,21 @@ pub(super) fn message_starts_followup_turn(messages: &[Message], message_index: 
         && messages[..message_index]
             .iter()
             .any(|message| message.role == MessageRole::User)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn transcript_layout_width_ignores_right_dock_in_fullscreen() {
+        let docked_width = calculate_transcript_content_width(1200.0, 200.0, 400.0, false);
+        assert_eq!(docked_width, px(560.0));
+
+        let fullscreen_width = calculate_transcript_content_width(1200.0, 200.0, 1000.0, true);
+        assert_eq!(fullscreen_width, px(CONTENT_MAX_WIDTH));
+
+        let tiny_width = calculate_transcript_content_width(200.0, 180.0, 0.0, false);
+        assert_eq!(tiny_width, px(1.0));
+    }
 }

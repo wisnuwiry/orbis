@@ -1562,9 +1562,9 @@ fn terminal_key_bytes(keystroke: &Keystroke, mode: TermMode) -> Option<Vec<u8>> 
     if modifiers.platform {
         #[cfg(target_os = "macos")]
         return match key {
-            "left" => Some(vec![0x01]),
-            "right" => Some(vec![0x05]),
-            "backspace" => Some(vec![0x15]),
+            "left" if !modifiers.alt && !modifiers.control => Some(vec![0x01]),
+            "right" if !modifiers.alt && !modifiers.control => Some(vec![0x05]),
+            "backspace" if !modifiers.alt && !modifiers.control => Some(vec![0x15]),
             _ => None,
         };
 
@@ -1889,6 +1889,22 @@ mod tests {
                 TermMode::empty()
             ),
             Some(b"\x1b[1;5D".to_vec())
+        );
+        #[cfg(target_os = "macos")]
+        assert_eq!(
+            terminal_key_bytes(
+                &key(
+                    "right",
+                    None,
+                    Modifiers {
+                        platform: true,
+                        alt: true,
+                        ..Default::default()
+                    }
+                ),
+                TermMode::empty()
+            ),
+            None
         );
     }
 

@@ -68,11 +68,12 @@ use crate::ui::{
 use crate::{
     CancelTaskSwitch, CancelTurn, CloseFind, CloseWindow, ConfirmTaskSwitch, CopySelection,
     FindNext, FindPrevious, FocusComposer, NavigateBack, NavigateForward, NewProject, NewSession,
-    OpenBrowser, OpenFiles, OpenFind, OpenFindReplace, OpenResumePicker, OpenReview, OpenSettings,
-    OpenTerminal, ReplaceAllMatches, SaveFile, SelectFirstTask, SelectLastTask, SelectNextSession,
-    SelectPreviousSession, SwitchTaskBackward, SwitchTaskForward, ToggleCommandPalette,
-    ToggleFindCaseSensitive, ToggleFindRegex, ToggleFindWholeWord, ToggleFpsCounter,
-    ToggleModelPicker, ToggleRightPanel, ToggleSidebar, ToggleUsagePanel,
+    NextRightPanelTab, OpenBrowser, OpenFiles, OpenFind, OpenFindReplace, OpenResumePicker,
+    OpenReview, OpenSettings, OpenTerminal, PrevRightPanelTab, ReplaceAllMatches, SaveFile,
+    SelectFirstTask, SelectLastTask, SelectNextSession, SelectPreviousSession, SwitchTaskBackward,
+    SwitchTaskForward, ToggleCommandPalette, ToggleFindCaseSensitive, ToggleFindRegex,
+    ToggleFindWholeWord, ToggleFpsCounter, ToggleModelPicker, ToggleRightPanel,
+    ToggleRightPanelFullscreen, ToggleSidebar, ToggleUsagePanel,
 };
 
 #[cfg(target_os = "macos")]
@@ -729,6 +730,8 @@ struct RightPanelFileEditor {
 
 struct RightPanelSessionState {
     visible: bool,
+    fullscreen: bool,
+    fullscreen_conversation: bool,
     surfaces: Vec<RightPanelSurface>,
     active_surface: Option<usize>,
     tabs_scroll_handle: ScrollHandle,
@@ -747,6 +750,8 @@ impl RightPanelSessionState {
     fn empty(visible: bool) -> Self {
         Self {
             visible,
+            fullscreen: false,
+            fullscreen_conversation: false,
             surfaces: Vec::new(),
             active_surface: None,
             tabs_scroll_handle: ScrollHandle::new(),
@@ -1339,6 +1344,13 @@ pub struct Padu {
     sidebar_width: f32,
     right_panel_visible: bool,
     right_panel_width: f32,
+    /// Fullscreen surface mode: the right panel takes the transcript column
+    /// as well as its dock, with Conversation as a switchable tab. Per
+    /// session, never persisted to disk — a relaunch always starts docked.
+    right_panel_fullscreen: bool,
+    /// While fullscreen, whether the Conversation tab (transcript + composer)
+    /// is shown instead of the active surface.
+    right_panel_fullscreen_conversation: bool,
     /// The show/hide slide each panel is in the middle of, if any. Driven by
     /// hand from `render` (see [`motion::WidthTween`]) because the width these
     /// produce is what the transcript column between them is laid out against.
@@ -3034,6 +3046,8 @@ impl Padu {
                 sidebar_width,
                 right_panel_visible,
                 right_panel_width,
+                right_panel_fullscreen: false,
+                right_panel_fullscreen_conversation: false,
                 sidebar_slide: None,
                 right_panel_slide: None,
                 sidebar_rendered_width: if sidebar_visible { sidebar_width } else { 0.0 },

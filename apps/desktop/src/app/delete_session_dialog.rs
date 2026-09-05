@@ -90,7 +90,6 @@ impl Padu {
         let theme = Theme::current(cx);
         let title = dialog.title.clone();
 
-        let cancel_focus_next = dialog.confirm_focus.clone();
         let cancel_button = div()
             .id("delete-session-cancel")
             .track_focus(&dialog.cancel_focus)
@@ -116,10 +115,6 @@ impl Padu {
             }))
             .on_key_down(cx.listener(move |padu, event: &KeyDownEvent, window, cx| {
                 match event.keystroke.key.as_str() {
-                    "right" => {
-                        window.focus(&cancel_focus_next, cx);
-                        cx.stop_propagation();
-                    }
                     "enter" | "space" => {
                         padu.close_delete_session_dialog(window, cx);
                         cx.stop_propagation();
@@ -132,7 +127,6 @@ impl Padu {
                 }
             }));
 
-        let confirm_focus_prev = dialog.cancel_focus.clone();
         let confirm_button = div()
             .id("delete-session-confirm")
             .track_focus(&dialog.confirm_focus)
@@ -147,21 +141,22 @@ impl Padu {
             .cursor_pointer()
             .text_size(sp(13.0))
             .font_weight(FontWeight::MEDIUM)
-            .bg(theme.danger)
-            .text_color(rgb(0xFFFFFF))
-            .hover(|s| s.bg(theme.danger_soft))
-            .focus_visible(|s| s.border_1().border_color(rgb(0xFFFFFF)))
+            .bg(theme.inverse)
+            .text_color(theme.on_inverse)
+            .hover(|s| s.opacity(0.9))
+            .focus_visible(|s| s.border_1().border_color(theme.accent))
             .child(tr!("session.delete_confirm"))
-            .child(kbd_badge_on_danger("↵"))
+            .child(kbd_badge_icon(
+                "icons/corner-down-left.svg",
+                theme.inverse,
+                theme.on_inverse,
+                gpui::hsla(0.0, 0.0, 1.0, 0.2),
+            ))
             .on_click(cx.listener(|padu, _, window, cx| {
                 padu.execute_delete_session_dialog(window, cx);
             }))
             .on_key_down(cx.listener(move |padu, event: &KeyDownEvent, window, cx| {
                 match event.keystroke.key.as_str() {
-                    "left" => {
-                        window.focus(&confirm_focus_prev, cx);
-                        cx.stop_propagation();
-                    }
                     "enter" | "space" => {
                         padu.execute_delete_session_dialog(window, cx);
                         cx.stop_propagation();
@@ -197,11 +192,11 @@ impl Padu {
                         div()
                             .size(px(32.0))
                             .rounded(px(8.0))
-                            .bg(theme.danger_soft)
+                            .bg(theme.overlay)
                             .flex()
                             .items_center()
                             .justify_center()
-                            .child(icon("icons/trash.svg", 16.0, theme.danger)),
+                            .child(icon("icons/trash.svg", 16.0, theme.text_secondary)),
                     )
                     .child(
                         div()

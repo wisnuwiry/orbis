@@ -49,6 +49,8 @@ export interface CommandPaletteActions {
   toggleUsage: () => void
   toggleSidebar: () => void
   toggleRightPanel: () => void
+  toggleRightPanelFullscreen?: () => void
+  cycleRightPanelTab?: (direction: 1 | -1) => void
   openSettings: (page: SettingsPageId) => void
   openOnboarding?: () => void
   selectTask: (sessionId: string) => void
@@ -63,6 +65,8 @@ export function CommandPalette({
   selectedSessionId,
   sidebarVisible,
   rightPanelVisible,
+  rightPanelExpanded = false,
+  canExpandRightPanel = false,
   canChooseModel,
   canToggleUsage,
   currentProvider,
@@ -75,6 +79,8 @@ export function CommandPalette({
   selectedSessionId?: string
   sidebarVisible: boolean
   rightPanelVisible: boolean
+  rightPanelExpanded?: boolean
+  canExpandRightPanel?: boolean
   canChooseModel: boolean
   canToggleUsage: boolean
   currentProvider: ProviderKind
@@ -281,6 +287,8 @@ export function CommandPalette({
         selectedSessionId,
         sidebarVisible,
         rightPanelVisible,
+        rightPanelExpanded,
+        canExpandRightPanel,
         canChooseModel,
         canToggleUsage,
         macShortcuts,
@@ -491,7 +499,7 @@ export function CommandPalette({
           </span>
           <span className="flex items-center gap-1.5">
             <Kbd variant="subtle" size="sm" className="px-1.5">
-              <PaduIcon className="size-3" name="cornerDownRight" />
+              <PaduIcon className="size-3" name="cornerDownLeft" />
             </Kbd>
             Select
           </span>
@@ -589,6 +597,8 @@ function buildItems({
   selectedSessionId,
   sidebarVisible,
   rightPanelVisible,
+  rightPanelExpanded,
+  canExpandRightPanel,
   canChooseModel,
   canToggleUsage,
   macShortcuts,
@@ -602,6 +612,8 @@ function buildItems({
   selectedSessionId?: string
   sidebarVisible: boolean
   rightPanelVisible: boolean
+  rightPanelExpanded?: boolean
+  canExpandRightPanel?: boolean
   canChooseModel: boolean
   canToggleUsage: boolean
   macShortcuts: boolean
@@ -635,6 +647,17 @@ function buildItems({
       command('toggle-sidebar', 'commands', t(sidebarVisible ? 'command_palette.hide_sidebar' : 'command_palette.show_sidebar'), 'panelLeft', shortcut('⌘B', 'Ctrl+B'), 'toggle show hide left sidebar history tasks', actions.toggleSidebar),
       command('toggle-right-panel', 'commands', t(rightPanelVisible ? 'command_palette.hide_right_panel' : 'command_palette.show_right_panel'), 'panelRight', shortcut('⇧⌘B', 'Ctrl+Shift+B'), 'toggle show hide right panel files review diff terminal', actions.toggleRightPanel),
     )
+    if (actions.toggleRightPanelFullscreen && (canExpandRightPanel || rightPanelExpanded)) {
+      commands.push(
+        command('toggle-right-panel-fullscreen', 'commands', t(rightPanelExpanded ? 'command_palette.exit_right_panel_fullscreen' : 'command_palette.enter_right_panel_fullscreen'), rightPanelExpanded ? 'minimize' : 'maximize', shortcut('⌘J', 'Ctrl+J'), 'fullscreen expand maximize collapse right panel conversation', actions.toggleRightPanelFullscreen),
+      )
+    }
+    if (actions.cycleRightPanelTab && rightPanelVisible) {
+      commands.push(
+        command('next-right-panel-tab', 'commands', t('command_palette.next_right_panel_tab'), 'arrowRight', shortcut('⌥⌘→', 'Ctrl+Alt+Right'), 'next right panel tab conversation browser terminal files review', () => actions.cycleRightPanelTab?.(1)),
+        command('prev-right-panel-tab', 'commands', t('command_palette.prev_right_panel_tab'), 'arrowLeft', shortcut('⌥⌘←', 'Ctrl+Alt+Left'), 'previous right panel tab conversation browser terminal files review', () => actions.cycleRightPanelTab?.(-1)),
+      )
+    }
   }
   for (const page of SETTINGS_PAGES) {
     commands.push(command(

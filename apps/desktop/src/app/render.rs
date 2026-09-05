@@ -128,9 +128,12 @@ impl Padu {
                 0.0
             },
         );
+        // Fullscreen takes the transcript column, so the docked panel slides
+        // away and the center renders the surface at full width instead.
+        let fullscreen = self.right_panel_fullscreen_active();
         let right_panel = slide_width(
             &mut self.right_panel_slide,
-            if self.right_panel_visible {
+            if self.right_panel_visible && !fullscreen {
                 right_panel_content
             } else {
                 0.0
@@ -160,11 +163,22 @@ impl Padu {
 
     /// Width left for the chat column once the panels take theirs — the
     /// widths they are painted at this frame, so a transcript measured
-    /// mid-slide matches the column it is laid out in.
+    /// mid-slide matches the column it is laid out in. Fullscreen gives the
+    /// transcript the whole center (sidebar aside) since the dock is gone.
     fn chat_viewport_width(&self, window: &Window) -> f32 {
-        f32::from(window.viewport_size().width)
-            - self.sidebar_rendered_width
-            - self.right_panel_rendered_width
+        if self.right_panel_fullscreen_active() {
+            f32::from(window.viewport_size().width) - self.sidebar_rendered_width
+        } else {
+            f32::from(window.viewport_size().width)
+                - self.sidebar_rendered_width
+                - self.right_panel_rendered_width
+        }
+    }
+
+    /// Width for the fullscreen surface: everything right of the sidebar.
+    fn fullscreen_panel_width(&self, window: &Window) -> f32 {
+        let (sidebar_width, _) = self.effective_panel_widths(window);
+        f32::from(window.viewport_size().width) - sidebar_width
     }
 
     /// [`PaduPane`] delegate for the sidebar island.
@@ -206,6 +220,83 @@ impl Padu {
     ) -> AnyElement {
         let (_, right_panel_width) = self.effective_panel_widths(window);
         self.render_right_panel(right_panel_width, window, cx)
+            .into_any_element()
+    }
+
+    /// Fullscreen takeover: the panel owns the transcript column, with
+    /// Conversation as just another tab. Sidebar stays; the dock goes away.
+    fn fullscreen_center_content(
+        &mut self,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) -> AnyElement {
+        let theme = Theme::current(cx);
+        let sidebar = self.sidebar_rendered_width > 0.0;
+        if !self.right_panel_fullscreen_conversation {
+            let width = self.fullscreen_panel_width(window);
+            return div()
+                .flex_1()
+                .h_full()
+                .min_w_0()
+                .flex()
+                .flex_col()
+                .bg(theme.surface)
+                .when(sidebar, |element| {
+                    element.border_l_1().border_color(theme.sidebar_border)
+                })
+                .relative()
+                .child(self.render_right_panel(width, window, cx))
+                .when(self.sidebar_visible, |element| {
+                    element.child(self.render_panel_resize_handle(
+                        "sidebar-resize-handle",
+                        PanelResizeTarget::Sidebar,
+                        cx,
+                    ))
+                })
+                .into_any_element();
+        }
+        // Conversation fullscreen: the usual transcript column, headed by the
+        // same tab strip so ←/→ never strands the user away from surfaces.
+        let empty = should_render_empty_state(self.selected_session());
+        let permission = self.render_permission(cx);
+        let computer_use = self.render_computer_use_overlay(cx);
+        let toast = self.render_active_toast(cx);
+        div()
+            .flex_1()
+            .h_full()
+            .min_w_0()
+            .flex()
+            .flex_col()
+            .bg(theme.surface)
+            .when(sidebar, |element| {
+                element.border_l_1().border_color(theme.sidebar_border)
+            })
+            .child(self.render_right_panel_header(window, cx))
+            .child(if empty {
+                self.render_empty_state(cx).into_any_element()
+            } else {
+                self.transcript_pane
+                    .clone()
+                    .cached(StyleRefinement::default().flex_1().min_h(px(0.0)).w_full())
+                    .into_any_element()
+            })
+            .children(permission)
+            .when(self.selected_project().is_some(), |element| {
+                element
+                    .children(self.render_queued_messages(cx))
+                    .child(self.render_composer(window, cx))
+                    .child(self.render_workspace_footer(cx))
+            })
+            .relative()
+            .children(toast)
+            .children(computer_use)
+            .when(self.sidebar_visible, |element| {
+                element.child(self.render_panel_resize_handle(
+                    "sidebar-resize-handle",
+                    PanelResizeTarget::Sidebar,
+                    cx,
+                ))
+            })
             .into_any_element()
     }
 
@@ -290,6 +381,9 @@ impl Render for Padu {
         let goal_dialog = self.render_goal_dialog(window, cx);
         let host_dialog = self.render_host_dialog(window, cx);
         let toast = self.render_active_toast(cx);
+        // Fullscreen owns the transcript column: sidebar stays, the docked
+        // panel slides away, and the center renders the takeover instead.
+        let fullscreen = self.right_panel_fullscreen_active();
         let content = div()
             .key_context("Padu")
             .on_action(cx.listener(Self::close_window_or_right_panel_tab_action))
@@ -298,6 +392,9 @@ impl Render for Padu {
             .on_action(cx.listener(Self::open_settings_action))
             .on_action(cx.listener(Self::toggle_sidebar_action))
             .on_action(cx.listener(Self::toggle_right_panel_action))
+            .on_action(cx.listener(Self::toggle_right_panel_fullscreen_action))
+            .on_action(cx.listener(Self::next_right_panel_tab_action))
+            .on_action(cx.listener(Self::prev_right_panel_tab_action))
             .on_action(cx.listener(Self::open_browser_action))
             .on_action(cx.listener(Self::open_terminal_action))
             .on_action(cx.listener(Self::open_files_action))
@@ -360,7 +457,9 @@ impl Render for Padu {
                         ),
                 )
             })
-            .child(
+            .child(if fullscreen {
+                self.fullscreen_center_content(window, cx)
+            } else {
                 div()
                     .flex_1()
                     .h_full()
@@ -396,9 +495,10 @@ impl Render for Padu {
                             PanelResizeTarget::Sidebar,
                             cx,
                         ))
-                    }),
-            )
-            .when(panels.right_panel > 0.0, |root| {
+                    })
+                    .into_any_element()
+            })
+            .when(panels.right_panel > 0.0 && !fullscreen, |root| {
                 root.child(
                     div()
                         .h_full()

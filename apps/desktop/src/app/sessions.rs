@@ -510,6 +510,10 @@ impl Padu {
             self.request_active_terminal_focus();
         } else {
             self.right_panel_pending_terminal_focus = None;
+            // Hiding the panel always exits fullscreen so reopening lands
+            // docked; the per-session flag is restored on session switch.
+            self.right_panel_fullscreen = false;
+            self.right_panel_fullscreen_conversation = false;
         }
         if self.right_panel_visible == visible {
             return;
@@ -566,13 +570,29 @@ impl Padu {
     /// What the panel actually occupies this frame is
     /// [`Padu::sidebar_rendered_width`] / [`Padu::right_panel_rendered_width`].
     pub(super) fn effective_panel_widths(&self, window: &Window) -> (f32, f32) {
-        fitted_panel_widths(
-            f32::from(window.viewport_size().width),
-            self.sidebar_visible || self.sidebar_slide.is_some(),
-            self.right_panel_visible || self.right_panel_slide.is_some(),
-            self.sidebar_width,
-            self.right_panel_width,
-        )
+        let viewport_width = f32::from(window.viewport_size().width);
+        if self.right_panel_fullscreen_active() {
+            let sidebar = if self.sidebar_visible || self.sidebar_slide.is_some() {
+                sanitize_panel_width(
+                    self.sidebar_width,
+                    DEFAULT_SIDEBAR_WIDTH,
+                    SIDEBAR_MIN_WIDTH,
+                    SIDEBAR_MAX_WIDTH,
+                )
+                .min((viewport_width - RIGHT_PANEL_MIN_WIDTH).max(0.0))
+            } else {
+                0.0
+            };
+            (sidebar, viewport_width - sidebar)
+        } else {
+            fitted_panel_widths(
+                viewport_width,
+                self.sidebar_visible || self.sidebar_slide.is_some(),
+                self.right_panel_visible || self.right_panel_slide.is_some(),
+                self.sidebar_width,
+                self.right_panel_width,
+            )
+        }
     }
 
     pub(super) fn begin_panel_resize(
@@ -627,9 +647,15 @@ impl Padu {
         let delta = f32::from(event.position.x) - drag.start_mouse_x;
         match drag.target {
             PanelResizeTarget::Sidebar => {
-                let maximum = SIDEBAR_MAX_WIDTH
-                    .min(viewport_width - MAIN_PANEL_MIN_WIDTH - right_panel_width)
-                    .max(SIDEBAR_MIN_WIDTH);
+                let maximum = if self.right_panel_fullscreen_active() {
+                    SIDEBAR_MAX_WIDTH
+                        .min(viewport_width - RIGHT_PANEL_MIN_WIDTH)
+                        .max(SIDEBAR_MIN_WIDTH)
+                } else {
+                    SIDEBAR_MAX_WIDTH
+                        .min(viewport_width - MAIN_PANEL_MIN_WIDTH - right_panel_width)
+                        .max(SIDEBAR_MIN_WIDTH)
+                };
                 let width = (drag.start_width + delta).clamp(SIDEBAR_MIN_WIDTH, maximum);
                 if (self.sidebar_width - width).abs() < 0.5 {
                     return;
@@ -778,6 +804,12 @@ impl Padu {
         }
         if self.message_edit.is_some() {
             self.cancel_message_edit(window, cx);
+            return;
+        }
+        // Idle Escape exits panel fullscreen before falling through to the
+        // turn stop below: a busy turn keeps its two-press stop contract.
+        if self.selected_escape_stop_target().is_none() && self.right_panel_fullscreen_active() {
+            self.set_right_panel_fullscreen(false, cx);
             return;
         }
         let Some(target) = self.selected_escape_stop_target() else {

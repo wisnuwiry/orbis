@@ -1,5 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 import {
+  fullscreenCycleNext,
+  fullscreenTabOrder,
+  isFullscreenExpandableSurface,
   mergeReviewDiffFiles,
   openFileInPanel,
   tabNavigationIndex,
@@ -121,6 +124,28 @@ describe('right-panel tab keyboard navigation', () => {
   test('moves directly to the first and last tabs', () => {
     expect(tabNavigationIndex(4, 2, 'Home')).toBe(0)
     expect(tabNavigationIndex(4, 1, 'End')).toBe(3)
+  })
+})
+
+describe('right-panel fullscreen tabs', () => {
+  test('orders Conversation first, then surfaces', () => {
+    expect(fullscreenTabOrder(0)).toEqual([-1])
+    expect(fullscreenTabOrder(2)).toEqual([-1, 0, 1])
+  })
+
+  test('cycles and wraps both directions', () => {
+    expect(fullscreenCycleNext(0, 2, 1)).toBe(1)
+    expect(fullscreenCycleNext(2, 2, 1)).toBe(0)
+    expect(fullscreenCycleNext(0, 2, -1)).toBe(2)
+    expect(fullscreenCycleNext(1, 2, -1)).toBe(0)
+  })
+
+  test('gates expand on browser, terminal, files, and review equivalents', () => {
+    expect(isFullscreenExpandableSurface('terminal')).toBe(true)
+    expect(isFullscreenExpandableSurface('files')).toBe(true)
+    expect(isFullscreenExpandableSurface('file')).toBe(true)
+    expect(isFullscreenExpandableSurface('changes')).toBe(true)
+    expect(isFullscreenExpandableSurface('backgroundWork')).toBe(false)
   })
 })
 

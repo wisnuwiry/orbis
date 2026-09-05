@@ -160,6 +160,9 @@ enum PaletteAction {
     CollapseSidebarGroups,
     ToggleSidebar,
     ToggleRightPanel,
+    ToggleRightPanelFullscreen,
+    NextRightPanelTab,
+    PrevRightPanelTab,
     OpenBrowser,
     OpenTerminal,
     OpenFiles,
@@ -823,6 +826,52 @@ impl Padu {
                 "toggle show hide right panel files diff terminal browser",
                 next(),
             ),
+        ]);
+
+        if self.right_panel_can_expand() || self.right_panel_fullscreen_active() {
+            commands.push(CommandPaletteItem::command(
+                PaletteSection::Commands,
+                tr!(if self.right_panel_fullscreen_active() {
+                    "command_palette.exit_right_panel_fullscreen"
+                } else {
+                    "command_palette.enter_right_panel_fullscreen"
+                }),
+                if self.right_panel_fullscreen_active() {
+                    "icons/minimize.svg"
+                } else {
+                    "icons/maximize.svg"
+                },
+                Some(crate::platform::primary_shortcut("⌘J", "Ctrl+J")),
+                PaletteAction::ToggleRightPanelFullscreen,
+                "fullscreen expand maximize collapse right panel conversation",
+                next(),
+            ));
+        }
+
+        if self.right_panel_visible || self.right_panel_fullscreen_active() {
+            commands.extend([
+                CommandPaletteItem::command(
+                    PaletteSection::Commands,
+                    tr!("command_palette.next_right_panel_tab"),
+                    "icons/arrow-right.svg",
+                    Some(crate::platform::primary_shortcut("⌥⌘→", "Ctrl+Alt+Right")),
+                    PaletteAction::NextRightPanelTab,
+                    "next right panel tab conversation browser terminal files review",
+                    next(),
+                ),
+                CommandPaletteItem::command(
+                    PaletteSection::Commands,
+                    tr!("command_palette.prev_right_panel_tab"),
+                    "icons/arrow-left.svg",
+                    Some(crate::platform::primary_shortcut("⌥⌘←", "Ctrl+Alt+Left")),
+                    PaletteAction::PrevRightPanelTab,
+                    "previous right panel tab conversation browser terminal files review",
+                    next(),
+                ),
+            ]);
+        }
+
+        commands.extend([
             CommandPaletteItem::command(
                 PaletteSection::Commands,
                 tr!("command_palette.open_browser"),
@@ -1668,6 +1717,15 @@ impl Padu {
             PaletteAction::ToggleRightPanel => {
                 self.toggle_right_panel_action(&ToggleRightPanel, window, cx)
             }
+            PaletteAction::ToggleRightPanelFullscreen => {
+                self.toggle_right_panel_fullscreen_action(&ToggleRightPanelFullscreen, window, cx)
+            }
+            PaletteAction::NextRightPanelTab => {
+                self.next_right_panel_tab_action(&NextRightPanelTab, window, cx)
+            }
+            PaletteAction::PrevRightPanelTab => {
+                self.prev_right_panel_tab_action(&PrevRightPanelTab, window, cx)
+            }
             PaletteAction::OpenBrowser => self.open_browser_action(&OpenBrowser, window, cx),
             PaletteAction::OpenTerminal => self.open_terminal_action(&OpenTerminal, window, cx),
             PaletteAction::OpenFiles => self.open_files_action(&OpenFiles, window, cx),
@@ -2200,7 +2258,7 @@ impl Padu {
                                     .justify_center()
                                     .bg(theme.overlay_strong)
                                     .child(icon(
-                                        "icons/corner-down-right.svg",
+                                        "icons/corner-down-left.svg",
                                         10.0,
                                         theme.text_tertiary,
                                     )),
