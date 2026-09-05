@@ -146,7 +146,7 @@ export function ConfirmDialog({
               <Kbd
                 size="xs"
                 variant={isDanger ? 'inverse' : 'onPrimary'}
-                className="px-1"
+                className="p-1 [&>span]:size-3"
               >
                 <PaduIcon name="cornerDownLeft" className="size-2.5" />
               </Kbd>
