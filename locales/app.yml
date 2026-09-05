@@ -1962,6 +1962,10 @@ files.resize_tree:
   en: Resize file tree
 files.refresh:
   en: Refresh files
+files.show_hidden:
+  en: Show hidden files
+files.hide_hidden:
+  en: Hide hidden files
 files.loading:
   en: Loading files…
 files.workspace_files:

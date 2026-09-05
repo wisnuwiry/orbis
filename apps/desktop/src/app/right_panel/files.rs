@@ -60,6 +60,7 @@ impl Padu {
                 .gap(px(6.0))
                 .cursor_pointer()
                 .when(selected, |element| element.bg(theme.overlay_strong))
+                .when(entry.is_ignored, |element| element.opacity(0.55))
                 .hover(|element| element.bg(theme.overlay))
                 .child(if is_dir {
                     icon(
@@ -84,7 +85,11 @@ impl Padu {
                         .flex_1()
                         .truncate()
                         .text_size(sp(12.5))
-                        .text_color(theme.text_secondary)
+                        .text_color(if entry.is_ignored {
+                            theme.text_ghost
+                        } else {
+                            theme.text_secondary
+                        })
                         .child(entry.name),
                 );
             list = if is_dir {
@@ -122,12 +127,63 @@ impl Padu {
                     .child(
                         div()
                             .min_w_0()
-                            .flex_1()
                             .truncate()
                             .text_size(sp(12.5))
                             .font_weight(FontWeight::MEDIUM)
                             .text_color(theme.text_secondary)
                             .child(project_name),
+                    )
+                    .child({
+                        let hidden = self.right_panel_show_hidden_files;
+                        let focus = self.transcript_control_focus("right-panel-hidden-files", cx);
+                        div()
+                            .id("right-panel-hidden-files")
+                            .track_focus(&focus)
+                            .tab_index(0)
+                            .size(px(26.0))
+                            .rounded(px(7.0))
+                            .flex_none()
+                            .flex()
+                            .items_center()
+                            .justify_center()
+                            .cursor_pointer()
+                            .focus_visible(|style| style.border_1().border_color(theme.accent))
+                            .hover(|style| style.bg(theme.overlay))
+                            .child(icon(
+                                if hidden {
+                                    "icons/eye.svg"
+                                } else {
+                                    "icons/eye-off.svg"
+                                },
+                                12.0,
+                                theme.text_tertiary,
+                            ))
+                            .tooltip(move |window, cx| {
+                                Tooltip::new(if hidden {
+                                    tr!("files.hide_hidden")
+                                } else {
+                                    tr!("files.show_hidden")
+                                })
+                                .build(window, cx)
+                            })
+                            .on_click(cx.listener(|this, _, _, cx| {
+                                this.toggle_right_panel_hidden_files(cx);
+                            }))
+                            .on_key_down(cx.listener(|this, event: &KeyDownEvent, _, cx| {
+                                if matches!(event.keystroke.key.as_str(), "enter" | "space") {
+                                    this.toggle_right_panel_hidden_files(cx);
+                                    cx.stop_propagation();
+                                }
+                            }))
+                    })
+                    .child(
+                        icon_button("right-panel-refresh-files", "icons/rotate-cw.svg", theme)
+                            .tooltip(|window, cx| {
+                                Tooltip::new(tr!("files.refresh")).build(window, cx)
+                            })
+                            .on_click(cx.listener(|this, _, _, cx| {
+                                this.refresh_right_panel_working_tree(cx);
+                            })),
                     ),
             )
             .child(
@@ -867,6 +923,12 @@ impl Padu {
         }
     }
 
+    pub(super) fn toggle_right_panel_hidden_files(&mut self, cx: &mut Context<Self>) {
+        self.right_panel_show_hidden_files = !self.right_panel_show_hidden_files;
+        self.refresh_right_panel_working_tree(cx);
+        cx.notify();
+    }
+
     /// Re-walks the project's working tree.
     ///
     /// `read_dir` plus a `stat` per entry, recursively over expanded
@@ -889,6 +951,7 @@ impl Padu {
             Query::Pending => {}
             Query::Missing(token) => {
                 let expanded = self.right_panel_expanded_paths.clone();
+                let show_hidden = self.right_panel_show_hidden_files;
                 let workspace = padu_client::WorkspaceClient::new(self.daemon.client());
                 cx.spawn(async move |padu, cx| {
                     let entries = cx
@@ -899,7 +962,7 @@ impl Padu {
                                 match workspace.request(padu_client::WorkspaceOperation::ListTree {
                                     root: path,
                                     expanded_paths: expanded.into_iter().collect(),
-                                    show_hidden: false,
+                                    show_hidden,
                                 }) {
                                     Ok(padu_client::WorkspaceResult::WorkingTree { entries }) => {
                                         entries
