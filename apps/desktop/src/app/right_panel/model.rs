@@ -5,6 +5,7 @@ pub(crate) enum FileOperationDialogKind {
     CreateFile { parent: PathBuf },
     CreateDirectory { parent: PathBuf },
     Rename { source: PathBuf },
+    Delete { target: PathBuf },
 }
 
 pub(crate) struct FileOperationDialog {

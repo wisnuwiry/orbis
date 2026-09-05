@@ -33,23 +33,40 @@ impl Padu {
         let entries = self.right_panel_working_tree.clone();
         let focus = self.transcript_control_focus("right-panel-working-tree", cx);
 
+        let cursor_index = self
+            .right_panel_files_cursor
+            .filter(|&index| index < entries.len());
+
         let mut list = div()
             .id("right-panel-working-tree")
             .track_focus(&focus)
             .tab_index(0)
             .key_context("WorkingTree")
+            .size_full()
+            .overflow_y_scroll()
+            .track_scroll(&self.right_panel_files_scroll_handle)
+            .focus_visible(|style| style.border_1().border_color(theme.accent))
+            .on_mouse_down(
+                MouseButton::Left,
+                cx.listener(|this, _, window, cx| {
+                    let focus = this.transcript_control_focus("right-panel-working-tree", cx);
+                    window.focus(&focus, cx);
+                }),
+            )
+            .on_key_down(cx.listener(|this, event: &KeyDownEvent, window, cx| {
+                this.right_panel_working_tree_key_down(event, window, cx);
+            }))
             .flex()
             .flex_col()
             .py(px(6.0));
-        for entry in entries {
+        for (index, entry) in entries.into_iter().enumerate() {
             let relative_path = entry.relative_path.clone();
             let absolute_path = entry.absolute_path.clone();
             let is_dir = entry.is_dir;
             let selected = selected_path == Some(relative_path.as_str());
+            let is_cursor = cursor_index == Some(index);
             let row = div()
-                .id(SharedString::from(format!(
-                    "right-panel-file-{relative_path}"
-                )))
+                .id(index)
                 .h(px(30.0))
                 .mx(px(8.0))
                 .pl(px(8.0 + entry.depth as f32 * 16.0))
@@ -59,9 +76,14 @@ impl Padu {
                 .items_center()
                 .gap(px(6.0))
                 .cursor_pointer()
-                .when(selected, |element| element.bg(theme.overlay_strong))
+                .when(selected && is_cursor, |element| {
+                    element.bg(theme.overlay_strong)
+                })
+                .when(selected ^ is_cursor, |element| element.bg(theme.overlay))
+                .when(!selected && !is_cursor, |element| {
+                    element.hover(|element| element.bg(theme.overlay))
+                })
                 .when(entry.is_ignored, |element| element.opacity(0.55))
-                .hover(|element| element.bg(theme.overlay))
                 .child(if is_dir {
                     icon(
                         if entry.expanded {
@@ -76,8 +98,21 @@ impl Padu {
                 } else {
                     div().w(px(10.0)).h(px(10.0)).flex_none().into_any_element()
                 })
-                .when_some(entry.file_icon, |element, file_icon_path| {
-                    element.child(file_icon(file_icon_path, 14.0))
+                .child(if is_dir {
+                    icon(
+                        if entry.expanded {
+                            "icons/folder-open.svg"
+                        } else {
+                            "icons/folder.svg"
+                        },
+                        14.0,
+                        theme.text_tertiary,
+                    )
+                    .into_any_element()
+                } else if let Some(file_icon_path) = entry.file_icon {
+                    file_icon(file_icon_path, 14.0).into_any_element()
+                } else {
+                    div().w(px(14.0)).h(px(14.0)).flex_none().into_any_element()
                 })
                 .child(
                     div()
@@ -102,7 +137,10 @@ impl Padu {
 
             let weak = cx.entity().downgrade();
             let mut row = if is_dir {
-                row.on_click(cx.listener(move |this, _, _, cx| {
+                row.on_click(cx.listener(move |this, _, window, cx| {
+                    this.right_panel_files_cursor = Some(index);
+                    let focus = this.transcript_control_focus("right-panel-working-tree", cx);
+                    window.focus(&focus, cx);
                     if !this.right_panel_expanded_paths.remove(&absolute_path) {
                         this.right_panel_expanded_paths
                             .insert(absolute_path.clone());
@@ -111,7 +149,10 @@ impl Padu {
                     cx.notify();
                 }))
             } else {
-                row.on_click(cx.listener(move |this, _, _, cx| {
+                row.on_click(cx.listener(move |this, _, window, cx| {
+                    this.right_panel_files_cursor = Some(index);
+                    let focus = this.transcript_control_focus("right-panel-working-tree", cx);
+                    window.focus(&focus, cx);
                     this.open_right_panel_file(relative_path.clone(), cx);
                 }))
             };
@@ -166,16 +207,47 @@ impl Padu {
                         );
                     }
                     items.push(
-                        MenuItem::new(tr!("files.copy_path"), move |_, cx| {
-                            cx.write_to_clipboard(ClipboardItem::new_string(
-                                copy_path.to_string_lossy().into_owned(),
-                            ));
+                        MenuItem::new(tr!("files.copy_path"), {
+                            let copy_path = copy_path.clone();
+                            let copy_weak = weak.clone();
+                            move |_, cx| {
+                                let path_string = copy_path.to_string_lossy().into_owned();
+                                let file_name = copy_path
+                                    .file_name()
+                                    .and_then(|n| n.to_str())
+                                    .unwrap_or(&path_string)
+                                    .to_owned();
+                                cx.write_to_clipboard(ClipboardItem::new_string(path_string));
+                                let _ = copy_weak.update(cx, |this, _| {
+                                    this.show_success_toast(tr!(
+                                        "files.copied_path",
+                                        path = file_name
+                                    ));
+                                });
+                            }
                         })
                         .icon("icons/copy.svg"),
                     );
                     items.push(
-                        MenuItem::new(tr!("files.copy_relative_path"), move |_, cx| {
-                            cx.write_to_clipboard(ClipboardItem::new_string(copy_relative.clone()));
+                        MenuItem::new(tr!("files.copy_relative_path"), {
+                            let copy_relative = copy_relative.clone();
+                            let copy_weak = weak.clone();
+                            move |_, cx| {
+                                let file_name = Path::new(&copy_relative)
+                                    .file_name()
+                                    .and_then(|n| n.to_str())
+                                    .unwrap_or(&copy_relative)
+                                    .to_owned();
+                                cx.write_to_clipboard(ClipboardItem::new_string(
+                                    copy_relative.clone(),
+                                ));
+                                let _ = copy_weak.update(cx, |this, _| {
+                                    this.show_success_toast(tr!(
+                                        "files.copied_path",
+                                        path = file_name
+                                    ));
+                                });
+                            }
                         })
                         .icon("icons/copy.svg"),
                     );
@@ -195,13 +267,21 @@ impl Padu {
                         .icon("icons/pencil.svg"),
                     );
                     let target = menu_path.clone();
+                    items.push(MenuItem::Separator);
                     items.push(
-                        MenuItem::new(tr!("files.delete"), move |_, cx| {
+                        MenuItem::new(tr!("files.delete"), move |window, cx| {
                             let _ = delete_weak.update(cx, |this, cx| {
-                                this.delete_right_panel_path(target.clone(), cx)
+                                this.begin_file_operation_dialog(
+                                    FileOperationDialogKind::Delete {
+                                        target: target.clone(),
+                                    },
+                                    window,
+                                    cx,
+                                );
                             });
                         })
-                        .icon("icons/trash.svg"),
+                        .icon("icons/trash.svg")
+                        .destructive(true),
                     );
                     items
                 },
@@ -220,70 +300,100 @@ impl Padu {
                     .px(px(16.0))
                     .flex()
                     .items_center()
+                    .justify_between()
                     .gap(px(8.0))
                     .border_b_1()
                     .border_color(theme.border)
-                    .child(icon("icons/folder.svg", 13.0, theme.text_tertiary))
                     .child(
                         div()
+                            .flex_1()
                             .min_w_0()
-                            .truncate()
-                            .text_size(sp(12.5))
-                            .font_weight(FontWeight::MEDIUM)
-                            .text_color(theme.text_secondary)
-                            .child(project_name),
-                    )
-                    .child({
-                        let hidden = self.right_panel_show_hidden_files;
-                        let focus = self.transcript_control_focus("right-panel-hidden-files", cx);
-                        div()
-                            .id("right-panel-hidden-files")
-                            .track_focus(&focus)
-                            .tab_index(0)
-                            .size(px(26.0))
-                            .rounded(px(7.0))
-                            .flex_none()
                             .flex()
                             .items_center()
-                            .justify_center()
-                            .cursor_pointer()
-                            .focus_visible(|style| style.border_1().border_color(theme.accent))
-                            .hover(|style| style.bg(theme.overlay))
-                            .child(icon(
-                                if hidden {
-                                    "icons/eye.svg"
-                                } else {
-                                    "icons/eye-off.svg"
-                                },
-                                12.0,
-                                theme.text_tertiary,
-                            ))
-                            .tooltip(move |window, cx| {
-                                Tooltip::new(if hidden {
-                                    tr!("files.hide_hidden")
-                                } else {
-                                    tr!("files.show_hidden")
-                                })
-                                .build(window, cx)
-                            })
-                            .on_click(cx.listener(|this, _, _, cx| {
-                                this.toggle_right_panel_hidden_files(cx);
-                            }))
-                            .on_key_down(cx.listener(|this, event: &KeyDownEvent, _, cx| {
-                                if matches!(event.keystroke.key.as_str(), "enter" | "space") {
-                                    this.toggle_right_panel_hidden_files(cx);
-                                    cx.stop_propagation();
-                                }
-                            }))
-                    })
+                            .gap(px(8.0))
+                            .child(icon("icons/folder.svg", 13.0, theme.text_tertiary))
+                            .child(
+                                div()
+                                    .min_w_0()
+                                    .truncate()
+                                    .text_size(sp(12.5))
+                                    .font_weight(FontWeight::MEDIUM)
+                                    .text_color(theme.text_secondary)
+                                    .child(project_name),
+                            ),
+                    )
                     .child(
-                        icon_button("right-panel-refresh-files", "icons/rotate-cw.svg", theme)
-                            .tooltip(|window, cx| {
-                                Tooltip::new(tr!("files.refresh")).build(window, cx)
+                        div()
+                            .flex()
+                            .items_center()
+                            .gap(px(4.0))
+                            .flex_none()
+                            .child({
+                                let hidden = self.right_panel_show_hidden_files;
+                                let focus =
+                                    self.transcript_control_focus("right-panel-hidden-files", cx);
+                                div()
+                                    .id("right-panel-hidden-files")
+                                    .track_focus(&focus)
+                                    .tab_index(0)
+                                    .size(px(26.0))
+                                    .rounded(px(7.0))
+                                    .flex_none()
+                                    .flex()
+                                    .items_center()
+                                    .justify_center()
+                                    .cursor_pointer()
+                                    .focus_visible(|style| {
+                                        style.border_1().border_color(theme.accent)
+                                    })
+                                    .hover(|style| style.bg(theme.overlay))
+                                    .child(icon(
+                                        if hidden {
+                                            "icons/eye.svg"
+                                        } else {
+                                            "icons/eye-off.svg"
+                                        },
+                                        12.0,
+                                        theme.text_tertiary,
+                                    ))
+                                    .tooltip(move |window, cx| {
+                                        Tooltip::new(if hidden {
+                                            tr!("files.hide_hidden")
+                                        } else {
+                                            tr!("files.show_hidden")
+                                        })
+                                        .build(window, cx)
+                                    })
+                                    .on_click(cx.listener(|this, _, _, cx| {
+                                        this.toggle_right_panel_hidden_files(cx);
+                                    }))
+                                    .on_key_down(cx.listener(
+                                        |this, event: &KeyDownEvent, _, cx| {
+                                            if matches!(
+                                                event.keystroke.key.as_str(),
+                                                "enter" | "space"
+                                            ) {
+                                                this.toggle_right_panel_hidden_files(cx);
+                                                cx.stop_propagation();
+                                            }
+                                        },
+                                    ))
                             })
-                            .on_click(cx.listener(|this, _, _, cx| {
-                                this.refresh_right_panel_working_tree(cx);
-                            })),
+                            .child(
+                                icon_button(
+                                    "right-panel-refresh-files",
+                                    "icons/rotate-cw.svg",
+                                    theme,
+                                )
+                                .tooltip(|window, cx| {
+                                    Tooltip::new(tr!("files.refresh")).build(window, cx)
+                                })
+                                .on_click(cx.listener(
+                                    |this, _, _, cx| {
+                                        this.refresh_right_panel_working_tree(cx);
+                                    },
+                                )),
+                            ),
                     ),
             )
             .child(
@@ -291,19 +401,133 @@ impl Padu {
                     .flex_1()
                     .min_h_0()
                     .relative()
-                    .child(
-                        div()
-                            .id("right-panel-files-scroll")
-                            .size_full()
-                            .overflow_y_scroll()
-                            .track_scroll(&self.right_panel_files_scroll_handle)
-                            .child(list),
-                    )
+                    .child(list)
                     .child(scrollbar::vertical(
                         &self.right_panel_files_scroll_handle,
                         &self.right_panel_files_scrollbar,
                     )),
             )
+    }
+
+    pub(crate) fn right_panel_working_tree_key_down(
+        &mut self,
+        event: &KeyDownEvent,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        let entries = self.right_panel_working_tree.clone();
+        if entries.is_empty() {
+            return;
+        }
+        let current = self
+            .right_panel_files_cursor
+            .filter(|&index| index < entries.len())
+            .unwrap_or(0);
+        let key = event.keystroke.key.as_str();
+        match key {
+            "up" => {
+                let target = current.saturating_sub(1);
+                self.right_panel_files_cursor = Some(target);
+                self.right_panel_files_scroll_handle.scroll_to_item(target);
+                cx.notify();
+                cx.stop_propagation();
+            }
+            "down" => {
+                let target = (current + 1).min(entries.len() - 1);
+                self.right_panel_files_cursor = Some(target);
+                self.right_panel_files_scroll_handle.scroll_to_item(target);
+                cx.notify();
+                cx.stop_propagation();
+            }
+            "home" => {
+                self.right_panel_files_cursor = Some(0);
+                self.right_panel_files_scroll_handle.scroll_to_item(0);
+                cx.notify();
+                cx.stop_propagation();
+            }
+            "end" => {
+                let target = entries.len() - 1;
+                self.right_panel_files_cursor = Some(target);
+                self.right_panel_files_scroll_handle.scroll_to_item(target);
+                cx.notify();
+                cx.stop_propagation();
+            }
+            "left" => {
+                let entry = &entries[current];
+                if entry.is_dir && entry.expanded {
+                    self.right_panel_expanded_paths.remove(&entry.absolute_path);
+                    self.refresh_right_panel_working_tree(cx);
+                    cx.notify();
+                } else if entry.depth > 0 {
+                    if let Some(parent_idx) = entries[..current]
+                        .iter()
+                        .rposition(|candidate| candidate.is_dir && candidate.depth < entry.depth)
+                    {
+                        self.right_panel_files_cursor = Some(parent_idx);
+                        self.right_panel_files_scroll_handle
+                            .scroll_to_item(parent_idx);
+                        cx.notify();
+                    }
+                }
+                cx.stop_propagation();
+            }
+            "right" => {
+                let entry = &entries[current];
+                if entry.is_dir {
+                    if !entry.expanded {
+                        self.right_panel_expanded_paths
+                            .insert(entry.absolute_path.clone());
+                        self.refresh_right_panel_working_tree(cx);
+                        cx.notify();
+                    } else if current + 1 < entries.len()
+                        && entries[current + 1].depth > entry.depth
+                    {
+                        let target = current + 1;
+                        self.right_panel_files_cursor = Some(target);
+                        self.right_panel_files_scroll_handle.scroll_to_item(target);
+                        cx.notify();
+                    }
+                }
+                cx.stop_propagation();
+            }
+            "enter" | "space" => {
+                let entry = &entries[current];
+                if entry.is_dir {
+                    if !self.right_panel_expanded_paths.remove(&entry.absolute_path) {
+                        self.right_panel_expanded_paths
+                            .insert(entry.absolute_path.clone());
+                    }
+                    self.refresh_right_panel_working_tree(cx);
+                    cx.notify();
+                } else {
+                    self.open_right_panel_file(entry.relative_path.clone(), cx);
+                }
+                cx.stop_propagation();
+            }
+            "f2" => {
+                let entry = &entries[current];
+                self.begin_file_operation_dialog(
+                    FileOperationDialogKind::Rename {
+                        source: entry.absolute_path.clone(),
+                    },
+                    window,
+                    cx,
+                );
+                cx.stop_propagation();
+            }
+            "delete" | "backspace" => {
+                let entry = &entries[current];
+                self.begin_file_operation_dialog(
+                    FileOperationDialogKind::Delete {
+                        target: entry.absolute_path.clone(),
+                    },
+                    window,
+                    cx,
+                );
+                cx.stop_propagation();
+            }
+            _ => {}
+        }
     }
 
     pub(crate) fn render_right_panel_file(
@@ -365,8 +589,13 @@ impl Padu {
                 }))
         });
 
+        let segments: Vec<&str> = relative_path.split('/').collect();
+        let file_name = segments.last().copied().unwrap_or(&relative_path);
+        let dir_segments = &segments[..segments.len().saturating_sub(1)];
+
         let copy_focus = self.transcript_control_focus("right-panel-copy-path", cx);
         let copy_path = relative_path.clone();
+        let copy_display_name = file_name.to_owned();
         let copy_button = div()
             .id("right-panel-copy-path")
             .track_focus(&copy_focus)
@@ -382,24 +611,30 @@ impl Padu {
             .hover(|style| style.bg(theme.overlay))
             .child(icon("icons/copy.svg", 12.0, theme.text_tertiary))
             .tooltip(|window, cx| Tooltip::new(tr!("files.copy_path")).build(window, cx))
-            .on_click(cx.listener(move |this, _, _, cx| {
-                cx.write_to_clipboard(ClipboardItem::new_string(copy_path.clone()));
-                this.show_toast(tr!("files.copied_path", path = copy_path.clone()));
+            .on_click(cx.listener({
+                let copy_display_name = copy_display_name.clone();
+                move |this, _, _, cx| {
+                    cx.write_to_clipboard(ClipboardItem::new_string(copy_path.clone()));
+                    this.show_success_toast(tr!(
+                        "files.copied_path",
+                        path = copy_display_name.clone()
+                    ));
+                }
             }))
             .on_key_down(cx.listener({
                 let copy_path = relative_path.clone();
+                let copy_display_name = copy_display_name.clone();
                 move |this, event: &KeyDownEvent, _, cx| {
                     if matches!(event.keystroke.key.as_str(), "enter" | "space") {
                         cx.write_to_clipboard(ClipboardItem::new_string(copy_path.clone()));
-                        this.show_toast(tr!("files.copied_path", path = copy_path.clone()));
+                        this.show_success_toast(tr!(
+                            "files.copied_path",
+                            path = copy_display_name.clone()
+                        ));
                         cx.stop_propagation();
                     }
                 }
             }));
-
-        let segments: Vec<&str> = relative_path.split('/').collect();
-        let file_name = segments.last().copied().unwrap_or(&relative_path);
-        let dir_segments = &segments[..segments.len().saturating_sub(1)];
 
         let breadcrumb_trail = div()
             .min_w_0()
@@ -1042,8 +1277,12 @@ impl Padu {
         if !initial.is_empty() {
             input.update(cx, |input, cx| input.set_content(initial, cx));
         }
-        let focus = input.read(cx).focus();
-        let focus_target = focus.clone();
+        let focus = cx.focus_handle();
+        let focus_target = if matches!(kind, FileOperationDialogKind::Delete { .. }) {
+            focus.clone()
+        } else {
+            input.read(cx).focus()
+        };
         let previous_focus = window.focused(cx);
         self.right_panel_file_operation_dialog = Some(FileOperationDialog {
             kind,
@@ -1077,13 +1316,19 @@ impl Padu {
         let Some(dialog) = self.right_panel_file_operation_dialog.take() else {
             return;
         };
-        let name = dialog.input.read(cx).content().trim().to_owned();
-        if name.is_empty() || Path::new(&name).components().count() != 1 {
-            self.show_toast(tr!("files.invalid_name"));
-            self.right_panel_file_operation_dialog = Some(dialog);
-            cx.notify();
-            return;
-        }
+        let is_delete = matches!(dialog.kind, FileOperationDialogKind::Delete { .. });
+        let name = if is_delete {
+            String::new()
+        } else {
+            let name = dialog.input.read(cx).content().trim().to_owned();
+            if name.is_empty() || Path::new(&name).components().count() != 1 {
+                self.show_toast(tr!("files.invalid_name"));
+                self.right_panel_file_operation_dialog = Some(dialog);
+                cx.notify();
+                return;
+            }
+            name
+        };
         let Some(root) = self.selected_workspace_path().map(Path::to_path_buf) else {
             return;
         };
@@ -1113,10 +1358,30 @@ impl Padu {
                 let Some(parent) = source_relative.parent() else {
                     return;
                 };
+                let new_relative = parent.join(&name);
+                if let Some(selected) = self.right_panel_files_selected_path.as_ref() {
+                    if selected == &source_relative.to_string_lossy() {
+                        self.right_panel_files_selected_path =
+                            Some(new_relative.to_string_lossy().into_owned());
+                    }
+                }
                 padu_client::WorkspaceOperation::RenamePath {
                     root: root.clone(),
                     from: source_relative.to_path_buf(),
-                    to: parent.join(&name),
+                    to: new_relative,
+                }
+            }
+            FileOperationDialogKind::Delete { target } => {
+                let Ok(relative_path) = target.strip_prefix(&root) else {
+                    return;
+                };
+                let rel_str = relative_path.to_string_lossy().into_owned();
+                if self.right_panel_files_selected_path.as_deref() == Some(&rel_str) {
+                    self.right_panel_files_selected_path = None;
+                }
+                padu_client::WorkspaceOperation::DeletePath {
+                    root: root.clone(),
+                    relative_path: relative_path.to_path_buf(),
                 }
             }
         };
@@ -1144,36 +1409,6 @@ impl Padu {
         cx.notify();
     }
 
-    pub(crate) fn delete_right_panel_path(&mut self, path: PathBuf, cx: &mut Context<Self>) {
-        let Some(root) = self.selected_workspace_path().map(Path::to_path_buf) else {
-            return;
-        };
-        let Ok(relative_path) = path.strip_prefix(&root) else {
-            return;
-        };
-        let workspace = padu_client::WorkspaceClient::new(self.daemon.client());
-        let operation = padu_client::WorkspaceOperation::DeletePath {
-            root: root.clone(),
-            relative_path: relative_path.to_path_buf(),
-        };
-        cx.spawn(async move |padu, cx| {
-            let result = cx
-                .background_executor()
-                .spawn(async move { workspace.request(operation) })
-                .await;
-            let _ = padu.update(cx, |padu, cx| {
-                match result {
-                    Ok(padu_client::WorkspaceResult::Ack) => {
-                        padu.refresh_right_panel_working_tree(cx)
-                    }
-                    _ => padu.show_toast(tr!("files.operation_failed")),
-                }
-                cx.notify();
-            });
-        })
-        .detach();
-    }
-
     pub(crate) fn render_file_operation_dialog(
         &mut self,
         _window: &mut Window,
@@ -1181,61 +1416,175 @@ impl Padu {
     ) -> Option<AnyElement> {
         let dialog = self.right_panel_file_operation_dialog.as_ref()?;
         let theme = Theme::current(cx);
+        let is_delete = matches!(dialog.kind, FileOperationDialogKind::Delete { .. });
         let title = match dialog.kind {
             FileOperationDialogKind::CreateFile { .. } => tr!("files.new_file"),
             FileOperationDialogKind::CreateDirectory { .. } => tr!("files.new_folder"),
             FileOperationDialogKind::Rename { .. } => tr!("common.rename"),
+            FileOperationDialogKind::Delete { .. } => tr!("files.delete"),
+        };
+        let confirm_label = match dialog.kind {
+            FileOperationDialogKind::Rename { .. } => tr!("common.rename"),
+            FileOperationDialogKind::Delete { .. } => tr!("files.delete"),
+            _ => tr!("files.confirm"),
         };
         let cancel = div()
             .id("file-operation-cancel")
-            .track_focus(&dialog.focus)
             .tab_index(0)
+            .h(px(30.0))
             .px(px(12.0))
-            .py(px(7.0))
+            .gap(px(6.0))
             .rounded(px(7.0))
+            .border_1()
+            .border_color(theme.border_strong)
             .cursor_pointer()
+            .text_size(sp(12.5))
             .text_color(theme.text_secondary)
+            .focus_visible(|style| style.border_1().border_color(theme.accent))
+            .hover(|e| e.bg(theme.overlay))
+            .flex()
+            .items_center()
+            .justify_center()
             .child(tr!("common.cancel"))
+            .child(kbd_badge("Esc", &theme))
             .on_click(
                 cx.listener(|this, _, window, cx| this.close_file_operation_dialog(window, cx)),
             );
-        let confirm = div()
+        let (confirm_bg, confirm_text, badge_border) = if is_delete {
+            (theme.danger, gpui::white(), gpui::hsla(0.0, 0.0, 1.0, 0.25))
+        } else {
+            (
+                theme.inverse,
+                theme.on_inverse,
+                gpui::hsla(0.0, 0.0, 1.0, 0.2),
+            )
+        };
+        let mut confirm = div()
             .id("file-operation-confirm")
             .tab_index(0)
-            .px(px(12.0))
-            .py(px(7.0))
+            .h(px(30.0))
+            .px(px(14.0))
+            .gap(px(6.0))
             .rounded(px(7.0))
+            .bg(confirm_bg)
             .cursor_pointer()
-            .bg(theme.inverse)
-            .text_color(theme.on_inverse)
-            .child(tr!("files.confirm"))
+            .text_size(sp(12.5))
+            .font_weight(FontWeight::MEDIUM)
+            .text_color(confirm_text)
+            .focus_visible(|style| style.border_1().border_color(theme.accent))
+            .hover(|e| e.opacity(0.9))
+            .flex()
+            .items_center()
+            .justify_center()
+            .child(confirm_label)
+            .child(kbd_badge_icon(
+                "icons/corner-down-left.svg",
+                confirm_bg,
+                confirm_text,
+                badge_border,
+            ))
             .on_click(
                 cx.listener(|this, _, window, cx| this.submit_file_operation_dialog(window, cx)),
             );
+        if is_delete {
+            confirm = confirm.track_focus(&dialog.focus);
+        }
+        let body = if is_delete {
+            let target_name = match &dialog.kind {
+                FileOperationDialogKind::Delete { target } => target
+                    .file_name()
+                    .and_then(|n| n.to_str())
+                    .unwrap_or_default()
+                    .to_owned(),
+                _ => String::new(),
+            };
+            div()
+                .text_size(sp(13.5))
+                .line_height(sp(20.0))
+                .text_color(theme.text_secondary)
+                .child(tr!("files.delete_confirm", name = target_name))
+        } else {
+            div()
+                .flex()
+                .flex_col()
+                .gap(px(6.0))
+                .child(
+                    div()
+                        .text_size(sp(12.5))
+                        .font_weight(FontWeight::MEDIUM)
+                        .text_color(theme.text_secondary)
+                        .child(tr!("files.name_placeholder")),
+                )
+                .child(
+                    div()
+                        .h(px(32.0))
+                        .px(px(10.0))
+                        .rounded(px(7.0))
+                        .border_1()
+                        .border_color(theme.border)
+                        .bg(theme.surface)
+                        .flex()
+                        .items_center()
+                        .child(dialog.input.clone()),
+                )
+        };
         let card = div()
             .id("file-operation-dialog")
-            .w(px(380.0))
-            .p(px(18.0))
-            .gap(px(12.0))
+            .w(px(420.0))
+            .p(px(20.0))
+            .gap(px(16.0))
             .flex()
             .flex_col()
             .rounded(px(14.0))
-            .bg(theme.surface)
+            .bg(theme.raised)
             .border_1()
-            .border_color(theme.border)
+            .border_color(theme.border_strong)
             .shadow_lg()
             .on_mouse_down(MouseButton::Left, |_, _, cx| cx.stop_propagation())
             .child(
                 div()
-                    .text_size(sp(15.0))
-                    .font_weight(FontWeight::SEMIBOLD)
-                    .text_color(theme.text)
-                    .child(title),
+                    .flex()
+                    .items_center()
+                    .justify_between()
+                    .child(
+                        div()
+                            .flex()
+                            .items_center()
+                            .gap(px(8.0))
+                            .when(is_delete, |header| {
+                                header.child(icon("icons/trash.svg", 15.0, theme.danger))
+                            })
+                            .child(
+                                div()
+                                    .text_size(sp(15.0))
+                                    .font_weight(FontWeight::SEMIBOLD)
+                                    .text_color(theme.text)
+                                    .child(title),
+                            ),
+                    )
+                    .child(
+                        div()
+                            .id("close-file-operation-dialog")
+                            .tab_index(0)
+                            .size(px(24.0))
+                            .rounded(px(6.0))
+                            .flex()
+                            .items_center()
+                            .justify_center()
+                            .cursor_pointer()
+                            .hover(|e| e.bg(theme.overlay))
+                            .child(icon("icons/x.svg", 12.0, theme.text_tertiary))
+                            .on_click(cx.listener(|this, _, window, cx| {
+                                this.close_file_operation_dialog(window, cx);
+                            })),
+                    ),
             )
-            .child(dialog.input.clone())
+            .child(body)
             .child(
                 div()
+                    .pt(px(4.0))
                     .flex()
+                    .items_center()
                     .justify_end()
                     .gap(px(8.0))
                     .child(cancel)
@@ -1243,21 +1592,38 @@ impl Padu {
             )
             .on_key_down(cx.listener(|this, event: &KeyDownEvent, window, cx| {
                 match event.keystroke.key.as_str() {
-                    "enter" => this.submit_file_operation_dialog(window, cx),
-                    "escape" => this.close_file_operation_dialog(window, cx),
+                    "enter" => {
+                        this.submit_file_operation_dialog(window, cx);
+                        cx.stop_propagation();
+                    }
+                    "escape" => {
+                        this.close_file_operation_dialog(window, cx);
+                        cx.stop_propagation();
+                    }
                     _ => {}
                 }
             }));
+        let scrim = if theme.is_dark {
+            gpui::hsla(0.0, 0.0, 0.0, 0.45)
+        } else {
+            gpui::hsla(0.0, 0.0, 0.0, 0.25)
+        };
         Some(
             div()
                 .id("file-operation-layer")
                 .absolute()
                 .inset_0()
                 .occlude()
-                .bg(gpui::hsla(0.0, 0.0, 0.0, 0.2))
+                .bg(scrim)
                 .flex()
                 .items_center()
                 .justify_center()
+                .on_mouse_down(
+                    MouseButton::Left,
+                    cx.listener(|this, _, window, cx| {
+                        this.close_file_operation_dialog(window, cx);
+                    }),
+                )
                 .child(card)
                 .into_any_element(),
         )

@@ -1027,6 +1027,13 @@ impl Padu {
                     return;
                 }
 
+                if let Some(pos) = self
+                    .right_panel_working_tree
+                    .iter()
+                    .position(|e| e.relative_path == relative_path)
+                {
+                    self.right_panel_files_cursor = Some(pos);
+                }
                 self.right_panel_files_selected_path = Some(relative_path);
                 self.set_right_panel_visible(true, cx);
                 cx.notify();

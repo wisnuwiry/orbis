@@ -50,7 +50,7 @@ pub(super) fn working_wave_dots(color: Hsla) -> AnyElement {
     .into_any_element()
 }
 
-pub(super) fn kbd_badge_styled(
+pub(crate) fn kbd_badge_styled(
     label: impl Into<SharedString>,
     bg: Hsla,
     text_color: Hsla,
@@ -75,7 +75,7 @@ pub(super) fn kbd_badge_styled(
         .into_any_element()
 }
 
-pub(super) fn kbd_badge(label: impl Into<SharedString>, theme: &Theme) -> AnyElement {
+pub(crate) fn kbd_badge(label: impl Into<SharedString>, theme: &Theme) -> AnyElement {
     kbd_badge_styled(
         label,
         theme.overlay_strong,
@@ -84,7 +84,7 @@ pub(super) fn kbd_badge(label: impl Into<SharedString>, theme: &Theme) -> AnyEle
     )
 }
 
-pub(super) fn kbd_badge_icon(
+pub(crate) fn kbd_badge_icon(
     icon_path: &'static str,
     bg: Hsla,
     icon_color: Hsla,

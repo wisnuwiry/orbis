@@ -1395,6 +1395,7 @@ pub struct Padu {
     right_panel_show_hidden_files: bool,
     right_panel_file_operation_dialog: Option<right_panel::FileOperationDialog>,
     right_panel_files_selected_path: Option<String>,
+    pub(crate) right_panel_files_cursor: Option<usize>,
     right_panel_file_tree_width: f32,
     right_panel_file_editors: HashMap<String, RightPanelFileEditor>,
     /// Find-and-replace over the visible file editor. Created on first use of
@@ -1959,11 +1960,11 @@ impl Padu {
         cx.notify();
     }
 
-    pub(super) fn show_toast(&mut self, message: impl Into<String>) {
+    pub(crate) fn show_toast(&mut self, message: impl Into<String>) {
         self.show_toast_with_tone(message, ToastTone::Alert);
     }
 
-    pub(super) fn show_success_toast(&mut self, message: impl Into<String>) {
+    pub(crate) fn show_success_toast(&mut self, message: impl Into<String>) {
         self.show_toast_with_tone(message, ToastTone::Success);
     }
 
@@ -3102,6 +3103,7 @@ impl Padu {
                 right_panel_show_hidden_files: false,
                 right_panel_file_operation_dialog: None,
                 right_panel_files_selected_path: None,
+                right_panel_files_cursor: None,
                 right_panel_file_tree_width: DEFAULT_FILE_TREE_WIDTH,
                 right_panel_file_editors: HashMap::new(),
                 file_search: None,
