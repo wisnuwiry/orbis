@@ -2,17 +2,8 @@ name: Deploy Web to Cloudflare
 
 on:
   push:
-    branches: [main]
-    paths:
-      - "apps/web/**"
-      - "packages/**"
-      - "crates/padu-protocol/**"
-      - "themes.json"
-      - "scripts/generate-themes.ts"
-      - "bun.lock"
-      - "package.json"
-      - "tsconfig.json"
-      - ".github/workflows/deploy-web.yml"
+    tags:
+      - "v*"
   workflow_dispatch:
 
 permissions:
