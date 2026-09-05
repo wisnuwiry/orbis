@@ -198,7 +198,9 @@ daemon.port_description: 公開中は、すべてのネットワークインタ�
 daemon.port_placeholder: "34123"
 daemon.allowed_origins: 許可するブラウザオリジン
 daemon.allowed_origins_description: WebSocket を開ける正確な http:// または https:// オリジンです。
-daemon.allowed_origins_placeholder: https://padu.example.com, http://localhost:3001
+daemon.allowed_origins_placeholder: https://app.padu.dev
+daemon.add_origin: オリジンを追加
+daemon.remove_origin: オリジンを削除
 daemon.apply: 適用
 daemon.restarting: 再起動中…
 daemon.credentials_title: デーモンアクセス認証情報

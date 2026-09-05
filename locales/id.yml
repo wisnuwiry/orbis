@@ -193,7 +193,9 @@ daemon.port_description: Padu mendengarkan pada semua antarmuka jaringan di port
 daemon.port_placeholder: 34123
 daemon.allowed_origins: Origin browser yang diizinkan
 daemon.allowed_origins_description: "Origin http:// atau https:// persis yang diizinkan untuk membuka WebSocket."
-daemon.allowed_origins_placeholder: "https://padu.example.com, http://localhost:3001"
+daemon.allowed_origins_placeholder: "https://app.padu.dev"
+daemon.add_origin: Tambah origin
+daemon.remove_origin: Hapus origin
 daemon.apply: Terapkan
 daemon.restarting: Memulai ulang…
 daemon.credentials_title: Kredensial Akses Daemon

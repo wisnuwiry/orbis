@@ -1074,7 +1074,7 @@ pub struct Padu {
     settings_search: Entity<TextInput>,
     keybindings_search: Entity<TextInput>,
     daemon_port_input: Entity<TextInput>,
-    daemon_origins_input: Entity<TextInput>,
+    daemon_origin_inputs: Vec<Entity<TextInput>>,
     daemon_reconfigure_pending: bool,
     daemon_token_revealed: bool,
     settings_focus: FocusHandle,
@@ -2158,7 +2158,6 @@ impl Padu {
                 .placeholder(tr!("keybindings.search"))
         });
         let daemon_port = state.daemon_exposure.port.to_string();
-        let daemon_origins = state.daemon_exposure.allowed_origins_text();
         let daemon_port_input = cx.new(|cx| {
             let mut input = TextInput::new(window, cx)
                 .select_all_on_focus_click()
@@ -2166,13 +2165,21 @@ impl Padu {
             input.set_content(daemon_port, cx);
             input
         });
-        let daemon_origins_input = cx.new(|cx| {
-            let mut input = TextInput::new(window, cx)
-                .select_all_on_focus_click()
-                .placeholder(tr!("daemon.allowed_origins_placeholder"));
-            input.set_content(daemon_origins, cx);
-            input
-        });
+        let daemon_origin_inputs: Vec<Entity<TextInput>> = state
+            .daemon_exposure
+            .allowed_origins
+            .iter()
+            .map(|origin| {
+                let origin = origin.clone();
+                cx.new(|cx| {
+                    let mut input = TextInput::new(window, cx)
+                        .select_all_on_focus_click()
+                        .placeholder(tr!("daemon.allowed_origins_placeholder"));
+                    input.set_content(origin, cx);
+                    input
+                })
+            })
+            .collect();
         let skills_search = cx.new(|cx| {
             TextInput::new(window, cx)
                 .clear_on_escape()
@@ -2721,7 +2728,16 @@ impl Padu {
                 },
             )
             .detach();
-            for input in [&daemon_port_input, &daemon_origins_input] {
+            cx.subscribe(
+                &daemon_port_input,
+                |this: &mut Self, _, event: &InputEvent, cx| match event {
+                    InputEvent::Submit(_) => this.apply_daemon_exposure_fields(cx),
+                    InputEvent::Edited => cx.notify(),
+                    _ => {}
+                },
+            )
+            .detach();
+            for input in &daemon_origin_inputs {
                 cx.subscribe(
                     input,
                     |this: &mut Self, _, event: &InputEvent, cx| match event {
@@ -2909,7 +2925,7 @@ impl Padu {
                 settings_search,
                 keybindings_search,
                 daemon_port_input,
-                daemon_origins_input,
+                daemon_origin_inputs,
                 daemon_reconfigure_pending: false,
                 daemon_token_revealed: false,
                 settings_focus,

@@ -393,7 +393,11 @@ daemon.allowed_origins:
 daemon.allowed_origins_description:
   en: Exact http:// or https:// origins allowed to open the WebSocket.
 daemon.allowed_origins_placeholder:
-  en: https://padu.example.com, http://localhost:3001
+  en: https://app.padu.dev
+daemon.add_origin:
+  en: Add origin
+daemon.remove_origin:
+  en: Remove origin
 daemon.apply:
   en: Apply
 daemon.restarting:
